@@ -1,6 +1,12 @@
 var app = angular.module("app", [
 	'macgyver',
+	'ngSanitize',
 ]);
+
+app.config(function($sanitizeProvider) {
+	// Example of how to allow style tags in mgHtml
+	$sanitizeProvider.addValidAttrs(['style']);
+})
 
 app.controller("macgyverExampleCtrl", function($http, $macgyver, $scope) {
 	$scope.data = {};

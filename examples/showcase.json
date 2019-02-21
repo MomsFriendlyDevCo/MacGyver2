@@ -230,7 +230,7 @@
 											"id": "row2Quz",
 											"title": "Quz",
 											"type": "mgHtml",
-											"text": "H<strong>T</strong><em>M</em><u>L</u>",
+											"text": "H<strong class=\"text-danger\">T</strong><em style=\"color: red\">M</em><u>L</u>",
 											"showTitle": false
 										}
 									]
@@ -437,7 +437,7 @@
 					"id": "demoHtml",
 					"type": "mgHtml",
 					"title": "HTML",
-					"text": "Hello <strong>World</strong>"
+					"text": "<span class=\"text-warning\">Hello</span> <strong style=\"color: red\">World</strong>"
 				},
 				{
 					"id": "demoPlaceholder",
