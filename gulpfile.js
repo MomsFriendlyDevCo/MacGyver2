@@ -14,15 +14,16 @@ var rimraf = require('rimraf');
 var uglify = require('gulp-uglify');
 var vm = require('vm');
 var watch = require('gulp-watch');
+gulp.registry(require('undertaker-forward-reference')());
 
-gulp.task('default', ['serve']);
-gulp.task('build', ['js', 'css', 'spec']);
+gulp.task('default', gulp.series('serve'));
+gulp.task('build', gulp.parallel('js', 'css', 'spec'));
 
 
 /**
 * Create a Nodemon monitored server and serve the demo project
 */
-gulp.task('serve', ['build'], function() {
+gulp.task('serve', gulp.series('build', ()=> {
 	var monitor = nodemon({
 		script: './demo/server.js',
 		ext: 'js css',
@@ -44,7 +45,7 @@ gulp.task('serve', ['build'], function() {
 		console.log('Rebuild client-side CSS files...');
 		gulp.start('css');
 	});
-});
+}));
 
 
 /**
@@ -136,7 +137,7 @@ gulp.task('spec', ()=> {
 /**
 * Compile the gh-pages branch in GitHub
 */
-gulp.task('gh-pages', ['build'], function() {
+gulp.task('gh-pages', gulp.series('build', ()=> {
 	rimraf.sync('./gh-pages');
 
 	return gulp.src([
@@ -183,4 +184,4 @@ gulp.task('gh-pages', ['build'], function() {
 			cacheDir: 'gh-pages',
 			push: true, // Change to false for dryrun (files dumped to cacheDir)
 		}))
-});
+}));

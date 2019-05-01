@@ -22,39 +22,40 @@
   "homepage": "https://github.com/MomsFriendlyDevCo/macgyver#readme",
   "dependencies": {
     "@momsfriendlydevco/angular-ui-scribble": "0.0.2",
-    "angular": "^1.7.5",
-    "angular-sanitize": "^1.7.5",
-    "bootstrap": "^3.4.1",
-    "dragular": "^4.5.0",
-    "filesize": "^3.6.1",
+    "angular": "^1.7.8",
+    "angular-sanitize": "^1.7.8",
+    "bootstrap": "^4.3.1",
+    "dragular": "^4.6.0",
+    "filesize": "^4.1.2",
     "font-awesome": "^4.7.0",
-    "jquery": "^3.3.1",
+    "jquery": "^3.4.0",
     "lodash": "^4.17.11",
     "tree-tools": "^1.4.3",
     "ui-select": "^0.19.8"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
-    "babel-plugin-angularjs-annotate": "^0.9.0",
+    "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "babel-plugin-angularjs-annotate": "^0.10.0",
     "express": "^4.16.4",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.1",
     "gulp-babel": "^8.0.0",
-    "gulp-clean-css": "^3.10.0",
+    "gulp-clean-css": "^4.2.0",
     "gulp-concat": "^2.6.1",
     "gulp-gh-pages": "^0.5.4",
-    "gulp-nodemon": "^2.2.1",
-    "gulp-plumber": "^1.2.0",
-    "gulp-preprocess": "^3.0.1",
+    "gulp-nodemon": "^2.4.2",
+    "gulp-plumber": "^1.2.1",
+    "gulp-preprocess": "^3.0.2",
     "gulp-rename": "^1.4.0",
     "gulp-replace": "^1.0.0",
-    "gulp-uglify": "^3.0.1",
+    "gulp-uglify": "^3.0.2",
     "gulp-util": "^3.0.8",
     "gulp-watch": "^5.0.1",
-    "popper.js": "^1.14.7",
-    "rimraf": "^2.6.2"
+    "popper.js": "^1.15.0",
+    "rimraf": "^2.6.3",
+    "undertaker-forward-reference": "^1.0.2"
   },
   "optionalDependencies": {
-    "@momsfriendlydevco/angular-bs-tooltip": "^1.2.6"
+    "@momsfriendlydevco/angular-bs-tooltip": "^1.3.0"
   }
 }
