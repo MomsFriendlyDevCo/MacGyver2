@@ -1,7 +1,0 @@
-@media print {
-	/* Toggle selection needs to be more visible in monochrome prints */
-	mg-toggle .btn.btn-default {
-		background: #398439 !important;
-		color: #fff !important;
-	}
-}
