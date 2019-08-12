@@ -382,6 +382,11 @@
 					"urlQuery": "examples/images/index.json",
 					"urlDelete": "/api/debug/403",
 					"urlUpload": "/api/debug/403"
+				},
+				{
+					"id": "demoCodeEditor",
+					"type": "mgCodeEditor",
+					"title": "Code Editor"
 				}
 			]
 		},
