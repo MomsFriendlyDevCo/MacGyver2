@@ -3,7 +3,8 @@ import VueRouter from 'vue-router';
 
 import componentDemoForm from './form';
 
-import serviceHttp from './services/http';
+import './services/setPath';
+import './services/http';
 
 $(()=> {
 	window.app = {};
