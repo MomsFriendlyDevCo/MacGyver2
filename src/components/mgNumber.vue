@@ -15,12 +15,12 @@ macgyver.register('mgNumber', {
 			{id: 'slider', title: 'Slider bar'},
 			{id: 'input', title: 'Number input box only'},
 		]},
-		bumperDownClass: {type: 'mgText', default: 'btn btn-default fa fa-arrow-down input-group-addon', advanced: true},
-		bumperUpClass: {type: 'mgText', default: 'btn btn-default fa fa-arrow-up input-group-addon', advanced: true},
+		bumperDownClass: {type: 'mgText', default: 'btn btn-light fa fa-arrow-down input-group-prepend', advanced: true},
+		bumperUpClass: {type: 'mgText', default: 'btn btn-light fa fa-arrow-up input-group-append', advanced: true},
 		prefix: {type: 'mgText', title: 'Prefix', help: 'Prefix to show before the input (input interface only)'},
-		prefixClass: {type: 'mgText', default: 'input-group-addon', advanced: true},
+		prefixClass: {type: 'mgText', default: 'input-group-prepend input-group-text', advanced: true},
 		suffix: {type: 'mgText', title: 'Suffix', help: 'Suffix to show after the input (input interface only)'},
-		suffixClass: {type: 'mgText', default: 'input-group-addon', advanced: true},
+		suffixClass: {type: 'mgText', default: 'input-group-append input-group-text', advanced: true},
 	},
 	format: v => {
 		if (!v) return '';
