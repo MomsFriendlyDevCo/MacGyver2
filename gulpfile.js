@@ -56,6 +56,7 @@ gulp.task('build:macgyver', ()=>
 	rollup.rollup({
 		input: './src/macgyver.js',
 		cache: cache.macgyver || false,
+		inlineDynamicImports: true,
 		external: [ // Don't include these in the Bundle as they are included elsewhere
 			'jquery',
 			'vue',

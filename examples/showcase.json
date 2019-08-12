@@ -1,6 +1,7 @@
 {
 	"id": "containerMain",
 	"type": "mgContainer",
+	"showTitles": false,
 	"items": [
 		{
 			"id": "containerInputs",
@@ -290,29 +291,6 @@
 						},
 						{
 							"id": "containerLayoutFormFormBaz",
-							"type": "mgText",
-							"title": "Baz"
-						}
-					]
-				},
-				{
-					"id": "containerLayoutPanel",
-					"type": "mgContainer",
-					"layout": "panel",
-					"title": "Panel",
-					"items": [
-						{
-							"id": "containerLayoutPanelFormFoo",
-							"type": "mgText",
-							"title": "Foo"
-						},
-						{
-							"id": "containerLayoutPanelFormBar",
-							"type": "mgText",
-							"title": "Bar"
-						},
-						{
-							"id": "containerLayoutPanelFormBaz",
 							"type": "mgText",
 							"title": "Baz"
 						}

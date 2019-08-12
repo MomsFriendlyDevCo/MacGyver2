@@ -2,6 +2,7 @@
 export default {
 	data() { return {
 		config: {},
+		data: {},
 		examples: [
 			'examples/showcase.json',
 		],
@@ -62,17 +63,10 @@ export default {
 				</div>
 			</div>
 			<div class="col-md-6">
-				FORM
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-sm-12">
-				<hr/>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col-md-12">
-				<mg-form config="config" data="data"></mg-form>
+				<mg-form
+					:config="config"
+					:data="data"
+				/>
 			</div>
 		</div>
 	</div>
