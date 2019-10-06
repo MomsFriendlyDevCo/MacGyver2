@@ -171,4 +171,11 @@ export default Vue.component('mgContainer', {
 	padding: 5px;
 }
 /* }}} */
+
+/* Misc utility types {{{ */
+.mg-form .help-block {
+	font-size: 80%;
+	color: #6c757d !important;
+}
+/* }}} */
 </style>

@@ -58,7 +58,7 @@ export default Vue.component('mgForm', {
 </script>
 
 <template>
-	<form @submit.prevent="submit()" class="form-horizontal">
+	<form @submit.prevent="submit()" class="form-horizontal mg-form">
 		<div v-if="errors.length" class="alert alert-warning">
 			<ul>
 				<li v-for="err in errors">{{err.error}}</li>
