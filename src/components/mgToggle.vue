@@ -1,5 +1,6 @@
 <script>
-Vue.use(window['vue-js-toggle-button'].default);
+import ToggleButton from 'vue-js-toggle-button';
+Vue.use(ToggleButton);
 
 macgyver.register('mgToggle', {
 	requires: 'node_modules/vue-js-toggle-button/dist/index.js',
