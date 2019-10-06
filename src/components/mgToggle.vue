@@ -17,6 +17,7 @@ macgyver.register('mgToggle', {
 	},
 	format: (v, config) => v ? config.onText : config.offText,
 	formatAlign: 'center',
+	shorthand: ['boolean', 'switch', 'toggle'],
 });
 
 export default Vue.component('mgToggle', {

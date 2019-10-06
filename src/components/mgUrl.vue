@@ -13,6 +13,7 @@ macgyver.register('mgUrl', {
 		if (!v) return '';
 		return `<a href="${v}" target="_blank">${v}</a>`;
 	},
+	shorthand: ['uri'],
 });
 
 export default Vue.component('mgUrl', {

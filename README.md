@@ -115,6 +115,7 @@ Widgets can contain the following meta properties:
 | `template`         | `string`  | `<COMPONENT_NAME/>`        | Rendering template to be used to draw the element                                                |
 | `title`            | `string`  | The ID via `_.startCase()` | The human friendly title of the widget                                                           |
 | `userPlaceable`    | `boolean` | `false`                    | Whether to hide the object from the user in the `mgFormEditor` UI                                |
+| `shorthand`        | `array`   | `[]`                       | Other aliases the widget answers to in shorthand mode                                            |
 
 
 $macgyver.getForm($scope)

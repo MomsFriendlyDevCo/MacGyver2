@@ -27,6 +27,7 @@ macgyver.register('mgNumber', {
 		return (_.isNumber(v) ? v : parseInt(v)).toLocaleString();
 	},
 	formatAlign: 'right',
+	shorthand: ['integer', 'int', 'float'],
 });
 
 export default Vue.component('mgNumber', {

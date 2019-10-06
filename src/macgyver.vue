@@ -340,9 +340,22 @@ Vue.prototype.$macgyver = (()=> {
 				items: _.map(spec, (v, k) => ({
 					id: k,
 					...v,
-					type: !v.type ? 'mgText'
-						: !v.type.startsWith('mg') ? `mg${_.upperFirst(v.type)}`
-						: v.type,
+					type: (()=> {
+						if (_.isString(v)) v = {type: v}; // Only key given is a string, assume it means type
+						if (!v.type) return 'mgText'; // No type given, assume mgText
+						if (v.type.startsWith('mg')) return v.type; // Type begins with 'mg' - trust the user
+
+						v.type = v.type.toLowerCase();
+						return Object.keys($macgyver.widgets) // Search for likely widgets
+							.find(wid => {
+								var widget = $macgyver.widgets[wid];
+								return (
+									widget.id.substr(2).toLowerCase() == v.type // Matched after 'mg' part. e.g. 'text' becomes 'mgText'
+									|| (widget.shorthand || []).find(s => s == v.type) // Matched a shorthand alias
+								);
+							})
+							|| v.type;
+					})(),
 				})),
 			}),
 			widgetDefaults: true,

@@ -4,6 +4,7 @@ export default {
 		config: {},
 		data: {},
 		examples: [
+			'examples/shorthand.json',
 			'examples/showcase.json',
 		],
 		example: 'examples/showcase.json',
