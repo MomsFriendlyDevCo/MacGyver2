@@ -22,7 +22,7 @@ Vue.prototype.$macgyver = (()=> {
 
 	/**
 	* Add a known widget to the widgets lookup object
-	* @param {string} id The unique ID of the widget to add
+	* @param {string} [id] The unique ID of the widget to add (this is optional if id is specified in properties)
 	* @param {Object} [properties] Optional properties of the widget to add
 	* @param {boolean} [options.isContainer] Indicates that the widget can contain other widgets (under the `items` array)
 	* @param {boolean} [options.isContainerArray] Addition to `isContainer` that indicates the widget will contain an array of rows (like a table)
@@ -34,12 +34,25 @@ Vue.prototype.$macgyver = (()=> {
 	* @param {boolean|function} [options.format=false] Whether the value of the widget can be exposed as a string. If this is === true the exact value is used, if === false (default) it will be ignored when making a digest of the form, if a function it will be called as (value) and expected to return a string value. NOTE: In the spec file, which is a flat JSON file any function argument will be overridden to `true`
 	* @param {string} [options.formatAlign='left'] The prefered column alignment when showing the result of `options.format`
 	* @param {boolean} [options.preferId=true] Whether the widget recommends needing an ID when its created, if false, no default ID is allocated via mgFormEditor
+	* @param {array <string>} [options.shorthand] Other aliases the widget answers to in shorthand mode (e.g. `{shorthand: ['boolean']}` will map that widget to the boolean type
 	*
 	* @returns {$macgyver} This chainable object
 	*/
 	$macgyver.register = (id, options) => {
-		$macgyver.widgets[id] = {
-			title: _.startCase(id),
+		// Argument mangling {{{
+		if (id && options) { // both id + options
+			options.id = id;
+		} else if (_.isPlainObject(id)) { // Just options
+			[id, options] = [id.id, id]; // Optional ID arg
+		} else {
+			throw new Error('$macgyver.register(id, options) requires either an ID + options or an options object');
+		}
+		// }}}
+
+		if (!_.isString(options.id) || !options.id.startsWith('mg')) throw new Error('Widget IDs must be simple strings beginning with "mg*"');
+
+		$macgyver.widgets[options.id] = {
+			title: _.startCase(options.id),
 			userPlaceable: true,
 			category: 'Misc',
 			icon: 'far far-square',
