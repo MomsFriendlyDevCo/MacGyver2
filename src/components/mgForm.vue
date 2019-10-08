@@ -1,4 +1,13 @@
 <script>
+/**
+* The top level MacGyver form
+* @param {string} [form] Unique form name
+* @param {Object|Array} config The MacGyver form object either in long form nested array structure or short form object (which is converted)
+* @param {Object} [data] The data binding
+*
+* @emits change Emitted as `(data)` whenever any data changes
+* @emits changeItem Emitted as `({path, value})` when any single item changes
+*/
 export default Vue.component('mgForm', {
 	data() { return {
 		id: undefined, // Set on create
@@ -27,8 +36,9 @@ export default Vue.component('mgForm', {
 		this.$macgyver.injectForm(this);
 
 		this.$on('mgChange', (path, value) => {
-			this.$setPath(`$props.data.${path}`, value);
-			// this.$forceUpdate(); // FIXME: This is sometimes needed - not sure why, maybe in models? MC - 2018-12-12 
+			this.$macgyver.utils.setPath(this, `$props.data.${path}`, value);
+			this.$emit('changeItem', {path, value});
+			this.$emit('change', this.$props.data);
 		});
 
 		this.$on('mgErrors', errors => this.errors = errors);

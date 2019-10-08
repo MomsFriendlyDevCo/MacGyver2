@@ -3,7 +3,6 @@ import VueRouter from 'vue-router';
 
 import componentDemoForm from './form';
 
-import './services/setPath';
 import './services/http';
 
 $(()=> {

@@ -121,6 +121,14 @@ Vue.prototype.$macgyver = (()=> {
 	};
 
 
+	$macgyver.forms.getPath = (id, path, fallback) => {
+		console.log('PREGP', {id, path, fallback});
+		var res =  $macgyver.utils.getPath($macgyver.$forms[id], path, fallback);
+		console.log('GP', id, path, '=', res);
+		return res;
+	};
+
+
 	/**
 	* Execute a function on a form
 	* The default behaviour of this function is documented within the function
@@ -551,6 +559,49 @@ Vue.prototype.$macgyver = (()=> {
 	$macgyver.injectForm = component => {
 		$macgyver.$forms[component.id] = component;
 		component.$on('mgIdentify', reply => reply(component));
+	};
+
+
+	/**
+	* Set of misc utility helper functions
+	* @var {Object};
+	*/
+	$macgyver.utils = {};
+
+
+	/**
+	* Navigate down a dotted notation path and set the final value using Vue.set()
+	* This function is designed to work as simillaly as possible to _.set()
+	* @param {Object} target The source object, usually the root controller
+	* @param {string|array} path Either a path in dotted or array notation
+	* @param {*} value The value set
+	*/
+	$macgyver.utils.setPath = (target, path, value) => {
+		var chunks = typeof path == 'string' ? path.split('.') : path;
+
+		// Ensure all paths up to this chunk-1 exist
+		var targ = target;
+		for (var i = 0; i < chunks.length - 1; i++) {
+			if (targ[chunks[i]] === undefined) {
+				targ = Vue.set(targ, chunks[i], {}); // Traversal point not yet setup
+			} else {
+				targ = targ[chunks[i]]; // Recurse into the newly created child (or the existing branch)
+			}
+		}
+		return Vue.set(targ, chunks[chunks.length-1], value);
+	};
+
+
+	/**
+	* Provides a function to quickly get a data path on a Vue component by its path
+	* This function is designed to work as simillaly as possible to _.get()
+	* @param {Object} target The source object, usually the root controller
+	* @param {string|array} path Either a path in dotted or array notation
+	* @param {*} [fallback=undefined] Optional fallback to return if no value is found
+	* @returns {*} Either the found value or the fallback
+	*/
+	$macgyver.utils.getPath = (target, path, fallback) => {
+		return _.get(target, path, fallback);
 	};
 
 
