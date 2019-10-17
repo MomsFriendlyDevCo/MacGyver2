@@ -58,6 +58,11 @@ export default Vue.component('mgContainer', {
 	created() {
 		this.$macgyver.inject(this);
 	},
+	methods: {
+		isBlank(path) {
+			return !! this.$macgyver.forms.getPath(this.$props.form, path);
+		},
+	},
 	mounted() {
 		if (this.$props.config.collapsable) {
 			var $card = $(this.$el).find('.card').first();

@@ -90,6 +90,7 @@ gulp.task('build:macgyver', ()=>
 				jQuery: 'jquery',
 				$: 'jquery',
 			}),
+			require('rollup-plugin-scss')(),
 			require('rollup-plugin-babel')({
 				presets: ['@babel/env'],
 				plugins: ['@babel/plugin-syntax-dynamic-import'],

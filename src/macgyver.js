@@ -12,7 +12,7 @@ import('./components/mgButton');
 import('./components/mgCheckBox');
 import('./components/mgChoiceButtons');
 import('./components/mgChoiceCheckbox');
-//... import('./components/mgChoiceDropdown');
+import('./components/mgChoiceDropdown');
 import('./components/mgChoicePopup'); // FIXME: Needs $prompt
 import('./components/mgChoiceRadio'); // FIXME: Not working
 //... import('./components/mgChoiceTags');

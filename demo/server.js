@@ -33,6 +33,10 @@ app.get('/dist/macgyver.js', function(req, res) {
 	res.sendFile('macgyver.js', {root: root + '/dist'});
 });
 
+app.get('/dist/macgyver.css', function(req, res) {
+	res.sendFile('macgyver.css', {root: root + '/dist'});
+});
+
 app.use(function(err, req, res, next){
 	console.error(err.stack);
 	res.send(500, 'Something broke!').end();

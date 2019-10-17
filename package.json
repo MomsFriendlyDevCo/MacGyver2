@@ -23,7 +23,8 @@
   "dependencies": {
     "bootstrap": "^4.3.1",
     "jquery": "^3.4.1",
-    "lodash": "^4.17.15"
+    "lodash": "^4.17.15",
+    "vue-select": "^3.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
@@ -53,6 +54,7 @@
     "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-scss": "^1.0.2",
     "rollup-plugin-uglify": "^6.0.2",
     "rollup-plugin-vue": "^5.0.1",
     "vue": "^2.6.10",

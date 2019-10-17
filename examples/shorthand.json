@@ -8,5 +8,9 @@
 		"min": 18,
 		"help": "How old are you in years?"
 	},
-	"developer": "boolean"
+	"developer": "boolean",
+	"sex": {
+		"type": "choice",
+		"enum": ["male", "female", "other"]
+	}
 }
