@@ -13,12 +13,14 @@
 				{
 					"id": "demoText",
 					"type": "mgText",
-					"title": "Text"
+					"title": "Text",
+					"default": "Hello World"
 				},
 				{
 					"id": "demoTextArea",
 					"type": "mgTextArea",
-					"title": "Textarea"
+					"title": "Text area",
+					"default": "Hello World\nHello World\nHello World"
 				},
 				{
 					"id": "demoNumber",
@@ -26,7 +28,8 @@
 					"title": "Number (simple input)",
 					"min": 1,
 					"max": 10,
-					"interface": "input"
+					"interface": "input",
+					"default": 3
 				},
 				{
 					"id": "demoNumberPrefixSuffix",
@@ -36,7 +39,8 @@
 					"max": 10,
 					"interface": "input",
 					"prefix": "$",
-					"suffix": ".00"
+					"suffix": ".00",
+					"default": 6
 				},
 				{
 					"id": "demoNumberBumpers",
@@ -44,7 +48,8 @@
 					"title": "Number (with Bumpers)",
 					"min": 1,
 					"max": 10,
-					"interface": "bumpers"
+					"interface": "bumpers",
+					"default": 4
 				},
 				{
 					"id": "demoNumberRange",
@@ -52,42 +57,50 @@
 					"title": "Number (with slider)",
 					"min": 1,
 					"max": 3,
-					"interface": "slider"
+					"interface": "slider",
+					"default": 2
 				},
 				{
 					"id": "demoDate",
 					"type": "mgDate",
-					"title": "Date"
+					"title": "Date",
+					"default": "2019-10-29"
 				},
 				{
 					"id": "demoTime",
 					"type": "mgTime",
-					"title": "Time"
+					"title": "Time",
+					"default": "10:15"
 				},
 				{
 					"id": "demoEmail",
 					"type": "mgEmail",
-					"title": "Email"
+					"title": "Email",
+					"default": "human@earth.com"
 				},
 				{
 					"id": "demoUrl",
 					"type": "mgUrl",
-					"title": "URL"
+					"title": "URL",
+					"default": "https://somewhere.com"
 				},
 				{
 					"id": "demoToggle",
 					"type": "mgToggle",
-					"title": "Toggle"
+					"title": "Toggle",
+					"default": true
 				},
 				{
 					"id": "demoCheckBox",
 					"type": "mgCheckBox",
-					"title": "Check box"
+					"title": "Check box",
+					"default": true
 				},
 				{
 					"id": "demoList",
 					"type": "mgList",
-					"title": "List"
+					"title": "List",
+					"default": ["One", "Two", "Three"]
 				}
 			]
 		},
@@ -102,7 +115,8 @@
 					"id": "demoChoiceButtons",
 					"type": "mgChoiceButtons",
 					"title": "Choice Buttons",
-					"enum": ["Foo", "Bar", "Baz"]
+					"enum": ["Foo", "Bar", "Baz"],
+					"default": "Bar"
 				},
 				{
 					"id": "demoChoiceButtonsStyles",
@@ -116,13 +130,15 @@
 						{"id": "btn-success", "classInactive": "btn btn-success far fa-invisible", "classActive": "btn btn-success far fa-check"},
 						{"id": "btn-warning", "classInactive": "btn btn-warning far fa-invisible", "classActive": "btn btn-warning far fa-check"},
 						{"id": "btn-danger", "classInactive": "btn btn-danger far fa-invisible", "classActive": "btn btn-danger far fa-check"}
-					]
+					],
+					"default": "btn-success"
 				},
 				{
 					"id": "demoChoiceDropdown",
 					"type": "mgChoiceDropdown",
 					"title": "Choice Dropdown",
-					"enum": ["Foo", "Bar", "Baz"]
+					"enum": ["Foo", "Bar", "Baz"],
+					"default": "Foo"
 				},
 				{
 					"id": "demoChoiceDropdownGroup",
@@ -130,13 +146,15 @@
 					"title": "Choice Dropdown (via JSON feed + group by)",
 					"url": "examples/dropdowns.json",
 					"idField": "id",
-					"groupBy": "path"
+					"groupBy": "path",
+					"default": 3
 				},
 				{
 					"id": "demoChoiceRadio",
 					"type": "mgChoiceRadio",
 					"title": "Choice Radio",
-					"enum": ["Foo", "Bar", "Baz"]
+					"enum": ["Foo", "Bar", "Baz"],
+					"default": "Baz"
 				}
 			]
 		},
@@ -291,6 +309,29 @@
 						},
 						{
 							"id": "containerLayoutFormFormBaz",
+							"type": "mgText",
+							"title": "Baz"
+						}
+					]
+				},
+				{
+					"id": "containerLayoutCardFloating",
+					"type": "mgContainer",
+					"layout": "formFloating",
+					"title": "Form with floating labels",
+					"items": [
+						{
+							"id": "containerLayoutCardFloatingFoo",
+							"type": "mgText",
+							"title": "Foo"
+						},
+						{
+							"id": "containerLayoutCardFloatingBar",
+							"type": "mgText",
+							"title": "Bar"
+						},
+						{
+							"id": "containerLayoutCardFloatingBaz",
 							"type": "mgText",
 							"title": "Baz"
 						}

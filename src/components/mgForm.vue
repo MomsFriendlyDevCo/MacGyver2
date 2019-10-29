@@ -3,6 +3,9 @@
 * The top level MacGyver form
 * @param {string} [form] Unique form name
 * @param {Object|Array} config The MacGyver form object either in long form nested array structure or short form object (which is converted)
+* @param {boolean} [populateDefaults=true] Apply initial defaults to the data when the config is ready, if false you can call vm.assignDefaults() manually if needed
+* @param {boolean} [actionsFallback=true] Use vm.$eval as a runner when no action listener is found
+* @param {Object} [actions] Actions subscribers
 * @param {Object} [data] The data binding
 *
 * @emits change Emitted as `(data)` whenever any data changes
@@ -20,11 +23,9 @@ export default Vue.component('mgForm', {
 		config: [Object, Array], // Can be a single object, array of objects or shorthand style
 		data: Object,
 
-		actionsFallback: {
-			type: Boolean,
-			default: true,
-		},
+		populateDefaults: {type: Boolean, default: true},
 		onAction: Function,
+		actionsFallback: {type: Boolean, default: true},
 		actions: { // Object of functions e.g. `{customFunc: ()=> {}}`
 			type: Object,
 			validator: v => _.every(v => _.isFunction(v)),
@@ -49,8 +50,37 @@ export default Vue.component('mgForm', {
 		* Force the form to rebuild its config
 		*/
 		rebuild() {
-			console.log('Rebuild config');
+			console.log(`Rebuild form config for form "${this.id}"`);
 			this.$set(this, 'layout', this.$macgyver.neatenSpec(this.$props.config));
+
+			if (this.$props.populateDefaults) this.assignDefaults();
+		},
+
+
+		/**
+		* Assign initial defaults if a value is not in the data object
+		*/
+		assignDefaults() {
+			var proto = this.getPrototype();
+			console.log('USE PROTO', proto);
+			_.merge(this.data, proto);
+		},
+
+
+		/**
+		* Compute the data prototype of the form
+		* This is an empty object with all the defaults populated
+		* @returns {Object} A prototype data object with all defaults populated
+		*/
+		getPrototype() {
+			return this.$macgyver
+				.flatten(this.config, {type: 'spec', want: 'array', wantDataPath: true})
+				.reduce((data, node) => {
+					if (!node.default) return data; // No default speciifed - skip
+
+					this.$macgyver.utils.setPath(data, node.path, node.default);
+					return data;
+				}, {})
 		},
 	},
 	watch: {
