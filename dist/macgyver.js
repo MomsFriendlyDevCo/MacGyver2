@@ -98,11 +98,7 @@
   */
 
   Vue$1.prototype.$macgyver = function () {
-    var $macgyver = {}; // Sanity checks
-
-    ['$http'].forEach(function (service) {
-      if (!$macgyver[service]) console.warn("Vue.prototype.".concat(service, " is not available, declare it before MacGvyer loads or there may be errors later"));
-    });
+    var $macgyver = {};
     /**
     * Storage for all MacGyver registered widgets
     * @var {Object}
@@ -230,14 +226,7 @@
     };
 
     $macgyver.forms.getPath = function (id, path, fallback) {
-      console.log('PREGP', {
-        id: id,
-        path: path,
-        fallback: fallback
-      });
-      var res = $macgyver.utils.getPath($macgyver.$forms[id], path, fallback);
-      console.log('GP', id, path, '=', res);
-      return res;
+      return $macgyver.utils.getPath($macgyver.$forms[id], path, fallback);
     };
     /**
     * Execute a function on a form
@@ -277,7 +266,7 @@
         });
         if (func.apply($macgyver.$forms[id], actionArgs)) return;
       } // }}}
-      // 4. If all else failed and FORM.$props.actionsFallback is true - handle it via vm.$eval
+      // 4. If all else failed and FORM.$props.actionsFallback is true - handle it via vm.$eval {{{
 
 
       $macgyver.$forms[id].$eval.call($macgyver.$forms[id], action); // }}}
@@ -2460,7 +2449,9 @@
   var script$b = Vue.component('mgContainer', {
     data: function data() {
       return {
-        highlights: {} // Lookup of extra classes to add to widgets
+        highlights: {},
+        // Lookup of extra classes to add to widgets
+        localData: {} // Lookup of immediate child data values, used when `$props.config.layout == 'formFloating'`
 
       };
     },
@@ -2470,11 +2461,6 @@
     },
     created: function created() {
       this.$macgyver.inject(this);
-    },
-    methods: {
-      isBlank: function isBlank(path) {
-        return !!this.$macgyver.forms.getPath(this.$props.form, path);
-      }
     },
     mounted: function mounted() {
       var _this = this;
@@ -2496,6 +2482,20 @@
                 return $card.addClass('card-collapsed');
               }
             });
+          }
+        });
+      }
+
+      if (this.$props.config.layout == 'formFloating') {
+        // When in floating mode we need to keep track of child data so we copy its value into our `localData` object lookup
+        this.$macgyver.$forms[this.$props.form].$on('changeItem', function (v) {
+          // Bind to parent form handler
+          if (_this.$props.config.items.some(function (item) {
+            return item.$dataPath == v.path;
+          })) {
+            // Is this widget one of our immediate children?
+            _this.$set(_this.localData, v.path, v.value); // Copy its data against our local copy
+
           }
         });
       }
@@ -2592,7 +2592,7 @@
                   [
                     _c("mg-component", {
                       staticClass: "control-input",
-                      class: _vm.isBlank(widget.$dataPath) && "blank",
+                      class: !_vm.localData[widget.$dataPath] && "blank",
                       attrs: { form: _vm.$props.form, config: widget }
                     }),
                     _vm._v(" "),
@@ -2606,13 +2606,7 @@
                             )
                           ]
                         )
-                      : _vm._e(),
-                    _vm._v(" "),
-                    _c("pre", [
-                      _vm._v("ISB? " + _vm._s(_vm.isBlank(widget.$dataPath)))
-                    ]),
-                    _vm._v(" "),
-                    _c("pre", [_vm._v(_vm._s(widget))])
+                      : _vm._e()
                   ],
                   1
                 ),
@@ -2795,7 +2789,7 @@
     /* style */
     const __vue_inject_styles__$b = function (inject) {
       if (!inject) return
-      inject("data-v-64d3bd58_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Card layout {{{ */\n/* Collapsable card {{{ */\n.mg-container.card.card-collapsable {\n\ttransition: all 0.2s ease-in;\n}\n.mg-container.card.card-collapsable .card-header {\n\tcursor: pointer;\n}\n.mg-container.card.card-collapsable .card-header::after {\n\tfont-family: \"Font Awesome 5 Pro\";\n\tcontent: '\\f054';\n\tfloat: right;\n\ttransition: transform 0.4s;\n}\n.mg-container.card.card-collapsable:not(.card-collapsed) .card-header::after {\n\ttransform: rotate(90deg);\n}\n\n\n/* Collapsed card {{{ */\n.mg-container.card.card-collapsable.card-collapsed {\n\tbox-shadow: none;\n\tborder-bottom: none;\n\tmargin-bottom: 0px;\n}\n.mg-container.card.card-collapsable.card-collapsed .card-body {\n\tdisplay: none;\n}\n/* }}} */\n/* }}} */\n/* }}} */\n\n/* formFloating {{{ */\n.mgContainer-formFloating > .col-12 {\n\tposition: relative;\n\tline-height: 14px;\n\tmargin: 0 0px;\n\tdisplay: inline-block;\n\twidth: 100%;\n}\n.mgContainer-formFloating > .col-12 > .control-input {\n\theight: 45px;\n\tpadding-top: 8px;\n\tpadding-bottom: 2px;\n\tpadding-left: 2px;\n\tpadding-right: 12px;\n\tfont-size: 15px;\n\tline-height: 1.42857143;\n\tcolor: #333333;\n\tbackground-color: #ffffff;\n\tbackground-image: none;\n\toutline: none;\n\t/* border: 1px solid rgba(120, 120, 120, 0.5);\n\t*/\n\tborder: none; \n\tborder-bottom: 1px solid #bbb;\n\t-moz-box-shadow: none;\n\t-webkit-box-shadow: none;\n\tbox-shadow: none;\n\tborder-radius: 0;\n\tposition: relative;\n}\n.mgContainer-formFloating > .col-12 > .control-input.blank + .control-label {\n\ttransform: translateY(0px);\n\tcolor: #bbb;\n\tfont-size: 15px;\n\tfont-weight: 100;\n\topacity: 1;\n}\n.mgContainer-formFloating > .col-12 > .control-input.control-input:focus + .control-label {\n\ttransform: translateY(-21px);\n\tcolor: #66afe9;\n\tfont-size: 14px;\n\topacity: 1;\n\tfont-weight: 100;\n\tbackground-color: white;\n}\n.mgContainer-formFloating > .col-12 > .control-label {\n\tcolor: #aaa;\n\tdisplay: inline-block;\n\tfont-size: 12px;\n\tposition: absolute;\n\tz-index: 2;\n\tleft: 2px;\n\ttop: 16px;\n\tpadding: 0 0px;\n\tpointer-events: none;\n\tbackground: white;\n\ttransition: all 300ms ease;\n\ttransform: translateY(-21px);\n\tfont-weight: 500;\n}\n/* }}} */\n\n/* Columns layout {{{ */\n.mg-container.mg-container-columns-no-border th,\n.mg-container.mg-container-columns-no-border td {\n\tpadding: 5px;\n}\n/* }}} */\n\n/* Misc utility types {{{ */\n.mg-form .help-block {\n\tfont-size: 80%;\n\tcolor: #6c757d !important;\n}\n/* }}} */\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgContainer.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAsJA,oBAAA;AACA,yBAAA;AACA;CACA,4BAAA;AACA;AAEA;CACA,eAAA;AACA;AAEA;CACA,iCAAA;CACA,gBAAA;CACA,YAAA;CACA,0BAAA;AACA;AAEA;CACA,wBAAA;AACA;;;AAGA,uBAAA;AACA;CACA,gBAAA;CACA,mBAAA;CACA,kBAAA;AACA;AAEA;CACA,aAAA;AACA;AACA,QAAA;AACA,QAAA;AACA,QAAA;;AAEA,qBAAA;AACA;CACA,kBAAA;CACA,iBAAA;CACA,aAAA;CACA,qBAAA;CACA,WAAA;AACA;AAEA;CACA,YAAA;CACA,gBAAA;CACA,mBAAA;CACA,iBAAA;CACA,mBAAA;CACA,eAAA;CACA,uBAAA;CACA,cAAA;CACA,yBAAA;CACA,sBAAA;CACA,aAAA;CACA;EACA;CACA,YAAA;CACA,6BAAA;CACA,qBAAA;CACA,wBAAA;CACA,gBAAA;CACA,gBAAA;CACA,kBAAA;AACA;AAEA;CACA,0BAAA;CACA,WAAA;CACA,eAAA;CACA,gBAAA;CACA,UAAA;AACA;AAEA;CACA,4BAAA;CACA,cAAA;CACA,eAAA;CACA,UAAA;CACA,gBAAA;CACA,uBAAA;AACA;AAEA;CACA,WAAA;CACA,qBAAA;CACA,eAAA;CACA,kBAAA;CACA,UAAA;CACA,SAAA;CACA,SAAA;CACA,cAAA;CACA,oBAAA;CACA,iBAAA;CACA,0BAAA;CACA,4BAAA;CACA,gBAAA;AACA;AACA,QAAA;;AAEA,uBAAA;AACA;;CAEA,YAAA;AACA;AACA,QAAA;;AAEA,2BAAA;AACA;CACA,cAAA;CACA,yBAAA;AACA;AACA,QAAA","file":"mgContainer.vue","sourcesContent":["<script>\n/**\n* MacGyver component loader\n* This is a meta component that loads other dynamic components as an array\n* @param {Object} config The config specification\n* @param {array} config.items A collection of sub-item objects to display\n* @param {string} [config.title] The title of the container to display\n* @param {string} [config.layout=\"form\"] The layout profile to use. ENUM: form = A standard horizontal form layout, card = a Bootstrap 4 card with header and footer, columns = vertically sorted column display\n* @param {boolean} [config.items[].help] Optional help text to show under the element\n* @param {boolean} [config.items[].showTitle=true] Whether to show the left-hand-side form title for the item\n* @param {string} [config.items[].title] Optional title to display for the widget\n* @param {string} config.items[].type The type of the object to render. This corresponds to a `mg*` component\n*/\n\nmacgyver.register('mgContainer', {\n\ttitle: 'Container layout',\n\ticon: 'far fa-th-large',\n\tcategory: 'Layout',\n\tisContainer: true,\n\tpreferId: false,\n\tconfig: {\n\t\tlayout: {\n\t\t\ttype: 'mgChoiceRadio',\n\t\t\ttitle: 'Layout profile',\n\t\t\thelp: 'How to layout child elements',\n\t\t\tdefault: 'form',\n\t\t\tenum: [\n\t\t\t\t{id: 'form', title: 'Simple form layout'},\n\t\t\t\t{id: 'formFloating', title: 'Form with floating labels'},\n\t\t\t\t{id: 'card', title: 'Card based layout'},\n\t\t\t\t{id: 'columns', title: 'Vertical column layout'},\n\t\t\t],\n\t\t},\n\t\tshowTitles: {type: 'mgToggle', default: true, help: 'Show titles for fields', showIf: \"layout == 'form' || layout == 'card'\"},\n\t\tcolumnHeaders: {type: 'mgToggle', default: false, help: 'Show column headers', showIf: \"layout == 'columns'\"},\n\t\tcollapsable: {type: 'mgToggle', default: false, help: 'This card can be hidden', showIf: \"layout == 'card'\"},\n\t\tcollapsed: {type: 'mgToggle', default: false, help: 'This card is collapsed by default', showIf: \"layout == 'card'\"},\n\t\tborder: {type: 'mgToggle', default: true, help: 'Show a border around the container', showIf: \"layout == 'columns'\"},\n\t},\n\tconfigChildren: {\n\t\thelp: {type: 'mgText', title: 'Help text', help: 'Optional help text for the item - just like what you are reading now'},\n\t\tshowTitle: {type: 'mgToggle', default: true, title: 'Show Title', help: 'Whether to show the side title for this element'},\n\t\ttitle: {type: 'mgText', title: 'Title'},\n\t\trowClass: {type: 'mgChoiceDropdown', title: 'Styling', help: 'Additional styling to apply to the widget', default: '', enum: [\n\t\t\t{id: '', title: 'Normal'},\n\t\t\t{id: 'mgContainerRowLarge', title: 'Large text'},\n\t\t]},\n\t},\n});\n\nexport default Vue.component('mgContainer', {\n\tdata: ()=> ({\n\t\thighlights: {}, // Lookup of extra classes to add to widgets\n\t}),\n\tprops: {\n\t\tconfig: Object,\n\t\tform: String,\n\t},\n\tcreated() {\n\t\tthis.$macgyver.inject(this);\n\t},\n\tmethods: {\n\t\tisBlank(path) {\n\t\t\treturn !! this.$macgyver.forms.getPath(this.$props.form, path);\n\t\t},\n\t},\n\tmounted() {\n\t\tif (this.$props.config.collapsable) {\n\t\t\tvar $card = $(this.$el).find('.card').first();\n\n\t\t\t$card.find('.card-header').first().on('click', ()=> {\n\t\t\t\tvar $body = $(this.$el).find('.card-body');\n\t\t\t\tif ($card.hasClass('card-collapsed')) {\n\t\t\t\t\t$body.slideDown({complete: ()=> $card.removeClass('card-collapsed')});\n\t\t\t\t} else {\n\t\t\t\t\t$body.slideUp({complete: ()=> $card.addClass('card-collapsed')});\n\t\t\t\t}\n\t\t\t});\n\t\t}\n\t},\n});\n</script>\n\n<template>\n\t<div v-if=\"$props.config.layout == 'form' || $props.config.layout === undefined\">\n\t\t<div v-for=\"(widget, widgetIndex) in $props.config.items\" :key=\"widget.id\" class=\"form-group row mgComponent\" :class=\"[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]\">\n\t\t\t<label v-if=\"widget.showTitle || $props.config.showTitles\" class=\"control-label text-left col-sm-3\">\n\t\t\t\t{{widget.title}}\n\t\t\t</label>\n\t\t\t<div :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'\">\n\t\t\t\t<mg-component :form=\"$props.form\" :config=\"widget\"/>\n\t\t\t</div>\n\t\t\t<div class=\"help-block\" v-if=\"widget.help\" :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'\">{{widget.help}}</div>\n\t\t</div>\n\t</div>\n\t<div v-else-if=\"$props.config.layout == 'formFloating'\">\n\t\t<div v-for=\"(widget, widgetIndex) in $props.config.items\" :key=\"widget.id\" class=\"form-group mgContainer-formFloating row mgComponent\" :class=\"[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]\">\n\t\t\t<div class=\"col-12\">\n\t\t\t\t<mg-component :form=\"$props.form\" :config=\"widget\" class=\"control-input\" :class=\"isBlank(widget.$dataPath) && 'blank'\"/>\n\t\t\t\t<label v-if=\"$props.config.showTitles\" class=\"control-label text-left col-sm-3\">\n\t\t\t\t\t{{widget.title}}\n\t\t\t\t</label>\n\t\t\t\t<pre>ISB? {{isBlank(widget.$dataPath)}}</pre>\n\t\t\t\t<pre>{{widget}}</pre>\n\t\t\t</div>\n\t\t\t<div class=\"help-block\" v-if=\"widget.help\" :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'\">{{widget.help}}</div>\n\t\t</div>\n\t</div>\n\t<div v-else-if=\"$props.config.layout == 'card'\">\n\t\t<div class=\"card mg-container\" :class=\"{'card-collapsable': $props.config.collapsable, 'card-collapsed': $props.config.collapsed}\">\n\t\t\t<div class=\"card-header\">{{$props.config.title}}</div>\n\t\t\t<div class=\"card-body\">\n\t\t\t\t<div v-for=\"(widget, widgetIndex) in $props.config.items\" :key=\"widget.id\" class=\"form-group row mgComponent\" :class=\"[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]\">\n\t\t\t\t\t<label v-if=\"widget.showTitle || $props.config.showTitles\" class=\"control-label text-left col-sm-3\">\n\t\t\t\t\t\t{{widget.title}}\n\t\t\t\t\t</label>\n\t\t\t\t\t<div :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'\">\n\t\t\t\t\t\t<mg-component :form=\"$props.form\" :config=\"widget\"/>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"help-block\" v-if=\"widget.help\" :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'\">{{widget.help}}</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<div v-else-if=\"$props.config.layout == 'columns'\">\n\t\t<table class=\"mg-container\" :class=\"$props.config.border ? 'table table-bordered' : 'mg-container-columns-no-border'\" style=\"width: 100%\">\n\t\t\t<thead v-if=\"$props.config.columnHeaders\">\n\t\t\t\t<tr>\n\t\t\t\t\t<th v-for=\"widget in config.items\" :key=\"widget.id\">{{widget.title}}</th>\n\t\t\t\t</tr>\n\t\t\t</thead>\n\t\t\t<tbody>\n\t\t\t\t<tr>\n\t\t\t\t\t<td v-for=\"(widget, widgetIndex) in $props.config.items\" :key=\"widget.id\" :class=\"[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]\">\n\t\t\t\t\t\t<mg-component :form=\"$props.form\" :config=\"widget\"/>\n\t\t\t\t\t\t<div class=\"help-block\" v-if=\"widget.help\">{{widget.help}}</div>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t</tbody>\n\t\t</table>\n\t</div>\n\t<div v-else class=\"mg-container\">\n\t\t<div class=\"alert alert-danger\">\n\t\t\tUnsupported mgContainer layout \"{{$props.config.layout || 'Unspecified'}}\"\n\t\t\t<pre>{{$props.config}}</pre>\n\t\t</div>\n\t</div>\n</template>\n\n<style>\n/* Card layout {{{ */\n/* Collapsable card {{{ */\n.mg-container.card.card-collapsable {\n\ttransition: all 0.2s ease-in;\n}\n\n.mg-container.card.card-collapsable .card-header {\n\tcursor: pointer;\n}\n\n.mg-container.card.card-collapsable .card-header::after {\n\tfont-family: \"Font Awesome 5 Pro\";\n\tcontent: '\\f054';\n\tfloat: right;\n\ttransition: transform 0.4s;\n}\n\n.mg-container.card.card-collapsable:not(.card-collapsed) .card-header::after {\n\ttransform: rotate(90deg);\n}\n\n\n/* Collapsed card {{{ */\n.mg-container.card.card-collapsable.card-collapsed {\n\tbox-shadow: none;\n\tborder-bottom: none;\n\tmargin-bottom: 0px;\n}\n\n.mg-container.card.card-collapsable.card-collapsed .card-body {\n\tdisplay: none;\n}\n/* }}} */\n/* }}} */\n/* }}} */\n\n/* formFloating {{{ */\n.mgContainer-formFloating > .col-12 {\n\tposition: relative;\n\tline-height: 14px;\n\tmargin: 0 0px;\n\tdisplay: inline-block;\n\twidth: 100%;\n}\n\n.mgContainer-formFloating > .col-12 > .control-input {\n\theight: 45px;\n\tpadding-top: 8px;\n\tpadding-bottom: 2px;\n\tpadding-left: 2px;\n\tpadding-right: 12px;\n\tfont-size: 15px;\n\tline-height: 1.42857143;\n\tcolor: #333333;\n\tbackground-color: #ffffff;\n\tbackground-image: none;\n\toutline: none;\n\t/* border: 1px solid rgba(120, 120, 120, 0.5);\n\t*/\n\tborder: none; \n\tborder-bottom: 1px solid #bbb;\n\t-moz-box-shadow: none;\n\t-webkit-box-shadow: none;\n\tbox-shadow: none;\n\tborder-radius: 0;\n\tposition: relative;\n}\n\n.mgContainer-formFloating > .col-12 > .control-input.blank + .control-label {\n\ttransform: translateY(0px);\n\tcolor: #bbb;\n\tfont-size: 15px;\n\tfont-weight: 100;\n\topacity: 1;\n}\n\n.mgContainer-formFloating > .col-12 > .control-input.control-input:focus + .control-label {\n\ttransform: translateY(-21px);\n\tcolor: #66afe9;\n\tfont-size: 14px;\n\topacity: 1;\n\tfont-weight: 100;\n\tbackground-color: white;\n}\n\n.mgContainer-formFloating > .col-12 > .control-label {\n\tcolor: #aaa;\n\tdisplay: inline-block;\n\tfont-size: 12px;\n\tposition: absolute;\n\tz-index: 2;\n\tleft: 2px;\n\ttop: 16px;\n\tpadding: 0 0px;\n\tpointer-events: none;\n\tbackground: white;\n\ttransition: all 300ms ease;\n\ttransform: translateY(-21px);\n\tfont-weight: 500;\n}\n/* }}} */\n\n/* Columns layout {{{ */\n.mg-container.mg-container-columns-no-border th,\n.mg-container.mg-container-columns-no-border td {\n\tpadding: 5px;\n}\n/* }}} */\n\n/* Misc utility types {{{ */\n.mg-form .help-block {\n\tfont-size: 80%;\n\tcolor: #6c757d !important;\n}\n/* }}} */\n</style>\n"]}, media: undefined });
+      inject("data-v-44de4e05_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Card layout {{{ */\n/* Collapsable card {{{ */\n.mg-container.card.card-collapsable {\n\ttransition: all 0.2s ease-in;\n}\n.mg-container.card.card-collapsable .card-header {\n\tcursor: pointer;\n}\n.mg-container.card.card-collapsable .card-header::after {\n\tfont-family: \"Font Awesome 5 Pro\";\n\tcontent: '\\f054';\n\tfloat: right;\n\ttransition: transform 0.4s;\n}\n.mg-container.card.card-collapsable:not(.card-collapsed) .card-header::after {\n\ttransform: rotate(90deg);\n}\n\n\n/* Collapsed card {{{ */\n.mg-container.card.card-collapsable.card-collapsed {\n\tbox-shadow: none;\n\tborder-bottom: none;\n\tmargin-bottom: 0px;\n}\n.mg-container.card.card-collapsable.card-collapsed .card-body {\n\tdisplay: none;\n}\n/* }}} */\n/* }}} */\n/* }}} */\n\n/* formFloating {{{ */\n.mgContainer-formFloating > .col-12 {\n\tposition: relative;\n\tline-height: 14px;\n\tmargin: 0 0px;\n\tdisplay: inline-block;\n\twidth: 100%;\n}\n.mgContainer-formFloating > .col-12 > .control-input {\n\theight: 45px;\n\tpadding-top: 8px;\n\tpadding-bottom: 2px;\n\tpadding-left: 2px;\n\tpadding-right: 12px;\n\tfont-size: 15px;\n\tline-height: 1.42857143;\n\tcolor: #333333;\n\tbackground-color: #ffffff;\n\tbackground-image: none;\n\toutline: none;\n\t/* border: 1px solid rgba(120, 120, 120, 0.5);\n\t*/\n\tborder: none;\n\tborder-bottom: 1px solid #bbb;\n\t-moz-box-shadow: none;\n\t-webkit-box-shadow: none;\n\tbox-shadow: none;\n\tborder-radius: 0;\n\tposition: relative;\n}\n.mgContainer-formFloating > .col-12 > .control-input.blank + .control-label {\n\ttransform: translateY(0px);\n\tcolor: #bbb;\n\tfont-size: 15px;\n\tfont-weight: 100;\n\topacity: 1;\n}\n.mgContainer-formFloating > .col-12 > .control-input.control-input:focus + .control-label {\n\ttransform: translateY(-21px);\n\tcolor: #66afe9;\n\tfont-size: 14px;\n\topacity: 1;\n\tfont-weight: 100;\n\tbackground-color: white;\n}\n.mgContainer-formFloating > .col-12 > .control-label {\n\tcolor: #aaa;\n\tdisplay: inline-block;\n\tfont-size: 12px;\n\tposition: absolute;\n\tz-index: 2;\n\tleft: 2px;\n\ttop: 16px;\n\tpadding: 0 0px;\n\tpointer-events: none;\n\tbackground: white;\n\ttransition: all 300ms ease;\n\ttransform: translateY(-21px);\n\tfont-weight: 500;\n}\n/* }}} */\n\n/* Columns layout {{{ */\n.mg-container.mg-container-columns-no-border th,\n.mg-container.mg-container-columns-no-border td {\n\tpadding: 5px;\n}\n/* }}} */\n\n/* Misc utility types {{{ */\n.mg-form .help-block {\n\tfont-size: 80%;\n\tcolor: #6c757d !important;\n}\n/* }}} */\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgContainer.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AA8JA,oBAAA;AACA,yBAAA;AACA;CACA,4BAAA;AACA;AAEA;CACA,eAAA;AACA;AAEA;CACA,iCAAA;CACA,gBAAA;CACA,YAAA;CACA,0BAAA;AACA;AAEA;CACA,wBAAA;AACA;;;AAGA,uBAAA;AACA;CACA,gBAAA;CACA,mBAAA;CACA,kBAAA;AACA;AAEA;CACA,aAAA;AACA;AACA,QAAA;AACA,QAAA;AACA,QAAA;;AAEA,qBAAA;AACA;CACA,kBAAA;CACA,iBAAA;CACA,aAAA;CACA,qBAAA;CACA,WAAA;AACA;AAEA;CACA,YAAA;CACA,gBAAA;CACA,mBAAA;CACA,iBAAA;CACA,mBAAA;CACA,eAAA;CACA,uBAAA;CACA,cAAA;CACA,yBAAA;CACA,sBAAA;CACA,aAAA;CACA;EACA;CACA,YAAA;CACA,6BAAA;CACA,qBAAA;CACA,wBAAA;CACA,gBAAA;CACA,gBAAA;CACA,kBAAA;AACA;AAEA;CACA,0BAAA;CACA,WAAA;CACA,eAAA;CACA,gBAAA;CACA,UAAA;AACA;AAEA;CACA,4BAAA;CACA,cAAA;CACA,eAAA;CACA,UAAA;CACA,gBAAA;CACA,uBAAA;AACA;AAEA;CACA,WAAA;CACA,qBAAA;CACA,eAAA;CACA,kBAAA;CACA,UAAA;CACA,SAAA;CACA,SAAA;CACA,cAAA;CACA,oBAAA;CACA,iBAAA;CACA,0BAAA;CACA,4BAAA;CACA,gBAAA;AACA;AACA,QAAA;;AAEA,uBAAA;AACA;;CAEA,YAAA;AACA;AACA,QAAA;;AAEA,2BAAA;AACA;CACA,cAAA;CACA,yBAAA;AACA;AACA,QAAA","file":"mgContainer.vue","sourcesContent":["<script>\n/**\n* MacGyver component loader\n* This is a meta component that loads other dynamic components as an array\n* @param {Object} config The config specification\n* @param {array} config.items A collection of sub-item objects to display\n* @param {string} [config.title] The title of the container to display\n* @param {string} [config.layout=\"form\"] The layout profile to use. ENUM: form = A standard horizontal form layout, card = a Bootstrap 4 card with header and footer, columns = vertically sorted column display\n* @param {boolean} [config.items[].help] Optional help text to show under the element\n* @param {boolean} [config.items[].showTitle=true] Whether to show the left-hand-side form title for the item\n* @param {string} [config.items[].title] Optional title to display for the widget\n* @param {string} config.items[].type The type of the object to render. This corresponds to a `mg*` component\n*/\n\nmacgyver.register('mgContainer', {\n\ttitle: 'Container layout',\n\ticon: 'far fa-th-large',\n\tcategory: 'Layout',\n\tisContainer: true,\n\tpreferId: false,\n\tconfig: {\n\t\tlayout: {\n\t\t\ttype: 'mgChoiceRadio',\n\t\t\ttitle: 'Layout profile',\n\t\t\thelp: 'How to layout child elements',\n\t\t\tdefault: 'form',\n\t\t\tenum: [\n\t\t\t\t{id: 'form', title: 'Simple form layout'},\n\t\t\t\t{id: 'formFloating', title: 'Form with floating labels'},\n\t\t\t\t{id: 'card', title: 'Card based layout'},\n\t\t\t\t{id: 'columns', title: 'Vertical column layout'},\n\t\t\t],\n\t\t},\n\t\tshowTitles: {type: 'mgToggle', default: true, help: 'Show titles for fields', showIf: \"layout == 'form' || layout == 'card'\"},\n\t\tcolumnHeaders: {type: 'mgToggle', default: false, help: 'Show column headers', showIf: \"layout == 'columns'\"},\n\t\tcollapsable: {type: 'mgToggle', default: false, help: 'This card can be hidden', showIf: \"layout == 'card'\"},\n\t\tcollapsed: {type: 'mgToggle', default: false, help: 'This card is collapsed by default', showIf: \"layout == 'card'\"},\n\t\tborder: {type: 'mgToggle', default: true, help: 'Show a border around the container', showIf: \"layout == 'columns'\"},\n\t},\n\tconfigChildren: {\n\t\thelp: {type: 'mgText', title: 'Help text', help: 'Optional help text for the item - just like what you are reading now'},\n\t\tshowTitle: {type: 'mgToggle', default: true, title: 'Show Title', help: 'Whether to show the side title for this element'},\n\t\ttitle: {type: 'mgText', title: 'Title'},\n\t\trowClass: {type: 'mgChoiceDropdown', title: 'Styling', help: 'Additional styling to apply to the widget', default: '', enum: [\n\t\t\t{id: '', title: 'Normal'},\n\t\t\t{id: 'mgContainerRowLarge', title: 'Large text'},\n\t\t]},\n\t},\n});\n\nexport default Vue.component('mgContainer', {\n\tdata: ()=> ({\n\t\thighlights: {}, // Lookup of extra classes to add to widgets\n\t\tlocalData: {}, // Lookup of immediate child data values, used when `$props.config.layout == 'formFloating'`\n\t}),\n\tprops: {\n\t\tconfig: Object,\n\t\tform: String,\n\t},\n\tcreated() {\n\t\tthis.$macgyver.inject(this);\n\t},\n\tmounted() {\n\t\tif (this.$props.config.collapsable) {\n\t\t\tvar $card = $(this.$el).find('.card').first();\n\n\t\t\t$card.find('.card-header').first().on('click', ()=> {\n\t\t\t\tvar $body = $(this.$el).find('.card-body');\n\t\t\t\tif ($card.hasClass('card-collapsed')) {\n\t\t\t\t\t$body.slideDown({complete: ()=> $card.removeClass('card-collapsed')});\n\t\t\t\t} else {\n\t\t\t\t\t$body.slideUp({complete: ()=> $card.addClass('card-collapsed')});\n\t\t\t\t}\n\t\t\t});\n\t\t}\n\n\t\tif (this.$props.config.layout == 'formFloating') {\n\t\t\t// When in floating mode we need to keep track of child data so we copy its value into our `localData` object lookup\n\t\t\tthis.$macgyver.$forms[this.$props.form].$on('changeItem', v => { // Bind to parent form handler\n\t\t\t\tif (this.$props.config.items.some(item => item.$dataPath == v.path)) { // Is this widget one of our immediate children?\n\t\t\t\t\tthis.$set(this.localData, v.path, v.value); // Copy its data against our local copy\n\t\t\t\t}\n\t\t\t});\n\t\t}\n\t},\n});\n</script>\n\n<template>\n\t<div v-if=\"$props.config.layout == 'form' || $props.config.layout === undefined\">\n\t\t<div v-for=\"(widget, widgetIndex) in $props.config.items\" :key=\"widget.id\" class=\"form-group row mgComponent\" :class=\"[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]\">\n\t\t\t<label v-if=\"widget.showTitle || $props.config.showTitles\" class=\"control-label text-left col-sm-3\">\n\t\t\t\t{{widget.title}}\n\t\t\t</label>\n\t\t\t<div :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'\">\n\t\t\t\t<mg-component :form=\"$props.form\" :config=\"widget\"/>\n\t\t\t</div>\n\t\t\t<div class=\"help-block\" v-if=\"widget.help\" :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'\">{{widget.help}}</div>\n\t\t</div>\n\t</div>\n\t<div v-else-if=\"$props.config.layout == 'formFloating'\">\n\t\t<div v-for=\"(widget, widgetIndex) in $props.config.items\" :key=\"widget.id\" class=\"form-group mgContainer-formFloating row mgComponent\" :class=\"[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]\">\n\t\t\t<div class=\"col-12\">\n\t\t\t\t<mg-component\n\t\t\t\t\t:form=\"$props.form\"\n\t\t\t\t\t:config=\"widget\"\n\t\t\t\t\tclass=\"control-input\"\n\t\t\t\t\t:class=\"!localData[widget.$dataPath] && 'blank'\"\n\t\t\t\t/>\n\t\t\t\t<label v-if=\"$props.config.showTitles\" class=\"control-label text-left col-sm-3\">\n\t\t\t\t\t{{widget.title}}\n\t\t\t\t</label>\n\t\t\t</div>\n\t\t\t<div class=\"help-block\" v-if=\"widget.help\" :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'\">{{widget.help}}</div>\n\t\t</div>\n\t</div>\n\t<div v-else-if=\"$props.config.layout == 'card'\">\n\t\t<div class=\"card mg-container\" :class=\"{'card-collapsable': $props.config.collapsable, 'card-collapsed': $props.config.collapsed}\">\n\t\t\t<div class=\"card-header\">{{$props.config.title}}</div>\n\t\t\t<div class=\"card-body\">\n\t\t\t\t<div v-for=\"(widget, widgetIndex) in $props.config.items\" :key=\"widget.id\" class=\"form-group row mgComponent\" :class=\"[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]\">\n\t\t\t\t\t<label v-if=\"widget.showTitle || $props.config.showTitles\" class=\"control-label text-left col-sm-3\">\n\t\t\t\t\t\t{{widget.title}}\n\t\t\t\t\t</label>\n\t\t\t\t\t<div :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'\">\n\t\t\t\t\t\t<mg-component :form=\"$props.form\" :config=\"widget\"/>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"help-block\" v-if=\"widget.help\" :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'\">{{widget.help}}</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<div v-else-if=\"$props.config.layout == 'columns'\">\n\t\t<table class=\"mg-container\" :class=\"$props.config.border ? 'table table-bordered' : 'mg-container-columns-no-border'\" style=\"width: 100%\">\n\t\t\t<thead v-if=\"$props.config.columnHeaders\">\n\t\t\t\t<tr>\n\t\t\t\t\t<th v-for=\"widget in config.items\" :key=\"widget.id\">{{widget.title}}</th>\n\t\t\t\t</tr>\n\t\t\t</thead>\n\t\t\t<tbody>\n\t\t\t\t<tr>\n\t\t\t\t\t<td v-for=\"(widget, widgetIndex) in $props.config.items\" :key=\"widget.id\" :class=\"[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]\">\n\t\t\t\t\t\t<mg-component :form=\"$props.form\" :config=\"widget\"/>\n\t\t\t\t\t\t<div class=\"help-block\" v-if=\"widget.help\">{{widget.help}}</div>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t</tbody>\n\t\t</table>\n\t</div>\n\t<div v-else class=\"mg-container\">\n\t\t<div class=\"alert alert-danger\">\n\t\t\tUnsupported mgContainer layout \"{{$props.config.layout || 'Unspecified'}}\"\n\t\t\t<pre>{{$props.config}}</pre>\n\t\t</div>\n\t</div>\n</template>\n\n<style>\n/* Card layout {{{ */\n/* Collapsable card {{{ */\n.mg-container.card.card-collapsable {\n\ttransition: all 0.2s ease-in;\n}\n\n.mg-container.card.card-collapsable .card-header {\n\tcursor: pointer;\n}\n\n.mg-container.card.card-collapsable .card-header::after {\n\tfont-family: \"Font Awesome 5 Pro\";\n\tcontent: '\\f054';\n\tfloat: right;\n\ttransition: transform 0.4s;\n}\n\n.mg-container.card.card-collapsable:not(.card-collapsed) .card-header::after {\n\ttransform: rotate(90deg);\n}\n\n\n/* Collapsed card {{{ */\n.mg-container.card.card-collapsable.card-collapsed {\n\tbox-shadow: none;\n\tborder-bottom: none;\n\tmargin-bottom: 0px;\n}\n\n.mg-container.card.card-collapsable.card-collapsed .card-body {\n\tdisplay: none;\n}\n/* }}} */\n/* }}} */\n/* }}} */\n\n/* formFloating {{{ */\n.mgContainer-formFloating > .col-12 {\n\tposition: relative;\n\tline-height: 14px;\n\tmargin: 0 0px;\n\tdisplay: inline-block;\n\twidth: 100%;\n}\n\n.mgContainer-formFloating > .col-12 > .control-input {\n\theight: 45px;\n\tpadding-top: 8px;\n\tpadding-bottom: 2px;\n\tpadding-left: 2px;\n\tpadding-right: 12px;\n\tfont-size: 15px;\n\tline-height: 1.42857143;\n\tcolor: #333333;\n\tbackground-color: #ffffff;\n\tbackground-image: none;\n\toutline: none;\n\t/* border: 1px solid rgba(120, 120, 120, 0.5);\n\t*/\n\tborder: none;\n\tborder-bottom: 1px solid #bbb;\n\t-moz-box-shadow: none;\n\t-webkit-box-shadow: none;\n\tbox-shadow: none;\n\tborder-radius: 0;\n\tposition: relative;\n}\n\n.mgContainer-formFloating > .col-12 > .control-input.blank + .control-label {\n\ttransform: translateY(0px);\n\tcolor: #bbb;\n\tfont-size: 15px;\n\tfont-weight: 100;\n\topacity: 1;\n}\n\n.mgContainer-formFloating > .col-12 > .control-input.control-input:focus + .control-label {\n\ttransform: translateY(-21px);\n\tcolor: #66afe9;\n\tfont-size: 14px;\n\topacity: 1;\n\tfont-weight: 100;\n\tbackground-color: white;\n}\n\n.mgContainer-formFloating > .col-12 > .control-label {\n\tcolor: #aaa;\n\tdisplay: inline-block;\n\tfont-size: 12px;\n\tposition: absolute;\n\tz-index: 2;\n\tleft: 2px;\n\ttop: 16px;\n\tpadding: 0 0px;\n\tpointer-events: none;\n\tbackground: white;\n\ttransition: all 300ms ease;\n\ttransform: translateY(-21px);\n\tfont-weight: 500;\n}\n/* }}} */\n\n/* Columns layout {{{ */\n.mg-container.mg-container-columns-no-border th,\n.mg-container.mg-container-columns-no-border td {\n\tpadding: 5px;\n}\n/* }}} */\n\n/* Misc utility types {{{ */\n.mg-form .help-block {\n\tfont-size: 80%;\n\tcolor: #6c757d !important;\n}\n/* }}} */\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
@@ -3113,6 +3107,9 @@
   * The top level MacGyver form
   * @param {string} [form] Unique form name
   * @param {Object|Array} config The MacGyver form object either in long form nested array structure or short form object (which is converted)
+  * @param {boolean} [populateDefaults=true] Apply initial defaults to the data when the config is ready, if false you can call vm.assignDefaults() manually if needed
+  * @param {boolean} [actionsFallback=true] Use vm.$eval as a runner when no action listener is found
+  * @param {Object} [actions] Actions subscribers
   * @param {Object} [data] The data binding
   *
   * @emits change Emitted as `(data)` whenever any data changes
@@ -3136,11 +3133,15 @@
       config: [Object, Array],
       // Can be a single object, array of objects or shorthand style
       data: Object,
-      actionsFallback: {
+      populateDefaults: {
         type: Boolean,
         "default": true
       },
       onAction: Function,
+      actionsFallback: {
+        type: Boolean,
+        "default": true
+      },
       actions: {
         // Object of functions e.g. `{customFunc: ()=> {}}`
         type: Object,
@@ -3162,9 +3163,10 @@
         _this.$emit('changeItem', {
           path: path,
           value: value
-        });
+        }); // FIXME: Its annoying we have to use cloneDeep here but if the data object remains as a Vue object deep nodes don't get change detection upstream
 
-        _this.$emit('change', _this.$props.data);
+
+        _this.$emit('change', _.cloneDeep(_this.$props.data));
       });
       this.$on('mgErrors', function (errors) {
         return _this.errors = errors;
@@ -3178,8 +3180,37 @@
       * Force the form to rebuild its config
       */
       rebuild: function rebuild() {
-        console.log('Rebuild config');
+        console.log("Rebuild form config for form \"".concat(this.id, "\""));
         this.$set(this, 'layout', this.$macgyver.neatenSpec(this.$props.config));
+        if (this.$props.populateDefaults) this.assignDefaults();
+      },
+
+      /**
+      * Assign initial defaults if a value is not in the data object
+      */
+      assignDefaults: function assignDefaults() {
+        _.merge(this.data, this.getPrototype());
+      },
+
+      /**
+      * Compute the data prototype of the form
+      * This is an empty object with all the defaults populated
+      * @returns {Object} A prototype data object with all defaults populated
+      */
+      getPrototype: function getPrototype() {
+        var _this2 = this;
+
+        return this.$macgyver.flatten(this.config, {
+          type: 'spec',
+          want: 'array',
+          wantDataPath: true
+        }).reduce(function (data, node) {
+          if (!node["default"]) return data; // No default speciifed - skip
+
+          _this2.$macgyver.utils.setPath(data, node.path, node["default"]);
+
+          return data;
+        }, {});
       }
     },
     watch: {
@@ -3189,10 +3220,6 @@
           // Config has been clobbered - rebuild the layout
           this.rebuild();
         }
-      },
-      data: function data() {
-        // Data object has been clobbered - tell all children to refetch their data
-        this.$macgyver.forms.emitDown(this.id, 'mgRefresh');
       }
     }
   });
@@ -5515,7 +5542,8 @@
         }]
       }
     },
-    format: true
+    format: true,
+    shorthand: ['string', 'str']
   });
   var script$u = Vue.component('mgText', {
     data: function data() {
