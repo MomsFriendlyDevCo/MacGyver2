@@ -26,6 +26,7 @@ macgyver.register('mgContainer', {
 			default: 'form',
 			enum: [
 				{id: 'form', title: 'Simple form layout'},
+				{id: 'formFloating', title: 'Form with floating labels'},
 				{id: 'card', title: 'Card based layout'},
 				{id: 'columns', title: 'Vertical column layout'},
 			],
@@ -50,6 +51,7 @@ macgyver.register('mgContainer', {
 export default Vue.component('mgContainer', {
 	data: ()=> ({
 		highlights: {}, // Lookup of extra classes to add to widgets
+		localData: {}, // Lookup of immediate child data values, used when `$props.config.layout == 'formFloating'`
 	}),
 	props: {
 		config: Object,
@@ -57,11 +59,6 @@ export default Vue.component('mgContainer', {
 	},
 	created() {
 		this.$macgyver.inject(this);
-	},
-	methods: {
-		isBlank(path) {
-			return !! this.$macgyver.forms.getPath(this.$props.form, path);
-		},
 	},
 	mounted() {
 		if (this.$props.config.collapsable) {
@@ -73,6 +70,15 @@ export default Vue.component('mgContainer', {
 					$body.slideDown({complete: ()=> $card.removeClass('card-collapsed')});
 				} else {
 					$body.slideUp({complete: ()=> $card.addClass('card-collapsed')});
+				}
+			});
+		}
+
+		if (this.$props.config.layout == 'formFloating') {
+			// When in floating mode we need to keep track of child data so we copy its value into our `localData` object lookup
+			this.$macgyver.$forms[this.$props.form].$on('changeItem', v => { // Bind to parent form handler
+				if (this.$props.config.items.some(item => item.$dataPath == v.path)) { // Is this widget one of our immediate children?
+					this.$set(this.localData, v.path, v.value); // Copy its data against our local copy
 				}
 			});
 		}
@@ -88,6 +94,22 @@ export default Vue.component('mgContainer', {
 			</label>
 			<div :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'">
 				<mg-component :form="$props.form" :config="widget"/>
+			</div>
+			<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
+		</div>
+	</div>
+	<div v-else-if="$props.config.layout == 'formFloating'">
+		<div v-for="(widget, widgetIndex) in $props.config.items" :key="widget.id" class="form-group mgContainer-formFloating row mgComponent" :class="[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]">
+			<div class="col-12">
+				<mg-component
+					:form="$props.form"
+					:config="widget"
+					class="control-input"
+					:class="!localData[widget.$dataPath] && 'blank'"
+				/>
+				<label v-if="$props.config.showTitles" class="control-label text-left col-sm-3">
+					{{widget.title}}
+				</label>
 			</div>
 			<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
 		</div>
@@ -168,6 +190,72 @@ export default Vue.component('mgContainer', {
 }
 /* }}} */
 /* }}} */
+/* }}} */
+
+/* formFloating {{{ */
+.mgContainer-formFloating > .col-12 {
+	position: relative;
+	line-height: 14px;
+	margin: 0 0px;
+	display: inline-block;
+	width: 100%;
+}
+
+.mgContainer-formFloating > .col-12 > .control-input {
+	height: 45px;
+	padding-top: 8px;
+	padding-bottom: 2px;
+	padding-left: 2px;
+	padding-right: 12px;
+	font-size: 15px;
+	line-height: 1.42857143;
+	color: #333333;
+	background-color: #ffffff;
+	background-image: none;
+	outline: none;
+	/* border: 1px solid rgba(120, 120, 120, 0.5);
+	*/
+	border: none;
+	border-bottom: 1px solid #bbb;
+	-moz-box-shadow: none;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	border-radius: 0;
+	position: relative;
+}
+
+.mgContainer-formFloating > .col-12 > .control-input.blank + .control-label {
+	transform: translateY(0px);
+	color: #bbb;
+	font-size: 15px;
+	font-weight: 100;
+	opacity: 1;
+}
+
+.mgContainer-formFloating > .col-12 > .control-input.control-input:focus + .control-label {
+	transform: translateY(-21px);
+	color: #66afe9;
+	font-size: 14px;
+	opacity: 1;
+	font-weight: 100;
+	background-color: white;
+}
+
+.mgContainer-formFloating > .col-12 > .control-label {
+	color: #aaa;
+	display: inline-block;
+	font-size: 12px;
+	position: absolute;
+	z-index: 2;
+	left: 2px;
+	top: 16px;
+	padding: 0 0px;
+	pointer-events: none;
+	background: white;
+	transition: all 300ms ease;
+	transform: translateY(-21px);
+	font-weight: 500;
+}
 /* }}} */
 
 /* Columns layout {{{ */
