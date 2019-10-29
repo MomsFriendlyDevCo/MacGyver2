@@ -36,6 +36,7 @@ export default Vue.component('mgChoiceDropdown', {
 	methods: {
 		change(val) {
 			this.data = val.id;
+			this.value = val.title;
 		},
 	},
 	created() {
