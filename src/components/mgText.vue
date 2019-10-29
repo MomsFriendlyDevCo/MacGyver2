@@ -35,6 +35,7 @@ macgyver.register('mgText', {
 		},
 	},
 	format: true,
+	shorthand: ['string', 'str'],
 });
 
 export default Vue.component('mgText', {
