@@ -14,7 +14,10 @@ export default {
 			immediate: true,
 			handler() {
 				this.$http.get(this.example)
-					.then(res => this.config = res.data);
+					.then(res => {
+						this.data = {};
+						this.config = res.data;
+					});
 			},
 		},
 	},
