@@ -9,11 +9,6 @@ import Vue from 'vue';
 Vue.prototype.$macgyver = (()=> {
 	var $macgyver = {};
 
-	// Sanity checks
-	['$http'].forEach(service => {
-		if (!$macgyver[service]) console.warn(`Vue.prototype.${service} is not available, declare it before MacGvyer loads or there may be errors later`);
-	});
-
 	/**
 	* Storage for all MacGyver registered widgets
 	* @var {Object}
