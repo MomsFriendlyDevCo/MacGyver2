@@ -67,6 +67,7 @@ export default {
 			<mg-form
 				:config="config"
 				:data="data"
+				@change="data = $event"
 			/>
 		</div>
 	</div>

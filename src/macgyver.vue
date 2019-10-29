@@ -122,10 +122,7 @@ Vue.prototype.$macgyver = (()=> {
 
 
 	$macgyver.forms.getPath = (id, path, fallback) => {
-		console.log('PREGP', {id, path, fallback});
-		var res =  $macgyver.utils.getPath($macgyver.$forms[id], path, fallback);
-		console.log('GP', id, path, '=', res);
-		return res;
+		return $macgyver.utils.getPath($macgyver.$forms[id], path, fallback);
 	};
 
 
@@ -163,7 +160,7 @@ Vue.prototype.$macgyver = (()=> {
 		}
 		// }}}
 
-		// 4. If all else failed and FORM.$props.actionsFallback is true - handle it via vm.$eval
+		// 4. If all else failed and FORM.$props.actionsFallback is true - handle it via vm.$eval {{{
 		$macgyver.$forms[id].$eval.call($macgyver.$forms[id], action);
 		// }}}
 	};

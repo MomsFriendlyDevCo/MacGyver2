@@ -39,7 +39,9 @@ export default Vue.component('mgForm', {
 		this.$on('mgChange', (path, value) => {
 			this.$macgyver.utils.setPath(this, `$props.data.${path}`, value);
 			this.$emit('changeItem', {path, value});
-			this.$emit('change', this.$props.data);
+
+			// FIXME: Its annoying we have to use cloneDeep here but if the data object remains as a Vue object deep nodes don't get change detection upstream
+			this.$emit('change', _.cloneDeep(this.$props.data));
 		});
 
 		this.$on('mgErrors', errors => this.errors = errors);
@@ -61,9 +63,7 @@ export default Vue.component('mgForm', {
 		* Assign initial defaults if a value is not in the data object
 		*/
 		assignDefaults() {
-			var proto = this.getPrototype();
-			console.log('USE PROTO', proto);
-			_.merge(this.data, proto);
+			_.merge(this.data, this.getPrototype());
 		},
 
 
@@ -89,9 +89,6 @@ export default Vue.component('mgForm', {
 			handler() { // Config has been clobbered - rebuild the layout
 				this.rebuild();
 			},
-		},
-		data() { // Data object has been clobbered - tell all children to refetch their data
-			this.$macgyver.forms.emitDown(this.id, 'mgRefresh');
 		},
 	},
 });

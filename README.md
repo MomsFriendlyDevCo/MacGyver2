@@ -28,6 +28,7 @@ Example
 			},
 		],
 	}"
+	@change="data = $event"
 />
 ```
 
