@@ -62,6 +62,10 @@
   }
 
   function _iterableToArrayLimit(arr, i) {
+    if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) {
+      return;
+    }
+
     var _arr = [];
     var _n = true;
     var _d = false;
@@ -763,90 +767,133 @@
 
   var script = Vue$1.prototype.$macgyver;
 
-  function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier
-  /* server only */
-  , shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
-    if (typeof shadowMode !== 'boolean') {
-      createInjectorSSR = createInjector;
-      createInjector = shadowMode;
-      shadowMode = false;
-    } // Vue.extend constructor export interop.
-
-
-    var options = typeof script === 'function' ? script.options : script; // render functions
-
-    if (template && template.render) {
-      options.render = template.render;
-      options.staticRenderFns = template.staticRenderFns;
-      options._compiled = true; // functional template
-
-      if (isFunctionalTemplate) {
-        options.functional = true;
+  function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier /* server only */, shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
+      if (typeof shadowMode !== 'boolean') {
+          createInjectorSSR = createInjector;
+          createInjector = shadowMode;
+          shadowMode = false;
       }
-    } // scopedId
-
-
-    if (scopeId) {
-      options._scopeId = scopeId;
-    }
-
-    var hook;
-
-    if (moduleIdentifier) {
-      // server build
-      hook = function hook(context) {
-        // 2.3 injection
-        context = context || // cached call
-        this.$vnode && this.$vnode.ssrContext || // stateful
-        this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext; // functional
-        // 2.2 with runInNewContext: true
-
-        if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
-          context = __VUE_SSR_CONTEXT__;
-        } // inject component styles
-
-
-        if (style) {
-          style.call(this, createInjectorSSR(context));
-        } // register component module identifier for async chunk inference
-
-
-        if (context && context._registeredComponents) {
-          context._registeredComponents.add(moduleIdentifier);
-        }
-      }; // used by ssr in case component is cached and beforeCreate
-      // never gets called
-
-
-      options._ssrRegister = hook;
-    } else if (style) {
-      hook = shadowMode ? function () {
-        style.call(this, createInjectorShadow(this.$root.$options.shadowRoot));
-      } : function (context) {
-        style.call(this, createInjector(context));
-      };
-    }
-
-    if (hook) {
-      if (options.functional) {
-        // register for functional component in vue file
-        var originalRender = options.render;
-
-        options.render = function renderWithStyleInjection(h, context) {
-          hook.call(context);
-          return originalRender(h, context);
-        };
-      } else {
-        // inject component registration as beforeCreate hook
-        var existing = options.beforeCreate;
-        options.beforeCreate = existing ? [].concat(existing, hook) : [hook];
+      // Vue.extend constructor export interop.
+      const options = typeof script === 'function' ? script.options : script;
+      // render functions
+      if (template && template.render) {
+          options.render = template.render;
+          options.staticRenderFns = template.staticRenderFns;
+          options._compiled = true;
+          // functional template
+          if (isFunctionalTemplate) {
+              options.functional = true;
+          }
       }
-    }
-
-    return script;
+      // scopedId
+      if (scopeId) {
+          options._scopeId = scopeId;
+      }
+      let hook;
+      if (moduleIdentifier) {
+          // server build
+          hook = function (context) {
+              // 2.3 injection
+              context =
+                  context || // cached call
+                      (this.$vnode && this.$vnode.ssrContext) || // stateful
+                      (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext); // functional
+              // 2.2 with runInNewContext: true
+              if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
+                  context = __VUE_SSR_CONTEXT__;
+              }
+              // inject component styles
+              if (style) {
+                  style.call(this, createInjectorSSR(context));
+              }
+              // register component module identifier for async chunk inference
+              if (context && context._registeredComponents) {
+                  context._registeredComponents.add(moduleIdentifier);
+              }
+          };
+          // used by ssr in case component is cached and beforeCreate
+          // never gets called
+          options._ssrRegister = hook;
+      }
+      else if (style) {
+          hook = shadowMode
+              ? function (context) {
+                  style.call(this, createInjectorShadow(context, this.$root.$options.shadowRoot));
+              }
+              : function (context) {
+                  style.call(this, createInjector(context));
+              };
+      }
+      if (hook) {
+          if (options.functional) {
+              // register for functional component in vue file
+              const originalRender = options.render;
+              options.render = function renderWithStyleInjection(h, context) {
+                  hook.call(context);
+                  return originalRender(h, context);
+              };
+          }
+          else {
+              // inject component registration as beforeCreate hook
+              const existing = options.beforeCreate;
+              options.beforeCreate = existing ? [].concat(existing, hook) : [hook];
+          }
+      }
+      return script;
   }
 
-  var normalizeComponent_1 = normalizeComponent;
+  const isOldIE = typeof navigator !== 'undefined' &&
+      /msie [6-9]\\b/.test(navigator.userAgent.toLowerCase());
+  function createInjector(context) {
+      return (id, style) => addStyle(id, style);
+  }
+  let HEAD;
+  const styles = {};
+  function addStyle(id, css) {
+      const group = isOldIE ? css.media || 'default' : id;
+      const style = styles[group] || (styles[group] = { ids: new Set(), styles: [] });
+      if (!style.ids.has(id)) {
+          style.ids.add(id);
+          let code = css.source;
+          if (css.map) {
+              // https://developer.chrome.com/devtools/docs/javascript-debugging
+              // this makes source maps inside style tags work properly in Chrome
+              code += '\n/*# sourceURL=' + css.map.sources[0] + ' */';
+              // http://stackoverflow.com/a/26603875
+              code +=
+                  '\n/*# sourceMappingURL=data:application/json;base64,' +
+                      btoa(unescape(encodeURIComponent(JSON.stringify(css.map)))) +
+                      ' */';
+          }
+          if (!style.element) {
+              style.element = document.createElement('style');
+              style.element.type = 'text/css';
+              if (css.media)
+                  style.element.setAttribute('media', css.media);
+              if (HEAD === undefined) {
+                  HEAD = document.head || document.getElementsByTagName('head')[0];
+              }
+              HEAD.appendChild(style.element);
+          }
+          if ('styleSheet' in style.element) {
+              style.styles.push(code);
+              style.element.styleSheet.cssText = style.styles
+                  .filter(Boolean)
+                  .join('\n');
+          }
+          else {
+              const index = style.ids.size - 1;
+              const textNode = document.createTextNode(code);
+              const nodes = style.element.childNodes;
+              if (nodes[index])
+                  style.element.removeChild(nodes[index]);
+              if (nodes.length)
+                  style.element.insertBefore(textNode, nodes[index]);
+              else
+                  style.element.appendChild(textNode);
+          }
+      }
+  }
 
   /* script */
   const __vue_script__ = script;
@@ -865,15 +912,19 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var MacGyver = normalizeComponent_1(
+    var MacGyver = normalizeComponent(
       {},
       __vue_inject_styles__,
       __vue_script__,
       __vue_scope_id__,
       __vue_is_functional_template__,
       __vue_module_identifier__,
+      false,
+      undefined,
       undefined,
       undefined
     );
@@ -1001,20 +1052,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgAlert = normalizeComponent_1(
+    var mgAlert = normalizeComponent(
       { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
       __vue_inject_styles__$1,
       __vue_script__$1,
       __vue_scope_id__$1,
       __vue_is_functional_template__$1,
       __vue_module_identifier__$1,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgAlert$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgAlert
   });
 
@@ -1109,20 +1165,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgButton = normalizeComponent_1(
+    var mgButton = normalizeComponent(
       { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
       __vue_inject_styles__$2,
       __vue_script__$2,
       __vue_scope_id__$2,
       __vue_is_functional_template__$2,
       __vue_module_identifier__$2,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgButton$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgButton
   });
 
@@ -1213,20 +1274,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgCheckBox = normalizeComponent_1(
+    var mgCheckBox = normalizeComponent(
       { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
       __vue_inject_styles__$3,
       __vue_script__$3,
       __vue_scope_id__$3,
       __vue_is_functional_template__$3,
       __vue_module_identifier__$3,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgCheckBox$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgCheckBox
   });
 
@@ -1312,61 +1378,6 @@
     }
   });
 
-  var isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\\b/.test(navigator.userAgent.toLowerCase());
-  function createInjector(context) {
-    return function (id, style) {
-      return addStyle(id, style);
-    };
-  }
-  var HEAD;
-  var styles = {};
-
-  function addStyle(id, css) {
-    var group = isOldIE ? css.media || 'default' : id;
-    var style = styles[group] || (styles[group] = {
-      ids: new Set(),
-      styles: []
-    });
-
-    if (!style.ids.has(id)) {
-      style.ids.add(id);
-      var code = css.source;
-
-      if (css.map) {
-        // https://developer.chrome.com/devtools/docs/javascript-debugging
-        // this makes source maps inside style tags work properly in Chrome
-        code += '\n/*# sourceURL=' + css.map.sources[0] + ' */'; // http://stackoverflow.com/a/26603875
-
-        code += '\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(css.map)))) + ' */';
-      }
-
-      if (!style.element) {
-        style.element = document.createElement('style');
-        style.element.type = 'text/css';
-        if (css.media) style.element.setAttribute('media', css.media);
-
-        if (HEAD === undefined) {
-          HEAD = document.head || document.getElementsByTagName('head')[0];
-        }
-
-        HEAD.appendChild(style.element);
-      }
-
-      if ('styleSheet' in style.element) {
-        style.styles.push(code);
-        style.element.styleSheet.cssText = style.styles.filter(Boolean).join('\n');
-      } else {
-        var index = style.ids.size - 1;
-        var textNode = document.createTextNode(code);
-        var nodes = style.element.childNodes;
-        if (nodes[index]) style.element.removeChild(nodes[index]);
-        if (nodes.length) style.element.insertBefore(textNode, nodes[index]);else style.element.appendChild(textNode);
-      }
-    }
-  }
-
-  var browser = createInjector;
-
   /* script */
   const __vue_script__$4 = script$4;
 
@@ -1428,20 +1439,25 @@
     const __vue_is_functional_template__$4 = false;
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgChoiceButtons = normalizeComponent_1(
+    var mgChoiceButtons = normalizeComponent(
       { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
       __vue_inject_styles__$4,
       __vue_script__$4,
       __vue_scope_id__$4,
       __vue_is_functional_template__$4,
       __vue_module_identifier__$4,
-      browser,
+      false,
+      createInjector,
+      undefined,
       undefined
     );
 
   var mgChoiceButtons$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgChoiceButtons
   });
 
@@ -1605,20 +1621,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgChoiceCheckbox = normalizeComponent_1(
+    var mgChoiceCheckbox = normalizeComponent(
       { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
       __vue_inject_styles__$5,
       __vue_script__$5,
       __vue_scope_id__$5,
       __vue_is_functional_template__$5,
       __vue_module_identifier__$5,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgChoiceCheckbox$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgChoiceCheckbox
   });
 
@@ -1762,20 +1783,25 @@
     const __vue_is_functional_template__$6 = false;
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgChoiceDropdown = normalizeComponent_1(
+    var mgChoiceDropdown = normalizeComponent(
       { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
       __vue_inject_styles__$6,
       __vue_script__$6,
       __vue_scope_id__$6,
       __vue_is_functional_template__$6,
       __vue_module_identifier__$6,
-      browser,
+      false,
+      createInjector,
+      undefined,
       undefined
     );
 
   var mgChoiceDropdown$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgChoiceDropdown
   });
 
@@ -1990,20 +2016,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgChoicePopup = normalizeComponent_1(
+    var mgChoicePopup = normalizeComponent(
       { render: __vue_render__$6, staticRenderFns: __vue_staticRenderFns__$6 },
       __vue_inject_styles__$7,
       __vue_script__$7,
       __vue_scope_id__$7,
       __vue_is_functional_template__$7,
       __vue_module_identifier__$7,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgChoicePopup$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgChoicePopup
   });
 
@@ -2134,20 +2165,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgChoiceRadio = normalizeComponent_1(
+    var mgChoiceRadio = normalizeComponent(
       { render: __vue_render__$7, staticRenderFns: __vue_staticRenderFns__$7 },
       __vue_inject_styles__$8,
       __vue_script__$8,
       __vue_scope_id__$8,
       __vue_is_functional_template__$8,
       __vue_module_identifier__$8,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgChoiceRadio$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgChoiceRadio
   });
 
@@ -2245,20 +2281,25 @@
     const __vue_is_functional_template__$9 = undefined;
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgCodeEditor = normalizeComponent_1(
+    var mgCodeEditor = normalizeComponent(
       {},
       __vue_inject_styles__$9,
       __vue_script__$9,
       __vue_scope_id__$9,
       __vue_is_functional_template__$9,
       __vue_module_identifier__$9,
-      browser,
+      false,
+      createInjector,
+      undefined,
       undefined
     );
 
   var mgCodeEditor$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgCodeEditor
   });
 
@@ -2328,20 +2369,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgComponent = normalizeComponent_1(
+    var mgComponent = normalizeComponent(
       {},
       __vue_inject_styles__$a,
       __vue_script__$a,
       __vue_scope_id__$a,
       __vue_is_functional_template__$a,
       __vue_module_identifier__$a,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgComponent$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgComponent
   });
 
@@ -2800,20 +2846,25 @@
     const __vue_is_functional_template__$b = false;
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgContainer = normalizeComponent_1(
+    var mgContainer = normalizeComponent(
       { render: __vue_render__$8, staticRenderFns: __vue_staticRenderFns__$8 },
       __vue_inject_styles__$b,
       __vue_script__$b,
       __vue_scope_id__$b,
       __vue_is_functional_template__$b,
       __vue_module_identifier__$b,
-      browser,
+      false,
+      createInjector,
+      undefined,
       undefined
     );
 
   var mgContainer$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgContainer
   });
 
@@ -2906,20 +2957,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgDate = normalizeComponent_1(
+    var mgDate = normalizeComponent(
       { render: __vue_render__$9, staticRenderFns: __vue_staticRenderFns__$9 },
       __vue_inject_styles__$c,
       __vue_script__$c,
       __vue_scope_id__$c,
       __vue_is_functional_template__$c,
       __vue_module_identifier__$c,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgDate$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgDate
   });
 
@@ -3003,20 +3059,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgEmail = normalizeComponent_1(
+    var mgEmail = normalizeComponent(
       { render: __vue_render__$a, staticRenderFns: __vue_staticRenderFns__$a },
       __vue_inject_styles__$d,
       __vue_script__$d,
       __vue_scope_id__$d,
       __vue_is_functional_template__$d,
       __vue_module_identifier__$d,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgEmail$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgEmail
   });
 
@@ -3086,20 +3147,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgError = normalizeComponent_1(
+    var mgError = normalizeComponent(
       { render: __vue_render__$b, staticRenderFns: __vue_staticRenderFns__$b },
       __vue_inject_styles__$e,
       __vue_script__$e,
       __vue_scope_id__$e,
       __vue_is_functional_template__$e,
       __vue_module_identifier__$e,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgError$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgError
   });
 
@@ -3276,20 +3342,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgForm = normalizeComponent_1(
+    var mgForm = normalizeComponent(
       { render: __vue_render__$c, staticRenderFns: __vue_staticRenderFns__$c },
       __vue_inject_styles__$f,
       __vue_script__$f,
       __vue_scope_id__$f,
       __vue_is_functional_template__$f,
       __vue_module_identifier__$f,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgForm$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgForm
   });
 
@@ -3372,20 +3443,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgGrid = normalizeComponent_1(
+    var mgGrid = normalizeComponent(
       { render: __vue_render__$d, staticRenderFns: __vue_staticRenderFns__$d },
       __vue_inject_styles__$g,
       __vue_script__$g,
       __vue_scope_id__$g,
       __vue_is_functional_template__$g,
       __vue_module_identifier__$g,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgGrid$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgGrid
   });
 
@@ -3442,20 +3518,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgHeading = normalizeComponent_1(
+    var mgHeading = normalizeComponent(
       { render: __vue_render__$e, staticRenderFns: __vue_staticRenderFns__$e },
       __vue_inject_styles__$h,
       __vue_script__$h,
       __vue_scope_id__$h,
       __vue_is_functional_template__$h,
       __vue_module_identifier__$h,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgHeading$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgHeading
   });
 
@@ -3515,20 +3596,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgHtml = normalizeComponent_1(
+    var mgHtml = normalizeComponent(
       { render: __vue_render__$f, staticRenderFns: __vue_staticRenderFns__$f },
       __vue_inject_styles__$i,
       __vue_script__$i,
       __vue_scope_id__$i,
       __vue_is_functional_template__$i,
       __vue_module_identifier__$i,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgHtml$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgHtml
   });
 
@@ -3678,20 +3764,25 @@
     const __vue_is_functional_template__$j = false;
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgIcon = normalizeComponent_1(
+    var mgIcon = normalizeComponent(
       { render: __vue_render__$g, staticRenderFns: __vue_staticRenderFns__$g },
       __vue_inject_styles__$j,
       __vue_script__$j,
       __vue_scope_id__$j,
       __vue_is_functional_template__$j,
       __vue_module_identifier__$j,
-      browser,
+      false,
+      createInjector,
+      undefined,
       undefined
     );
 
   var mgIcon$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgIcon
   });
 
@@ -3878,20 +3969,25 @@
     const __vue_is_functional_template__$k = false;
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgInfoBlock = normalizeComponent_1(
+    var mgInfoBlock = normalizeComponent(
       { render: __vue_render__$h, staticRenderFns: __vue_staticRenderFns__$h },
       __vue_inject_styles__$k,
       __vue_script__$k,
       __vue_scope_id__$k,
       __vue_is_functional_template__$k,
       __vue_module_identifier__$k,
-      browser,
+      false,
+      createInjector,
+      undefined,
       undefined
     );
 
   var mgInfoBlock$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgInfoBlock
   });
 
@@ -3953,20 +4049,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgLabel = normalizeComponent_1(
+    var mgLabel = normalizeComponent(
       { render: __vue_render__$i, staticRenderFns: __vue_staticRenderFns__$i },
       __vue_inject_styles__$l,
       __vue_script__$l,
       __vue_scope_id__$l,
       __vue_is_functional_template__$l,
       __vue_module_identifier__$l,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgLabel$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgLabel
   });
 
@@ -4194,20 +4295,25 @@
     const __vue_is_functional_template__$m = false;
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgList = normalizeComponent_1(
+    var mgList = normalizeComponent(
       { render: __vue_render__$j, staticRenderFns: __vue_staticRenderFns__$j },
       __vue_inject_styles__$m,
       __vue_script__$m,
       __vue_scope_id__$m,
       __vue_is_functional_template__$m,
       __vue_module_identifier__$m,
-      browser,
+      false,
+      createInjector,
+      undefined,
       undefined
     );
 
   var mgList$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgList
   });
 
@@ -4476,20 +4582,25 @@
     const __vue_is_functional_template__$n = false;
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgNumber = normalizeComponent_1(
+    var mgNumber = normalizeComponent(
       { render: __vue_render__$k, staticRenderFns: __vue_staticRenderFns__$k },
       __vue_inject_styles__$n,
       __vue_script__$n,
       __vue_scope_id__$n,
       __vue_is_functional_template__$n,
       __vue_module_identifier__$n,
-      browser,
+      false,
+      createInjector,
+      undefined,
       undefined
     );
 
   var mgNumber$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgNumber
   });
 
@@ -4629,20 +4740,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgPermissions = normalizeComponent_1(
+    var mgPermissions = normalizeComponent(
       { render: __vue_render__$l, staticRenderFns: __vue_staticRenderFns__$l },
       __vue_inject_styles__$o,
       __vue_script__$o,
       __vue_scope_id__$o,
       __vue_is_functional_template__$o,
       __vue_module_identifier__$o,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgPermissions$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgPermissions
   });
 
@@ -4730,20 +4846,25 @@
     const __vue_is_functional_template__$p = false;
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgPlaceholder = normalizeComponent_1(
+    var mgPlaceholder = normalizeComponent(
       { render: __vue_render__$m, staticRenderFns: __vue_staticRenderFns__$m },
       __vue_inject_styles__$p,
       __vue_script__$p,
       __vue_scope_id__$p,
       __vue_is_functional_template__$p,
       __vue_module_identifier__$p,
-      browser,
+      false,
+      createInjector,
+      undefined,
       undefined
     );
 
   var mgPlaceholder$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgPlaceholder
   });
 
@@ -4896,20 +5017,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgRestQuery = normalizeComponent_1(
+    var mgRestQuery = normalizeComponent(
       { render: __vue_render__$n, staticRenderFns: __vue_staticRenderFns__$n },
       __vue_inject_styles__$q,
       __vue_script__$q,
       __vue_scope_id__$q,
       __vue_is_functional_template__$q,
       __vue_module_identifier__$q,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgRestQuery$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgRestQuery
   });
 
@@ -4960,20 +5086,25 @@
     const __vue_is_functional_template__$r = false;
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgSeperator = normalizeComponent_1(
+    var mgSeperator = normalizeComponent(
       { render: __vue_render__$o, staticRenderFns: __vue_staticRenderFns__$o },
       __vue_inject_styles__$r,
       __vue_script__$r,
       __vue_scope_id__$r,
       __vue_is_functional_template__$r,
       __vue_module_identifier__$r,
-      browser,
+      false,
+      createInjector,
+      undefined,
       undefined
     );
 
   var mgSeperator$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgSeperator
   });
 
@@ -5330,20 +5461,25 @@
     const __vue_is_functional_template__$s = false;
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgTable = normalizeComponent_1(
+    var mgTable = normalizeComponent(
       { render: __vue_render__$p, staticRenderFns: __vue_staticRenderFns__$p },
       __vue_inject_styles__$s,
       __vue_script__$s,
       __vue_scope_id__$s,
       __vue_is_functional_template__$s,
       __vue_module_identifier__$s,
-      browser,
+      false,
+      createInjector,
+      undefined,
       undefined
     );
 
   var mgTable$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgTable
   });
 
@@ -5445,20 +5581,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgTextArea = normalizeComponent_1(
+    var mgTextArea = normalizeComponent(
       { render: __vue_render__$q, staticRenderFns: __vue_staticRenderFns__$q },
       __vue_inject_styles__$t,
       __vue_script__$t,
       __vue_scope_id__$t,
       __vue_is_functional_template__$t,
       __vue_module_identifier__$t,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgTextArea$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgTextArea
   });
 
@@ -5626,20 +5767,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgText = normalizeComponent_1(
+    var mgText = normalizeComponent(
       { render: __vue_render__$r, staticRenderFns: __vue_staticRenderFns__$r },
       __vue_inject_styles__$u,
       __vue_script__$u,
       __vue_scope_id__$u,
       __vue_is_functional_template__$u,
       __vue_module_identifier__$u,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgText$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgText
   });
 
@@ -5731,20 +5877,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgTime = normalizeComponent_1(
+    var mgTime = normalizeComponent(
       { render: __vue_render__$s, staticRenderFns: __vue_staticRenderFns__$s },
       __vue_inject_styles__$v,
       __vue_script__$v,
       __vue_scope_id__$v,
       __vue_is_functional_template__$v,
       __vue_module_identifier__$v,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgTime$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgTime
   });
 
@@ -5826,13 +5977,13 @@
 
 
   /* styles */
-  __webpack_require__(7);
+  __webpack_require__(8);
 
-  var Component = __webpack_require__(5)(
+  var Component = __webpack_require__(6)(
     /* script */
     __webpack_require__(1),
     /* template */
-    __webpack_require__(6),
+    __webpack_require__(7),
     /* scopeId */
     "data-v-25adc6c0",
     /* cssModules */
@@ -5846,6 +5997,7 @@
   /* 1 */
   /***/ (function(module, __webpack_exports__, __webpack_require__) {
   Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+  /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(3);
   var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
   //
@@ -5891,25 +6043,13 @@
   //
   //
 
+
+
   var DEFAULT_COLOR_CHECKED = '#75c791';
   var DEFAULT_COLOR_UNCHECKED = '#bfcbd9';
   var DEFAULT_LABEL_CHECKED = 'on';
   var DEFAULT_LABEL_UNCHECKED = 'off';
   var DEFAULT_SWITCH_COLOR = '#fff';
-
-  var contains = function contains(object, title) {
-    return (typeof object === 'undefined' ? 'undefined' : _typeof(object)) === 'object' && object.hasOwnProperty(title);
-  };
-
-  var px = function px(v) {
-    return v + 'px';
-  };
-
-  var translate3d = function translate3d(x, y) {
-    var z = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '0px';
-
-    return 'translate3d(' + x + ', ' + y + ', ' + z + ')';
-  };
 
   /* harmony default export */ __webpack_exports__["default"] = ({
     name: 'ToggleButton',
@@ -5925,6 +6065,9 @@
         type: Boolean,
         default: false
       },
+      tag: {
+        type: String
+      },
       sync: {
         type: Boolean,
         default: false
@@ -5936,13 +6079,13 @@
       color: {
         type: [String, Object],
         validator: function validator(value) {
-          return (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' ? value.checked || value.unchecked || value.disabled : typeof value === 'string';
+          return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["a" /* isString */])(value) || __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* has */])(value, 'checked') || __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* has */])(value, 'unchecked') || __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* has */])(value, 'disabled');
         }
       },
       switchColor: {
         type: [String, Object],
         validator: function validator(value) {
-          return (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' ? value.checked || value.unchecked : typeof value === 'string';
+          return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["a" /* isString */])(value) || __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* has */])(value, 'checked') || __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["b" /* has */])(value, 'unchecked');
         }
       },
       cssColors: {
@@ -5978,33 +6121,36 @@
             disabled = this.disabled;
 
 
-        return ['vue-js-switch', { toggled: toggled, disabled: disabled }];
+        return ['vue-js-switch', {
+          toggled: toggled,
+          disabled: disabled
+        }];
       },
       coreStyle: function coreStyle() {
         return {
-          width: px(this.width),
-          height: px(this.height),
+          width: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* px */])(this.width),
+          height: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* px */])(this.height),
           backgroundColor: this.cssColors ? null : this.disabled ? this.colorDisabled : this.colorCurrent,
-          borderRadius: px(Math.round(this.height / 2))
+          borderRadius: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* px */])(Math.round(this.height / 2))
         };
       },
       buttonRadius: function buttonRadius() {
         return this.height - this.margin * 2;
       },
       distance: function distance() {
-        return px(this.width - this.height + this.margin);
+        return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* px */])(this.width - this.height + this.margin);
       },
       buttonStyle: function buttonStyle() {
         var transition = 'transform ' + this.speed + 'ms';
-        var margin = px(this.margin);
+        var margin = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* px */])(this.margin);
 
-        var transform = this.toggled ? translate3d(this.distance, margin) : translate3d(margin, margin);
+        var transform = this.toggled ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* translate3d */])(this.distance, margin) : __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* translate3d */])(margin, margin);
 
         var background = this.switchColor ? this.switchColorCurrent : null;
 
         return {
-          width: px(this.buttonRadius),
-          height: px(this.buttonRadius),
+          width: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* px */])(this.buttonRadius),
+          height: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* px */])(this.buttonRadius),
           transition: transition,
           transform: transform,
           background: background
@@ -6012,65 +6158,47 @@
       },
       labelStyle: function labelStyle() {
         return {
-          lineHeight: px(this.height),
-          fontSize: this.fontSize ? px(this.fontSize) : null
+          lineHeight: __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* px */])(this.height),
+          fontSize: this.fontSize ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* px */])(this.fontSize) : null
         };
       },
       colorChecked: function colorChecked() {
         var color = this.color;
 
 
-        if ((typeof color === 'undefined' ? 'undefined' : _typeof(color)) !== 'object') {
+        if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["e" /* isObject */])(color)) {
           return color || DEFAULT_COLOR_CHECKED;
         }
 
-        return contains(color, 'checked') ? color.checked : DEFAULT_COLOR_CHECKED;
+        return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["f" /* get */])(color, 'checked', DEFAULT_COLOR_CHECKED);
       },
       colorUnchecked: function colorUnchecked() {
-        var color = this.color;
-
-
-        return contains(color, 'unchecked') ? color.unchecked : DEFAULT_COLOR_UNCHECKED;
+        return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["f" /* get */])(this.color, 'unchecked', DEFAULT_COLOR_UNCHECKED);
       },
       colorDisabled: function colorDisabled() {
-        var color = this.color;
-
-
-        return contains(color, 'disabled') ? color.disabled : this.colorCurrent;
+        return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["f" /* get */])(this.color, 'disabled', this.colorCurrent);
       },
       colorCurrent: function colorCurrent() {
         return this.toggled ? this.colorChecked : this.colorUnchecked;
       },
       labelChecked: function labelChecked() {
-        var labels = this.labels;
-
-
-        return contains(labels, 'checked') ? labels.checked : DEFAULT_LABEL_CHECKED;
+        return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["f" /* get */])(this.labels, 'checked', DEFAULT_LABEL_CHECKED);
       },
       labelUnchecked: function labelUnchecked() {
-        var labels = this.labels;
-
-
-        return contains(labels, 'unchecked') ? labels.unchecked : DEFAULT_LABEL_UNCHECKED;
+        return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["f" /* get */])(this.labels, 'unchecked', DEFAULT_LABEL_UNCHECKED);
       },
       switchColorChecked: function switchColorChecked() {
-        var switchColor = this.switchColor;
-
-
-        return contains(switchColor, 'checked') ? switchColor.checked : DEFAULT_SWITCH_COLOR;
+        return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["f" /* get */])(this.switchColor, 'checked', DEFAULT_SWITCH_COLOR);
       },
       switchColorUnchecked: function switchColorUnchecked() {
-        var switchColor = this.switchColor;
-
-
-        return contains(switchColor, 'unchecked') ? switchColor.unchecked : DEFAULT_SWITCH_COLOR;
+        return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["f" /* get */])(this.switchColor, 'unchecked', DEFAULT_SWITCH_COLOR);
       },
       switchColorCurrent: function switchColorCurrent() {
         var switchColor = this.switchColor;
 
 
-        if ((typeof switchColor === 'undefined' ? 'undefined' : _typeof(switchColor)) !== 'object') {
-          return switchColor || DEFAULT_SWITCH_COLOR;
+        if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__utils__["e" /* isObject */])(this.switchColor)) {
+          return this.switchColor || DEFAULT_SWITCH_COLOR;
         }
 
         return this.toggled ? this.switchColorChecked : this.switchColorUnchecked;
@@ -6091,10 +6219,16 @@
 
     methods: {
       toggle: function toggle(event) {
-        this.toggled = !this.toggled;
-        this.$emit('input', this.toggled);
+        var toggled = !this.toggled;
+
+        if (!this.sync) {
+          this.toggled = toggled;
+        }
+
+        this.$emit('input', toggled);
         this.$emit('change', {
-          value: this.toggled,
+          value: toggled,
+          tag: this.tag,
           srcEvent: event
         });
       }
@@ -6127,9 +6261,47 @@
 
   /***/ }),
   /* 3 */
+  /***/ (function(module, __webpack_exports__, __webpack_require__) {
+  /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return isString; });
+  /* unused harmony export isBoolean */
+  /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return isObject; });
+  /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return has; });
+  /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return get; });
+  /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return px; });
+  /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return translate3d; });
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+  var isString = function isString(value) {
+    return typeof value === 'string';
+  };
+
+  var isObject = function isObject(value) {
+    return (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object';
+  };
+
+  var has = function has(object, key) {
+    return isObject(object) && object.hasOwnProperty(key);
+  };
+
+  var get = function get(object, key, defaultValue) {
+    return has(object, key) ? object[key] : defaultValue;
+  };
+
+  var px = function px(value) {
+    return value + 'px';
+  };
+
+  var translate3d = function translate3d(x, y) {
+    var z = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '0px';
+
+    return 'translate3d(' + x + ', ' + y + ', ' + z + ')';
+  };
+
+  /***/ }),
+  /* 4 */
   /***/ (function(module, exports, __webpack_require__) {
 
-  exports = module.exports = __webpack_require__(4)();
+  exports = module.exports = __webpack_require__(5)();
   // imports
 
 
@@ -6140,7 +6312,7 @@
 
 
   /***/ }),
-  /* 4 */
+  /* 5 */
   /***/ (function(module, exports) {
 
   /*
@@ -6196,7 +6368,7 @@
 
 
   /***/ }),
-  /* 5 */
+  /* 6 */
   /***/ (function(module, exports) {
 
   // this module is a runtime utility for cleaner component module output and will
@@ -6253,7 +6425,7 @@
 
 
   /***/ }),
-  /* 6 */
+  /* 7 */
   /***/ (function(module, exports) {
 
   module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -6295,20 +6467,20 @@
   },staticRenderFns: []};
 
   /***/ }),
-  /* 7 */
+  /* 8 */
   /***/ (function(module, exports, __webpack_require__) {
 
   // style-loader: Adds some css to the DOM by adding a <style> tag
 
   // load the styles
-  var content = __webpack_require__(3);
+  var content = __webpack_require__(4);
   if(typeof content === 'string') content = [[module.i, content, '']];
   if(content.locals) module.exports = content.locals;
   // add the styles to the DOM
-  var update = __webpack_require__(8)("2283861f", content, true);
+  var update = __webpack_require__(9)("2283861f", content, true);
 
   /***/ }),
-  /* 8 */
+  /* 9 */
   /***/ (function(module, exports, __webpack_require__) {
 
   /*
@@ -6327,7 +6499,7 @@
     ) }
   }
 
-  var listToStyles = __webpack_require__(9);
+  var listToStyles = __webpack_require__(10);
 
   /*
   type StyleObject = {
@@ -6529,7 +6701,7 @@
 
 
   /***/ }),
-  /* 9 */
+  /* 10 */
   /***/ (function(module, exports) {
 
   /**
@@ -6671,20 +6843,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgToggle = normalizeComponent_1(
+    var mgToggle = normalizeComponent(
       { render: __vue_render__$t, staticRenderFns: __vue_staticRenderFns__$t },
       __vue_inject_styles__$w,
       __vue_script__$w,
       __vue_scope_id__$w,
       __vue_is_functional_template__$w,
       __vue_module_identifier__$w,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgToggle$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgToggle
   });
 
@@ -6774,20 +6951,25 @@
     
     /* style inject SSR */
     
+    /* style inject shadow dom */
+    
 
     
-    var mgUrl = normalizeComponent_1(
+    var mgUrl = normalizeComponent(
       { render: __vue_render__$u, staticRenderFns: __vue_staticRenderFns__$u },
       __vue_inject_styles__$x,
       __vue_script__$x,
       __vue_scope_id__$x,
       __vue_is_functional_template__$x,
       __vue_module_identifier__$x,
+      false,
+      undefined,
       undefined,
       undefined
     );
 
   var mgUrl$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     'default': mgUrl
   });
 
