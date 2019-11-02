@@ -96,668 +96,672 @@
   }
 
   /**
+  * Shared front-end / back-end MacGyver utilities
+  * For Vue specific utilities see ./macgyver.vue
+  */
+  var $macgyver = {};
+  /**
+  * Storage for all MacGyver registered widgets
+  * @var {Object}
+  */
+
+  $macgyver.widgets = {};
+  /**
+  * Add a known widget to the widgets lookup object
+  * @param {string} [id] The unique ID of the widget to add (this is optional if id is specified in properties)
+  * @param {Object} [properties] Optional properties of the widget to add
+  * @param {boolean} [options.isContainer] Indicates that the widget can contain other widgets (under the `items` array)
+  * @param {boolean} [options.isContainerArray] Addition to `isContainer` that indicates the widget will contain an array of rows (like a table)
+  * @param {string} [options.title=id] Optional human readable title of the widget
+  * @param {string} [options.icon="far fa-square"] Optional icon to display in the form editor
+  * @param {Object} [options.config] Optional list of configuration the widget takes, this is in the form of a MacGyver form
+  * @param {boolean} [options.userPlaceable=true] Whether this component should be listed as placeable by the user (if false, its hidden in the mgFormEditor UI)
+  * @param {string} [options.category="Misc"] Which category this widget fits into when displaying the 'Add widget' dialog in mgFormEditor
+  * @param {boolean|function} [options.format=false] Whether the value of the widget can be exposed as a string. If this is === true the exact value is used, if === false (default) it will be ignored when making a digest of the form, if a function it will be called as (value) and expected to return a string value. NOTE: In the spec file, which is a flat JSON file any function argument will be overridden to `true`
+  * @param {string} [options.formatAlign='left'] The prefered column alignment when showing the result of `options.format`
+  * @param {boolean} [options.preferId=true] Whether the widget recommends needing an ID when its created, if false, no default ID is allocated via mgFormEditor
+  * @param {array <string>} [options.shorthand] Other aliases the widget answers to in shorthand mode (e.g. `{shorthand: ['boolean']}` will map that widget to the boolean type
+  *
+  * @returns {$macgyver} This chainable object
+  */
+
+  $macgyver.register = function (id, options) {
+    // Argument mangling {{{
+    if (id && options) {
+      // both id + options
+      options.id = id;
+    } else if (_.isPlainObject(id)) {
+      // Just options
+      var _ref = [id.id, id];
+      id = _ref[0];
+      options = _ref[1];
+    } else {
+      throw new Error('$macgyver.register(id, options) requires either an ID + options or an options object');
+    } // }}}
+
+
+    if (!_.isString(options.id) || !options.id.startsWith('mg')) throw new Error('Widget IDs must be simple strings beginning with "mg*"');
+    $macgyver.widgets[options.id] = _objectSpread2({
+      title: _.startCase(options.id),
+      userPlaceable: true,
+      category: 'Misc',
+      icon: 'far far-square',
+      format: false,
+      formatAlign: 'left',
+      isContainer: false,
+      isContainerArray: false,
+      preferId: true
+    }, options);
+    return $macgyver;
+  };
+
+  $macgyver.$nextId = 0;
+
+  $macgyver.nextId = function () {
+    return "mgForm".concat($macgyver.$nextId++);
+  };
+  /**
+  * Set of convenience functions to manage on-screen MacGyver forms
+  */
+
+
+  $macgyver.forms = {};
+  /**
+  * Convenience function to validate all MacGyver forms on a screen and return the array of failed validations
+  * @param {string} [id] The form ID to validate, if omitted the first form on the page is used
+  * @param {boolean} [showErrors=true] Allow the form to display a list of errors as well as returning them
+  * @returns {array <Object>} Collection where each item is {error}
+  */
+
+  $macgyver.forms.validate = function (id) {
+    var showErrors = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+    if (!id) id = _.keys($macgyver.$forms)[0];
+    if (!id) throw new Error('No MacGyver form found');
+    console.log('Use form', id);
+    var responses = [];
+    $macgyver.forms.emitDown(id, 'mgValidate', function (error) {
+      return responses.push({
+        error: error
+      });
+    });
+    if (showErrors) $macgyver.forms.emit(id, 'mgErrors', responses);
+    return responses;
+  };
+  /**
+  * Emit a message to a specific mgForm element
+  * @param {string} id The ID of the form to emit to
+  * @param {string} msg The message to emit
+  * @param {*} [payload...] The payload of the message to emit
+  */
+
+
+  $macgyver.forms.emit = function (id, msg) {
+    var _$macgyver$$forms$id;
+
+    if (!$macgyver.$forms[id]) throw new Error('Unknown form ID');
+
+    for (var _len = arguments.length, payload = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+      payload[_key - 2] = arguments[_key];
+    }
+
+    (_$macgyver$$forms$id = $macgyver.$forms[id]).$emit.apply(_$macgyver$$forms$id, [msg].concat(payload));
+  };
+  /**
+  * Emit a message to all child controls of a given form
+  * @param {string} id The ID of the form to emit to
+  * @param {string} msg The message to emit
+  * @param {*} [payload...] The payload of the message to emit
+  */
+
+
+  $macgyver.forms.emitDown = function (id, msg) {
+    var _$macgyver$$forms$id2;
+
+    if (!$macgyver.$forms[id]) throw new Error('Unknown form ID');
+
+    for (var _len2 = arguments.length, payload = new Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
+      payload[_key2 - 2] = arguments[_key2];
+    }
+
+    (_$macgyver$$forms$id2 = $macgyver.$forms[id]).$emitDown.apply(_$macgyver$$forms$id2, [msg].concat(payload));
+  };
+
+  $macgyver.forms.getPath = function (id, path, fallback) {
+    return $macgyver.utils.getPath($macgyver.$forms[id], path, fallback);
+  };
+  /**
+  * Execute a function on a form
+  * The default behaviour of this function is documented within the function
+  * @param {string} id The ID of the form to execute the function on
+  * @param {string} action The action to execute
+  * @emits mgRun Event fired at the form level only. Use the form property handleActions to specify if the form should handle or trap the event to override
+  */
+
+
+  $macgyver.forms.run = function (id, action) {
+    // 1. Emit mgRun to parents and see if they want to handle it {{{
+    var handled = false;
+    $macgyver.$forms[id].$emitUp('mgRun', {
+      action: action
+    }, function (isHandled) {
+      if (isHandled) handled = true;
+    });
+    if (handled) return; // }}}
+    // 2. Use FORM.$props.onAction(action) and see if returns truthy {{{
+
+    if ($macgyver.$forms[id].$props.onAction && $macgyver.$forms[id].$props.onAction(action)) return; // }}}
+    // 3. See if FORM.$props.actions[action] exists and if so whether it returns truthy {{{
+
+    var _ref2 = /^([a-z0-9\_]*?)(\(.*\))?$/i.exec(action) || [],
+        _ref3 = _slicedToArray(_ref2, 3),
+        junk = _ref3[0],
+        actionReadable = _ref3[1],
+        actionArgs = _ref3[2];
+
+    if (actionReadable && $macgyver.$forms[id].$props.actions && $macgyver.$forms[id].$props.actions[actionReadable]) {
+      // Collapse strings to functions
+      var func = _.isString($macgyver.$forms[id].$props.actions[actionReadable]) ? $macgyver.$forms[id][actionReadable] : $macgyver.$forms[id].$props.actions[actionReadable]; // Tidy up actionArgs
+
+      actionArgs = _(actionArgs || '').trim('()').split(',').map(function (i) {
+        return i && JSON.parse(i.replace(/'/g, '"'));
+      });
+      if (func.apply($macgyver.$forms[id], actionArgs)) return;
+    } // }}}
+    // 4. If all else failed and FORM.$props.actionsFallback is true - handle it via vm.$eval {{{
+
+
+    $macgyver.$forms[id].$eval.call($macgyver.$forms[id], action); // }}}
+  }; // $macgyver.notify{} {{{
+
+  /**
+  * A collection of ways MacGyver can notify the user
+  * These should be replaced by whatever your local framework supports
+  */
+
+
+  $macgyver.notify = {};
+  /**
+  * Signify that a loading event is taking place
+  * This function should be overridden by the framework to include whatever load handling is requried
+  * By default it uses https://www.npmjs.com/package/@momsfriendlydevco/loader
+  * @param {string} id The unique ID for the loading item
+  * @param {boolean} [status=true] Whether the item is performing an operation that requires loading
+  * @param {Object} [options] Additional options
+  * @param {boolean} [options.foreground=false] Whether the loading event should occur in the foreground
+  */
+
+  $macgyver.notify.loading = function (id) {
+    var status = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+    var options = arguments.length > 2 ? arguments[2] : undefined;
+
+    if (status && options && options.foreground) {
+      Loader.start(id, status);
+    } else if (status) {
+      Loader.startBackground(id, status);
+    } else {
+      Loader.stop(id);
+    }
+  };
+  /**
+  * Provide a warning message to the user
+  * @param {string} message The message to display
+  */
+
+
+  $macgyver.notify.warn = function (message) {
+    return $toast.warning(message);
+  };
+  /**
+  * Provide an error message to the user
+  * @param {string} message The message to display
+  */
+
+
+  $macgyver.notify.error = function (message) {
+    return $toast.error(message);
+  }; // }}}
+
+  /**
+  * Glue various MacGyver emitter handlers to a registered component
+  * Registers a few universal handles, which can be called via $macgyver.forms.emitDown(id, EVENT):
+  *   - mgIdentify - component will respond with its Vue instance
+  *   - mgRefresh - component with refresh its data state
+  *
+  * Adds a watcher which will emit `mgChange` when the `data` property changes (basically transforms the change event to `mgChange`)
+  *
+  * @param {VueInstance} component The component to register against
+  */
+
+
+  $macgyver.inject = function (component) {
+    // Sanity checks {{{
+    if (!component.$props.form) throw new Error('Cannot locate $props.form <string>, make sure that vm{props: {form: String, config: Object}} is declared'); // }}}
+
+    component.$on('mgIdentify', function (reply) {
+      return reply(component);
+    }); // Read in initial data value
+
+    if (component.$props.config.$dataPath) {
+      var refresher = function refresher() {
+        component.data = _.get($macgyver.$forms[component.$props.form].$props.data, component.$props.config.$dataPath);
+      };
+
+      component.$on('mgRefresh', refresher);
+      refresher();
+    } // Inject data watcher which transforms change operations into emitters to the nearest parent form {{{
+
+
+    component.$watch('data', function (val) {
+      $macgyver.$forms[component.$props.form].$emit('mgChange', component.$props.config.$dataPath, val);
+    }); // }}}
+  };
+  /**
+  * Flatten the a spec into an object lookup where each key is the dotted notation of the key
+  * NOTE: Specifying {want:'array'} will add the extra property 'path' onto the output collection
+  * @param {Object} root The data or spec object to examine
+  * @param {Object} [options] Optional settings to use
+  * @param {number} [options.maxDepth=0] How far down the tree to recurse, set to falsy to infinitely recurse
+  * @param {Object|function} [options.filter] Either a Lodash match expression or a function to run on each widget - only truthy values are appended to the output. Function is called as `(widget, dataPath, specPath, depth)`
+  * @param {Object|function} [options.filterChildren] Either a Lodash match expression or a function to run on each widget - only truthy values are recursed into. Function is called as `(widget, dataPath, specPath, depth)`
+  * @param {string} [type="auto"] How to recurse into items. ENUM: 'auto' (try to determine how to recurse from root element), 'spec', 'data'
+  * @param {string} [want="object"] How to return the output. ENUM: 'object' (an object where each key is the path and the value is the object), 'array' (a flattened version of an object), object is faster
+  * @param {boolean|string} [wantDataPath=false] Whether to mutate the output widget with a dotted notation string indicating where to look in a data object for the value of the widget, if this is a string it specifies the key to use as storage
+  * @param {boolean} [wantSpec=false] Whether to mutate the output widget with the widget specification as an object for each item
+  * @param {boolean|string} [wantSpecPath=false] Whether to mutate the output widget with a dotted notation path on where to find the widget within a spec object, if this is a string it specifies the key to use as storage
+  */
+
+
+  $macgyver.flatten = function (root, options) {
+    var settings = _.defaults(options, {
+      maxDepth: 0,
+      filter: undefined,
+      filterChildren: undefined,
+      type: 'auto',
+      want: 'object',
+      wantDataPath: false,
+      wantSpec: false,
+      wantSpecPath: false
+    });
+
+    if (settings.filter && !_.isFunction(settings.filter) && _.isObject(settings.filter)) settings.filter = _.matches(settings.filter);
+    if (settings.want != 'object' && settings.want != 'array') throw new Error('$macgyver.flatten({want}) can only be "object" or "array"');
+
+    if (settings.type == 'auto') {
+      if (root.items) {
+        settings.type = 'spec';
+      } else if (_.every(root, function (k, v) {
+        return !v.items;
+      })) {
+        settings.type = 'data';
+      } else {
+        throw new Error('Cannot determine type of input object to $macgyver.flatten(), specify it explicitly with {type=spec|data}');
+      }
+    }
+
+    var found = settings.want == 'object' ? {} : [];
+
+    var depthScanner = function depthScanner(node, dataPath, specPath, depth) {
+      if (!_.isObject(node)) return; // Add to bucket of found objects?
+
+      if (!settings.filter // No filter
+      || settings.filter.call(node, node, path, depth) // OR we pass the filter
+      ) {
+          if (settings.wantDataPath) node[_.isString(settings.wantDataPath) ? settings.wantDataPath : 'path'] = dataPath.concat([node.id]).filter(function (i) {
+            return i;
+          }).join('.');
+          if (settings.wantSpecPath) node[_.isString(settings.wantSpecPath) ? settings.wantSpecPath : 'specPath'] = specPath.join('.');
+
+          if (settings.want == 'object') {
+            if (node.id) found[node.id] = node;
+          } else {
+            found.push(node);
+          }
+        } // Recurse into children?
+
+
+      var recursionSubject = settings.type == 'spec' ? node.items : node;
+
+      if (_.isArray(recursionSubject) && (!settings.filterChildren // No filter
+      || settings.filterChildren.call(node, node, dataPath, specPath, depth) // ...or we pass the filter
+      ) && (!settings.maxDepth || depth <= settings.maxDepth)) {
+        recursionSubject.forEach(function (item, itemIndex) {
+          return depthScanner(item, dataPath, specPath.concat(settings.type == 'spec' ? ['items', itemIndex] : [itemIndex]), depth + 1);
+        });
+      }
+    };
+
+    depthScanner(root, [], [], 0);
+    return found;
+  };
+  /**
+  * Apply various criteria to a 'rough' spec to turn it into a clean one
+  *
+  * NOTE: 'Shorthand' is a simple `{id1: spec1, id2: spec2}` way of setting up a form. See the widget config for an example
+  *       Shorthand may also have types that omit the `mg` prefix e.g. `text` instead of `mgText`
+  *
+  * @param {Object|array} spec A MacGyver spec to process and mutate
+  * @param {Object} [options] Additional options to use
+  * @param {boolean} [options.clone=true] Whether to clone the object before neatening, slow but Vue disallows mutation
+  * @param {boolean} [options.convertArray=true] Convert arrays to object if not already in that format
+  * @param {function} [options.convertArrayWrapper] Function used to convert from array - defaults to a simple mgContainer wrapper. Called as (spec)
+  * @param {boolean} [options.convertShorthand=true] Accept shorthand format and convert if necessary
+  * @param {function} [options.convertShorthandDetect] Function used to detect shorthand format - defaults to object with valid string keys sans 'id' field. Called as (spec)
+  * @param {function} [options.convertShorthandTranslate] Function used to convert shorthand format. Called as (spec)
+  * @param {boolean} [options.widgetDefaults=true] Assign each item its default values from the widget config if that setting is omitted
+  * @param {string} [options.widgetTitles=true] Add any missing title fields from the ID
+  * @param {boolean} [options.deblank=true] Reformat null/undefined/empty forms into a skeleton form
+  * @returns {Object} The mutated spec
+  */
+
+
+  $macgyver.neatenSpec = function (spec, options) {
+    var settings = _objectSpread2({
+      clone: true,
+      convertArray: true,
+      convertArrayWrapper: function convertArrayWrapper(items) {
+        return {
+          type: 'mgContainer',
+          showTitles: false,
+          items: items
+        };
+      },
+      convertShorthand: true,
+      convertShorthandDetect: function convertShorthandDetect(spec) {
+        return _.isPlainObject(spec) // Simple object
+        && !_.has(spec, 'type') // It doesn't have a type key (i.e. there is only one item in this object
+        && _.every(spec, function (v, k) {
+          return !_.has(v, 'id') && (!_.has(v, 'type') || v.type != 'mgContainer');
+        });
+      },
+      // Each item lacks and ID and either doesn't have a type or that type is not a container
+      convertShorthandTranslate: function convertShorthandTranslate(spec) {
+        return {
+          type: 'mgContainer',
+          items: _.map(spec, function (v, k) {
+            return _objectSpread2({
+              id: k
+            }, v, {
+              type: function () {
+                if (_.isString(v)) v = {
+                  type: v
+                }; // Only key given is a string, assume it means type
+
+                if (!v.type) return 'mgText'; // No type given, assume mgText
+
+                if (v.type.startsWith('mg')) return v.type; // Type begins with 'mg' - trust the user
+
+                v.type = v.type.toLowerCase();
+                return Object.keys($macgyver.widgets) // Search for likely widgets
+                .find(function (wid) {
+                  var widget = $macgyver.widgets[wid];
+                  return widget.id.substr(2).toLowerCase() == v.type // Matched after 'mg' part. e.g. 'text' becomes 'mgText'
+                  || (widget.shorthand || []).find(function (s) {
+                    return s == v.type;
+                  }) // Matched a shorthand alias
+                  ;
+                }) || v.type;
+              }()
+            });
+          })
+        };
+      },
+      widgetDefaults: true,
+      widgetTitles: true,
+      deblank: true
+    }, options);
+
+    var layout = settings.clone ? _.cloneDeep(spec) : spec; // Output spec
+
+    if (settings.deblank && _.isEmpty(layout)) {
+      // Convert empty or unusable values into a skeleton
+      layout = {
+        type: 'mgContainer',
+        items: []
+      };
+    }
+
+    if (settings.convertArray && _.isArray(layout)) {
+      // convert array spec -> object?
+      layout = settings.convertArrayWrapper(layout);
+    }
+
+    if (settings.convertShorthand && settings.convertShorthandDetect(layout)) {
+      // Is shorthand format
+      layout = settings.convertShorthandTranslate(layout);
+    }
+
+    $macgyver.flatten(layout, {
+      type: 'spec',
+      want: 'array',
+      wantDataPath: '$dataPath',
+      wantSpecPath: '$specPath'
+    }).forEach(function (widget) {
+      if (!widget.type || !$macgyver.widgets[widget.type]) {
+        // Remap unknown widget
+        console.log("Unknown widget '".concat(widget.type, "'"), widget);
+        widget.errorText = widget.type ? "Unknown widget '".concat(widget.type, "'") : 'Widget type not specified';
+        widget.errorWidgetType = widget.type;
+        widget.type = 'mgError';
+      } else if (settings.widgetDefaults) {
+        Object.assign(widget, _($macgyver.widgets[widget.type].config).pickBy(function (v, k) {
+          return !_.has(widget, k) && _.has(v, 'default');
+        }).mapValues(function (v) {
+          return v["default"];
+        }).value());
+      }
+
+      if (settings.widgetTitles && !widget.title && widget.id) widget.title = _.startCase(widget.id);
+    });
+    return layout;
+  };
+  /**
+  * Fetch any artbitrary data set from a URL
+  * This function is designed to accept a customizable single-string URL which the user can customize and a spec options object that the requesting widget can define
+  * NOTE: This function will invoke the loading notifier and call the warning notifier on an error
+  *
+  * @param {string} url The URL to fetch
+  * @param {Object} [options] Additional options
+  * @param {boolean} [options.type='object'] What data type to expect from the server. ENUM: 'object', 'array', 'raw'. If array and mappings are specified each member of the collection is mapped and an array returned
+  * @param {Object <Object>} [options.mappings={}] Mappings to extract, each key is the mapping name with the value as an object containing `{required <boolean>}`
+  * @param {function} [options.format] Data formatter, defaults to a simple passthrough. Called as `(output, session)`
+  * @param {string|function} [options.formatError] Error thrown if the formatter fails, can be a string or function called as `(err)`. Defaults to 'Unable to format data feed from ${url} - ${err.toString()}`
+  * @returns {Object} The extracted data object
+  *
+  * @example Fetch a simple collection
+  * fetch('/api/datafeeds/random/users')
+  *
+  * @example Generate a random number as an object and return the extracted value as the promise response
+  * fetch('/api/datafeeds/random/number?$extract=number', {mappings: {extract: {required: true}, format: d => d.extract}});
+  *
+  * @example Fetch a collection of items extracting both 'id' and 'title' fields
+  * fetch('/api/datafeeds/random/users?$title=name&$id=_id', {mappings: {_id: {required: true}, title: {required: true}}})
+  */
+
+
+  $macgyver.fetch = function (url, options) {
+    return Promise.resolve() // Create the initial session {{{
+    .then(function () {
+      return {
+        mappings: {},
+        parsedUrl: new URL(url, window.location),
+        settings: _objectSpread2({
+          type: 'object',
+          mappings: {},
+          format: function format(data, session) {
+            return data;
+          },
+          formatError: function formatError(err) {
+            return "Unable to format data feed from ".concat(url, " - ").concat(err.toString());
+          }
+        }, options)
+      };
+    }) // }}}
+    // Extract mappings from the URL string {{{
+    .then(function (session) {
+      if (!_.isEmpty(session.settings.mappings)) {
+        // Extract mappings
+        Array.from(session.parsedUrl.searchParams.entries()).forEach(function (pair) {
+          var _pair = _slicedToArray(pair, 2),
+              k = _pair[0],
+              v = _pair[1];
+
+          if (k.startsWith('$')) {
+            session.mappings[k] = v;
+            session.parsedUrl.searchParams["delete"](k);
+          }
+        });
+      }
+
+      return session;
+    }) // }}}
+    // Verify that requested mappings are present {{{
+    .then(function (session) {
+      var checkRequired = _(session.settings).pickBy(function (v, k) {
+        return k.required && !_.has(session.mappings, v);
+      }).map(function (v, k) {
+        return k;
+      }).value();
+
+      if (checkRequired.length) throw "Required URL \"".concat(url, "\" is missing the required mappings: ").concat(checkRequired.join(', '));
+      return session;
+    }) // }}}
+    // Make the request {{{
+    .then(function (session) {
+      return $macgyver.$http.get(session.parsedUrl.toString()).then(function (res) {
+        return session.response = res;
+      }).then(function () {
+        return session;
+      });
+    }) // }}}
+    // Apply object cohersion + mappings {{{
+    .then(function (session) {
+      // FIXME: This logic is probably buggered - Too drunk, MC - 2019-01-04
+      switch (session.settings.type) {
+        case 'array':
+          if (!_.isArray(session.response.data)) throw "Expected an array from data feed \"".concat(url, "\" but got a non-array");
+
+          if (!_.isEmpty(session.mappings)) {
+            var pickKeys = _.map(session.settings.mappings, function (v, k) {
+              return session.mappings['$' + k];
+            });
+
+            session.output = session.response.data.map(function (doc) {
+              return (// Remap data using mappings
+                _.pick(doc, pickKeys)
+              );
+            });
+          } else {
+            session.output = session.response.data;
+          }
+
+          return session;
+
+        case 'object':
+          if (!_.isPlainObject(session.response.data)) throw "Expected object return from data feed \"".concat(url, "\" but got a non-plain-object");
+
+          if (!_.isEmpty(session.mappings)) {
+            session.output = _(session.mappings).mapKeys(function (v, k) {
+              return k.replace(/^\$/, '');
+            }) // Remove '$' prefix
+            .mapValues(function (v, k) {
+              return session.response.data[session.mappings['$' + k]];
+            }).value();
+          } else {
+            session.output = session.response.data;
+          }
+
+          return session;
+
+        case 'raw':
+          session.output = session.response.data;
+          return session;
+      }
+    }) // }}}
+    // Apply formatter {{{
+    .then(function (session) {
+      try {
+        return session.settings.format(session.output, session);
+      } catch (err) {
+        throw _.isString(session.settings.formatError) ? session.settings.formatError : session.settings.formatError(err);
+      }
+    }) // }}}
+    ["catch"](function (err) {
+      $macgyver.notify.error(err);
+      throw err;
+    })["finally"](function () {
+      return $macgyver.notify.loading(url, false);
+    });
+  };
+  /**
+  * Register of known forms to their Vue instance mapping
+  * @var $Object <VueInstance>}
+  */
+
+
+  $macgyver.$forms = {};
+  /**
+  * Registeres a MacGyver form by its generated ID
+  * @params {VueInstance} component The Vue component to register
+  */
+
+  $macgyver.injectForm = function (component) {
+    $macgyver.$forms[component.id] = component;
+    component.$on('mgIdentify', function (reply) {
+      return reply(component);
+    });
+  };
+  /**
+  * Set of misc utility helper functions
+  * @var {Object};
+  */
+
+
+  $macgyver.utils = {};
+  /**
+  * Navigate down a dotted notation path and set the final value using Vue.set()
+  * This function is designed to work as simillaly as possible to _.set()
+  * @param {Object} target The source object, usually the root controller
+  * @param {string|array} path Either a path in dotted or array notation
+  * @param {*} value The value set
+  */
+
+  $macgyver.utils.setPath = function (target, path, value) {
+    var chunks = typeof path == 'string' ? path.split('.') : path; // Ensure all paths up to this chunk-1 exist
+
+    var targ = target;
+
+    for (var i = 0; i < chunks.length - 1; i++) {
+      if (targ[chunks[i]] === undefined) {
+        targ = Vue.set(targ, chunks[i], {}); // Traversal point not yet setup
+      } else {
+        targ = targ[chunks[i]]; // Recurse into the newly created child (or the existing branch)
+      }
+    }
+
+    return Vue.set(targ, chunks[chunks.length - 1], value);
+  };
+  /**
+  * Provides a function to quickly get a data path on a Vue component by its path
+  * This function is designed to work as simillaly as possible to _.get()
+  * @param {Object} target The source object, usually the root controller
+  * @param {string|array} path Either a path in dotted or array notation
+  * @param {*} [fallback=undefined] Optional fallback to return if no value is found
+  * @returns {*} Either the found value or the fallback
+  */
+
+
+  $macgyver.utils.getPath = function (target, path, fallback) {
+    return _.get(target, path, fallback);
+  };
+
+  /**
   * Main MacGyver "service" (acutally just a Vue prototype extension)
   * This service requires {$http, $toast} to be available on the prototype
   * @var {Object}
   */
 
   Vue$1.prototype.$macgyver = function () {
-    var $macgyver = {};
-    /**
-    * Storage for all MacGyver registered widgets
-    * @var {Object}
-    */
-
-    $macgyver.widgets = {};
-    /**
-    * Add a known widget to the widgets lookup object
-    * @param {string} [id] The unique ID of the widget to add (this is optional if id is specified in properties)
-    * @param {Object} [properties] Optional properties of the widget to add
-    * @param {boolean} [options.isContainer] Indicates that the widget can contain other widgets (under the `items` array)
-    * @param {boolean} [options.isContainerArray] Addition to `isContainer` that indicates the widget will contain an array of rows (like a table)
-    * @param {string} [options.title=id] Optional human readable title of the widget
-    * @param {string} [options.icon="far fa-square"] Optional icon to display in the form editor
-    * @param {Object} [options.config] Optional list of configuration the widget takes, this is in the form of a MacGyver form
-    * @param {boolean} [options.userPlaceable=true] Whether this component should be listed as placeable by the user (if false, its hidden in the mgFormEditor UI)
-    * @param {string} [options.category="Misc"] Which category this widget fits into when displaying the 'Add widget' dialog in mgFormEditor
-    * @param {boolean|function} [options.format=false] Whether the value of the widget can be exposed as a string. If this is === true the exact value is used, if === false (default) it will be ignored when making a digest of the form, if a function it will be called as (value) and expected to return a string value. NOTE: In the spec file, which is a flat JSON file any function argument will be overridden to `true`
-    * @param {string} [options.formatAlign='left'] The prefered column alignment when showing the result of `options.format`
-    * @param {boolean} [options.preferId=true] Whether the widget recommends needing an ID when its created, if false, no default ID is allocated via mgFormEditor
-    * @param {array <string>} [options.shorthand] Other aliases the widget answers to in shorthand mode (e.g. `{shorthand: ['boolean']}` will map that widget to the boolean type
-    *
-    * @returns {$macgyver} This chainable object
-    */
-
-    $macgyver.register = function (id, options) {
-      // Argument mangling {{{
-      if (id && options) {
-        // both id + options
-        options.id = id;
-      } else if (_.isPlainObject(id)) {
-        // Just options
-        var _ref = [id.id, id];
-        id = _ref[0];
-        options = _ref[1];
-      } else {
-        throw new Error('$macgyver.register(id, options) requires either an ID + options or an options object');
-      } // }}}
-
-
-      if (!_.isString(options.id) || !options.id.startsWith('mg')) throw new Error('Widget IDs must be simple strings beginning with "mg*"');
-      $macgyver.widgets[options.id] = _objectSpread2({
-        title: _.startCase(options.id),
-        userPlaceable: true,
-        category: 'Misc',
-        icon: 'far far-square',
-        format: false,
-        formatAlign: 'left',
-        isContainer: false,
-        isContainerArray: false,
-        preferId: true
-      }, options);
-      return $macgyver;
-    };
-
-    $macgyver.$nextId = 0;
-
-    $macgyver.nextId = function () {
-      return "mgForm".concat($macgyver.$nextId++);
-    };
-    /**
-    * Set of convenience functions to manage on-screen MacGyver forms
-    */
-
-
-    $macgyver.forms = {};
-    /**
-    * Convenience function to validate all MacGyver forms on a screen and return the array of failed validations
-    * @param {string} [id] The form ID to validate, if omitted the first form on the page is used
-    * @param {boolean} [showErrors=true] Allow the form to display a list of errors as well as returning them
-    * @returns {array <Object>} Collection where each item is {error}
-    */
-
-    $macgyver.forms.validate = function (id) {
-      var showErrors = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-      if (!id) id = _.keys($macgyver.$forms)[0];
-      if (!id) throw new Error('No MacGyver form found');
-      console.log('Use form', id);
-      var responses = [];
-      $macgyver.forms.emitDown(id, 'mgValidate', function (error) {
-        return responses.push({
-          error: error
-        });
-      });
-      if (showErrors) $macgyver.forms.emit(id, 'mgErrors', responses);
-      return responses;
-    };
-    /**
-    * Emit a message to a specific mgForm element
-    * @param {string} id The ID of the form to emit to
-    * @param {string} msg The message to emit
-    * @param {*} [payload...] The payload of the message to emit
-    */
-
-
-    $macgyver.forms.emit = function (id, msg) {
-      var _$macgyver$$forms$id;
-
-      if (!$macgyver.$forms[id]) throw new Error('Unknown form ID');
-
-      for (var _len = arguments.length, payload = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-        payload[_key - 2] = arguments[_key];
-      }
-
-      (_$macgyver$$forms$id = $macgyver.$forms[id]).$emit.apply(_$macgyver$$forms$id, [msg].concat(payload));
-    };
-    /**
-    * Emit a message to all child controls of a given form
-    * @param {string} id The ID of the form to emit to
-    * @param {string} msg The message to emit
-    * @param {*} [payload...] The payload of the message to emit
-    */
-
-
-    $macgyver.forms.emitDown = function (id, msg) {
-      var _$macgyver$$forms$id2;
-
-      if (!$macgyver.$forms[id]) throw new Error('Unknown form ID');
-
-      for (var _len2 = arguments.length, payload = new Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
-        payload[_key2 - 2] = arguments[_key2];
-      }
-
-      (_$macgyver$$forms$id2 = $macgyver.$forms[id]).$emitDown.apply(_$macgyver$$forms$id2, [msg].concat(payload));
-    };
-
-    $macgyver.forms.getPath = function (id, path, fallback) {
-      return $macgyver.utils.getPath($macgyver.$forms[id], path, fallback);
-    };
-    /**
-    * Execute a function on a form
-    * The default behaviour of this function is documented within the function
-    * @param {string} id The ID of the form to execute the function on
-    * @param {string} action The action to execute
-    * @emits mgRun Event fired at the form level only. Use the form property handleActions to specify if the form should handle or trap the event to override
-    */
-
-
-    $macgyver.forms.run = function (id, action) {
-      // 1. Emit mgRun to parents and see if they want to handle it {{{
-      var handled = false;
-      $macgyver.$forms[id].$emitUp('mgRun', {
-        action: action
-      }, function (isHandled) {
-        if (isHandled) handled = true;
-      });
-      if (handled) return; // }}}
-      // 2. Use FORM.$props.onAction(action) and see if returns truthy {{{
-
-      if ($macgyver.$forms[id].$props.onAction && $macgyver.$forms[id].$props.onAction(action)) return; // }}}
-      // 3. See if FORM.$props.actions[action] exists and if so whether it returns truthy {{{
-
-      var _ref2 = /^([a-z0-9\_]*?)(\(.*\))?$/i.exec(action) || [],
-          _ref3 = _slicedToArray(_ref2, 3),
-          junk = _ref3[0],
-          actionReadable = _ref3[1],
-          actionArgs = _ref3[2];
-
-      if (actionReadable && $macgyver.$forms[id].$props.actions && $macgyver.$forms[id].$props.actions[actionReadable]) {
-        // Collapse strings to functions
-        var func = _.isString($macgyver.$forms[id].$props.actions[actionReadable]) ? $macgyver.$forms[id][actionReadable] : $macgyver.$forms[id].$props.actions[actionReadable]; // Tidy up actionArgs
-
-        actionArgs = _(actionArgs || '').trim('()').split(',').map(function (i) {
-          return i && JSON.parse(i.replace(/'/g, '"'));
-        });
-        if (func.apply($macgyver.$forms[id], actionArgs)) return;
-      } // }}}
-      // 4. If all else failed and FORM.$props.actionsFallback is true - handle it via vm.$eval {{{
-
-
-      $macgyver.$forms[id].$eval.call($macgyver.$forms[id], action); // }}}
-    }; // $macgyver.notify{} {{{
-
-    /**
-    * A collection of ways MacGyver can notify the user
-    * These should be replaced by whatever your local framework supports
-    */
-
-
-    $macgyver.notify = {};
-    /**
-    * Signify that a loading event is taking place
-    * This function should be overridden by the framework to include whatever load handling is requried
-    * By default it uses https://www.npmjs.com/package/@momsfriendlydevco/loader
-    * @param {string} id The unique ID for the loading item
-    * @param {boolean} [status=true] Whether the item is performing an operation that requires loading
-    * @param {Object} [options] Additional options
-    * @param {boolean} [options.foreground=false] Whether the loading event should occur in the foreground
-    */
-
-    $macgyver.notify.loading = function (id) {
-      var status = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-      var options = arguments.length > 2 ? arguments[2] : undefined;
-
-      if (status && options && options.foreground) {
-        Loader.start(id, status);
-      } else if (status) {
-        Loader.startBackground(id, status);
-      } else {
-        Loader.stop(id);
-      }
-    };
-    /**
-    * Provide a warning message to the user
-    * @param {string} message The message to display
-    */
-
-
-    $macgyver.notify.warn = function (message) {
-      return $toast.warning(message);
-    };
-    /**
-    * Provide an error message to the user
-    * @param {string} message The message to display
-    */
-
-
-    $macgyver.notify.error = function (message) {
-      return $toast.error(message);
-    }; // }}}
-
-    /**
-    * Glue various MacGyver emitter handlers to a registered component
-    * Registers a few universal handles, which can be called via $macgyver.forms.emitDown(id, EVENT):
-    *   - mgIdentify - component will respond with its Vue instance
-    *   - mgRefresh - component with refresh its data state
-    *
-    * Adds a watcher which will emit `mgChange` when the `data` property changes (basically transforms the change event to `mgChange`)
-    *
-    * @param {VueInstance} component The component to register against
-    */
-
-
-    $macgyver.inject = function (component) {
-      // Sanity checks {{{
-      if (!component.$props.form) throw new Error('Cannot locate $props.form <string>, make sure that vm{props: {form: String, config: Object}} is declared'); // }}}
-
-      component.$on('mgIdentify', function (reply) {
-        return reply(component);
-      }); // Read in initial data value
-
-      if (component.$props.config.$dataPath) {
-        var refresher = function refresher() {
-          component.data = _.get($macgyver.$forms[component.$props.form].$props.data, component.$props.config.$dataPath);
-        };
-
-        component.$on('mgRefresh', refresher);
-        refresher();
-      } // Inject data watcher which transforms change operations into emitters to the nearest parent form {{{
-
-
-      component.$watch('data', function (val) {
-        $macgyver.$forms[component.$props.form].$emit('mgChange', component.$props.config.$dataPath, val);
-      }); // }}}
-    };
-    /**
-    * Flatten the a spec into an object lookup where each key is the dotted notation of the key
-    * NOTE: Specifying {want:'array'} will add the extra property 'path' onto the output collection
-    * @param {Object} root The data or spec object to examine
-    * @param {Object} [options] Optional settings to use
-    * @param {number} [options.maxDepth=0] How far down the tree to recurse, set to falsy to infinitely recurse
-    * @param {Object|function} [options.filter] Either a Lodash match expression or a function to run on each widget - only truthy values are appended to the output. Function is called as `(widget, dataPath, specPath, depth)`
-    * @param {Object|function} [options.filterChildren] Either a Lodash match expression or a function to run on each widget - only truthy values are recursed into. Function is called as `(widget, dataPath, specPath, depth)`
-    * @param {string} [type="auto"] How to recurse into items. ENUM: 'auto' (try to determine how to recurse from root element), 'spec', 'data'
-    * @param {string} [want="object"] How to return the output. ENUM: 'object' (an object where each key is the path and the value is the object), 'array' (a flattened version of an object), object is faster
-    * @param {boolean|string} [wantDataPath=false] Whether to mutate the output widget with a dotted notation string indicating where to look in a data object for the value of the widget, if this is a string it specifies the key to use as storage
-    * @param {boolean} [wantSpec=false] Whether to mutate the output widget with the widget specification as an object for each item
-    * @param {boolean|string} [wantSpecPath=false] Whether to mutate the output widget with a dotted notation path on where to find the widget within a spec object, if this is a string it specifies the key to use as storage
-    */
-
-
-    $macgyver.flatten = function (root, options) {
-      var settings = _.defaults(options, {
-        maxDepth: 0,
-        filter: undefined,
-        filterChildren: undefined,
-        type: 'auto',
-        want: 'object',
-        wantDataPath: false,
-        wantSpec: false,
-        wantSpecPath: false
-      });
-
-      if (settings.filter && !_.isFunction(settings.filter) && _.isObject(settings.filter)) settings.filter = _.matches(settings.filter);
-      if (settings.want != 'object' && settings.want != 'array') throw new Error('$macgyver.flatten({want}) can only be "object" or "array"');
-
-      if (settings.type == 'auto') {
-        if (root.items) {
-          settings.type = 'spec';
-        } else if (_.every(root, function (k, v) {
-          return !v.items;
-        })) {
-          settings.type = 'data';
-        } else {
-          throw new Error('Cannot determine type of input object to $macgyver.flatten(), specify it explicitly with {type=spec|data}');
-        }
-      }
-
-      var found = settings.want == 'object' ? {} : [];
-
-      var depthScanner = function depthScanner(node, dataPath, specPath, depth) {
-        if (!_.isObject(node)) return; // Add to bucket of found objects?
-
-        if (!settings.filter // No filter
-        || settings.filter.call(node, node, path, depth) // OR we pass the filter
-        ) {
-            if (settings.wantDataPath) node[_.isString(settings.wantDataPath) ? settings.wantDataPath : 'path'] = dataPath.concat([node.id]).filter(function (i) {
-              return i;
-            }).join('.');
-            if (settings.wantSpecPath) node[_.isString(settings.wantSpecPath) ? settings.wantSpecPath : 'specPath'] = specPath.join('.');
-
-            if (settings.want == 'object') {
-              if (node.id) found[node.id] = node;
-            } else {
-              found.push(node);
-            }
-          } // Recurse into children?
-
-
-        var recursionSubject = settings.type == 'spec' ? node.items : node;
-
-        if (_.isArray(recursionSubject) && (!settings.filterChildren // No filter
-        || settings.filterChildren.call(node, node, dataPath, specPath, depth) // ...or we pass the filter
-        ) && (!settings.maxDepth || depth <= settings.maxDepth)) {
-          recursionSubject.forEach(function (item, itemIndex) {
-            return depthScanner(item, dataPath, specPath.concat(settings.type == 'spec' ? ['items', itemIndex] : [itemIndex]), depth + 1);
-          });
-        }
-      };
-
-      depthScanner(root, [], [], 0);
-      return found;
-    };
-    /**
-    * Apply various criteria to a 'rough' spec to turn it into a clean one
-    *
-    * NOTE: 'Shorthand' is a simple `{id1: spec1, id2: spec2}` way of setting up a form. See the widget config for an example
-    *       Shorthand may also have types that omit the `mg` prefix e.g. `text` instead of `mgText`
-    *
-    * @param {Object|array} spec A MacGyver spec to process and mutate
-    * @param {Object} [options] Additional options to use
-    * @param {boolean} [options.clone=true] Whether to clone the object before neatening, slow but Vue disallows mutation
-    * @param {boolean} [options.convertArray=true] Convert arrays to object if not already in that format
-    * @param {function} [options.convertArrayWrapper] Function used to convert from array - defaults to a simple mgContainer wrapper. Called as (spec)
-    * @param {boolean} [options.convertShorthand=true] Accept shorthand format and convert if necessary
-    * @param {function} [options.convertShorthandDetect] Function used to detect shorthand format - defaults to object with valid string keys sans 'id' field. Called as (spec)
-    * @param {function} [options.convertShorthandTranslate] Function used to convert shorthand format. Called as (spec)
-    * @param {boolean} [options.widgetDefaults=true] Assign each item its default values from the widget config if that setting is omitted
-    * @param {string} [options.widgetTitles=true] Add any missing title fields from the ID
-    * @param {boolean} [options.deblank=true] Reformat null/undefined/empty forms into a skeleton form
-    * @returns {Object} The mutated spec
-    */
-
-
-    $macgyver.neatenSpec = function (spec, options) {
-      var settings = _objectSpread2({
-        clone: true,
-        convertArray: true,
-        convertArrayWrapper: function convertArrayWrapper(items) {
-          return {
-            type: 'mgContainer',
-            showTitles: false,
-            items: items
-          };
-        },
-        convertShorthand: true,
-        convertShorthandDetect: function convertShorthandDetect(spec) {
-          return _.isPlainObject(spec) // Simple object
-          && !_.has(spec, 'type') // It doesn't have a type key (i.e. there is only one item in this object
-          && _.every(spec, function (v, k) {
-            return !_.has(v, 'id') && (!_.has(v, 'type') || v.type != 'mgContainer');
-          });
-        },
-        // Each item lacks and ID and either doesn't have a type or that type is not a container
-        convertShorthandTranslate: function convertShorthandTranslate(spec) {
-          return {
-            type: 'mgContainer',
-            items: _.map(spec, function (v, k) {
-              return _objectSpread2({
-                id: k
-              }, v, {
-                type: function () {
-                  if (_.isString(v)) v = {
-                    type: v
-                  }; // Only key given is a string, assume it means type
-
-                  if (!v.type) return 'mgText'; // No type given, assume mgText
-
-                  if (v.type.startsWith('mg')) return v.type; // Type begins with 'mg' - trust the user
-
-                  v.type = v.type.toLowerCase();
-                  return Object.keys($macgyver.widgets) // Search for likely widgets
-                  .find(function (wid) {
-                    var widget = $macgyver.widgets[wid];
-                    return widget.id.substr(2).toLowerCase() == v.type // Matched after 'mg' part. e.g. 'text' becomes 'mgText'
-                    || (widget.shorthand || []).find(function (s) {
-                      return s == v.type;
-                    }) // Matched a shorthand alias
-                    ;
-                  }) || v.type;
-                }()
-              });
-            })
-          };
-        },
-        widgetDefaults: true,
-        widgetTitles: true,
-        deblank: true
-      }, options);
-
-      var layout = settings.clone ? _.cloneDeep(spec) : spec; // Output spec
-
-      if (settings.deblank && _.isEmpty(layout)) {
-        // Convert empty or unusable values into a skeleton
-        layout = {
-          type: 'mgContainer',
-          items: []
-        };
-      }
-
-      if (settings.convertArray && _.isArray(layout)) {
-        // convert array spec -> object?
-        layout = settings.convertArrayWrapper(layout);
-      }
-
-      if (settings.convertShorthand && settings.convertShorthandDetect(layout)) {
-        // Is shorthand format
-        layout = settings.convertShorthandTranslate(layout);
-      }
-
-      $macgyver.flatten(layout, {
-        type: 'spec',
-        want: 'array',
-        wantDataPath: '$dataPath',
-        wantSpecPath: '$specPath'
-      }).forEach(function (widget) {
-        if (!widget.type || !$macgyver.widgets[widget.type]) {
-          // Remap unknown widget
-          console.log("Unknown widget '".concat(widget.type, "'"), widget);
-          widget.errorText = widget.type ? "Unknown widget '".concat(widget.type, "'") : 'Widget type not specified';
-          widget.errorWidgetType = widget.type;
-          widget.type = 'mgError';
-        } else if (settings.widgetDefaults) {
-          Object.assign(widget, _($macgyver.widgets[widget.type].config).pickBy(function (v, k) {
-            return !_.has(widget, k) && _.has(v, 'default');
-          }).mapValues(function (v) {
-            return v["default"];
-          }).value());
-        }
-
-        if (settings.widgetTitles && !widget.title && widget.id) widget.title = _.startCase(widget.id);
-      });
-      return layout;
-    };
-    /**
-    * Fetch any artbitrary data set from a URL
-    * This function is designed to accept a customizable single-string URL which the user can customize and a spec options object that the requesting widget can define
-    * NOTE: This function will invoke the loading notifier and call the warning notifier on an error
-    *
-    * @param {string} url The URL to fetch
-    * @param {Object} [options] Additional options
-    * @param {boolean} [options.type='object'] What data type to expect from the server. ENUM: 'object', 'array', 'raw'. If array and mappings are specified each member of the collection is mapped and an array returned
-    * @param {Object <Object>} [options.mappings={}] Mappings to extract, each key is the mapping name with the value as an object containing `{required <boolean>}`
-    * @param {function} [options.format] Data formatter, defaults to a simple passthrough. Called as `(output, session)`
-    * @param {string|function} [options.formatError] Error thrown if the formatter fails, can be a string or function called as `(err)`. Defaults to 'Unable to format data feed from ${url} - ${err.toString()}`
-    * @returns {Object} The extracted data object
-    *
-    * @example Fetch a simple collection
-    * fetch('/api/datafeeds/random/users')
-    *
-    * @example Generate a random number as an object and return the extracted value as the promise response
-    * fetch('/api/datafeeds/random/number?$extract=number', {mappings: {extract: {required: true}, format: d => d.extract}});
-    *
-    * @example Fetch a collection of items extracting both 'id' and 'title' fields
-    * fetch('/api/datafeeds/random/users?$title=name&$id=_id', {mappings: {_id: {required: true}, title: {required: true}}})
-    */
-
-
-    $macgyver.fetch = function (url, options) {
-      return Promise.resolve() // Create the initial session {{{
-      .then(function () {
-        return {
-          mappings: {},
-          parsedUrl: new URL(url, window.location),
-          settings: _objectSpread2({
-            type: 'object',
-            mappings: {},
-            format: function format(data, session) {
-              return data;
-            },
-            formatError: function formatError(err) {
-              return "Unable to format data feed from ".concat(url, " - ").concat(err.toString());
-            }
-          }, options)
-        };
-      }) // }}}
-      // Extract mappings from the URL string {{{
-      .then(function (session) {
-        if (!_.isEmpty(session.settings.mappings)) {
-          // Extract mappings
-          Array.from(session.parsedUrl.searchParams.entries()).forEach(function (pair) {
-            var _pair = _slicedToArray(pair, 2),
-                k = _pair[0],
-                v = _pair[1];
-
-            if (k.startsWith('$')) {
-              session.mappings[k] = v;
-              session.parsedUrl.searchParams["delete"](k);
-            }
-          });
-        }
-
-        return session;
-      }) // }}}
-      // Verify that requested mappings are present {{{
-      .then(function (session) {
-        var checkRequired = _(session.settings).pickBy(function (v, k) {
-          return k.required && !_.has(session.mappings, v);
-        }).map(function (v, k) {
-          return k;
-        }).value();
-
-        if (checkRequired.length) throw "Required URL \"".concat(url, "\" is missing the required mappings: ").concat(checkRequired.join(', '));
-        return session;
-      }) // }}}
-      // Make the request {{{
-      .then(function (session) {
-        return $macgyver.$http.get(session.parsedUrl.toString()).then(function (res) {
-          return session.response = res;
-        }).then(function () {
-          return session;
-        });
-      }) // }}}
-      // Apply object cohersion + mappings {{{
-      .then(function (session) {
-        // FIXME: This logic is probably buggered - Too drunk, MC - 2019-01-04 
-        switch (session.settings.type) {
-          case 'array':
-            if (!_.isArray(session.response.data)) throw "Expected an array from data feed \"".concat(url, "\" but got a non-array");
-
-            if (!_.isEmpty(session.mappings)) {
-              var pickKeys = _.map(session.settings.mappings, function (v, k) {
-                return session.mappings['$' + k];
-              });
-
-              session.output = session.response.data.map(function (doc) {
-                return (// Remap data using mappings
-                  _.pick(doc, pickKeys)
-                );
-              });
-            } else {
-              session.output = session.response.data;
-            }
-
-            return session;
-
-          case 'object':
-            if (!_.isPlainObject(session.response.data)) throw "Expected object return from data feed \"".concat(url, "\" but got a non-plain-object");
-
-            if (!_.isEmpty(session.mappings)) {
-              session.output = _(session.mappings).mapKeys(function (v, k) {
-                return k.replace(/^\$/, '');
-              }) // Remove '$' prefix
-              .mapValues(function (v, k) {
-                return session.response.data[session.mappings['$' + k]];
-              }).value();
-            } else {
-              session.output = session.response.data;
-            }
-
-            return session;
-
-          case 'raw':
-            session.output = session.response.data;
-            return session;
-        }
-      }) // }}}
-      // Apply formatter {{{
-      .then(function (session) {
-        try {
-          return session.settings.format(session.output, session);
-        } catch (err) {
-          throw _.isString(session.settings.formatError) ? session.settings.formatError : session.settings.formatError(err);
-        }
-      }) // }}}
-      ["catch"](function (err) {
-        $macgyver.notify.error(err);
-        throw err;
-      })["finally"](function () {
-        return $macgyver.notify.loading(url, false);
-      });
-    };
-    /**
-    * Register of known forms to their Vue instance mapping
-    * @var $Object <VueInstance>}
-    */
-
-
-    $macgyver.$forms = {};
-    /**
-    * Registeres a MacGyver form by its generated ID
-    * @params {VueInstance} component The Vue component to register
-    */
-
-    $macgyver.injectForm = function (component) {
-      $macgyver.$forms[component.id] = component;
-      component.$on('mgIdentify', function (reply) {
-        return reply(component);
-      });
-    };
-    /**
-    * Set of misc utility helper functions
-    * @var {Object};
-    */
-
-
-    $macgyver.utils = {};
-    /**
-    * Navigate down a dotted notation path and set the final value using Vue.set()
-    * This function is designed to work as simillaly as possible to _.set()
-    * @param {Object} target The source object, usually the root controller
-    * @param {string|array} path Either a path in dotted or array notation
-    * @param {*} value The value set
-    */
-
-    $macgyver.utils.setPath = function (target, path, value) {
-      var chunks = typeof path == 'string' ? path.split('.') : path; // Ensure all paths up to this chunk-1 exist
-
-      var targ = target;
-
-      for (var i = 0; i < chunks.length - 1; i++) {
-        if (targ[chunks[i]] === undefined) {
-          targ = Vue$1.set(targ, chunks[i], {}); // Traversal point not yet setup
-        } else {
-          targ = targ[chunks[i]]; // Recurse into the newly created child (or the existing branch)
-        }
-      }
-
-      return Vue$1.set(targ, chunks[chunks.length - 1], value);
-    };
-    /**
-    * Provides a function to quickly get a data path on a Vue component by its path
-    * This function is designed to work as simillaly as possible to _.get()
-    * @param {Object} target The source object, usually the root controller
-    * @param {string|array} path Either a path in dotted or array notation
-    * @param {*} [fallback=undefined] Optional fallback to return if no value is found
-    * @returns {*} Either the found value or the fallback
-    */
-
-
-    $macgyver.utils.getPath = function (target, path, fallback) {
-      return _.get(target, path, fallback);
-    }; // Absorb various methods from a Vue prototype
-
-
+    // Absorb various methods from a Vue prototype
     var vInstance = new Vue$1();
     ['$on', '$off', '$once', '$emit'].forEach(function (method) {
       return $macgyver[method] = vInstance[method].bind(vInstance);
@@ -1707,6 +1711,7 @@
     methods: {
       change: function change(val) {
         this.data = val.id;
+        this.value = val.title;
       }
     },
     created: function created() {
@@ -1772,7 +1777,7 @@
     /* style */
     const __vue_inject_styles__$6 = function (inject) {
       if (!inject) return
-      inject("data-v-979e24da_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Make look consistant with Bootstrap */\n.v-select.open .dropdown-toggle {\n\tborder-color: #5cb3fd;\n}\n\n/* Remove weird dropdown icon that Bootstrap adds */\n.v-select .dropdown-toggle::after {\n\tdisplay: none;\n}\n\n/* Wider spacing for clear button */\n.v-select .dropdown-toggle .clear {\n\tmargin-right: 10px;\n}\n\n/* Align dropdown icon correctly */\n.v-select .open-indicator {\n\tmargin-top: -2px;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgChoiceDropdown.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AA4EA,wCAAA;AACA;CACA,qBAAA;AACA;;AAEA,mDAAA;AACA;CACA,aAAA;AACA;;AAEA,mCAAA;AACA;CACA,kBAAA;AACA;;AAEA,kCAAA;AACA;CACA,gBAAA;AACA","file":"mgChoiceDropdown.vue","sourcesContent":["<script>\nimport VueSelect from 'vue-select';\nimport 'vue-select/dist/vue-select.css';\n\nVue.component('v-select', VueSelect);\n\nmacgyver.register('mgChoiceDropdown', {\n\ttitle: 'Dropdown multiple-choice',\n\ticon: 'far fa-chevron-circle-down',\n\tcategory: 'Choice Selectors',\n\tpreferId: true,\n\tconfig: {\n\t\tenum: {\n\t\t\ttype: 'mgList',\n\t\t\ttitle: 'List items',\n\t\t\tdefault: ['Item One', 'Item Two', 'Item Three'],\n\t\t},\n\t\tenumUrl: {type: 'mgUrl', advanced: true, help: 'Data feed URL to fetch choice values from'},\n\t\tplaceholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},\n\t\trequired: {type: 'mgToggle', default: false, help: 'One choice must be selected'},\n\t},\n\tformat: true, // FIXME: Not sure about this, what if we need to lookup the value by the enum ID?\n\tshorthand: ['choice', 'choose', 'dropdown', 'pick'],\n});\n\nexport default Vue.component('mgChoiceDropdown', {\n\tdata: ()=> ({\n\t\tdata: undefined,\n\t\tvalue: [],\n\t\tenumIter: [],\n\t}),\n\tprops: {\n\t\tconfig: Object,\n\t\tform: String,\n\t},\n\tmethods: {\n\t\tchange(val) {\n\t\t\tthis.data = val.id;\n\t\t},\n\t},\n\tcreated() {\n\t\tthis.$macgyver.inject(this);\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);\n\t\t});\n\n\t\tthis.$watch('$props.config.enumUrl', ()=> {\n\t\t\tif (!this.$props.config.enumUrl) return;\n\t\t\tthis.$macgyver.fetchEnumUrl(this.$props.config.enumUrl)\n\t\t\t\t.then(data => this.$set(this.$props.config, 'enum', data))\n\t\t}, {immediate: true});\n\n\t\tthis.$watch('$props.config.enum', ()=> {\n\t\t\tif (_.isArray(this.$props.config.enum) && _.isString(this.$props.config.enum[0])) { // Array of strings\n\t\t\t\tthis.enumIter = this.$props.config.enum.map(i => ({id: _.camelCase(i), title: i}));\n\t\t\t} else if (_.isArray(this.$props.config.enum) && _.isObject(this.$props.config.enum[0])) { // Collection\n\t\t\t\tthis.enumIter = this.$props.config.enum;\n\t\t\t}\n\n\t\t\tif (this.data) this.value = this.enumIter.find(e => e.id == this.data) || this.data;\n\t\t}, {immediate: true});\n\t},\n});\n</script>\n\n<template>\n\t<v-select\n\t\t:value=\"value\"\n\t\tlabel=\"title\"\n\t\t:options=\"enumIter\"\n\t\t:placeholder=\"$props.config.placeholder\"\n\t\t@input=\"change\"\n\t/>\n</template>\n\n<style>\n/* Make look consistant with Bootstrap */\n.v-select.open .dropdown-toggle {\n\tborder-color: #5cb3fd;\n}\n\n/* Remove weird dropdown icon that Bootstrap adds */\n.v-select .dropdown-toggle::after {\n\tdisplay: none;\n}\n\n/* Wider spacing for clear button */\n.v-select .dropdown-toggle .clear {\n\tmargin-right: 10px;\n}\n\n/* Align dropdown icon correctly */\n.v-select .open-indicator {\n\tmargin-top: -2px;\n}\n</style>\n"]}, media: undefined });
+      inject("data-v-1bc91ca4_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Make look consistant with Bootstrap */\n.v-select.open .dropdown-toggle {\n\tborder-color: #5cb3fd;\n}\n\n/* Remove weird dropdown icon that Bootstrap adds */\n.v-select .dropdown-toggle::after {\n\tdisplay: none;\n}\n\n/* Wider spacing for clear button */\n.v-select .dropdown-toggle .clear {\n\tmargin-right: 10px;\n}\n\n/* Align dropdown icon correctly */\n.v-select .open-indicator {\n\tmargin-top: -2px;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgChoiceDropdown.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AA6EA,wCAAA;AACA;CACA,qBAAA;AACA;;AAEA,mDAAA;AACA;CACA,aAAA;AACA;;AAEA,mCAAA;AACA;CACA,kBAAA;AACA;;AAEA,kCAAA;AACA;CACA,gBAAA;AACA","file":"mgChoiceDropdown.vue","sourcesContent":["<script>\nimport VueSelect from 'vue-select';\nimport 'vue-select/dist/vue-select.css';\n\nVue.component('v-select', VueSelect);\n\nmacgyver.register('mgChoiceDropdown', {\n\ttitle: 'Dropdown multiple-choice',\n\ticon: 'far fa-chevron-circle-down',\n\tcategory: 'Choice Selectors',\n\tpreferId: true,\n\tconfig: {\n\t\tenum: {\n\t\t\ttype: 'mgList',\n\t\t\ttitle: 'List items',\n\t\t\tdefault: ['Item One', 'Item Two', 'Item Three'],\n\t\t},\n\t\tenumUrl: {type: 'mgUrl', advanced: true, help: 'Data feed URL to fetch choice values from'},\n\t\tplaceholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},\n\t\trequired: {type: 'mgToggle', default: false, help: 'One choice must be selected'},\n\t},\n\tformat: true, // FIXME: Not sure about this, what if we need to lookup the value by the enum ID?\n\tshorthand: ['choice', 'choose', 'dropdown', 'pick'],\n});\n\nexport default Vue.component('mgChoiceDropdown', {\n\tdata: ()=> ({\n\t\tdata: undefined,\n\t\tvalue: [],\n\t\tenumIter: [],\n\t}),\n\tprops: {\n\t\tconfig: Object,\n\t\tform: String,\n\t},\n\tmethods: {\n\t\tchange(val) {\n\t\t\tthis.data = val.id;\n\t\t\tthis.value = val.title;\n\t\t},\n\t},\n\tcreated() {\n\t\tthis.$macgyver.inject(this);\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);\n\t\t});\n\n\t\tthis.$watch('$props.config.enumUrl', ()=> {\n\t\t\tif (!this.$props.config.enumUrl) return;\n\t\t\tthis.$macgyver.fetchEnumUrl(this.$props.config.enumUrl)\n\t\t\t\t.then(data => this.$set(this.$props.config, 'enum', data))\n\t\t}, {immediate: true});\n\n\t\tthis.$watch('$props.config.enum', ()=> {\n\t\t\tif (_.isArray(this.$props.config.enum) && _.isString(this.$props.config.enum[0])) { // Array of strings\n\t\t\t\tthis.enumIter = this.$props.config.enum.map(i => ({id: _.camelCase(i), title: i}));\n\t\t\t} else if (_.isArray(this.$props.config.enum) && _.isObject(this.$props.config.enum[0])) { // Collection\n\t\t\t\tthis.enumIter = this.$props.config.enum;\n\t\t\t}\n\n\t\t\tif (this.data) this.value = this.enumIter.find(e => e.id == this.data) || this.data;\n\t\t}, {immediate: true});\n\t},\n});\n</script>\n\n<template>\n\t<v-select\n\t\t:value=\"value\"\n\t\tlabel=\"title\"\n\t\t:options=\"enumIter\"\n\t\t:placeholder=\"$props.config.placeholder\"\n\t\t@input=\"change\"\n\t/>\n</template>\n\n<style>\n/* Make look consistant with Bootstrap */\n.v-select.open .dropdown-toggle {\n\tborder-color: #5cb3fd;\n}\n\n/* Remove weird dropdown icon that Bootstrap adds */\n.v-select .dropdown-toggle::after {\n\tdisplay: none;\n}\n\n/* Wider spacing for clear button */\n.v-select .dropdown-toggle .clear {\n\tmargin-right: 10px;\n}\n\n/* Align dropdown icon correctly */\n.v-select .open-indicator {\n\tmargin-top: -2px;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */

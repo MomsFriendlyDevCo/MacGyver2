@@ -17,7 +17,7 @@ var cache = {}; // Caches for various Rollup builds
 var isProduction = !!process.env.NODE_ENV && process.env.NODE_ENV=='production';
 
 gulp.task('default', gulp.series('serve'));
-gulp.task('build', gulp.parallel('build:demo', 'build:macgyver'));
+gulp.task('build', gulp.parallel('build:demo', 'build:macgyver:vue', 'build:macgyver:node'));
 
 
 /**
@@ -50,12 +50,68 @@ gulp.task('serve', 'build', ()=> {
 
 
 /**
-* Build main MacGyver stack
+* Build main MacGyver stack for Node
 */
-gulp.task('build:macgyver', ()=>
+gulp.task('build:macgyver:node', ()=>
 	rollup.rollup({
-		input: './src/macgyver.js',
-		cache: cache.macgyver || false,
+		input: './src/entrypoint-node.js',
+		cache: cache.macgyverNode || false,
+		inlineDynamicImports: true,
+		plugins: [
+			require('rollup-plugin-commonjs')({
+				include: ['node_modules/**/*', 'dist/**/*'],
+				namedExports: {
+					'dist/macgyver.js': ['macgyver'],
+				},
+			}),
+			require('rollup-plugin-vue')(),
+			require('rollup-plugin-includepaths')({
+				paths: ['dist'],
+			}),
+			require('rollup-plugin-node-resolve')({
+				mainFields: ['browser', 'module', 'main'],
+				extensions: ['.js', '.vue'],
+			}),
+			require('rollup-plugin-node-globals')({
+				baseDir: false,
+				buffer: false,
+				dirname: false,
+				filename: false,
+				global: false,
+				process: true,
+			}),
+			require('rollup-plugin-inject')({
+				include: '**/*.js',
+				exclude: 'node_modules/**',
+				jQuery: 'jquery',
+				$: 'jquery',
+			}),
+			require('rollup-plugin-babel')({
+				presets: ['@babel/env'],
+				plugins: ['@babel/plugin-syntax-dynamic-import'],
+				exclude: 'node_modules/**',
+			}),
+			isProduction && require('rollup-plugin-uglify').uglify(),
+		],
+	}).then(bundle => {
+		cache.macgyverNode = bundle.cache;
+		bundle.write({
+			format: 'cjs',
+			file: './dist/macgyver-node.js',
+			name: 'macgyver',
+			sourcemap: true,
+		});
+	})
+);
+
+
+/**
+* Build main MacGyver stack for Vue
+*/
+gulp.task('build:macgyver:vue', ()=>
+	rollup.rollup({
+		input: './src/entrypoint-vue.js',
+		cache: cache.macgyverVue || false,
 		inlineDynamicImports: true,
 		external: [ // Don't include these in the Bundle as they are included elsewhere
 			'jquery',
@@ -99,7 +155,7 @@ gulp.task('build:macgyver', ()=>
 			isProduction && require('rollup-plugin-uglify').uglify(),
 		],
 	}).then(bundle => {
-		cache.macgyver = bundle.cache;
+		cache.macgyverVue = bundle.cache;
 		bundle.write({
 			format: 'iife',
 			file: './dist/macgyver.js',

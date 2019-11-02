@@ -2,7 +2,7 @@
   "name": "@momsfriendlydevco/macgyver",
   "version": "2.0.0",
   "description": "Dynamic form widgets for Vue",
-  "main": "src/shared.js",
+  "main": "dist/macgyver-node.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MomsFriendlyDevCo/macgyver.git"
