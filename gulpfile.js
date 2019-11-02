@@ -70,21 +70,12 @@ gulp.task('build:node', ()=>
 			}),
 			require('rollup-plugin-node-resolve')({
 				mainFields: ['browser', 'module', 'main'],
-				extensions: ['.js', '.vue'],
-			}),
-			require('rollup-plugin-node-globals')({
-				baseDir: false,
-				buffer: false,
-				dirname: false,
-				filename: false,
-				global: false,
-				process: true,
+				extensions: ['.js'],
 			}),
 			require('rollup-plugin-inject')({
 				include: '**/*.js',
 				exclude: 'node_modules/**',
-				jQuery: 'jquery',
-				$: 'jquery',
+				_: 'lodash',
 			}),
 			require('rollup-plugin-babel')({
 				presets: ['@babel/env'],
