@@ -17,7 +17,7 @@ var cache = {}; // Caches for various Rollup builds
 var isProduction = !!process.env.NODE_ENV && process.env.NODE_ENV=='production';
 
 gulp.task('default', gulp.series('serve'));
-gulp.task('build', gulp.parallel('build:demo', 'build:macgyver:vue', 'build:macgyver:node'));
+gulp.task('build', gulp.parallel('build:demo', 'build:vue', 'build:node'));
 
 
 /**
@@ -38,7 +38,7 @@ gulp.task('serve', 'build', ()=> {
 
 	watch(['./src/**/*.{js,vue}'], ()=> {
 		gulp.log('Rebuild MacGyver...');
-		return gulp.run('build:macgyver:node', 'build:macgyver:vue');
+		return gulp.run('build:node', 'build:vue');
 	});
 
 	watch(['./demo/**/*.{js,vue}'], ()=> {
@@ -52,7 +52,7 @@ gulp.task('serve', 'build', ()=> {
 /**
 * Build main MacGyver stack for Node
 */
-gulp.task('build:macgyver:node', ()=>
+gulp.task('build:node', ()=>
 	rollup.rollup({
 		input: './src/entrypoint-node.js',
 		cache: cache.macgyverNode || false,
@@ -108,7 +108,7 @@ gulp.task('build:macgyver:node', ()=>
 /**
 * Build main MacGyver stack for Vue
 */
-gulp.task('build:macgyver:vue', ()=>
+gulp.task('build:vue', ()=>
 	rollup.rollup({
 		input: './src/entrypoint-vue.js',
 		cache: cache.macgyverVue || false,
