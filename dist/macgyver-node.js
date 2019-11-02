@@ -226,6 +226,26 @@ $macgyver.forms.getPath = function (id, path, fallback) {
   return $macgyver.utils.getPath($macgyver.$forms[id], path, fallback);
 };
 /**
+* Compute the data prototype of the form
+* This is an empty object with all the defaults populated
+* @param {string|Object} id Either the form ID to use or the form spec object to exmaine
+* @returns {Object} A prototype data object with all defaults populated
+*/
+
+
+$macgyver.forms.getPrototype = function (id) {
+  return $macgyver.flatten(_.isString(id) ? $macgyver.$forms[id].config : id, {
+    type: 'spec',
+    want: 'array',
+    wantDataPath: true
+  }).reduce(function (data, node) {
+    if (!node["default"]) return data; // No default speciifed - skip
+
+    $macgyver.utils.setPath(data, node.path, node["default"]);
+    return data;
+  }, {});
+};
+/**
 * Execute a function on a form
 * The default behaviour of this function is documented within the function
 * @param {string} id The ID of the form to execute the function on

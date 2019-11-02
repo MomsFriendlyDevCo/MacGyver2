@@ -38,7 +38,7 @@ gulp.task('serve', 'build', ()=> {
 
 	watch(['./src/**/*.{js,vue}'], ()=> {
 		gulp.log('Rebuild MacGyver...');
-		return gulp.run('build:macgyver');
+		return gulp.run('build:macgyver:node', 'build:macgyver:vue');
 	});
 
 	watch(['./demo/**/*.{js,vue}'], ()=> {

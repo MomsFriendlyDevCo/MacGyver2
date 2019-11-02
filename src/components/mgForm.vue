@@ -71,16 +71,11 @@ export default Vue.component('mgForm', {
 		* Compute the data prototype of the form
 		* This is an empty object with all the defaults populated
 		* @returns {Object} A prototype data object with all defaults populated
+		* @see $macgyver.forms.getPrototype()
 		*/
 		getPrototype() {
-			return this.$macgyver
-				.flatten(this.config, {type: 'spec', want: 'array', wantDataPath: true})
-				.reduce((data, node) => {
-					if (!node.default) return data; // No default speciifed - skip
-
-					this.$macgyver.utils.setPath(data, node.path, node.default);
-					return data;
-				}, {})
+			if (!this.id) return {}; // Form not yet ready
+			return this.$macgyver.forms.getPrototype(this.id);
 		},
 	},
 	watch: {
