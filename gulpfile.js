@@ -72,14 +72,12 @@ gulp.task('build:node', ()=>
 				mainFields: ['browser', 'module', 'main'],
 				extensions: ['.js'],
 			}),
-			require('rollup-plugin-inject')({
-				include: '**/*.js',
-				exclude: 'node_modules/**',
-				_: 'lodash',
-			}),
 			require('rollup-plugin-babel')({
 				presets: ['@babel/env'],
-				plugins: ['@babel/plugin-syntax-dynamic-import'],
+				plugins: [
+					['@babel/plugin-proposal-pipeline-operator', {proposal: 'fsharp'}],
+					'lodash',
+				],
 				exclude: 'node_modules/**',
 			}),
 			isProduction && require('rollup-plugin-uglify').uglify(),
@@ -123,6 +121,14 @@ gulp.task('build:vue', ()=>
 				mainFields: ['browser', 'module', 'main'],
 				extensions: ['.js', '.vue'],
 			}),
+			require('rollup-plugin-babel')({
+				presets: ['@babel/env'],
+				plugins: [
+					['@babel/plugin-proposal-pipeline-operator', {proposal: 'fsharp'}],
+					'lodash',
+				],
+				exclude: 'node_modules/**',
+			}),
 			require('rollup-plugin-node-globals')({
 				baseDir: false,
 				buffer: false,
@@ -138,11 +144,6 @@ gulp.task('build:vue', ()=>
 				$: 'jquery',
 			}),
 			require('rollup-plugin-scss')(),
-			require('rollup-plugin-babel')({
-				presets: ['@babel/env'],
-				plugins: ['@babel/plugin-syntax-dynamic-import'],
-				exclude: 'node_modules/**',
-			}),
 			isProduction && require('rollup-plugin-uglify').uglify(),
 		],
 	}).then(bundle => {
@@ -206,7 +207,10 @@ gulp.task('build:demo', ()=>
 			}),
 			require('rollup-plugin-babel')({
 				presets: ['@babel/env'],
-				plugins: ['@babel/plugin-syntax-dynamic-import'],
+				plugins: [
+					['@babel/plugin-proposal-pipeline-operator', {proposal: 'fsharp'}],
+					'lodash',
+				],
 				exclude: 'node_modules/**',
 			}),
 			isProduction && require('rollup-plugin-uglify').uglify(),

@@ -15,10 +15,9 @@ export default Vue.component('mgError', {
 		// Mutate the incomming config back to what the original object probably was
 		displayConfig() {
 			if (!this.$props.config) return 'No config';
-			return _(this.$props.config)
-				.pickBy((v, k) => !k.startsWith('error'))
-				.set('type', this.$props.config.errorWidgetType)
-				.value();
+			return this.$props.config
+				|> v => _.pickBy(v, (v, k) => !k.startsWith('error'))
+				|> v => _.set(v, 'type', this.$props.config.errorWidgetType)
 		},
 	},
 	data: ()=> ({

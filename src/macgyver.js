@@ -186,7 +186,7 @@ $macgyver.forms.run = (id, action) => {
 			: $macgyver.$forms[id].$props.actions[actionReadable];
 
 		// Tidy up actionArgs
-		actionArgs = _(actionArgs || '').trim('()').split(',').map(i => i && JSON.parse(i.replace(/'/g, '"')));
+		actionArgs = (actionArgs || '').trim('()').split(',').map(i => i && JSON.parse(i.replace(/'/g, '"')));
 
 		if (func.apply($macgyver.$forms[id], actionArgs)) return;
 	}
@@ -404,10 +404,9 @@ $macgyver.neatenSpec = (spec, options) => {
 				widget.errorWidgetType = widget.type;
 				widget.type = 'mgError';
 			} else if (settings.widgetDefaults) {
-				Object.assign(widget, _($macgyver.widgets[widget.type].config)
-					.pickBy((v, k) => !_.has(widget, k) && _.has(v, 'default'))
-					.mapValues(v => v.default)
-					.value()
+				Object.assign(widget, $macgyver.widgets[widget.type].config
+					|> v => _.pickBy(v, (v, k) => !_.has(widget, k) && _.has(v, 'default'))
+					|> v => _.mapValues(v, v => v.default)
 				);
 			}
 
@@ -473,10 +472,9 @@ $macgyver.fetch = (url, options) =>
 		// }}}
 		// Verify that requested mappings are present {{{
 		.then(session => {
-			var checkRequired = _(session.settings)
-				.pickBy((v, k) => k.required && !_.has(session.mappings, v))
-				.map((v, k) => k)
-				.value();
+			var checkRequired = session.settings
+				|> v => _.pickBy(v, (v, k) => k.required && !_.has(session.mappings, v))
+				|> v => _.map(v, (v, k) => k)
 
 			if (checkRequired.length) throw `Required URL "${url}" is missing the required mappings: ${checkRequired.join(', ')}`;
 			return session;
@@ -507,10 +505,9 @@ $macgyver.fetch = (url, options) =>
 				case 'object':
 					if (!_.isPlainObject(session.response.data)) throw `Expected object return from data feed "${url}" but got a non-plain-object`;
 					if (!_.isEmpty(session.mappings)) {
-						session.output = _(session.mappings)
-							.mapKeys((v, k) => k.replace(/^\$/, '')) // Remove '$' prefix
-							.mapValues((v, k) => session.response.data[session.mappings['$' + k]])
-							.value();
+						session.output = session.mappings
+							|> v => _.mapKeys(v, (v, k) => k.replace(/^\$/, '')) // Remove '$' prefix
+							|> v => _.mapValues(v, (v, k) => session.response.data[session.mappings['$' + k]])
 					} else {
 						session.output = session.response.data;
 					}
