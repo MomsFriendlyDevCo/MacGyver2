@@ -58,7 +58,11 @@ export default Vue.component('mgChoiceDropdown', {
 				this.enumIter = this.$props.config.enum;
 			}
 
-			if (this.data) this.value = this.enumIter.find(e => e.id == this.data) || this.data;
+			if (this.data) {
+				this.value = this.enumIter.find(e => e.id == this.data) || this.data;
+			} else if (this.$props.config.default) {
+				this.value = this.enumIter.find(e => e.id == this.$props.config.default) || this.$props.config.default;
+			}
 		}, {immediate: true});
 	},
 });
