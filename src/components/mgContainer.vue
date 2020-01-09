@@ -356,6 +356,10 @@ export default Vue.component('mgContainer', {
 	border-bottom: 1px solid #CCC;
 }
 
+.mg-container.mg-container-query .col input[type=number] {
+	text-align: center;
+}
+
 .mg-container.mg-container-query .col input:focus {
 	box-shadow: none;
 	border: 1px solid #CCC;
@@ -380,14 +384,26 @@ export default Vue.component('mgContainer', {
 .mg-container.mg-container-query .row:hover .col svg {
 	opacity: 1;
 }
+
+.mg-container.mg-container-query .col .vs__clear {
+	display: none;
+}
 /* }}} */
 
 /* Query > Dropdowns {{{ */
-.mg-container.mg-container-query .col .v-select {
+.mg-container.mg-container-query .v-select {
 	width: 100%;
 }
 
-.mg-container.mg-container-query .col .v-select .vs__dropdown-toggle {
+.mg-container.mg-container-query .v-select,
+.mg-container.mg-container-query .v-select .vs--searchable .vs__dropdown-toggle,
+.mg-container.mg-container-query .v-select .vs__selected,
+.mg-container.mg-container-query .v-select input,
+.mg-container.mg-container-query .v-select .vs__actions {
+	cursor: pointer !important;
+}
+
+.mg-container.mg-container-query .v-select .vs__dropdown-toggle {
 	border: none;
 }
 
@@ -399,9 +415,25 @@ export default Vue.component('mgContainer', {
 	top: 3px;
 }
 
-.mg-container.mg-container-query .col .v-select .vs__actions svg {
+.mg-container.mg-container-query .col .v-select .vs__actions svg,
+.mg-container.mg-container-query .col .v-select .vs__deselect {
 	stroke: #FFF;
 	fill: #FFF;
+}
+
+.mg-container.mg-container-query .col .v-select.mg-choice-tags .vs__selected-options .vs__selected {
+	background-color: #5bc0de;
+	border-radius: 10px;
+	color: #fff;
+	display: inline-block;
+	font-size: 12px;
+	line-height: 1rem;
+	min-width: 10px;
+	padding: 1px 10px;
+	text-align: center;
+	vertical-align: middle;
+	white-space: nowrap;
+	border: none;
 }
 /* }}} */
 

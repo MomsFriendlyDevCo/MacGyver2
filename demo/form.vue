@@ -4,6 +4,7 @@ export default {
 		config: {},
 		data: {},
 		examples: [
+			'examples/mgQuery.json',
 			'examples/shorthand.json',
 			'examples/showcase.json',
 		],

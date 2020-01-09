@@ -38,6 +38,7 @@ import('./components/mgList');
 import('./components/mgNumber');
 import('./components/mgPermissions');
 import('./components/mgPlaceholder');
+import('./components/mgQuery');
 import('./components/mgRestQuery'); // FIXME: Needs $prompt
 import('./components/mgSeperator');
 import('./components/mgTable');
