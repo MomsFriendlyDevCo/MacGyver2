@@ -1,0 +1,20 @@
+{
+	"id": "containerMain",
+	"type": "mgContainer",
+	"showTitles": false,
+	"items": [
+		{
+			"id": "containerQuery",
+			"type": "mgContainer",
+			"layout": "card",
+			"title": "mgQuery",
+			"showTitles": false,
+			"items": [
+				{
+					"id": "query",
+					"type": "mgQuery"
+				}
+			]
+		}
+	]
+}
