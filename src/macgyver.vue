@@ -39,6 +39,8 @@ Vue.prototype.$macgyver = (()=> {
 
 			component.$on('mgRefresh', refresher);
 			refresher();
+		} else if (component.$props.config.default) { // No data path but there IS a default - link to that instead
+			component.data = _.clone(component.$props.config.default);
 		}
 
 		// Inject data watcher which transforms change operations into emitters to the nearest parent form {{{
