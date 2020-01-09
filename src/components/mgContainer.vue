@@ -5,7 +5,7 @@
 * @param {Object} config The config specification
 * @param {array} config.items A collection of sub-item objects to display
 * @param {string} [config.title] The title of the container to display
-* @param {string} [config.layout="form"] The layout profile to use. ENUM: form = A standard horizontal form layout, card = a Bootstrap 4 card with header and footer, columns = vertically sorted column display
+* @param {string} [config.layout="form"] The layout profile to use. ENUM: form = A standard horizontal form layout, card = a Bootstrap 4 card with header and footer, columns = vertically sorted column display, query = an inline query constructor
 * @param {boolean} [config.items[].help] Optional help text to show under the element
 * @param {boolean} [config.items[].showTitle=true] Whether to show the left-hand-side form title for the item
 * @param {string} [config.items[].title] Optional title to display for the widget
@@ -29,6 +29,7 @@ macgyver.register('mgContainer', {
 				{id: 'formFloating', title: 'Form with floating labels'},
 				{id: 'card', title: 'Card based layout'},
 				{id: 'columns', title: 'Vertical column layout'},
+				{id: 'query', title: 'Query constructor'},
 			],
 		},
 		showTitles: {type: 'mgToggle', default: true, help: 'Show titles for fields', showIf: "layout == 'form' || layout == 'card'"},
@@ -147,6 +148,21 @@ export default Vue.component('mgContainer', {
 			</tbody>
 		</table>
 	</div>
+	<div v-else-if="$props.config.layout == 'query'">
+		<div class="mg-container mg-container-query">
+			<div v-for="rowWidget in $props.config.items" :key="rowWidget.id">
+				<div v-if="rowWidget.type == 'mgContainer' && rowWidget.layout == 'query-row'" class="row">
+					<div v-for="colWidget in rowWidget.items" :key="colWidget.id" class="col mgComponent">
+						<mg-component :form="$props.form" :config="colWidget"/>
+					</div>
+				</div>
+				<div v-else class="alert alert-danger">
+					All children of mgContainer[layout=query] must match the mgContainer[layout=queryRow]
+					<pre>{{widget}}</pre>
+				</div>
+			</div>
+		</div>
+	</div>
 	<div v-else class="mg-container">
 		<div class="alert alert-danger">
 			Unsupported mgContainer layout "{{$props.config.layout || 'Unspecified'}}"
@@ -263,6 +279,139 @@ export default Vue.component('mgContainer', {
 .mg-container.mg-container-columns-no-border td {
 	padding: 5px;
 }
+/* }}} */
+
+/* Query layout {{{ */
+.mg-container.mg-container-query .row {
+	display: block;
+}
+
+.mg-container.mg-container-query .col {
+	display: inline-flex;
+	width: 200px;
+	height: 35px;
+	min-width: 200px;
+	margin-left: 30px;
+	margin-bottom: 10px;
+	max-width: 400px;
+	position: relative;
+	align-items: center;
+	box-shadow: 1px 3px 5px 0px rgba(50, 50, 50, 0.75);
+	border-radius: 3px;
+	color: #FFF;
+	height: 38px;
+	padding: 5px 15px;
+	background: #FFF;
+}
+
+/* Query > Background color scale {{{ */
+.mg-container.mg-container-query .col:nth-child(1) {
+	background: #104E8B;
+}
+
+.mg-container.mg-container-query .col:nth-child(2) {
+	background: #1874CD;
+}
+
+.mg-container.mg-container-query .col:nth-child(3) {
+	background: #1C86EE;
+}
+/* }}} */
+
+/* Query > Connecting lines {{{ */
+/* Vertical */
+.mg-container.mg-container-query .row::before {
+	background-color: #CCC;
+	content: '';
+	display: block;
+	position: absolute;
+	width: 4px;
+	top: 17px;
+	bottom: 30px;
+}
+
+/* Horizontal */
+.mg-container.mg-container-query .col::before {
+	left: -30px;
+	height: 4px;
+	top: calc(50% - 2px);
+	width: 30px;
+	background-color: #CCC;
+	content: '';
+	display: block;
+	position: absolute;
+}
+/* }}} */
+
+/* Query > Basic Inputs {{{ */
+.mg-container.mg-container-query .col input {
+	background: transparent;
+	border: 1px solid transparent;
+	color: #FFF;
+	height: 1.8em;
+	border-radius: 0px;
+}
+
+.mg-container.mg-container-query .col input[type=text] {
+	border-bottom: 1px solid #CCC;
+}
+
+.mg-container.mg-container-query .col input:focus {
+	box-shadow: none;
+	border: 1px solid #CCC;
+}
+/* }}} */
+
+/* Query > Buttons {{{ */
+.mg-container.mg-container-query .col .btn {
+	box-shadow: none;
+	padding: 1px 5px;
+	background: transparent;
+	border: 1px solid #003e7b;
+}
+
+.mg-container.mg-container-query .col .btn,
+.mg-container.mg-container-query .col svg {
+	opacity: 0.2;
+	transition: opacity 0.5s;
+}
+
+.mg-container.mg-container-query .row:hover .col .btn,
+.mg-container.mg-container-query .row:hover .col svg {
+	opacity: 1;
+}
+/* }}} */
+
+/* Query > Dropdowns {{{ */
+.mg-container.mg-container-query .col .v-select {
+	width: 100%;
+}
+
+.mg-container.mg-container-query .col .v-select .vs__dropdown-toggle {
+	border: none;
+}
+
+.mg-container.mg-container-query .col .v-select .vs__selected {
+	color: #FFF;
+}
+
+.mg-container.mg-container-query .col .v-select .vs__selected {
+	top: 3px;
+}
+
+.mg-container.mg-container-query .col .v-select .vs__actions svg {
+	stroke: #FFF;
+	fill: #FFF;
+}
+/* }}} */
+
+/* Query > Toggle {{{ */
+.mg-container.mg-container-query .col .vue-js-switch {
+	margin: auto;
+	height: 10px;
+	top: -5px;
+}
+/* }}} */
 /* }}} */
 
 /* Misc utility types {{{ */

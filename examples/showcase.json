@@ -472,6 +472,80 @@
 					"height": 100
 				}
 			]
+		},
+		{
+			"id": "containerQuery",
+			"type": "mgContainer",
+			"layout": "card",
+			"title": "Query",
+			"showTitles": false,
+			"items": [
+				{
+					"id": "query",
+					"type": "mgContainer",
+					"layout": "query",
+					"title": "Query",
+					"items": [
+						{
+							"type": "mgContainer",
+							"layout": "query-row",
+							"items": [
+								{
+									"type": "mgLabel",
+									"text": "Text entry"
+								},
+								{
+									"type": "mgText",
+									"default": "Example text"
+								}
+							]
+						},
+						{
+							"type": "mgContainer",
+							"layout": "query-row",
+							"items": [
+								{
+									"type": "mgLabel",
+									"text": "Number entry"
+								},
+								{
+									"type": "mgNumber",
+									"default": 123
+								}
+							]
+						},
+						{
+							"type": "mgContainer",
+							"layout": "query-row",
+							"items": [
+								{
+									"type": "mgLabel",
+									"text": "Dropdown"
+								},
+								{
+									"type": "mgChoiceDropdown",
+									"enum": ["Foo", "Bar", "Baz"],
+									"default": "Foo"
+								}
+							]
+						},
+						{
+							"type": "mgContainer",
+							"layout": "query-row",
+							"items": [
+								{
+									"type": "mgLabel",
+									"text": "Toggle"
+								},
+								{
+									"type": "mgToggle",
+									"default": true
+								}
+							]
+						}
+					]
+				}
+			]
 		}
 	]
 }
