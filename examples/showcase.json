@@ -150,6 +150,13 @@
 					"default": 3
 				},
 				{
+					"id": "demoChoiceTags",
+					"type": "mgChoiceTags",
+					"title": "Mulitiple tag choice",
+					"enum": ["Foo", "Bar", "Baz"],
+					"default": "Foo"
+				},
+				{
 					"id": "demoChoiceRadio",
 					"type": "mgChoiceRadio",
 					"title": "Choice Radio",
