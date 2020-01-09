@@ -42,7 +42,7 @@ export default Vue.component('mgToggle', {
 
 <template>
 	<toggle-button
-		:value="false"
+		:value="data"
 		:color="{checked: $props.config.onColor, unchecked: $props.config.offColor, disabled: $props.config.disabledColor}"
 		:labels="{checked: $props.config.onText, unchecked: $props.config.offText}"
 		:switchColor="$props.config.switchColor"
