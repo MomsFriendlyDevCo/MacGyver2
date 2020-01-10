@@ -12,7 +12,15 @@
 			"items": [
 				{
 					"id": "query",
-					"type": "mgQuery"
+					"type": "mgQuery",
+					"default": {
+						"email": {"$exists": true},
+						"role": "user",
+						"status": {"$in": ["pending", "active"]},
+						"sort": "username",
+						"splonk": "Yes",
+						"limit": 10
+					}
 				}
 			]
 		}

@@ -9,7 +9,7 @@ macgyver.register('mgQuery', {
 		* The spec is composed of an object lookup with the dotted notation path as the key and an object set of properties
 		* @property {string} [type='string'] The type of the field, used to determine the component to use as the value input
 		* @property {boolean} [showOperand=true] Whether to allow the user to select the operand ("Equals", "Is in" etc.) if false this only allows straight equality
-		* @property {array <string>|array <object>} [enum] If the type is a string this restricts operand values to a list of selectable values
+		* @property {array <string>|array <object>|string} [enum] If the type is a string this restricts operand values to a list of selectable values. The value can also be one of the following meta values: '$FIELDS' - list all spec fields
 		*/
 		spec: {type: 'mgCodeEditor', syntax: 'json'},
 	},
@@ -41,22 +41,13 @@ export default Vue.component('mgQuery', {
 			status: {type: 'string', enum: ['pending', 'active', 'deleted']},
 			lastLogin: {type: 'date'},
 
-			sort: {type: 'string', showOperand: false, enum: ['FIXME:fields']},
+			sort: {type: 'string', showOperand: false, enum: '$FIELDS'},
 			limit: {type: 'number', showOperand: false},
 			skip: {type: 'number', showOperand: false},
 		}}},
 	},
 	created() {
 		this.$macgyver.inject(this);
-
-		// FIXME: Example input
-		this.data = {
-			email: {$exists: true},
-			role: 'user',
-			status: {$in: ['pending', 'active']},
-			sort: 'username',
-			limit: 10,
-		};
 
 		this.$watchAll([
 			'$props.config.url',
@@ -65,13 +56,24 @@ export default Vue.component('mgQuery', {
 	},
 	methods: {
 		refresh() {
-			console.log('USING FAKE SETUP');
-
+			// Calculate which fields we can use in enums
 			var fieldsEnum = Object.keys(this.$props.spec)
 				.map(key => ({
 					id: key,
 					title: _.startCase(key),
 				}));
+
+
+			/**
+			* Populate enum values from a spec branch
+			* Really this just deals with meta cases like '$FIELDS' (see spec definition for 'enum')
+			* @param {Object} pathSpec The path branch specification
+			* @returns {array} An mgChoice* compatible ENUM composed of {id, title}
+			*/
+			var populateEnum = pathSpec =>
+				pathSpec.enum === '$FIELDS' ? fieldsEnum
+					: pathSpec.enum;
+
 
 			this.subformData = {};
 			this.queryComponent = {
@@ -133,7 +135,11 @@ export default Vue.component('mgQuery', {
 								};
 
 								if (['$eq', '$ne'].includes(operand) && pathSpec.enum) {
-									row.items.push({type: 'mgChoiceDropdown', enum: pathSpec.enum, default: value});
+									row.items.push({
+										type: 'mgChoiceDropdown',
+										enum: populateEnum(pathSpec),
+										default: value,
+									});
 								} if (['$eq', '$ne'].includes(operand) && pathSpec.type == 'string') {
 									row.items.push({type: 'mgText', default: value});
 								} else if (['$eq', '$ne'].includes(operand) && pathSpec.type == 'number') {
@@ -148,7 +154,11 @@ export default Vue.component('mgQuery', {
 										default: value,
 									});
 								} else if (operand == '$in' || operand == '$nin') {
-									row.items.push({type: 'mgChoiceTags', enum: pathSpec.enum, default: value});
+									row.items.push({
+										type: 'mgChoiceTags',
+										default: value,
+										enum: populateEnum(pathSpec),
+									});
 								} else {
 									row.items.push({
 										type: 'mgError',
@@ -161,73 +171,6 @@ export default Vue.component('mgQuery', {
 					)
 					.reduce((t, v) => t.concat(v), []) // Flatten
 			};
-
-			return;
-			this.queryComponent = {
-				"id": "query",
-				"type": "mgContainer",
-				"layout": "query",
-				"title": "Query",
-				"items": [
-					{
-						"type": "mgContainer",
-						"layout": "query-row",
-						"items": [
-							{
-								"type": "mgLabel",
-								"text": "Text entry"
-							},
-							{
-								"type": "mgText",
-								"default": "Example text"
-							}
-						]
-					},
-					{
-						"type": "mgContainer",
-						"layout": "query-row",
-						"items": [
-							{
-								"type": "mgLabel",
-								"text": "Number entry"
-							},
-							{
-								"type": "mgNumber",
-								"default": 123
-							}
-						]
-					},
-					{
-						"type": "mgContainer",
-						"layout": "query-row",
-						"items": [
-							{
-								"type": "mgLabel",
-								"text": "Dropdown"
-							},
-							{
-								"type": "mgChoiceDropdown",
-								"enum": ["Foo", "Bar", "Baz"],
-								"default": "Foo"
-							}
-						]
-					},
-					{
-						"type": "mgContainer",
-						"layout": "query-row",
-						"items": [
-							{
-								"type": "mgLabel",
-								"text": "Toggle"
-							},
-							{
-								"type": "mgToggle",
-								"default": true
-							}
-						]
-					}
-				]
-			}
 		},
 	},
 });
