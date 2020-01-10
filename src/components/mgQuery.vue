@@ -140,7 +140,7 @@ export default Vue.component('mgQuery', {
 										enum: populateEnum(pathSpec),
 										default: value,
 									});
-								} if (['$eq', '$ne'].includes(operand) && pathSpec.type == 'string') {
+								} else if (['$eq', '$ne'].includes(operand) && pathSpec.type == 'string') {
 									row.items.push({type: 'mgText', default: value});
 								} else if (['$eq', '$ne'].includes(operand) && pathSpec.type == 'number') {
 									row.items.push({type: 'mgNumber', default: value});
