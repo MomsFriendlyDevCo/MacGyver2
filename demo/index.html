@@ -4,6 +4,10 @@
 
 		<!-- Font-awesome -->
 		<link href="node_modules/@fortawesome/fontawesome-free/css/all.css" rel="stylesheet" type="text/css"/>
+		<style>
+		/* Patch to correct BS4 / ".far" classes to use fontawesome-free */
+		.fa, .fas, .far {font-weight: 900 !important}
+		</style>
 
 		<!-- Lodash -->
 		<script src="node_modules/lodash/lodash.min.js"></script>
