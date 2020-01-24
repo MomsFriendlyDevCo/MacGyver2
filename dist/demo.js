@@ -10,8 +10,9 @@
 	    return {
 	      config: {},
 	      data: {},
-	      examples: ['examples/shorthand.json', 'examples/showcase.json'],
-	      example: 'examples/showcase.json'
+	      examples: ['examples/mgQuery.json', 'examples/shorthand.json', 'examples/showcase.json'],
+	      example: 'examples/showcase.json' // example: 'examples/mgQuery.json',
+
 	    };
 	  },
 	  watch: {
@@ -291,7 +292,7 @@
 	  /* style */
 	  const __vue_inject_styles__ = function (inject) {
 	    if (!inject) return
-	    inject("data-v-1ce0b10c_0", { source: "\na {\n\tcursor: pointer;\n}\n.card .card-title {\n\tmargin-left: 5px;\n\tmargin-bottom: 0;\n}\n.window-panes {\n\tdisplay: block;\n\tposition: fixed;\n\ttop: 60px;\n\tleft: 10px;\n\tbottom: 10px;\n\tright: 10px;\n}\n.window-panes > * {\n\toverflow: auto;\n\theight: calc(100% - 60px);\n\tdisplay: block;\n\tpadding: 20px;\n}\n.window-panes > .window-pane-left {\n\tposition: fixed;\n\tleft: 10px;\n\twidth: calc(50% - 20px);\n}\n.window-panes > .window-pane-right {\n\tposition: fixed;\n\tright: 10px;\n\twidth: calc(50% - 20px);\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/demo/form.vue"],"names":[],"mappings":";AA+EA;CACA,eAAA;AACA;AAEA;CACA,gBAAA;CACA,gBAAA;AACA;AAEA;CACA,cAAA;CACA,eAAA;CACA,SAAA;CACA,UAAA;CACA,YAAA;CACA,WAAA;AACA;AAEA;CACA,cAAA;CACA,yBAAA;CACA,cAAA;CACA,aAAA;AACA;AAEA;CACA,eAAA;CACA,UAAA;CACA,uBAAA;AACA;AAEA;CACA,eAAA;CACA,WAAA;CACA,uBAAA;AACA","file":"form.vue","sourcesContent":["<script>\nexport default {\n\tdata() { return {\n\t\tconfig: {},\n\t\tdata: {},\n\t\texamples: [\n\t\t\t'examples/shorthand.json',\n\t\t\t'examples/showcase.json',\n\t\t],\n\t\texample: 'examples/showcase.json',\n\t}},\n\twatch: {\n\t\texample: {\n\t\t\timmediate: true,\n\t\t\thandler() {\n\t\t\t\tthis.$http.get(this.example)\n\t\t\t\t\t.then(res => {\n\t\t\t\t\t\tthis.data = {};\n\t\t\t\t\t\tthis.config = res.data;\n\t\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n};\n</script>\n\n<template>\n\t<div class=\"window-panes\">\n\t\t<div class=\"window-pane-left\">\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-12\">\n\t\t\t\t\t<div class=\"card\">\n\t\t\t\t\t\t<div class=\"card-header d-flex justify-content-between p-1\">\n\t\t\t\t\t\t\t<h4 class=\"card-title\">Config</h4>\n\t\t\t\t\t\t\t<div class=\"btn-group\">\n\t\t\t\t\t\t\t\t<a class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\">\n\t\t\t\t\t\t\t\t\t{{example}}\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t<ul class=\"dropdown-menu\">\n\t\t\t\t\t\t\t\t\t<li v-for=\"exampleItem in examples\" :key=\"example\">\n\t\t\t\t\t\t\t\t\t\t<a @click=\"example = exampleItem\" class=\"dropdown-item\">\n\t\t\t\t\t\t\t\t\t\t\t<i :class=\"example == exampleItem ? 'fas fa-check-circle' : 'far fa-circle'\"/>\n\t\t\t\t\t\t\t\t\t\t\t{{exampleItem}}\n\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"card-body\" style=\"height: 200px; overflow-y: scroll\">\n\t\t\t\t\t\t\t<pre>{{config | json}}</pre>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"row mt-3\">\n\t\t\t\t<div class=\"col-12\">\n\t\t\t\t\t<div class=\"card\">\n\t\t\t\t\t\t<div class=\"card-header p-1\">\n\t\t\t\t\t\t\t<h4 class=\"card-title\">Form data</h4>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"card-body\" style=\"height: 200px; overflow-y: scroll\">\n\t\t\t\t\t\t\t<pre>{{data | json}}</pre>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"window-pane-right\">\n\t\t\t<mg-form\n\t\t\t\t:config=\"config\"\n\t\t\t\t:data=\"data\"\n\t\t\t\t@change=\"data = $event\"\n\t\t\t/>\n\t\t</div>\n\t</div>\n</template>\n\n<style>\na {\n\tcursor: pointer;\n}\n\n.card .card-title {\n\tmargin-left: 5px;\n\tmargin-bottom: 0;\n}\n\n.window-panes {\n\tdisplay: block;\n\tposition: fixed;\n\ttop: 60px;\n\tleft: 10px;\n\tbottom: 10px;\n\tright: 10px;\n}\n\n.window-panes > * {\n\toverflow: auto;\n\theight: calc(100% - 60px);\n\tdisplay: block;\n\tpadding: 20px;\n}\n\n.window-panes > .window-pane-left {\n\tposition: fixed;\n\tleft: 10px;\n\twidth: calc(50% - 20px);\n}\n\n.window-panes > .window-pane-right {\n\tposition: fixed;\n\tright: 10px;\n\twidth: calc(50% - 20px);\n}\n</style>\n"]}, media: undefined });
+	    inject("data-v-401e0a67_0", { source: "\na {\n\tcursor: pointer;\n}\n.card .card-title {\n\tmargin-left: 5px;\n\tmargin-bottom: 0;\n}\n.window-panes {\n\tdisplay: block;\n\tposition: fixed;\n\ttop: 60px;\n\tleft: 10px;\n\tbottom: 10px;\n\tright: 10px;\n}\n.window-panes > * {\n\toverflow: auto;\n\theight: calc(100% - 60px);\n\tdisplay: block;\n\tpadding: 20px;\n}\n.window-panes > .window-pane-left {\n\tposition: fixed;\n\tleft: 10px;\n\twidth: calc(50% - 20px);\n}\n.window-panes > .window-pane-right {\n\tposition: fixed;\n\tright: 10px;\n\twidth: calc(50% - 20px);\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/demo/form.vue"],"names":[],"mappings":";AAiFA;CACA,eAAA;AACA;AAEA;CACA,gBAAA;CACA,gBAAA;AACA;AAEA;CACA,cAAA;CACA,eAAA;CACA,SAAA;CACA,UAAA;CACA,YAAA;CACA,WAAA;AACA;AAEA;CACA,cAAA;CACA,yBAAA;CACA,cAAA;CACA,aAAA;AACA;AAEA;CACA,eAAA;CACA,UAAA;CACA,uBAAA;AACA;AAEA;CACA,eAAA;CACA,WAAA;CACA,uBAAA;AACA","file":"form.vue","sourcesContent":["<script>\nexport default {\n\tdata() { return {\n\t\tconfig: {},\n\t\tdata: {},\n\t\texamples: [\n\t\t\t'examples/mgQuery.json',\n\t\t\t'examples/shorthand.json',\n\t\t\t'examples/showcase.json',\n\t\t],\n\t\texample: 'examples/showcase.json',\n\t\t// example: 'examples/mgQuery.json',\n\t}},\n\twatch: {\n\t\texample: {\n\t\t\timmediate: true,\n\t\t\thandler() {\n\t\t\t\tthis.$http.get(this.example)\n\t\t\t\t\t.then(res => {\n\t\t\t\t\t\tthis.data = {};\n\t\t\t\t\t\tthis.config = res.data;\n\t\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n};\n</script>\n\n<template>\n\t<div class=\"window-panes\">\n\t\t<div class=\"window-pane-left\">\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-12\">\n\t\t\t\t\t<div class=\"card\">\n\t\t\t\t\t\t<div class=\"card-header d-flex justify-content-between p-1\">\n\t\t\t\t\t\t\t<h4 class=\"card-title\">Config</h4>\n\t\t\t\t\t\t\t<div class=\"btn-group\">\n\t\t\t\t\t\t\t\t<a class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\">\n\t\t\t\t\t\t\t\t\t{{example}}\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t<ul class=\"dropdown-menu\">\n\t\t\t\t\t\t\t\t\t<li v-for=\"exampleItem in examples\" :key=\"example\">\n\t\t\t\t\t\t\t\t\t\t<a @click=\"example = exampleItem\" class=\"dropdown-item\">\n\t\t\t\t\t\t\t\t\t\t\t<i :class=\"example == exampleItem ? 'fas fa-check-circle' : 'far fa-circle'\"/>\n\t\t\t\t\t\t\t\t\t\t\t{{exampleItem}}\n\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"card-body\" style=\"height: 200px; overflow-y: scroll\">\n\t\t\t\t\t\t\t<pre>{{config | json}}</pre>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"row mt-3\">\n\t\t\t\t<div class=\"col-12\">\n\t\t\t\t\t<div class=\"card\">\n\t\t\t\t\t\t<div class=\"card-header p-1\">\n\t\t\t\t\t\t\t<h4 class=\"card-title\">Form data</h4>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"card-body\" style=\"height: 200px; overflow-y: scroll\">\n\t\t\t\t\t\t\t<pre>{{data | json}}</pre>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"window-pane-right\">\n\t\t\t<mg-form\n\t\t\t\t:config=\"config\"\n\t\t\t\t:data=\"data\"\n\t\t\t\t@change=\"data = $event\"\n\t\t\t/>\n\t\t</div>\n\t</div>\n</template>\n\n<style>\na {\n\tcursor: pointer;\n}\n\n.card .card-title {\n\tmargin-left: 5px;\n\tmargin-bottom: 0;\n}\n\n.window-panes {\n\tdisplay: block;\n\tposition: fixed;\n\ttop: 60px;\n\tleft: 10px;\n\tbottom: 10px;\n\tright: 10px;\n}\n\n.window-panes > * {\n\toverflow: auto;\n\theight: calc(100% - 60px);\n\tdisplay: block;\n\tpadding: 20px;\n}\n\n.window-panes > .window-pane-left {\n\tposition: fixed;\n\tleft: 10px;\n\twidth: calc(50% - 20px);\n}\n\n.window-panes > .window-pane-right {\n\tposition: fixed;\n\tright: 10px;\n\twidth: calc(50% - 20px);\n}\n</style>\n"]}, media: undefined });
 
 	  };
 	  /* scoped */
@@ -306,7 +307,7 @@
 	  
 
 	  
-	  var componentDemoForm = normalizeComponent(
+	  const __vue_component__ = normalizeComponent(
 	    { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
 	    __vue_inject_styles__,
 	    __vue_script__,
@@ -552,7 +553,7 @@
 	}
 
 	var axios = createCommonjsModule(function (module, exports) {
-	/* axios v0.19.0 | (c) 2019 by Matt Zabriskie */
+	/* axios v0.19.2 | (c) 2020 by Matt Zabriskie */
 	(function webpackUniversalModuleDefinition(root, factory) {
 		module.exports = factory();
 	})(commonjsGlobal, function() {
@@ -610,9 +611,9 @@
 		
 		var utils = __webpack_require__(2);
 		var bind = __webpack_require__(3);
-		var Axios = __webpack_require__(5);
+		var Axios = __webpack_require__(4);
 		var mergeConfig = __webpack_require__(22);
-		var defaults = __webpack_require__(11);
+		var defaults = __webpack_require__(10);
 		
 		/**
 		 * Create an instance of Axios
@@ -647,7 +648,7 @@
 		// Expose Cancel & CancelToken
 		axios.Cancel = __webpack_require__(23);
 		axios.CancelToken = __webpack_require__(24);
-		axios.isCancel = __webpack_require__(10);
+		axios.isCancel = __webpack_require__(9);
 		
 		// Expose all/spread
 		axios.all = function all(promises) {
@@ -666,7 +667,6 @@
 	/***/ (function(module, exports, __webpack_require__) {
 		
 		var bind = __webpack_require__(3);
-		var isBuffer = __webpack_require__(4);
 		
 		/*global toString:true*/
 		
@@ -682,6 +682,27 @@
 		 */
 		function isArray(val) {
 		  return toString.call(val) === '[object Array]';
+		}
+		
+		/**
+		 * Determine if a value is undefined
+		 *
+		 * @param {Object} val The value to test
+		 * @returns {boolean} True if the value is undefined, otherwise false
+		 */
+		function isUndefined(val) {
+		  return typeof val === 'undefined';
+		}
+		
+		/**
+		 * Determine if a value is a Buffer
+		 *
+		 * @param {Object} val The value to test
+		 * @returns {boolean} True if value is a Buffer, otherwise false
+		 */
+		function isBuffer(val) {
+		  return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor)
+		    && typeof val.constructor.isBuffer === 'function' && val.constructor.isBuffer(val);
 		}
 		
 		/**
@@ -738,16 +759,6 @@
 		 */
 		function isNumber(val) {
 		  return typeof val === 'number';
-		}
-		
-		/**
-		 * Determine if a value is undefined
-		 *
-		 * @param {Object} val The value to test
-		 * @returns {boolean} True if the value is undefined, otherwise false
-		 */
-		function isUndefined(val) {
-		  return typeof val === 'undefined';
 		}
 		
 		/**
@@ -1016,29 +1027,12 @@
 
 	/***/ }),
 	/* 4 */
-	/***/ (function(module, exports) {
-
-		/*!
-		 * Determine if an object is a Buffer
-		 *
-		 * @author   Feross Aboukhadijeh <https://feross.org>
-		 * @license  MIT
-		 */
-		
-		module.exports = function isBuffer (obj) {
-		  return obj != null && obj.constructor != null &&
-		    typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
-		};
-
-
-	/***/ }),
-	/* 5 */
 	/***/ (function(module, exports, __webpack_require__) {
 		
 		var utils = __webpack_require__(2);
-		var buildURL = __webpack_require__(6);
-		var InterceptorManager = __webpack_require__(7);
-		var dispatchRequest = __webpack_require__(8);
+		var buildURL = __webpack_require__(5);
+		var InterceptorManager = __webpack_require__(6);
+		var dispatchRequest = __webpack_require__(7);
 		var mergeConfig = __webpack_require__(22);
 		
 		/**
@@ -1070,7 +1064,15 @@
 		  }
 		
 		  config = mergeConfig(this.defaults, config);
-		  config.method = config.method ? config.method.toLowerCase() : 'get';
+		
+		  // Set config.method
+		  if (config.method) {
+		    config.method = config.method.toLowerCase();
+		  } else if (this.defaults.method) {
+		    config.method = this.defaults.method.toLowerCase();
+		  } else {
+		    config.method = 'get';
+		  }
 		
 		  // Hook up interceptors middleware
 		  var chain = [dispatchRequest, undefined];
@@ -1122,7 +1124,7 @@
 
 
 	/***/ }),
-	/* 6 */
+	/* 5 */
 	/***/ (function(module, exports, __webpack_require__) {
 		
 		var utils = __webpack_require__(2);
@@ -1197,7 +1199,7 @@
 
 
 	/***/ }),
-	/* 7 */
+	/* 6 */
 	/***/ (function(module, exports, __webpack_require__) {
 		
 		var utils = __webpack_require__(2);
@@ -1253,15 +1255,13 @@
 
 
 	/***/ }),
-	/* 8 */
+	/* 7 */
 	/***/ (function(module, exports, __webpack_require__) {
 		
 		var utils = __webpack_require__(2);
-		var transformData = __webpack_require__(9);
-		var isCancel = __webpack_require__(10);
-		var defaults = __webpack_require__(11);
-		var isAbsoluteURL = __webpack_require__(20);
-		var combineURLs = __webpack_require__(21);
+		var transformData = __webpack_require__(8);
+		var isCancel = __webpack_require__(9);
+		var defaults = __webpack_require__(10);
 		
 		/**
 		 * Throws a `Cancel` if cancellation has been requested.
@@ -1281,11 +1281,6 @@
 		module.exports = function dispatchRequest(config) {
 		  throwIfCancellationRequested(config);
 		
-		  // Support baseURL config
-		  if (config.baseURL && !isAbsoluteURL(config.url)) {
-		    config.url = combineURLs(config.baseURL, config.url);
-		  }
-		
 		  // Ensure headers exist
 		  config.headers = config.headers || {};
 		
@@ -1300,7 +1295,7 @@
 		  config.headers = utils.merge(
 		    config.headers.common || {},
 		    config.headers[config.method] || {},
-		    config.headers || {}
+		    config.headers
 		  );
 		
 		  utils.forEach(
@@ -1343,7 +1338,7 @@
 
 
 	/***/ }),
-	/* 9 */
+	/* 8 */
 	/***/ (function(module, exports, __webpack_require__) {
 		
 		var utils = __webpack_require__(2);
@@ -1367,7 +1362,7 @@
 
 
 	/***/ }),
-	/* 10 */
+	/* 9 */
 	/***/ (function(module, exports) {
 		
 		module.exports = function isCancel(value) {
@@ -1376,11 +1371,11 @@
 
 
 	/***/ }),
-	/* 11 */
+	/* 10 */
 	/***/ (function(module, exports, __webpack_require__) {
 		
 		var utils = __webpack_require__(2);
-		var normalizeHeaderName = __webpack_require__(12);
+		var normalizeHeaderName = __webpack_require__(11);
 		
 		var DEFAULT_CONTENT_TYPE = {
 		  'Content-Type': 'application/x-www-form-urlencoded'
@@ -1394,13 +1389,12 @@
 		
 		function getDefaultAdapter() {
 		  var adapter;
-		  // Only Node.JS has a process variable that is of [[Class]] process
-		  if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
-		    // For node use HTTP adapter
-		    adapter = __webpack_require__(13);
-		  } else if (typeof XMLHttpRequest !== 'undefined') {
+		  if (typeof XMLHttpRequest !== 'undefined') {
 		    // For browsers use XHR adapter
-		    adapter = __webpack_require__(13);
+		    adapter = __webpack_require__(12);
+		  } else if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
+		    // For node use HTTP adapter
+		    adapter = __webpack_require__(12);
 		  }
 		  return adapter;
 		}
@@ -1478,7 +1472,7 @@
 
 
 	/***/ }),
-	/* 12 */
+	/* 11 */
 	/***/ (function(module, exports, __webpack_require__) {
 		
 		var utils = __webpack_require__(2);
@@ -1494,15 +1488,16 @@
 
 
 	/***/ }),
-	/* 13 */
+	/* 12 */
 	/***/ (function(module, exports, __webpack_require__) {
 		
 		var utils = __webpack_require__(2);
-		var settle = __webpack_require__(14);
-		var buildURL = __webpack_require__(6);
-		var parseHeaders = __webpack_require__(17);
-		var isURLSameOrigin = __webpack_require__(18);
-		var createError = __webpack_require__(15);
+		var settle = __webpack_require__(13);
+		var buildURL = __webpack_require__(5);
+		var buildFullPath = __webpack_require__(16);
+		var parseHeaders = __webpack_require__(19);
+		var isURLSameOrigin = __webpack_require__(20);
+		var createError = __webpack_require__(14);
 		
 		module.exports = function xhrAdapter(config) {
 		  return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -1522,7 +1517,8 @@
 		      requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
 		    }
 		
-		    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
+		    var fullPath = buildFullPath(config.baseURL, config.url);
+		    request.open(config.method.toUpperCase(), buildURL(fullPath, config.params, config.paramsSerializer), true);
 		
 		    // Set the request timeout in MS
 		    request.timeout = config.timeout;
@@ -1583,7 +1579,11 @@
 		
 		    // Handle timeout
 		    request.ontimeout = function handleTimeout() {
-		      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED',
+		      var timeoutErrorMessage = 'timeout of ' + config.timeout + 'ms exceeded';
+		      if (config.timeoutErrorMessage) {
+		        timeoutErrorMessage = config.timeoutErrorMessage;
+		      }
+		      reject(createError(timeoutErrorMessage, config, 'ECONNABORTED',
 		        request));
 		
 		      // Clean up request
@@ -1594,10 +1594,10 @@
 		    // This is only done if running in a standard browser environment.
 		    // Specifically not if we're in a web worker, or react-native.
 		    if (utils.isStandardBrowserEnv()) {
-		      var cookies = __webpack_require__(19);
+		      var cookies = __webpack_require__(21);
 		
 		      // Add xsrf header
-		      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
+		      var xsrfValue = (config.withCredentials || isURLSameOrigin(fullPath)) && config.xsrfCookieName ?
 		        cookies.read(config.xsrfCookieName) :
 		        undefined;
 		
@@ -1620,8 +1620,8 @@
 		    }
 		
 		    // Add withCredentials to request if needed
-		    if (config.withCredentials) {
-		      request.withCredentials = true;
+		    if (!utils.isUndefined(config.withCredentials)) {
+		      request.withCredentials = !!config.withCredentials;
 		    }
 		
 		    // Add responseType to request if needed
@@ -1672,10 +1672,10 @@
 
 
 	/***/ }),
-	/* 14 */
+	/* 13 */
 	/***/ (function(module, exports, __webpack_require__) {
 		
-		var createError = __webpack_require__(15);
+		var createError = __webpack_require__(14);
 		
 		/**
 		 * Resolve or reject a Promise based on response status.
@@ -1701,10 +1701,10 @@
 
 
 	/***/ }),
-	/* 15 */
+	/* 14 */
 	/***/ (function(module, exports, __webpack_require__) {
 		
-		var enhanceError = __webpack_require__(16);
+		var enhanceError = __webpack_require__(15);
 		
 		/**
 		 * Create an Error with the specified message, config, error code, request and response.
@@ -1723,7 +1723,7 @@
 
 
 	/***/ }),
-	/* 16 */
+	/* 15 */
 	/***/ (function(module, exports) {
 		
 		/**
@@ -1769,7 +1769,67 @@
 
 
 	/***/ }),
+	/* 16 */
+	/***/ (function(module, exports, __webpack_require__) {
+		
+		var isAbsoluteURL = __webpack_require__(17);
+		var combineURLs = __webpack_require__(18);
+		
+		/**
+		 * Creates a new URL by combining the baseURL with the requestedURL,
+		 * only when the requestedURL is not already an absolute URL.
+		 * If the requestURL is absolute, this function returns the requestedURL untouched.
+		 *
+		 * @param {string} baseURL The base URL
+		 * @param {string} requestedURL Absolute or relative URL to combine
+		 * @returns {string} The combined full path
+		 */
+		module.exports = function buildFullPath(baseURL, requestedURL) {
+		  if (baseURL && !isAbsoluteURL(requestedURL)) {
+		    return combineURLs(baseURL, requestedURL);
+		  }
+		  return requestedURL;
+		};
+
+
+	/***/ }),
 	/* 17 */
+	/***/ (function(module, exports) {
+		
+		/**
+		 * Determines whether the specified URL is absolute
+		 *
+		 * @param {string} url The URL to test
+		 * @returns {boolean} True if the specified URL is absolute, otherwise false
+		 */
+		module.exports = function isAbsoluteURL(url) {
+		  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
+		  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
+		  // by any combination of letters, digits, plus, period, or hyphen.
+		  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
+		};
+
+
+	/***/ }),
+	/* 18 */
+	/***/ (function(module, exports) {
+		
+		/**
+		 * Creates a new URL by combining the specified URLs
+		 *
+		 * @param {string} baseURL The base URL
+		 * @param {string} relativeURL The relative URL
+		 * @returns {string} The combined URL
+		 */
+		module.exports = function combineURLs(baseURL, relativeURL) {
+		  return relativeURL
+		    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
+		    : baseURL;
+		};
+
+
+	/***/ }),
+	/* 19 */
 	/***/ (function(module, exports, __webpack_require__) {
 		
 		var utils = __webpack_require__(2);
@@ -1826,7 +1886,7 @@
 
 
 	/***/ }),
-	/* 18 */
+	/* 20 */
 	/***/ (function(module, exports, __webpack_require__) {
 		
 		var utils = __webpack_require__(2);
@@ -1898,7 +1958,7 @@
 
 
 	/***/ }),
-	/* 19 */
+	/* 21 */
 	/***/ (function(module, exports, __webpack_require__) {
 		
 		var utils = __webpack_require__(2);
@@ -1955,42 +2015,6 @@
 
 
 	/***/ }),
-	/* 20 */
-	/***/ (function(module, exports) {
-		
-		/**
-		 * Determines whether the specified URL is absolute
-		 *
-		 * @param {string} url The URL to test
-		 * @returns {boolean} True if the specified URL is absolute, otherwise false
-		 */
-		module.exports = function isAbsoluteURL(url) {
-		  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
-		  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
-		  // by any combination of letters, digits, plus, period, or hyphen.
-		  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
-		};
-
-
-	/***/ }),
-	/* 21 */
-	/***/ (function(module, exports) {
-		
-		/**
-		 * Creates a new URL by combining the specified URLs
-		 *
-		 * @param {string} baseURL The base URL
-		 * @param {string} relativeURL The relative URL
-		 * @returns {string} The combined URL
-		 */
-		module.exports = function combineURLs(baseURL, relativeURL) {
-		  return relativeURL
-		    ? baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '')
-		    : baseURL;
-		};
-
-
-	/***/ }),
 	/* 22 */
 	/***/ (function(module, exports, __webpack_require__) {
 		
@@ -2009,13 +2033,23 @@
 		  config2 = config2 || {};
 		  var config = {};
 		
-		  utils.forEach(['url', 'method', 'params', 'data'], function valueFromConfig2(prop) {
+		  var valueFromConfig2Keys = ['url', 'method', 'params', 'data'];
+		  var mergeDeepPropertiesKeys = ['headers', 'auth', 'proxy'];
+		  var defaultToConfig2Keys = [
+		    'baseURL', 'url', 'transformRequest', 'transformResponse', 'paramsSerializer',
+		    'timeout', 'withCredentials', 'adapter', 'responseType', 'xsrfCookieName',
+		    'xsrfHeaderName', 'onUploadProgress', 'onDownloadProgress',
+		    'maxContentLength', 'validateStatus', 'maxRedirects', 'httpAgent',
+		    'httpsAgent', 'cancelToken', 'socketPath'
+		  ];
+		
+		  utils.forEach(valueFromConfig2Keys, function valueFromConfig2(prop) {
 		    if (typeof config2[prop] !== 'undefined') {
 		      config[prop] = config2[prop];
 		    }
 		  });
 		
-		  utils.forEach(['headers', 'auth', 'proxy'], function mergeDeepProperties(prop) {
+		  utils.forEach(mergeDeepPropertiesKeys, function mergeDeepProperties(prop) {
 		    if (utils.isObject(config2[prop])) {
 		      config[prop] = utils.deepMerge(config1[prop], config2[prop]);
 		    } else if (typeof config2[prop] !== 'undefined') {
@@ -2027,13 +2061,25 @@
 		    }
 		  });
 		
-		  utils.forEach([
-		    'baseURL', 'transformRequest', 'transformResponse', 'paramsSerializer',
-		    'timeout', 'withCredentials', 'adapter', 'responseType', 'xsrfCookieName',
-		    'xsrfHeaderName', 'onUploadProgress', 'onDownloadProgress', 'maxContentLength',
-		    'validateStatus', 'maxRedirects', 'httpAgent', 'httpsAgent', 'cancelToken',
-		    'socketPath'
-		  ], function defaultToConfig2(prop) {
+		  utils.forEach(defaultToConfig2Keys, function defaultToConfig2(prop) {
+		    if (typeof config2[prop] !== 'undefined') {
+		      config[prop] = config2[prop];
+		    } else if (typeof config1[prop] !== 'undefined') {
+		      config[prop] = config1[prop];
+		    }
+		  });
+		
+		  var axiosKeys = valueFromConfig2Keys
+		    .concat(mergeDeepPropertiesKeys)
+		    .concat(defaultToConfig2Keys);
+		
+		  var otherKeys = Object
+		    .keys(config2)
+		    .filter(function filterAxiosKeys(key) {
+		      return axiosKeys.indexOf(key) === -1;
+		    });
+		
+		  utils.forEach(otherKeys, function otherKeysDefaultToConfig2(prop) {
 		    if (typeof config2[prop] !== 'undefined') {
 		      config[prop] = config2[prop];
 		    } else if (typeof config1[prop] !== 'undefined') {
@@ -2210,7 +2256,7 @@
 	  
 
 	  
-	  normalizeComponent(
+	  const __vue_component__$1 = normalizeComponent(
 	    {},
 	    __vue_inject_styles__$1,
 	    __vue_script__$1,
@@ -2228,7 +2274,7 @@
 	  app.router = new VueRouter({
 	    routes: [{
 	      path: '/',
-	      component: componentDemoForm
+	      component: __vue_component__
 	    }]
 	  });
 	  app.vue = new Vue$1({
