@@ -18,7 +18,6 @@ macgyver.register('mgQuery', {
 export default Vue.component('mgQuery', {
 	data: ()=> ({
 		data: undefined,
-		subformData: {},
 		queryComponent: [],
 	}),
 	props: {

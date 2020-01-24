@@ -45,7 +45,11 @@ Vue.prototype.$macgyver = (()=> {
 
 		// Inject data watcher which transforms change operations into emitters to the nearest parent form {{{
 		component.$watch('data', val => {
+			// Emit `mgChange` to form element
 			$macgyver.$forms[component.$props.form].$emit('mgChange', component.$props.config.$dataPath, val);
+
+			// If the component also has a .onChange binding fire that
+			if (component.$props.config.onChange) component.$props.config.onChange.call(component, val);
 		});
 		// }}}
 	};

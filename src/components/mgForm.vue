@@ -5,11 +5,12 @@
 * @param {Object|Array} config The MacGyver form object either in long form nested array structure or short form object (which is converted)
 * @param {boolean} [populateDefaults=true] Apply initial defaults to the data when the config is ready, if false you can call vm.assignDefaults() manually if needed
 * @param {boolean} [actionsFallback=true] Use vm.$eval as a runner when no action listener is found
-* @param {Object} [actions] Actions subscribers
+* @param {Object} [actions] Actions subscribers, a lookup list of action definition string keys and their firable function. Functions are called with the context as `(...params)`
 * @param {Object} [data] The data binding
 *
 * @emits change Emitted as `(data)` whenever any data changes
 * @emits changeItem Emitted as `({path, value})` when any single item changes
+* @emits onAction Emitted as `({action, params})` when any action is fired
 */
 export default Vue.component('mgForm', {
 	data() { return {

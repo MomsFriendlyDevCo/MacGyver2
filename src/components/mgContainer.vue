@@ -46,6 +46,7 @@ macgyver.register('mgContainer', {
 			{id: '', title: 'Normal'},
 			{id: 'mgContainerRowLarge', title: 'Large text'},
 		]},
+		onChange: {type: 'string', title: 'Change action', help: 'Action to trigger when the value of this component changes', advanced: true},
 	},
 });
 

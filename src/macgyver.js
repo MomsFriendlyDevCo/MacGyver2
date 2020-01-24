@@ -164,19 +164,23 @@ $macgyver.forms.getPrototype = (id) =>
 * The default behaviour of this function is documented within the function
 * @param {string} id The ID of the form to execute the function on
 * @param {string} action The action to execute
-* @emits mgRun Event fired at the form level only. Use the form property handleActions to specify if the form should handle or trap the event to override
+* @param {*} [context] The context of the action, defaults to the form component
+* @param {*} [params...] Additional parameters to execute
+* @emits mgRun Event fired at the form level only with a single object of the form `{action, params}`. Use the form property handleActions to specify if the form should handle or trap the event to override
 */
-$macgyver.forms.run = (id, action) => {
+$macgyver.forms.run = (id, action, context, ...params) => {
+	if (!context) context = $macgyver.$forms[id];
+
 	// 1. Emit mgRun to parents and see if they want to handle it {{{
 	var handled = false;
-	$macgyver.$forms[id].$emitUp('mgRun', {action}, isHandled => {
+	$macgyver.$forms[id].$emitUp('mgRun', {action, params}, isHandled => {
 		if (isHandled) handled = true;
 	});
 	if (handled) return;
 	// }}}
 
 	// 2. Use FORM.$props.onAction(action) and see if returns truthy {{{
-	if ($macgyver.$forms[id].$props.onAction && $macgyver.$forms[id].$props.onAction(action)) return;
+	if ($macgyver.$forms[id].$props.onAction && $macgyver.$forms[id].$props.onAction.call(context, action, ...params)) return;
 	// }}}
 
 	// 3. See if FORM.$props.actions[action] exists and if so whether it returns truthy {{{
@@ -189,12 +193,12 @@ $macgyver.forms.run = (id, action) => {
 		// Tidy up actionArgs
 		actionArgs = (actionArgs || '').trim('()').split(',').map(i => i && JSON.parse(i.replace(/'/g, '"')));
 
-		if (func.apply($macgyver.$forms[id], actionArgs)) return;
+		if (func.apply($macgyver.$forms[id], [actionArgs, ...params])) return;
 	}
 	// }}}
 
 	// 4. If all else failed and FORM.$props.actionsFallback is true - handle it via vm.$eval {{{
-	$macgyver.$forms[id].$eval.call($macgyver.$forms[id], action);
+	$macgyver.$forms[id].$eval.call(context, action, ...params);
 	// }}}
 };
 
