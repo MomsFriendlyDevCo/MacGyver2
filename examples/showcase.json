@@ -125,11 +125,11 @@
 					"iconSelected": "far fa-fw fa-check",
 					"iconDefault": "far fa-fw",
 					"enum": [
-						{"id": "btn-primary", "classInactive": "btn btn-primary far fa-invisible", "classActive": "btn btn-primary far fa-check"},
-						{"id": "btn-info", "classInactive": "btn btn-info far fa-invisible", "classActive": "btn btn-info far fa-check"},
-						{"id": "btn-success", "classInactive": "btn btn-success far fa-invisible", "classActive": "btn btn-success far fa-check"},
-						{"id": "btn-warning", "classInactive": "btn btn-warning far fa-invisible", "classActive": "btn btn-warning far fa-check"},
-						{"id": "btn-danger", "classInactive": "btn btn-danger far fa-invisible", "classActive": "btn btn-danger far fa-check"}
+						{"id": "btn-primary", "classInactive": "btn btn-primary far fa-invisible", "classActive": "btn btn-primary far fa-check text-white"},
+						{"id": "btn-info", "classInactive": "btn btn-info far fa-invisible", "classActive": "btn btn-info far fa-check text-white"},
+						{"id": "btn-success", "classInactive": "btn btn-success far fa-invisible", "classActive": "btn btn-success far fa-check text-white"},
+						{"id": "btn-warning", "classInactive": "btn btn-warning far fa-invisible", "classActive": "btn btn-warning far fa-check text-white"},
+						{"id": "btn-danger", "classInactive": "btn btn-danger far fa-invisible", "classActive": "btn btn-danger far fa-check text-white"}
 					],
 					"default": "btn-success"
 				},
