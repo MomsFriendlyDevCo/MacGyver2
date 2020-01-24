@@ -4,6 +4,7 @@
 */
 
 import _ from 'lodash';
+import sift from 'sift';
 var $macgyver = {};
 
 /**
@@ -565,6 +566,65 @@ $macgyver.utils.global = (()=> {
 	if (typeof global !== 'undefined') { return global; }
 	throw new Error('unable to locate global object');
 })();
+
+
+/**
+* Attempt to parse a rough JS expression into a Sift / Mongo compatible expression
+* This makes future calls to $macgyver.utils.evalMatch() much quicker
+* TODO: This probably needs replacing / merging with [sift-shorthand](https://github.com/hash-bang/sift-shorthand) at some point
+* @param {Object|string} expression Input expression, if this is an object it is assumed to already be a sift expression and returned uneffected
+* @param {boolean} [asFunc=true] Return a Sift filtering function (the most efficient method), if falsy return the compiled object (useful for debugging)
+* @returns {Sift} Sift function for use with $macgyver.utils.evalMatch()
+*/
+$macgyver.utils.evalCompile = (expression, asFunc = true) => {
+	var match;
+	if (_.isFunction(expression)) { // Already compiled Sift function
+		if (!asFunc) throw new Error('Cannot convert compiled Sift object back to an object - disable asFunc parameter');
+		return expression;
+	} else if (_.isPlainObject(expression)) { // An object but not as Sift function
+		return (asFunc ? sift(expression) : expression);
+	} else if ((_.isString(expression)) && (match = /^\s*(?<left>[\w\d\.]+)(?<operand>\s*==?\s*|\s*\!=\s*|\s*<=?\s*|\s*>=?\s*|\s+\$lte?\s+|\s+\$gte?\s+)(?<right>.+)\s*$/.exec(expression))) { // Simple direct (in)equality e.g. `a == 1', `b != 'this'`
+		match.groups.operand = match.groups.operand.trim();
+		if (isFinite(match.groups.right)) {
+			match.groups.right = +match.groups.right;
+		} else if (/^(["']).*\1$/.test(match.groups.right)) { // Enclosed in " or '
+			match.groups.right = match.groups.right.substr(1, match.groups.right.length - 2);
+		}
+
+		var obj;
+		if (['=', '==', '$eq'].includes(match.groups.operand)) { // Direct equality
+			obj = {[match.groups.left]: match.groups.right};
+		} else {
+			var siftOperand =
+				['!=', '$ne'].includes(match.groups.operand) ? '$ne'
+				: ['>', '$gt'].includes(match.groups.operand) ? '$gt'
+				: ['<', '$lt'].includes(match.groups.operand) ? '$lt'
+				: ['>=', '$gte'].includes(match.groups.operand) ? '$gte'
+				: ['<=', '$lte'].includes(match.groups.operand) ? '$lte'
+				: throw new Error(`Unknown operand "${match.groups.operand}" while parsing expression "${expression}"`);
+
+			obj = {[match.groups.left]: {[siftOperand]: match.groups.right}};
+		}
+
+		return (asFunc ? sift(obj) : obj);
+	} else {
+		throw new Error(`Error parsinng expression "${expression}", $macgyver.utils.evelParse() can only process simple expressions for now, use Sift object syntax for more complex tests`);
+	}
+};
+
+
+/**
+* Evaluate an expression and return if it matches the given environment
+* This function is used by the `showIf` parameter to determine field visibility
+* NOTE: Passing a string to this function is possible but its better to precompile the expression via $macgyver.utils.evalCompile() first so its quicker to process each time
+* @param {string|Object|Sift} expression String expression (which will be parsed), object (which will be parsed) or Sift object to filter by in asending order of efficiency
+* @param {Object} env Local environment to compare
+*/
+$macgyver.utils.evalMatch = (expression, env) => {
+	var useExpression = typeof expression == 'string' ? $macgyver.utils.evalCompile(expression) : expression;
+
+	return ([env].filter(sift(useExpression))).length == 1;
+};
 
 
 /**
