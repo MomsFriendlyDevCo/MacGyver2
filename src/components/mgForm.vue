@@ -16,7 +16,7 @@ export default Vue.component('mgForm', {
 		id: undefined, // Set on create
 		editing: false, // Set by mgFormEditor when its this components parent
 		errors: [], // array <Object> {error}
-		layout: undefined, // Calculated version of config after its been though $macgyver.neatenSpec()
+		spec: undefined, // Calculated version of config after its been though $macgyver.compileSpec()
 	}},
 	props: {
 		form: String,
@@ -53,9 +53,17 @@ export default Vue.component('mgForm', {
 		*/
 		rebuild() {
 			console.log(`Rebuild form config for form "${this.id}"`);
-			this.$set(this, 'layout', this.$macgyver.neatenSpec(this.$props.config));
+
+			this.spec = this.$macgyver.compileSpec(this.$props.config);
 
 			if (this.$props.populateDefaults) this.assignDefaults();
+		},
+
+
+		/**
+		* Force recomputation of show via showIf values
+		*/
+		refreshShowIf() {
 		},
 
 
@@ -97,6 +105,6 @@ export default Vue.component('mgForm', {
 			</ul>
 		</div>
 
-		<mg-component :form="id" :config="layout"/>
+		<mg-component :form="id" :config="spec.spec"/>
 	</form>
 </template>

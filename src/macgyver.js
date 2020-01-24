@@ -339,9 +339,9 @@ $macgyver.flatten = (root, options) => {
 * @param {boolean} [options.widgetDefaults=true] Assign each item its default values from the widget config if that setting is omitted
 * @param {string} [options.widgetTitles=true] Add any missing title fields from the ID
 * @param {boolean} [options.deblank=true] Reformat null/undefined/empty forms into a skeleton form
-* @returns {Object} The mutated spec
+* @returns {Object} An object composed of the keys {spec}
 */
-$macgyver.neatenSpec = (spec, options) => {
+$macgyver.compileSpec = (spec, options) => {
 	var settings = {
 		clone: true,
 		convertArray: true,
@@ -380,19 +380,19 @@ $macgyver.neatenSpec = (spec, options) => {
 		...options,
 	};
 
-	var layout = settings.clone ? _.cloneDeep(spec) : spec; // Output spec
+	var spec = settings.clone ? _.cloneDeep(spec) : spec; // Output spec
 
-	if (settings.deblank && _.isEmpty(layout)) { // Convert empty or unusable values into a skeleton
-		layout = {type: 'mgContainer', items: []};
+	if (settings.deblank && _.isEmpty(spec)) { // Convert empty or unusable values into a skeleton
+		spec = {type: 'mgContainer', items: []};
 	}
-	if (settings.convertArray && _.isArray(layout)) { // convert array spec -> object?
-		layout = settings.convertArrayWrapper(layout);
+	if (settings.convertArray && _.isArray(spec)) { // convert array spec -> object?
+		spec = settings.convertArrayWrapper(spec);
 	}
-	if (settings.convertShorthand && settings.convertShorthandDetect(layout)) { // Is shorthand format
-		layout = settings.convertShorthandTranslate(layout);
+	if (settings.convertShorthand && settings.convertShorthandDetect(spec)) { // Is shorthand format
+		spec = settings.convertShorthandTranslate(spec);
 	}
 
-	$macgyver.flatten(layout, {
+	$macgyver.flatten(spec, {
 		type: 'spec',
 		want: 'array',
 		wantDataPath: '$dataPath',
@@ -414,7 +414,9 @@ $macgyver.neatenSpec = (spec, options) => {
 			if (settings.widgetTitles && !widget.title && widget.id) widget.title = _.startCase(widget.id);
 		})
 
-	return layout;
+	return {
+		spec,
+	};
 };
 
 
