@@ -84,10 +84,11 @@ $macgyver.inject(vm)
 Glue various MacGyver emitter handlers to a registered component.
 
 
-$macgyver.neatenSpec(spec)
+$macgyver.compileSpec(spec)
 --------------------------
-Attempt to neaten up a 'rough' MacGyver spec into a pristine one.
+Attempt to compile up a 'rough' MacGyver spec into a pristine one.
 This function performs various sanity checks on nested elements e.g. checking each item has a valid ID and if not adding one.
+It returns an object composed of the form `{spec}`
 
 
 $macgyver.widgets
