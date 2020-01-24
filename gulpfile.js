@@ -3,6 +3,7 @@ var cleanCSS = require('gulp-clean-css');
 var concat = require('gulp-concat');
 var ghPages = require('gulp-gh-pages');
 var gulp = require('@momsfriendlydevco/gulpy');
+var fs = require('fs');
 var nodemon = require('gulp-nodemon');
 var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
@@ -76,6 +77,7 @@ gulp.task('build:node', ()=>
 				presets: ['@babel/env'],
 				plugins: [
 					['@babel/plugin-proposal-pipeline-operator', {proposal: 'fsharp'}],
+					'@babel/plugin-proposal-throw-expressions',
 					'lodash',
 				],
 				exclude: 'node_modules/**',
@@ -125,6 +127,7 @@ gulp.task('build:vue', ()=>
 				presets: ['@babel/env'],
 				plugins: [
 					['@babel/plugin-proposal-pipeline-operator', {proposal: 'fsharp'}],
+					'@babel/plugin-proposal-throw-expressions',
 					'lodash',
 				],
 				exclude: 'node_modules/**',
@@ -158,6 +161,16 @@ gulp.task('build:vue', ()=>
 				vue: 'Vue',
 			},
 		});
+	})
+	.then(()=> fs.unlink(`${__dirname}/.error`, ()=> {}))
+	.catch(e => {
+		fs.writeFile(`${__dirname}/.error`, e.toString().replace( // Output last error, as plaintext (strip ANSI) to `.error`
+			new RegExp([
+				'[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)',
+				'(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))'
+			].join('|'), 'g')
+		, ''), ()=> {});
+		console.warn(e.toString());
 	})
 );
 
@@ -209,6 +222,7 @@ gulp.task('build:demo', ()=>
 				presets: ['@babel/env'],
 				plugins: [
 					['@babel/plugin-proposal-pipeline-operator', {proposal: 'fsharp'}],
+					'@babel/plugin-proposal-throw-expressions',
 					'lodash',
 				],
 				exclude: 'node_modules/**',
