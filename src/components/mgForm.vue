@@ -43,6 +43,7 @@ export default Vue.component('mgForm', {
 
 			// FIXME: Its annoying we have to use cloneDeep here but if the data object remains as a Vue object deep nodes don't get change detection upstream
 			this.$emit('change', _.cloneDeep(this.$props.data));
+			this.refreshShowIfs();
 		});
 
 		this.$on('mgErrors', errors => this.errors = errors);
@@ -58,13 +59,17 @@ export default Vue.component('mgForm', {
 			this.spec = this.$macgyver.compileSpec(this.$props.config);
 
 			if (this.$props.populateDefaults) this.assignDefaults();
+			this.refreshShowIfs();
 		},
 
 
 		/**
 		* Force recomputation of show via showIf values
 		*/
-		refreshShowIf() {
+		refreshShowIfs() {
+			this.spec.showIfs.forEach(widget =>
+				widget.show = this.$macgyver.utils.evalMatch(widget.showIf, this.data)
+			);
 		},
 
 

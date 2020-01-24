@@ -90,7 +90,13 @@ export default Vue.component('mgContainer', {
 
 <template>
 	<div v-if="$props.config.layout == 'form' || $props.config.layout === undefined">
-		<div v-for="(widget, widgetIndex) in $props.config.items" :key="widget.id" class="form-group row mgComponent" :class="[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]">
+		<div
+			v-for="(widget, widgetIndex) in $props.config.items"
+			:key="widget.id"
+			v-if="widget.show"
+			class="form-group row mgComponent"
+			:class="[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]"
+		>
 			<label v-if="widget.showTitle || $props.config.showTitles" class="control-label text-left col-sm-3">
 				{{widget.title}}
 			</label>
@@ -100,8 +106,36 @@ export default Vue.component('mgContainer', {
 			<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
 		</div>
 	</div>
+	<div v-else-if="$props.config.layout == 'card'">
+		<div class="card mg-container" :class="{'card-collapsable': $props.config.collapsable, 'card-collapsed': $props.config.collapsed}">
+			<div class="card-header">{{$props.config.title}}</div>
+			<div class="card-body">
+				<div
+					v-for="(widget, widgetIndex) in $props.config.items"
+					:key="widget.id"
+					v-if="widget.show"
+					class="form-group row mgComponent"
+					:class="[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]"
+				>
+					<label v-if="widget.showTitle || $props.config.showTitles" class="control-label text-left col-sm-3">
+						{{widget.title}}
+					</label>
+					<div :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'">
+						<mg-component :form="$props.form" :config="widget"/>
+					</div>
+					<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
+				</div>
+			</div>
+		</div>
+	</div>
 	<div v-else-if="$props.config.layout == 'formFloating'">
-		<div v-for="(widget, widgetIndex) in $props.config.items" :key="widget.id" class="form-group mgContainer-formFloating row mgComponent" :class="[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]">
+		<div
+			v-for="(widget, widgetIndex) in $props.config.items"
+			:key="widget.id"
+			v-if="widget.show"
+			class="form-group mgContainer-formFloating row mgComponent"
+			:class="[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]"
+		>
 			<div class="col-12">
 				<mg-component
 					:form="$props.form"
@@ -116,32 +150,25 @@ export default Vue.component('mgContainer', {
 			<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
 		</div>
 	</div>
-	<div v-else-if="$props.config.layout == 'card'">
-		<div class="card mg-container" :class="{'card-collapsable': $props.config.collapsable, 'card-collapsed': $props.config.collapsed}">
-			<div class="card-header">{{$props.config.title}}</div>
-			<div class="card-body">
-				<div v-for="(widget, widgetIndex) in $props.config.items" :key="widget.id" class="form-group row mgComponent" :class="[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]">
-					<label v-if="widget.showTitle || $props.config.showTitles" class="control-label text-left col-sm-3">
-						{{widget.title}}
-					</label>
-					<div :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'">
-						<mg-component :form="$props.form" :config="widget"/>
-					</div>
-					<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
-				</div>
-			</div>
-		</div>
-	</div>
 	<div v-else-if="$props.config.layout == 'columns'">
 		<table class="mg-container" :class="$props.config.border ? 'table table-bordered' : 'mg-container-columns-no-border'" style="width: 100%">
 			<thead v-if="$props.config.columnHeaders">
 				<tr>
-					<th v-for="widget in config.items" :key="widget.id">{{widget.title}}</th>
+					<th
+						v-for="widget in config.items"
+						:key="widget.id"
+						v-if="widget.show"
+					>{{widget.title}}</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
-					<td v-for="(widget, widgetIndex) in $props.config.items" :key="widget.id" :class="[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]">
+					<td
+						v-for="(widget, widgetIndex) in $props.config.items"
+						:key="widget.id"
+						v-if="widget.show"
+						:class="[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]"
+					>
 						<mg-component :form="$props.form" :config="widget"/>
 						<div class="help-block" v-if="widget.help">{{widget.help}}</div>
 					</td>

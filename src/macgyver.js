@@ -396,6 +396,12 @@ $macgyver.compileSpec = (spec, options) => {
 		spec = settings.convertShorthandTranslate(spec);
 	}
 
+	/**
+	* Collection of items that have a showIf property
+	* @var {array<Object>} Each widget with a showIf property
+	*/
+	var showIfs = [];
+
 	$macgyver.flatten(spec, {
 		type: 'spec',
 		want: 'array',
@@ -415,12 +421,19 @@ $macgyver.compileSpec = (spec, options) => {
 				);
 			}
 
+			// Glue .show property to all elements that omit it
+			widget.show = widget.show == undefined ? true : !!widget.show;
+
+			// Add all widgets with a .showIf expression into a quick-lookup collection
+			if (widget.showIf) {
+				widget.showIf = $macgyver.utils.evalCompile(widget.showIf); // Compile showIf property so its as fast as possible
+				showIfs.push(widget);
+			}
+
 			if (settings.widgetTitles && !widget.title && widget.id) widget.title = _.startCase(widget.id);
 		})
 
-	return {
-		spec,
-	};
+	return {spec, showIfs};
 };
 
 
@@ -627,9 +640,7 @@ $macgyver.utils.evalCompile = (expression, asFunc = true) => {
 * @param {Object} env Local environment to compare
 */
 $macgyver.utils.evalMatch = (expression, env) => {
-	var useExpression = typeof expression == 'string' ? $macgyver.utils.evalCompile(expression) : expression;
-
-	return ([env].filter(sift(useExpression))).length == 1;
+	return ([env].filter($macgyver.utils.evalCompile(expression))).length == 1;
 };
 
 

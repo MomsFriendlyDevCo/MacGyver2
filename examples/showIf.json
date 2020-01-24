@@ -1,0 +1,32 @@
+{
+	"type": "mgContainer",
+	"layout": "card",
+	"title": "showIf examples",
+	"items": [
+		{
+			"type": "mgChoiceButtons",
+			"id": "type",
+			"default": "foo",
+			"enum": ["foo", "bar", "baz"],
+			"help": "Change the above selection to toggle the visibility of the below widgets"
+		},
+		{
+			"type": "mgLabel",
+			"title": "Only Foo",
+			"showIf": "type == 'foo'",
+			"text": "Only visible if type is foo"
+		},
+		{
+			"type": "mgLabel",
+			"title": "Only Foo or Bar",
+			"showIf": {"$or": [{"type": "foo"}, {"type": "bar"}]},
+			"text": "Only visible if type is foo OR bar"
+		},
+		{
+			"type": "mgLabel",
+			"title": "Only Baz",
+			"showIf": "type == 'baz'",
+			"text": "Only visible if type is baz"
+		}
+	]
+}
