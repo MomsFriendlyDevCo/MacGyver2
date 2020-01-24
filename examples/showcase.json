@@ -144,7 +144,7 @@
 					"id": "demoChoiceDropdownGroup",
 					"type": "mgChoiceDropdown",
 					"title": "Choice Dropdown (via JSON feed + group by)",
-					"url": "examples/dropdowns.json",
+					"enumUrl": "examples/dropdowns.json",
 					"idField": "id",
 					"groupBy": "path",
 					"default": 3

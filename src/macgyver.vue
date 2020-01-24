@@ -10,6 +10,14 @@ import Vue from 'vue';
 Vue.prototype.$macgyver = (()=> {
 	var $macgyver = MacGyver;
 
+	/**
+	* Axios compatible HTTP fetcher
+	* Optional binding unless anything requires web access
+	* @var {Object}
+	*/
+	$macgyver.$http;
+
+
 	// Absorb various methods from a Vue prototype
 	var vInstance = new Vue();
 	['$on', '$off', '$once', '$emit'].forEach(method => $macgyver[method] = vInstance[method].bind(vInstance));
@@ -64,6 +72,9 @@ Vue.prototype.$macgyver = (()=> {
 		component.$on('mgIdentify', reply => reply(component));
 	};
 
+
+	// Auto-bind to Axios if its defined
+	if (window.axios) $macgyver.$http = window.axios;
 
 	return $macgyver;
 })();

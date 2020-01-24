@@ -58,7 +58,7 @@ export default Vue.component('mgInfoBlock', {
 			if (!this.$props.config.url) return;
 			Promise.resolve()
 				.then(()=> this.isLoading = true)
-				.then(()=> this.$macgyver.fetch(this.$props.config.url, {
+				.then(()=> this.$macgyver.utils.fetch(this.$props.config.url, {
 					type: 'object',
 					mappings: {extract: {required: true}},
 					format: d => d.extract,

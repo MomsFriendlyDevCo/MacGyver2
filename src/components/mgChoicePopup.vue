@@ -75,7 +75,7 @@ export default Vue.component('mgChoicePopup', {
 			immediate: true,
 			handler() {
 				if (!this.$props.config.enumUrl) return;
-				this.$macgyver.fetch(this.$props.config.enumUrl, {
+				this.$macgyver.utils.fetch(this.$props.config.enumUrl, {
 					type: 'array',
 					mappings: {
 						id: {required: true},

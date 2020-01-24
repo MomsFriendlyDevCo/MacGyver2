@@ -222,11 +222,11 @@ $macgyver.notify = {};
 */
 $macgyver.notify.loading = (id, status = true, options) => {
 	if (status && options && options.foreground) {
-		Loader.start(id, status);
+		console.log('[$macgyver]', 'Loading foreground', id, {status});
 	} else if (status) {
-		Loader.startBackground(id, status);
+		console.log('[$macgyver]', 'Loading background', id, {status});
 	} else {
-		Loader.stop(id);
+		console.log('[$macgyver]', 'Stop loading', id, {status});
 	}
 };
 
@@ -235,14 +235,14 @@ $macgyver.notify.loading = (id, status = true, options) => {
 * Provide a warning message to the user
 * @param {string} message The message to display
 */
-$macgyver.notify.warn = message => $toast.warning(message);
+$macgyver.notify.warn = message => console.log('[$macgyver]', 'WARN', message);
 
 
 /**
 * Provide an error message to the user
 * @param {string} message The message to display
 */
-$macgyver.notify.error = message => $toast.error(message);
+$macgyver.notify.error = message => console.log('[$macgyver]', message);
 // }}}
 
 
@@ -438,6 +438,37 @@ $macgyver.compileSpec = (spec, options) => {
 
 
 /**
+* Register of known forms to their Vue instance / plain object mapping
+* For front-end MacGyver this is the VueInstance object of the registered form
+* For the back-end this is a simple object of the form `{config, data}`
+* @var {VueInstance|Object>}
+* @property {Object} config The form spec
+* @property {Object} data The current form data
+*/
+$macgyver.$forms = {};
+
+
+/**
+* Set of misc utility helper functions
+* @var {Object};
+*/
+$macgyver.utils = {};
+
+
+/**
+* Local storage for the global object
+* This is a wrapper until `globalThis` becomes available in both Node and the browser
+* @var {Object} The global scope
+*/
+$macgyver.utils.global = (()=> {
+	if (typeof self !== 'undefined') { return self; }
+	if (typeof window !== 'undefined') { return window; }
+	if (typeof global !== 'undefined') { return global; }
+	throw new Error('unable to locate global object');
+})();
+
+
+/**
 * Fetch any artbitrary data set from a URL
 * This function is designed to accept a customizable single-string URL which the user can customize and a spec options object that the requesting widget can define
 * NOTE: This function will invoke the loading notifier and call the warning notifier on an error
@@ -459,8 +490,11 @@ $macgyver.compileSpec = (spec, options) => {
 * @example Fetch a collection of items extracting both 'id' and 'title' fields
 * fetch('/api/datafeeds/random/users?$title=name&$id=_id', {mappings: {_id: {required: true}, title: {required: true}}})
 */
-$macgyver.fetch = (url, options) =>
+$macgyver.utils.fetch = (url, options) =>
 	Promise.resolve()
+		// Sanity checks {{{
+		.then(()=> $macgyver.$http || Promise.reject('No Axios compatible HTTP library - set $macgyver.$http to the library reference'))
+		// }}}
 		// Create the initial session {{{
 		.then(()=> ({
 			mappings: {},
@@ -554,37 +588,6 @@ $macgyver.fetch = (url, options) =>
 			throw err;
 		})
 		.finally(()=> $macgyver.notify.loading(url, false))
-
-
-/**
-* Register of known forms to their Vue instance / plain object mapping
-* For front-end MacGyver this is the VueInstance object of the registered form
-* For the back-end this is a simple object of the form `{config, data}`
-* @var {VueInstance|Object>}
-* @property {Object} config The form spec
-* @property {Object} data The current form data
-*/
-$macgyver.$forms = {};
-
-
-/**
-* Set of misc utility helper functions
-* @var {Object};
-*/
-$macgyver.utils = {};
-
-
-/**
-* Local storage for the global object
-* This is a wrapper until `globalThis` becomes available in both Node and the browser
-* @var {Object} The global scope
-*/
-$macgyver.utils.global = (()=> {
-	if (typeof self !== 'undefined') { return self; }
-	if (typeof window !== 'undefined') { return window; }
-	if (typeof global !== 'undefined') { return global; }
-	throw new Error('unable to locate global object');
-})();
 
 
 /**

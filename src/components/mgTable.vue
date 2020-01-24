@@ -45,7 +45,7 @@ export default Vue.component('mgTable', {
 	mounted() {
 		this.$watch('$props.config.url', ()=> {
 			if (!this.$props.config.url) return;
-			this.$macgyver.fetch(this.$props.config.url, {type: 'array'})
+			this.$macgyver.utils.fetch(this.$props.config.url, {type: 'array'})
 				.then(data => this.$set(this.$props.config, 'data', data))
 		}, {immediate: true});
 	},
