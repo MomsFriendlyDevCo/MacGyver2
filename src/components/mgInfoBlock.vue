@@ -22,10 +22,11 @@ macgyver.register('mgInfoBlock', {
 			],
 		},
 		icon: {type: 'mgIcon', default: 'far fa-info-circle'},
-		iconLoading: {type: 'mgIcon', default: 'far fa-spinner fa-spin'},
+		iconLoading: {type: 'mgIcon', default: 'far fa-spinner fa-spin', advanced: true},
 		iconSize: {
 			type: 'mgChoiceButtons',
 			default: 'fa-4x',
+			advanced: true,
 			enum: [
 				{id: '', text: 'Normal'},
 				{id: 'fa-2x', text: '2x'},

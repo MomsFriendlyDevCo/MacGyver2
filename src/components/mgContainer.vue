@@ -32,7 +32,7 @@ macgyver.register('mgContainer', {
 				{id: 'query', title: 'Query constructor'},
 			],
 		},
-		showTitles: {type: 'mgToggle', default: true, help: 'Show titles for fields', showIf: "layout == 'form' || layout == 'card'"},
+		showTitles: {type: 'mgToggle', default: true, help: 'Show titles for fields', showIf: {layout: {$in: ['form', 'card']}}},
 		columnHeaders: {type: 'mgToggle', default: false, help: 'Show column headers', showIf: "layout == 'columns'"},
 		collapsable: {type: 'mgToggle', default: false, help: 'This card can be hidden', showIf: "layout == 'card'"},
 		collapsed: {type: 'mgToggle', default: false, help: 'This card is collapsed by default', showIf: "layout == 'card'"},
@@ -47,6 +47,8 @@ macgyver.register('mgContainer', {
 			{id: 'mgContainerRowLarge', title: 'Large text'},
 		]},
 		onChange: {type: 'string', title: 'Change action', help: 'Action to trigger when the value of this component changes', advanced: true},
+		show: {type: 'mgToggle', default: true, advanced: true, help: 'Whether the item is visible by default'},
+		showIf: {type: 'mgCodeEditor', syntax: 'text', advanced: true, help: 'A simple equality expression or Sift object to deteremine visibility'},
 	},
 });
 

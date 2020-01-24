@@ -10,13 +10,13 @@ macgyver.register('mgChoicePopup', {
 			title: 'List items',
 			default: ['Item One', 'Item Two', 'Item Three'],
 		},
-		popupTitle: {type: 'mgText', default: 'Select item'},
+		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
+		popupTitle: {type: 'mgText', default: 'Select item', advanced: true},
 		inactiveText: {type: 'mgText', default: 'Select item...', advanced: true},
 		iconActive: {type: 'mgIcon', default: 'far fa-check', advanced: true},
 		iconInactive: {type: 'mgIcon', default: 'far fa-ellipsis-h', advanced: true},
 		classActive: {type: 'mgText', default: 'btn btn-primary', advanced: true},
 		classInactive: {type: 'mgText', default: 'btn btn-default', advanced: true},
-		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 	},
 	format: true, // FIXME: Not sure about this, what if we need to lookup the value by the enum ID?
 });

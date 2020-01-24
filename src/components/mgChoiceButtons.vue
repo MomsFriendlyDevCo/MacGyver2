@@ -10,10 +10,10 @@ macgyver.register('mgChoiceButtons', {
 			title: 'List items',
 			default: ['Item One', 'Item Two', 'Item Three'],
 		},
+		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 		classWrapper: {type: 'mgText', default: 'btn-group', title: 'Group CSS class', advanced: true},
 		itemClassActive: {type: 'mgText', default: 'btn btn-primary', advanced: true},
 		itemClassInactive: {type: 'mgText', default: 'btn btn-light', advanced: true},
-		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 	},
 	format: true, // FIXME: Not sure about this, what if we need to lookup the value by the enum ID?
 });

@@ -14,7 +14,7 @@ macgyver.register('mgToggle', {
 		offText: {type: 'mgText', default: 'off'},
 		offColor: {type: 'mgColor', default: '#bfcbd9', advanced: true},
 		switchColor: {type: 'mgColor', default: '#fff', advanced: true},
-		disabledColor: {type: 'mgColor', default: '#cccccc'},
+		disabledColor: {type: 'mgColor', default: '#cccccc', advanced: true},
 	},
 	format: (v, config) => v ? config.onText : config.offText,
 	formatAlign: 'center',

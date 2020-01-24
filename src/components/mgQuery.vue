@@ -55,6 +55,8 @@ export default Vue.component('mgQuery', {
 	},
 	methods: {
 		refresh() {
+			console.log('Render', _.cloneDeep(this.data));
+
 			// Calculate which fields we can use in enums
 			var fieldsEnum = Object.keys(this.$props.spec)
 				.map(key => ({
@@ -74,7 +76,6 @@ export default Vue.component('mgQuery', {
 					: pathSpec.enum;
 
 
-			this.subformData = {};
 			this.queryComponent = {
 				type: 'mgContainer',
 				layout: 'query',
@@ -82,10 +83,11 @@ export default Vue.component('mgQuery', {
 					.map((path, pathIndex) => // Examine each path key
 						Object.keys(typeof this.data[path] == 'object' ? this.data[path] : {$eq: this.data[path]}) // Examine each operand key
 							.map((operand, operandIndex) => {
-								var value = this.data[path][operand] || this.data[path];
+								var value = this.data[path];
 								var pathSpec = this.spec[path] || {unknown: true, type: 'string'};
 
 								var row = {
+									id: 'id' + _.random(10000,99999),
 									type: 'mgContainer',
 									layout: 'query-row',
 									items: [
@@ -93,6 +95,18 @@ export default Vue.component('mgQuery', {
 											type: 'mgChoiceDropdown',
 											enum: fieldsEnum,
 											default: path,
+											onChange: value => {
+												if (_.isPlainObject(this.data[path])) { // Multiple value setter
+													console.log('Change field with other operands', path, 'to', value, {leaf: this.data[path]});
+													delete this.data[path][operand];
+													this.data[value][operand] = '';
+												} else { // Single value setter
+													console.log('Change simple field', path, 'to', value, {leaf: this.data[path]});
+													delete this.data[path];
+													this.data[value] = '';
+												}
+												this.refresh();
+											},
 										},
 										{
 											type: 'mgChoiceDropdown',
@@ -129,11 +143,30 @@ export default Vue.component('mgQuery', {
 												] : []),
 											],
 											default: operand,
+											onChange: value => {
+												debugger;
+												if (_.isPlainObject(this.data[path])) { // Multiple operand setter
+													console.log('Change nested operand for path', path, 'to', value);
+													delete this.$data[path][operand];
+													this.$data[path].$eq = value;
+												} else if (value == '$eq') { // Single operand setter
+													console.log('Change simple operand for path', path, 'to', value);
+													this.data[path] = value;
+												} else {
+													this.data[path] = {
+														...(_.isPlainObject(this.data[path]) ? this.data : null),
+														[value]: '',
+													};
+												}
+												this.refresh();
+											},
 										},
 									],
 								};
 
-								if (['$eq', '$ne'].includes(operand) && pathSpec.enum) {
+								if (value === undefined) { // Special case for when a path operand hasn't been defined yet - usually just after the user has added a new path or tried to change an existing one
+									// Pass
+								} else if (['$eq', '$ne'].includes(operand) && pathSpec.enum) {
 									row.items.push({
 										type: 'mgChoiceDropdown',
 										enum: populateEnum(pathSpec),
@@ -171,6 +204,10 @@ export default Vue.component('mgQuery', {
 					.reduce((t, v) => t.concat(v), []) // Flatten
 			};
 		},
+
+		changeField(path, value) {
+			console.log('Change', path, '=', value);
+		},
 	},
 });
 </script>
@@ -180,10 +217,7 @@ export default Vue.component('mgQuery', {
 		<mg-form
 			:form="`${$props.config.id}-subform`"
 			:config="queryComponent"
-			:data="subformData"
 		/>
-		<pre>Config: {{$props.config}}</pre>
 		<pre>Data: {{data}}</pre>
-		<pre>Subform Data: {{subformData}}</pre>
 	</div>
 </template>
