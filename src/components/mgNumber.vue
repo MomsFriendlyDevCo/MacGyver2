@@ -17,9 +17,9 @@ macgyver.register('mgNumber', {
 		]},
 		bumperDownClass: {type: 'mgText', default: 'btn btn-light fa fa-arrow-down input-group-prepend', advanced: true},
 		bumperUpClass: {type: 'mgText', default: 'btn btn-light fa fa-arrow-up input-group-append', advanced: true},
-		prefix: {type: 'mgText', title: 'Prefix', help: 'Prefix to show before the input (input interface only)'},
+		prefix: {type: 'mgText', title: 'Prefix', help: 'Prefix to show before the input (input interface only)', showIf: 'interface == "input"'},
 		prefixClass: {type: 'mgText', default: 'input-group-prepend input-group-text', advanced: true},
-		suffix: {type: 'mgText', title: 'Suffix', help: 'Suffix to show after the input (input interface only)'},
+		suffix: {type: 'mgText', title: 'Suffix', help: 'Suffix to show after the input (input interface only)', showIf: 'interface == "input"'},
 		suffixClass: {type: 'mgText', default: 'input-group-append input-group-text', advanced: true},
 	},
 	format: v => {
