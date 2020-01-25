@@ -473,12 +473,17 @@ $macgyver.utils.global = (()=> {
 * This function is designed to accept a customizable single-string URL which the user can customize and a spec options object that the requesting widget can define
 * NOTE: This function will invoke the loading notifier and call the warning notifier on an error
 *
-* @param {string} url The URL to fetch
-* @param {Object} [options] Additional options
+* @param {string} [url] The URL to fetch
+* @param {Object} options Additional options
+* @param {string} [options.url] Alternate way to pass the URL
 * @param {boolean} [options.type='object'] What data type to expect from the server. ENUM: 'object', 'array', 'raw'. If array and mappings are specified each member of the collection is mapped and an array returned
-* @param {Object <Object>} [options.mappings={}] Mappings to extract, each key is the mapping name with the value as an object containing `{required <boolean>}`
 * @param {function} [options.format] Data formatter, defaults to a simple passthrough. Called as `(output, session)`
 * @param {string|function} [options.formatError] Error thrown if the formatter fails, can be a string or function called as `(err)`. Defaults to 'Unable to format data feed from ${url} - ${err.toString()}`
+* @param {string} [options.from] The field from where to retrieve the value
+*
+* @param {Object <Object>} [options.mappings={}] Mappings to extract, each key is the mapping name with the value as an object containing the below spec
+* @param {boolean} [options.mappings.required=false] Whether the mapping is required
+*
 * @returns {Object} The extracted data object
 *
 * @example Fetch a simple collection
@@ -495,13 +500,23 @@ $macgyver.utils.fetch = (url, options) =>
 		// Sanity checks {{{
 		.then(()=> $macgyver.$http || Promise.reject('No Axios compatible HTTP library - set $macgyver.$http to the library reference'))
 		// }}}
+		// Injection options from URL {{{
+		.then(()=> {
+			if (_.isPlainObject(url)) {
+				[url, options] = [url.url, url];
+			} else {
+				options.url = url;
+			}
+			if (!url) throw new Error('Unknown URL to fetch');
+		})
+		// }}}
 		// Create the initial session {{{
 		.then(()=> ({
-			mappings: {},
+			mappings: {}, // Parsed mappings (either a copy of settings.mappings || extracted from the URL)
 			parsedUrl: new URL(url, window.location),
 			settings: {
 				type: 'object',
-				mappings: {},
+				mappings: {}, // Optional mappings the user provided
 				format: (data, session) => data,
 				formatError: err => `Unable to format data feed from ${url} - ${err.toString()}`,
 				...options,
@@ -510,27 +525,19 @@ $macgyver.utils.fetch = (url, options) =>
 		// }}}
 		// Extract mappings from the URL string {{{
 		.then(session => {
-			if (!_.isEmpty(session.settings.mappings)) { // Extract mappings
+			if (!_.isEmpty(options.mappings)) { // Mappings are specified in options
+				session.mappings = options.mappings;
+			} else { // Try to extract mappings if options doesn't already have a parsed set
 				Array.from(session.parsedUrl.searchParams.entries())
 					.forEach((pair) => {
 						var [k, v] = pair;
 						if (k.startsWith('$')) {
-							session.mappings[k] = v;
+							session.mappings[k] = {required: true, from: v};
 							session.parsedUrl.searchParams.delete(k);
 						}
 					});
 			}
 
-			return session;
-		})
-		// }}}
-		// Verify that requested mappings are present {{{
-		.then(session => {
-			var checkRequired = session.settings
-				|> v => _.pickBy(v, (v, k) => k.required && !_.has(session.mappings, v))
-				|> v => _.map(v, (v, k) => k)
-
-			if (checkRequired.length) throw `Required URL "${url}" is missing the required mappings: ${checkRequired.join(', ')}`;
 			return session;
 		})
 		// }}}
@@ -543,15 +550,16 @@ $macgyver.utils.fetch = (url, options) =>
 		// }}}
 		// Apply object cohersion + mappings {{{
 		.then(session => {
-			// FIXME: This logic is probably buggered - Too drunk, MC - 2019-01-04
 			switch (session.settings.type) {
 				case 'array':
 					if (!_.isArray(session.response.data)) throw `Expected an array from data feed "${url}" but got a non-array`;
 					if (!_.isEmpty(session.mappings)) {
-						var pickKeys = _.map(session.settings.mappings, (v, k) => session.mappings['$' + k])
-						session.output = session.response.data.map(doc => // Remap data using mappings
-							_.pick(doc, pickKeys)
-						)
+						session.output = session.response.data.map((item, itemIndex) =>
+							_.mapValues(session.mappings, (v, k) => {
+								if (v.required && item[v.from] === undefined) throw new Error(`Required field ${v.from} is not present in data feed for item #${itemIndex+1}`);
+								return item[v.from];
+							})
+						);
 					} else {
 						session.output = session.response.data;
 					}
@@ -559,9 +567,10 @@ $macgyver.utils.fetch = (url, options) =>
 				case 'object':
 					if (!_.isPlainObject(session.response.data)) throw `Expected object return from data feed "${url}" but got a non-plain-object`;
 					if (!_.isEmpty(session.mappings)) {
-						session.output = session.mappings
-							|> v => _.mapKeys(v, (v, k) => k.replace(/^\$/, '')) // Remove '$' prefix
-							|> v => _.mapValues(v, (v, k) => session.response.data[session.mappings['$' + k]])
+						session.output = _.mapValues(session.mappings, (v, k) => {
+							if (v.required && session.response.data[k] === undefined) throw new Error(`Required field ${k} is not present in data feed for item #${itemIndex+1}`);
+							return session.response.data[v.from];
+						})
 					} else {
 						session.output = session.response.data;
 					}
