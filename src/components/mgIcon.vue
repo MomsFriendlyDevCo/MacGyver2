@@ -38,7 +38,7 @@ export default Vue.component('mgIcon', {
 				.then(res => this.$macgyver.$prompt.macgyver({
 					title: 'Select icon',
 					buttons: [], // We're capturing the first click so we don't need confirm buttons
-					form: [
+					macgyver: [
 						{
 							id: 'class',
 							type: 'mgChoiceButtons',
@@ -51,14 +51,10 @@ export default Vue.component('mgIcon', {
 							})),
 						},
 					],
-					data: {
-						class: this.data,
-					},
 					onShow: ()=> {
 						// Bind to the mg-form element, detect the first change and close the dialog
-						this.$macgyver.$forms.promptMacGyver.$on('mgChange', ()=> setTimeout(()=> { // Timeout not really needed but it lets the button highlight before we close
-							this.$macgyver.$prompt.$settings.$defer.resolve(this.$macgyver.$prompt.$settings.data);
-							this.$macgyver.$prompt.close(true)
+						this.$macgyver.$prompt.settings.macgyverForm.$on('mgChange', ()=> setTimeout(()=> { // Timeout not really needed but it lets the button highlight before we close
+							this.$macgyver.$prompt.close(true, this.$macgyver.$prompt.settings.value);
 						}, 100));
 					},
 				}))
@@ -71,7 +67,7 @@ export default Vue.component('mgIcon', {
 <template>
 	<a
 		@click="selectIcon()"
-		class="btn btn-light"
+		class="btn btn-light btn-icon-fixed"
 		:class="data ? [data, $props.config.classActive || $props.config.class] : [$props.config.iconFallback, $props.config.classInactive || $props.config.class]"
 	/>
 </template>
