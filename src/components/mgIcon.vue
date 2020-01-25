@@ -7,6 +7,7 @@ macgyver.register('mgIcon', {
 	config: {
 		iconFallback: {type: 'mgIcon', default: 'far fa-info', help: 'The icon to use if non is selected'},
 		required: {type: 'mgToggle', default: false},
+		interface: {type: 'mgChoiceButtons', default: 'modal', enum: ['modal', 'dropdown']},
 		iconFeed: {type: 'mgText', default: '/api/webfonts/fa.json', advanced: true, help: 'The data source to import icon information', relative: true},
 		class: {type: 'mgText', default: 'btn btn-light btn-circle', advanced: true},
 		classActive: {type: 'mgText', advanced: true},
@@ -34,7 +35,7 @@ export default Vue.component('mgIcon', {
 			Promise.resolve()
 				.then(()=> this.$macgyver.notify.loading(this._uid, true))
 				.then(()=> this.$http.get(this.$props.config.iconFeed))
-				.tap(()=> this.$macgyver.notify.loading(this._uid, false))
+				.then(res => { this.$macgyver.notify.loading(this._uid, false); return res })
 				.then(res => this.$macgyver.$prompt.macgyver({
 					title: 'Select icon',
 					buttons: [], // We're capturing the first click so we don't need confirm buttons
@@ -65,11 +66,37 @@ export default Vue.component('mgIcon', {
 </script>
 
 <template>
-	<a
-		@click="selectIcon()"
-		class="btn btn-light btn-icon-fixed"
-		:class="data ? [data, $props.config.classActive || $props.config.class] : [$props.config.iconFallback, $props.config.classInactive || $props.config.class]"
-	/>
+	<div class="mg-icon">
+		<a
+			v-if="$props.config.interface == 'modal'"
+			@click="selectIcon()"
+			class="btn btn-light btn-icon-fixed"
+			:class="data ? [data, $props.config.classActive || $props.config.class] : [$props.config.iconFallback, $props.config.classInactive || $props.config.class]"
+		/>
+		<mg-choice-dropdown
+			v-else-if="$props.config.interface == 'dropdown'"
+			:form="$props.form"
+			:data="data"
+			:config="{
+				enumSource: 'url',
+				enumUrl: {
+					url: $props.config.iconFeed,
+					type: 'array',
+					mappings: {
+						id: {required: true, from: 'class'},
+						title: {required: true, from: 'id'},
+						icon: {required: true, from: 'class'},
+					},
+				},
+				default: $props.config.default,
+				required: $props.config.required,
+			}"
+		/>
+		<mg-error
+			v-else
+			:config="{errorText: 'Unknown mgIcon interface'}"
+		/>
+	</div>
 </template>
 
 <style>
