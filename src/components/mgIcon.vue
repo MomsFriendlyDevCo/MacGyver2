@@ -35,7 +35,7 @@ export default Vue.component('mgIcon', {
 				.then(()=> this.$macgyver.notify.loading(this._uid, true))
 				.then(()=> this.$http.get(this.$props.config.iconFeed))
 				.tap(()=> this.$macgyver.notify.loading(this._uid, false))
-				.then(res => this.$prompt.macgyver({
+				.then(res => this.$macgyver.$prompt.macgyver({
 					title: 'Select icon',
 					buttons: [], // We're capturing the first click so we don't need confirm buttons
 					form: [
@@ -57,8 +57,8 @@ export default Vue.component('mgIcon', {
 					onShow: ()=> {
 						// Bind to the mg-form element, detect the first change and close the dialog
 						this.$macgyver.$forms.promptMacGyver.$on('mgChange', ()=> setTimeout(()=> { // Timeout not really needed but it lets the button highlight before we close
-							this.$prompt.$settings.$defer.resolve(this.$prompt.$settings.data);
-							this.$prompt.close(true)
+							this.$macgyver.$prompt.$settings.$defer.resolve(this.$macgyver.$prompt.$settings.data);
+							this.$macgyver.$prompt.close(true)
 						}, 100));
 					},
 				}))

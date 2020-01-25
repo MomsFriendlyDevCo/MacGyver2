@@ -18,6 +18,13 @@ Vue.prototype.$macgyver = (()=> {
 	$macgyver.$http;
 
 
+	/**
+	* Doop compatible Prompt handler
+	* @var {Object}
+	*/
+	$macgyver.$prompt;
+
+
 	// Absorb various methods from a Vue prototype
 	var vInstance = new Vue();
 	['$on', '$off', '$once', '$emit'].forEach(method => $macgyver[method] = vInstance[method].bind(vInstance));
