@@ -45,7 +45,7 @@ export default Vue.component('mgChoiceDropdown', {
 		this.$watch('$props.config.enumUrl', ()=> {
 			if (!this.$props.config.enumUrl) return;
 			this.$macgyver.utils.fetch(this.$props.config.enumUrl, {type: 'array'})
-				.then(data => this.$set(this.$props.config, 'enum', data))
+				.then(data => this.enumIter = data);
 		}, {immediate: true});
 
 		this.$watch('$props.config.enum', ()=> {
