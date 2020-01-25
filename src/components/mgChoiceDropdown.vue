@@ -10,12 +10,9 @@ macgyver.register('mgChoiceDropdown', {
 	category: 'Choice Selectors',
 	preferId: true,
 	config: {
-		enum: {
-			type: 'mgList',
-			title: 'List items',
-			default: ['Item One', 'Item Two', 'Item Three'],
-		},
-		enumUrl: {type: 'mgUrl', advanced: true, help: 'Data feed URL to fetch choice values from'},
+		enumSource: {type: 'mgChoiceButtons', default: 'list', enum: ['list', 'url'], default: 'list', help: 'Where to populate the list data from'},
+		enum: {type: 'mgList', title: 'List items', showIf: 'enumSource == "list"'},
+		enumUrl: {type: 'mgUrl', showIf: 'enumSource == "url"', help: 'Data feed URL to fetch choice values from'},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 	},
