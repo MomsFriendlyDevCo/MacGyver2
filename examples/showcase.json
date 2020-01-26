@@ -447,7 +447,10 @@
 				{
 					"id": "demoCodeEditor",
 					"type": "mgCodeEditor",
-					"title": "Code Editor"
+					"title": "Code Editor",
+					"syntax": "json",
+					"convert": "true",
+					"default": {"foo": 1, "bar": {"baz": [2, 3, "hello"]}}
 				}
 			]
 		},
