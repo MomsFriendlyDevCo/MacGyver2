@@ -23,7 +23,7 @@
 					"default": "Hello World\nHello World\nHello World"
 				},
 				{
-					"id": "demoNumber",
+					"id": "demoNumberSimple",
 					"type": "mgNumber",
 					"title": "Number (simple input)",
 					"min": 1,
@@ -101,6 +101,19 @@
 					"type": "mgList",
 					"title": "List",
 					"default": ["One", "Two", "Three"]
+				},
+				{
+					"id": "demoIconModal",
+					"type": "mgIcon",
+					"title": "Icon (modal interface)",
+					"default": "far fa-coffee"
+				},
+				{
+					"id": "demoIconDropdown",
+					"type": "mgIcon",
+					"title": "Icon (dropdown interface)",
+					"default": "fa fa-biohazard",
+					"interface": "dropdown"
 				}
 			]
 		},

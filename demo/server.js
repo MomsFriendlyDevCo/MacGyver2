@@ -37,9 +37,13 @@ app.get('/dist/macgyver.css', function(req, res) {
 	res.sendFile('macgyver.css', {root: root + '/dist'});
 });
 
+app.get('/api/webfonts/fa.json', function(req, res) {
+	res.sendFile('webfonts-fa.json', {root: root + '/demo'});
+});
+
 app.use(function(err, req, res, next){
 	console.error(err.stack);
-	res.send(500, 'Something broke!').end();
+	res.sendStatus(500, 'Something broke!');
 });
 
 var port = process.env.PORT || process.env.VMC_APP_PORT || 8080;

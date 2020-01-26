@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var babel = require('gulp-babel');
 var cleanCSS = require('gulp-clean-css');
 var concat = require('gulp-concat');
@@ -13,12 +14,14 @@ var rollup = require('rollup');
 var uglify = require('gulp-uglify');
 var vm = require('vm');
 var watch = require('gulp-watch');
+var yaml = require('yaml');
 
 var cache = {}; // Caches for various Rollup builds
 var isProduction = !!process.env.NODE_ENV && process.env.NODE_ENV=='production';
 
 gulp.task('default', gulp.series('serve'));
 gulp.task('build', gulp.parallel('build:demo', 'build:vue', 'build:node'));
+gulp.task('build:demo', gulp.parallel('build:demo:vue', 'build:demo:fa'));
 
 
 /**
@@ -176,9 +179,9 @@ gulp.task('build:vue', ()=>
 
 
 /**
-* Build demo
+* Build demo Vue files
 */
-gulp.task('build:demo', ()=>
+gulp.task('build:demo:vue', ()=>
 	rollup.rollup({
 		input: './demo/app.js',
 		cache: cache.demo || false,
@@ -245,10 +248,46 @@ gulp.task('build:demo', ()=>
 	})
 );
 
+
+/**
+* Build demo FontAwesome icon list file
+*/
+gulp.task('build:demo:fa', ()=>
+	_.chain(fs.readFileSync(`${__dirname}/node_modules/@fortawesome/fontawesome-free/metadata/icons.yml`, 'utf-8'))
+		.thru(contents => yaml.parse(contents))
+		.map((v, k) => {
+			v.class = k;
+			return _.pick(v, [
+				'class', 'styles', 'unicode',
+			]);
+		})
+		.map(icon => ({
+			id: icon.class,
+			class:
+				icon.styles[0] == 'brands' ? `fab fa-${icon.class}`
+				: `fa fa-${icon.class}`,
+			varients: icon.styles
+				.map(s =>
+					s == 'brands' ? `fab fa-${icon.class}`
+					: s == 'solid' ? `fa fa-${icon.class}`
+					: s == 'regular' ? `far fa-${icon.class}`
+					: s == 'light' ? `fal fa-${icon.class}`
+					: null
+				)
+				.filter(s => s),
+		}))
+		.thru(content => JSON.stringify(content, null, '\t'))
+		.tap(v => fs.writeFileSync('./demo/webfonts-fa.json', v))
+		.thru(()=> Promise.resolve())
+		.value()
+);
+
+
 /**
 * Compile the gh-pages branch in GitHub
 */
 gulp.task('gh-pages', 'build', ()=> del('./gh-pages'), ()=>
+	// FIXME: Need to compile the list of FA icons from somewhere
 	gulp.src([
 		'./LICENSE',
 		'./demo/_config.yml',
@@ -257,6 +296,7 @@ gulp.task('gh-pages', 'build', ()=> del('./gh-pages'), ()=>
 		'./demo/editor.html',
 		'./demo/index.html',
 		'./demo/style.css',
+		'./demo/webfonts-fa.css',
 		'./dist/**/*',
 		'./examples/**/*',
 		'./node_modules/popper.js/dist/popper.min.js',
@@ -271,7 +311,10 @@ gulp.task('gh-pages', 'build', ()=> del('./gh-pages'), ()=>
 		'./node_modules/tree-tools/dist/ngTreeTools.js',
 	], {base: __dirname})
 		.pipe(rename(function(path) {
-			if (path.dirname == 'demo') { // Move all demo files into root
+			if (path.dirname == 'demo' && path.basename == 'webfonts-fa.css') { // Move webfont dir into server api path
+				path.dirname = 'api/webfonts';
+				path.basename = 'fa.json';
+			} else if (path.dirname == 'demo') { // Move all demo files into root
 				path.dirname = '.';
 			}
 			return path;
