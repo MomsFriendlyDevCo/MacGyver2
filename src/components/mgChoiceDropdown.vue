@@ -11,7 +11,16 @@ macgyver.register('mgChoiceDropdown', {
 	preferId: true,
 	config: {
 		enumSource: {type: 'mgChoiceButtons', default: 'list', enum: ['list', 'url'], default: 'list', help: 'Where to populate the list data from'},
-		enum: {type: 'mgList', title: 'List items', showIf: 'enumSource == "list"'},
+		enum: {
+			type: 'mgTable',
+			title: 'List items',
+			showIf: 'enumSource == "list"',
+			items: [
+				{id: 'id', type: 'mgText', required: true},
+				{id: 'title', type: 'mgText', required: true},
+				{id: 'icon', type: 'mgIcon'},
+			],
+		},
 		enumUrl: {type: 'mgUrl', showIf: 'enumSource == "url"', help: 'Data feed URL to fetch choice values from'},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
@@ -33,7 +42,23 @@ export default Vue.component('mgChoiceDropdown', {
 	methods: {
 		change(val) {
 			this.data = val.id;
-			this.value = val.title;
+			this.value = val;
+		},
+
+		/**
+		* Populate the enumIter object
+		* This function also correctly populates the selected item (or the default)
+		* Each item is assumed to have the spec `{id: String, title: String, icon?: String}`
+		* @param {array<Object>} enumIter The new iterable enum
+		*/
+		setEnum(enumIter) {
+			this.enumIter = enumIter;
+
+			if (this.data) {
+				this.value = this.enumIter.find(e => e.id == this.data) || this.data;
+			} else if (this.$props.config.default) {
+				this.value = this.enumIter.find(e => e.id == this.$props.config.default) || this.$props.config.default;
+			}
 		},
 	},
 	created() {
@@ -45,20 +70,14 @@ export default Vue.component('mgChoiceDropdown', {
 		this.$watch('$props.config.enumUrl', ()=> {
 			if (!this.$props.config.enumUrl) return;
 			this.$macgyver.utils.fetch(this.$props.config.enumUrl, {type: 'array'})
-				.then(data => this.enumIter = data);
+				.then(data => this.setEnum(data))
 		}, {immediate: true});
 
 		this.$watch('$props.config.enum', ()=> {
 			if (_.isArray(this.$props.config.enum) && _.isString(this.$props.config.enum[0])) { // Array of strings
-				this.enumIter = this.$props.config.enum.map(i => ({id: _.camelCase(i), title: i}));
+				this.setEnum(this.$props.config.enum.map(i => ({id: _.camelCase(i), title: i})));
 			} else if (_.isArray(this.$props.config.enum) && _.isObject(this.$props.config.enum[0])) { // Collection
-				this.enumIter = this.$props.config.enum;
-			}
-
-			if (this.data) {
-				this.value = this.enumIter.find(e => e.id == this.data) || this.data;
-			} else if (this.$props.config.default) {
-				this.value = this.enumIter.find(e => e.id == this.$props.config.default) || this.$props.config.default;
+				this.setEnum(this.$props.config.enum);
 			}
 		}, {immediate: true});
 	},
@@ -72,7 +91,16 @@ export default Vue.component('mgChoiceDropdown', {
 		:options="enumIter"
 		:placeholder="$props.config.placeholder"
 		@input="change"
-	/>
+	>
+		<template #selected-option="option">
+			<i v-if="value.icon" :class="value.icon"/>
+			{{value.title}}
+		</template>
+		<template #option="option">
+			<i v-if="option.icon" :class="option.icon"/>
+			{{option.title}}
+		</template>
+	</v-select>
 </template>
 
 <style>
@@ -94,5 +122,9 @@ export default Vue.component('mgChoiceDropdown', {
 /* Align dropdown icon correctly */
 .v-select .open-indicator {
 	margin-top: -2px;
+}
+
+.v-select .vs__selected i {
+	margin-right: 5px;
 }
 </style>
