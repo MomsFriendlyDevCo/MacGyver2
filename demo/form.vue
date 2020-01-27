@@ -7,6 +7,7 @@ export default {
 			'examples/mgQuery.json',
 			'examples/shorthand.json',
 			'examples/showcase.json',
+			'examples/showIf.json',
 		],
 		example: 'examples/showcase.json',
 		// example: 'examples/mgQuery.json',

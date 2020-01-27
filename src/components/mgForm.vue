@@ -40,7 +40,6 @@ export default Vue.component('mgForm', {
 
 		this.$on('mgChange', (path, value) => {
 			if (this.inRefresh) return;
-			console.log('SET FD', path, '=', value);
 			this.$macgyver.utils.setPath(this, `formData.${path}`, value);
 			this.$emit('changeItem', {path, value});
 
@@ -60,6 +59,7 @@ export default Vue.component('mgForm', {
 			console.log(`Rebuild form config for form "${this.id}"`);
 
 			this.spec = this.$macgyver.compileSpec(this.$props.config);
+			if (!this.spec || !this.spec.spec) throw new Error('Invalid Macgyver form spec');
 		},
 
 
@@ -85,6 +85,7 @@ export default Vue.component('mgForm', {
 		* Force recomputation of show via showIf values
 		*/
 		refreshShowIfs() {
+			if (!this.spec) return;
 			this.spec.showIfs.forEach(widget =>
 				widget.show = this.$macgyver.utils.evalMatch(widget.showIf, this.formData)
 			);
@@ -95,6 +96,7 @@ export default Vue.component('mgForm', {
 		* Assign initial defaults if a value is not in the data object
 		*/
 		assignDefaults() {
+			if (!this.spec) return;
 			_.defaultsDeep(this.formData, this.getPrototype());
 		},
 
