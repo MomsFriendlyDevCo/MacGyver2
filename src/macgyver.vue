@@ -49,10 +49,12 @@ Vue.prototype.$macgyver = (()=> {
 		// Read in initial data value
 		if (component.$props.config.$dataPath) {
 			var refresher = ()=> {
-				component.data = _.get($macgyver.$forms[component.$props.form].$props.data, component.$props.config.$dataPath);
+				component.data = _.get($macgyver.$forms[component.$props.form].formData, component.$props.config.$dataPath);
 			};
 
 			component.$on('mgRefresh', refresher);
+			$macgyver.$forms[component.$props.form].$on('mgRefreshForm', refresher);
+
 			refresher();
 		} else if (component.$props.config.default) { // No data path but there IS a default - link to that instead
 			component.data = _.clone(component.$props.config.default);

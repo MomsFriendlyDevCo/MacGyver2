@@ -18,6 +18,8 @@ export default Vue.component('mgForm', {
 		editing: false, // Set by mgFormEditor when its this components parent
 		errors: [], // array <Object> {error}
 		spec: undefined, // Calculated version of config after its been though $macgyver.compileSpec()
+		formData: undefined, // Calculated version of $props.data after default population
+		inRefresh: false, // Whether we are doing a refresh from the top-down, prevents recursive refreshing
 	}},
 	props: {
 		form: String,
@@ -33,16 +35,16 @@ export default Vue.component('mgForm', {
 		},
 	},
 	created() {
-		this.id = this.$props.form || this.$macgyver.nextId();
-
+		this.id = this.id || this.$props.form || this.$macgyver.nextId();
 		this.$macgyver.injectForm(this);
 
 		this.$on('mgChange', (path, value) => {
-			this.$macgyver.utils.setPath(this, `$props.data.${path}`, value);
+			if (this.inRefresh) return;
+			console.log('SET FD', path, '=', value);
+			this.$macgyver.utils.setPath(this, `formData.${path}`, value);
 			this.$emit('changeItem', {path, value});
 
-			// FIXME: Its annoying we have to use cloneDeep here but if the data object remains as a Vue object deep nodes don't get change detection upstream
-			this.$emit('change', _.cloneDeep(this.$props.data));
+			this.$emit('change', this.formData);
 			this.refreshShowIfs();
 		});
 
@@ -54,12 +56,28 @@ export default Vue.component('mgForm', {
 		* Force the form to rebuild its config
 		*/
 		rebuild() {
+			this.id = this.id || this.$props.form || this.$macgyver.nextId();
 			console.log(`Rebuild form config for form "${this.id}"`);
 
 			this.spec = this.$macgyver.compileSpec(this.$props.config);
+		},
+
+
+		/**
+		* Force the form to rebuild its data set
+		*/
+		rebuildData() {
+			if (this.inRefresh) return console.log('Skip refresh');
+			this.inRefresh = true;
+
+			this.formData = _.cloneDeep(this.$props.data);
 
 			if (this.$props.populateDefaults) this.assignDefaults();
 			this.refreshShowIfs();
+			this.$emit('mgRefreshForm');
+			this.$nextTick(()=> // Wait one tick for all attempts to recall this function recursively to exhaust
+				this.inRefresh = false
+			);
 		},
 
 
@@ -68,7 +86,7 @@ export default Vue.component('mgForm', {
 		*/
 		refreshShowIfs() {
 			this.spec.showIfs.forEach(widget =>
-				widget.show = this.$macgyver.utils.evalMatch(widget.showIf, this.data)
+				widget.show = this.$macgyver.utils.evalMatch(widget.showIf, this.formData)
 			);
 		},
 
@@ -77,7 +95,7 @@ export default Vue.component('mgForm', {
 		* Assign initial defaults if a value is not in the data object
 		*/
 		assignDefaults() {
-			_.merge(this.data, this.getPrototype());
+			_.defaultsDeep(this.formData, this.getPrototype());
 		},
 
 
@@ -93,10 +111,18 @@ export default Vue.component('mgForm', {
 		},
 	},
 	watch: {
-		config: {
-			immediate: true,
+		'$props.config': {
+			immediate: false, // This actually gets called after $prop injection anyway
+			deep: true,
 			handler() { // Config has been clobbered - rebuild the layout
 				this.rebuild();
+			},
+		},
+		'$props.data': {
+			immediate: false, // This actually gets called after $prop injection anyway
+			deep: true,
+			handler() { // Config has been clobbered - rebuild the layout
+				this.rebuildData();
 			},
 		},
 	},
@@ -111,6 +137,10 @@ export default Vue.component('mgForm', {
 			</ul>
 		</div>
 
-		<mg-component :form="id" :config="spec.spec"/>
+		<mg-component
+			v-if="spec"
+			:form="id"
+			:config="spec.spec"
+		/>
 	</form>
 </template>
