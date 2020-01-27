@@ -10,10 +10,18 @@
 	    return {
 	      config: {},
 	      data: {},
-	      examples: ['examples/mgQuery.json', 'examples/shorthand.json', 'examples/showcase.json'],
+	      examples: ['examples/mgQuery.json', 'examples/shorthand.json', 'examples/showcase.json', 'examples/showIf.json'],
 	      example: 'examples/showcase.json' // example: 'examples/mgQuery.json',
 
 	    };
+	  },
+	  methods: {
+	    randomizeData: function randomizeData() {
+	      this.data = {
+	        demoText: 'Hello World ' + _.random(100, 999),
+	        demoNumberSimple: _.random(100, 999)
+	      };
+	    }
 	  },
 	  watch: {
 	    example: {
@@ -245,7 +253,20 @@
 	      _c("div", { staticClass: "row mt-3" }, [
 	        _c("div", { staticClass: "col-12" }, [
 	          _c("div", { staticClass: "card" }, [
-	            _vm._m(0),
+	            _c("div", { staticClass: "card-header p-1" }, [
+	              _c("div", { staticClass: "btn-group float-right m-1" }, [
+	                _c("a", {
+	                  staticClass: "btn btn-sm btn-light far fa-random",
+	                  on: {
+	                    click: function($event) {
+	                      return _vm.randomizeData()
+	                    }
+	                  }
+	                })
+	              ]),
+	              _vm._v(" "),
+	              _c("h4", { staticClass: "card-title" }, [_vm._v("Form data")])
+	            ]),
 	            _vm._v(" "),
 	            _c(
 	              "div",
@@ -277,22 +298,13 @@
 	    )
 	  ])
 	};
-	var __vue_staticRenderFns__ = [
-	  function() {
-	    var _vm = this;
-	    var _h = _vm.$createElement;
-	    var _c = _vm._self._c || _h;
-	    return _c("div", { staticClass: "card-header p-1" }, [
-	      _c("h4", { staticClass: "card-title" }, [_vm._v("Form data")])
-	    ])
-	  }
-	];
+	var __vue_staticRenderFns__ = [];
 	__vue_render__._withStripped = true;
 
 	  /* style */
 	  const __vue_inject_styles__ = function (inject) {
 	    if (!inject) return
-	    inject("data-v-401e0a67_0", { source: "\na {\n\tcursor: pointer;\n}\n.card .card-title {\n\tmargin-left: 5px;\n\tmargin-bottom: 0;\n}\n.window-panes {\n\tdisplay: block;\n\tposition: fixed;\n\ttop: 60px;\n\tleft: 10px;\n\tbottom: 10px;\n\tright: 10px;\n}\n.window-panes > * {\n\toverflow: auto;\n\theight: calc(100% - 60px);\n\tdisplay: block;\n\tpadding: 20px;\n}\n.window-panes > .window-pane-left {\n\tposition: fixed;\n\tleft: 10px;\n\twidth: calc(50% - 20px);\n}\n.window-panes > .window-pane-right {\n\tposition: fixed;\n\tright: 10px;\n\twidth: calc(50% - 20px);\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/demo/form.vue"],"names":[],"mappings":";AAiFA;CACA,eAAA;AACA;AAEA;CACA,gBAAA;CACA,gBAAA;AACA;AAEA;CACA,cAAA;CACA,eAAA;CACA,SAAA;CACA,UAAA;CACA,YAAA;CACA,WAAA;AACA;AAEA;CACA,cAAA;CACA,yBAAA;CACA,cAAA;CACA,aAAA;AACA;AAEA;CACA,eAAA;CACA,UAAA;CACA,uBAAA;AACA;AAEA;CACA,eAAA;CACA,WAAA;CACA,uBAAA;AACA","file":"form.vue","sourcesContent":["<script>\nexport default {\n\tdata() { return {\n\t\tconfig: {},\n\t\tdata: {},\n\t\texamples: [\n\t\t\t'examples/mgQuery.json',\n\t\t\t'examples/shorthand.json',\n\t\t\t'examples/showcase.json',\n\t\t],\n\t\texample: 'examples/showcase.json',\n\t\t// example: 'examples/mgQuery.json',\n\t}},\n\twatch: {\n\t\texample: {\n\t\t\timmediate: true,\n\t\t\thandler() {\n\t\t\t\tthis.$http.get(this.example)\n\t\t\t\t\t.then(res => {\n\t\t\t\t\t\tthis.data = {};\n\t\t\t\t\t\tthis.config = res.data;\n\t\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n};\n</script>\n\n<template>\n\t<div class=\"window-panes\">\n\t\t<div class=\"window-pane-left\">\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-12\">\n\t\t\t\t\t<div class=\"card\">\n\t\t\t\t\t\t<div class=\"card-header d-flex justify-content-between p-1\">\n\t\t\t\t\t\t\t<h4 class=\"card-title\">Config</h4>\n\t\t\t\t\t\t\t<div class=\"btn-group\">\n\t\t\t\t\t\t\t\t<a class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\">\n\t\t\t\t\t\t\t\t\t{{example}}\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t<ul class=\"dropdown-menu\">\n\t\t\t\t\t\t\t\t\t<li v-for=\"exampleItem in examples\" :key=\"example\">\n\t\t\t\t\t\t\t\t\t\t<a @click=\"example = exampleItem\" class=\"dropdown-item\">\n\t\t\t\t\t\t\t\t\t\t\t<i :class=\"example == exampleItem ? 'fas fa-check-circle' : 'far fa-circle'\"/>\n\t\t\t\t\t\t\t\t\t\t\t{{exampleItem}}\n\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"card-body\" style=\"height: 200px; overflow-y: scroll\">\n\t\t\t\t\t\t\t<pre>{{config | json}}</pre>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"row mt-3\">\n\t\t\t\t<div class=\"col-12\">\n\t\t\t\t\t<div class=\"card\">\n\t\t\t\t\t\t<div class=\"card-header p-1\">\n\t\t\t\t\t\t\t<h4 class=\"card-title\">Form data</h4>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"card-body\" style=\"height: 200px; overflow-y: scroll\">\n\t\t\t\t\t\t\t<pre>{{data | json}}</pre>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"window-pane-right\">\n\t\t\t<mg-form\n\t\t\t\t:config=\"config\"\n\t\t\t\t:data=\"data\"\n\t\t\t\t@change=\"data = $event\"\n\t\t\t/>\n\t\t</div>\n\t</div>\n</template>\n\n<style>\na {\n\tcursor: pointer;\n}\n\n.card .card-title {\n\tmargin-left: 5px;\n\tmargin-bottom: 0;\n}\n\n.window-panes {\n\tdisplay: block;\n\tposition: fixed;\n\ttop: 60px;\n\tleft: 10px;\n\tbottom: 10px;\n\tright: 10px;\n}\n\n.window-panes > * {\n\toverflow: auto;\n\theight: calc(100% - 60px);\n\tdisplay: block;\n\tpadding: 20px;\n}\n\n.window-panes > .window-pane-left {\n\tposition: fixed;\n\tleft: 10px;\n\twidth: calc(50% - 20px);\n}\n\n.window-panes > .window-pane-right {\n\tposition: fixed;\n\tright: 10px;\n\twidth: calc(50% - 20px);\n}\n</style>\n"]}, media: undefined });
+	    inject("data-v-7af064ce_0", { source: "\na {\n\tcursor: pointer;\n}\n.card .card-title {\n\tmargin-left: 5px;\n\tmargin-bottom: 0;\n}\n.window-panes {\n\tdisplay: block;\n\tposition: fixed;\n\ttop: 60px;\n\tleft: 10px;\n\tbottom: 10px;\n\tright: 10px;\n}\n.window-panes > * {\n\toverflow: auto;\n\theight: calc(100% - 60px);\n\tdisplay: block;\n\tpadding: 20px;\n}\n.window-panes > .window-pane-left {\n\tposition: fixed;\n\tleft: 10px;\n\twidth: calc(50% - 20px);\n}\n.window-panes > .window-pane-right {\n\tposition: fixed;\n\tright: 10px;\n\twidth: calc(50% - 20px);\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/demo/form.vue"],"names":[],"mappings":";AA6FA;CACA,eAAA;AACA;AAEA;CACA,gBAAA;CACA,gBAAA;AACA;AAEA;CACA,cAAA;CACA,eAAA;CACA,SAAA;CACA,UAAA;CACA,YAAA;CACA,WAAA;AACA;AAEA;CACA,cAAA;CACA,yBAAA;CACA,cAAA;CACA,aAAA;AACA;AAEA;CACA,eAAA;CACA,UAAA;CACA,uBAAA;AACA;AAEA;CACA,eAAA;CACA,WAAA;CACA,uBAAA;AACA","file":"form.vue","sourcesContent":["<script>\nexport default {\n\tdata() { return {\n\t\tconfig: {},\n\t\tdata: {},\n\t\texamples: [\n\t\t\t'examples/mgQuery.json',\n\t\t\t'examples/shorthand.json',\n\t\t\t'examples/showcase.json',\n\t\t\t'examples/showIf.json',\n\t\t],\n\t\texample: 'examples/showcase.json',\n\t\t// example: 'examples/mgQuery.json',\n\t}},\n\tmethods: {\n\t\trandomizeData() {\n\t\t\tthis.data = {\n\t\t\t\tdemoText: 'Hello World ' + _.random(100, 999),\n\t\t\t\tdemoNumberSimple: _.random(100, 999),\n\t\t\t}\n\t\t},\n\t},\n\twatch: {\n\t\texample: {\n\t\t\timmediate: true,\n\t\t\thandler() {\n\t\t\t\tthis.$http.get(this.example)\n\t\t\t\t\t.then(res => {\n\t\t\t\t\t\tthis.data = {};\n\t\t\t\t\t\tthis.config = res.data;\n\t\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n};\n</script>\n\n<template>\n\t<div class=\"window-panes\">\n\t\t<div class=\"window-pane-left\">\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-12\">\n\t\t\t\t\t<div class=\"card\">\n\t\t\t\t\t\t<div class=\"card-header d-flex justify-content-between p-1\">\n\t\t\t\t\t\t\t<h4 class=\"card-title\">Config</h4>\n\t\t\t\t\t\t\t<div class=\"btn-group\">\n\t\t\t\t\t\t\t\t<a class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\">\n\t\t\t\t\t\t\t\t\t{{example}}\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t<ul class=\"dropdown-menu\">\n\t\t\t\t\t\t\t\t\t<li v-for=\"exampleItem in examples\" :key=\"example\">\n\t\t\t\t\t\t\t\t\t\t<a @click=\"example = exampleItem\" class=\"dropdown-item\">\n\t\t\t\t\t\t\t\t\t\t\t<i :class=\"example == exampleItem ? 'fas fa-check-circle' : 'far fa-circle'\"/>\n\t\t\t\t\t\t\t\t\t\t\t{{exampleItem}}\n\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"card-body\" style=\"height: 200px; overflow-y: scroll\">\n\t\t\t\t\t\t\t<pre>{{config | json}}</pre>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"row mt-3\">\n\t\t\t\t<div class=\"col-12\">\n\t\t\t\t\t<div class=\"card\">\n\t\t\t\t\t\t<div class=\"card-header p-1\">\n\t\t\t\t\t\t\t<div class=\"btn-group float-right m-1\">\n\t\t\t\t\t\t\t\t<a @click=\"randomizeData()\" class=\"btn btn-sm btn-light far fa-random\"/>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<h4 class=\"card-title\">Form data</h4>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"card-body\" style=\"height: 200px; overflow-y: scroll\">\n\t\t\t\t\t\t\t<pre>{{data | json}}</pre>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div class=\"window-pane-right\">\n\t\t\t<mg-form\n\t\t\t\t:config=\"config\"\n\t\t\t\t:data=\"data\"\n\t\t\t\t@change=\"data = $event\"\n\t\t\t/>\n\t\t</div>\n\t</div>\n</template>\n\n<style>\na {\n\tcursor: pointer;\n}\n\n.card .card-title {\n\tmargin-left: 5px;\n\tmargin-bottom: 0;\n}\n\n.window-panes {\n\tdisplay: block;\n\tposition: fixed;\n\ttop: 60px;\n\tleft: 10px;\n\tbottom: 10px;\n\tright: 10px;\n}\n\n.window-panes > * {\n\toverflow: auto;\n\theight: calc(100% - 60px);\n\tdisplay: block;\n\tpadding: 20px;\n}\n\n.window-panes > .window-pane-left {\n\tposition: fixed;\n\tleft: 10px;\n\twidth: calc(50% - 20px);\n}\n\n.window-panes > .window-pane-right {\n\tposition: fixed;\n\tright: 10px;\n\twidth: calc(50% - 20px);\n}\n</style>\n"]}, media: undefined });
 
 	  };
 	  /* scoped */
