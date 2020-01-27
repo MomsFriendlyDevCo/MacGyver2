@@ -9,7 +9,16 @@ export default {
 			'examples/showcase.json',
 		],
 		example: 'examples/showcase.json',
+		// example: 'examples/mgQuery.json',
 	}},
+	methods: {
+		randomizeData() {
+			this.data = {
+				demoText: 'Hello World ' + _.random(100, 999),
+				demoNumberSimple: _.random(100, 999),
+			}
+		},
+	},
 	watch: {
 		example: {
 			immediate: true,
@@ -57,6 +66,9 @@ export default {
 				<div class="col-12">
 					<div class="card">
 						<div class="card-header p-1">
+							<div class="btn-group float-right m-1">
+								<a @click="randomizeData()" class="btn btn-sm btn-light far fa-random"/>
+							</div>
 							<h4 class="card-title">Form data</h4>
 						</div>
 						<div class="card-body" style="height: 200px; overflow-y: scroll">
