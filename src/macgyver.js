@@ -249,7 +249,7 @@ $macgyver.notify.error = message => console.log('[$macgyver]', message);
 /**
 * Flatten the a spec into an object lookup where each key is the dotted notation of the key
 * NOTE: Specifying {want:'array'} will add the extra property 'path' onto the output collection
-* @param {Object} root The data or spec object to examine
+* @param {Object|array} root The data or spec object to examine, this should be the root object but can also convert arrays into objects on the fly (although this is slower)
 * @param {Object} [options] Optional settings to use
 * @param {number} [options.maxDepth=0] How far down the tree to recurse, set to falsy to infinitely recurse
 * @param {Object|function} [options.filter] Either a Lodash match expression or a function to run on each widget - only truthy values are appended to the output. Function is called as `(widget, dataPath, specPath, depth)`
@@ -262,6 +262,7 @@ $macgyver.notify.error = message => console.log('[$macgyver]', message);
 */
 $macgyver.flatten = (root, options) => {
 	var settings = _.defaults(options, {
+		root: _.isArray(root) ? $macgyver.compileSpec(root).spec : root,
 		maxDepth: 0,
 		filter: undefined,
 		filterChildren: undefined,
@@ -275,9 +276,9 @@ $macgyver.flatten = (root, options) => {
 	if (settings.filter && !_.isFunction(settings.filter) && _.isObject(settings.filter)) settings.filter = _.matches(settings.filter);
 	if (settings.want != 'object' && settings.want != 'array') throw new Error('$macgyver.flatten({want}) can only be "object" or "array"');
 	if (settings.type == 'auto') {
-		if (root.items) {
+		if (settings.root.items) {
 			settings.type = 'spec';
-		} else if (_.every(root, (k, v) => !v.items)) {
+		} else if (_.every(settings.root, (k, v) => !v.items)) {
 			settings.type = 'data';
 		} else {
 			throw new Error('Cannot determine type of input object to $macgyver.flatten(), specify it explicitly with {type=spec|data}');
@@ -320,7 +321,7 @@ $macgyver.flatten = (root, options) => {
 			);
 		}
 	};
-	depthScanner(root, [], [], 0);
+	depthScanner(settings.root, [], [], 0);
 
 	return found;
 };
