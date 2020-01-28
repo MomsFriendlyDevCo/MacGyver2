@@ -24,6 +24,7 @@ macgyver.register('mgChoiceDropdown', {
 		enumUrl: {type: 'mgUrl', showIf: 'enumSource == "url"', help: 'Data feed URL to fetch choice values from'},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
+		focus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},
 	},
 	format: true, // FIXME: Not sure about this, what if we need to lookup the value by the enum ID?
 	shorthand: ['choice', 'choose', 'dropdown', 'pick'],
@@ -81,11 +82,18 @@ export default Vue.component('mgChoiceDropdown', {
 			}
 		}, {immediate: true});
 	},
+	mounted() {
+		if (this.$props.config.focus) {
+			// NOTE: Focus selection does NOT work if DevTools is open in Chome
+			this.$refs.select.searchEl.focus();
+		}
+	},
 });
 </script>
 
 <template>
 	<v-select
+		ref="select"
 		:value="value"
 		label="title"
 		:options="enumIter"
