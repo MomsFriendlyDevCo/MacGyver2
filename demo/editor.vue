@@ -29,9 +29,9 @@ export default {
 <template>
 	<div class="window-panes">
 		<div class="window-pane-left">
-			<div class="row">
+			<div class="row h-100">
 				<div class="col-12">
-					<div class="card">
+					<div class="card h-100">
 						<div class="card-header d-flex justify-content-between p-1">
 							<h4 class="card-title">Config</h4>
 							<div class="btn-group">
