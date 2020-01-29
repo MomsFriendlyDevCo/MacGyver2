@@ -2,24 +2,15 @@
 export default {
 	data() { return {
 		config: {},
-		data: {},
 		examples: [
 			'examples/mgQuery.json',
+			'examples/simple.json',
 			'examples/shorthand.json',
 			'examples/showcase.json',
 			'examples/showIf.json',
 		],
-		example: 'examples/showcase.json',
-		// example: 'examples/mgQuery.json',
+		example: 'examples/simple.json',
 	}},
-	methods: {
-		randomizeData() {
-			this.data = {
-				demoText: 'Hello World ' + _.random(100, 999),
-				demoNumberSimple: _.random(100, 999),
-			}
-		},
-	},
 	watch: {
 		example: {
 			immediate: true,
@@ -58,22 +49,7 @@ export default {
 							</div>
 						</div>
 						<div class="card-body" style="height: 200px; overflow-y: scroll">
-							<pre>{{config}}</pre>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="row mt-3">
-				<div class="col-12">
-					<div class="card">
-						<div class="card-header p-1">
-							<div class="btn-group float-right m-1">
-								<a @click="randomizeData()" class="btn btn-sm btn-light far fa-random"/>
-							</div>
-							<h4 class="card-title">Form data</h4>
-						</div>
-						<div class="card-body" style="height: 200px; overflow-y: scroll">
-							<pre>{{data | json}}</pre>
+							<pre>{{config | json}}</pre>
 						</div>
 					</div>
 				</div>
@@ -81,10 +57,9 @@ export default {
 		</div>
 
 		<div class="window-pane-right">
-			<mg-form
+			<mg-form-editor
 				:config="config"
-				:data="data"
-				@change="data = $event"
+				@change="config = $event"
 			/>
 		</div>
 	</div>
