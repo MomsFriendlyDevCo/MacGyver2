@@ -99,7 +99,7 @@ export default Vue.component('mgContainer', {
 			class="form-group row mgComponent"
 			:class="[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]"
 		>
-			<label v-if="widget.showTitle || $props.config.showTitles" class="control-label text-left col-sm-3">
+			<label v-if="widget.showTitle || $props.config.showTitles" class="col-form-label text-left col-sm-3">
 				{{widget.title}}
 			</label>
 			<div :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'">
@@ -119,7 +119,7 @@ export default Vue.component('mgContainer', {
 					class="form-group row mgComponent"
 					:class="[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]"
 				>
-					<label v-if="widget.showTitle || $props.config.showTitles" class="control-label text-left col-sm-3">
+					<label v-if="widget.showTitle || $props.config.showTitles" class="col-form-label text-left col-sm-3">
 						{{widget.title}}
 					</label>
 					<div :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'">
@@ -145,7 +145,7 @@ export default Vue.component('mgContainer', {
 					class="control-input"
 					:class="!localData[widget.$dataPath] && 'blank'"
 				/>
-				<label v-if="$props.config.showTitles" class="control-label text-left col-sm-3">
+				<label v-if="$props.config.showTitles" class="col-form-label text-left col-sm-3">
 					{{widget.title}}
 				</label>
 			</div>
@@ -270,7 +270,7 @@ export default Vue.component('mgContainer', {
 	position: relative;
 }
 
-.mgContainer-formFloating > .col-12 > .control-input.blank + .control-label {
+.mgContainer-formFloating > .col-12 > .control-input.blank + .col-form-label {
 	transform: translateY(0px);
 	color: #bbb;
 	font-size: 15px;
@@ -278,7 +278,7 @@ export default Vue.component('mgContainer', {
 	opacity: 1;
 }
 
-.mgContainer-formFloating > .col-12 > .control-input.control-input:focus + .control-label {
+.mgContainer-formFloating > .col-12 > .control-input.control-input:focus + .col-form-label {
 	transform: translateY(-21px);
 	color: #66afe9;
 	font-size: 14px;
@@ -287,7 +287,7 @@ export default Vue.component('mgContainer', {
 	background-color: white;
 }
 
-.mgContainer-formFloating > .col-12 > .control-label {
+.mgContainer-formFloating > .col-12 > .col-form-label {
 	color: #aaa;
 	display: inline-block;
 	font-size: 12px;
