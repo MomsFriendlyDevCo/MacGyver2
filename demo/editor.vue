@@ -49,7 +49,7 @@ export default {
 							</div>
 						</div>
 						<div class="card-body" style="height: 200px; overflow-y: scroll">
-							<pre>{{config | json}}</pre>
+							<pre>{{config}}</pre>
 						</div>
 					</div>
 				</div>

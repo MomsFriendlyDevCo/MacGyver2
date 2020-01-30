@@ -19,6 +19,14 @@ export default {
 				</li>
 			</ul>
 		</div>
+		<ul class="navbar-nav">
+			<li class="navbar-item">
+				<a href="https://github.com/MomsFriendlyDevCo/MacGyver2" class="btn btn-light">
+					<i class="fab fa-github"/>
+					GitHub
+				</a>
+			</li>
+		</ul>
 	</nav>
 </template>
 
