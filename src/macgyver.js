@@ -191,7 +191,11 @@ $macgyver.forms.run = (id, action, context, ...params) => {
 			: $macgyver.$forms[id].$props.actions[actionReadable];
 
 		// Tidy up actionArgs
-		actionArgs = (actionArgs || '').trim('()').split(',').map(i => i && JSON.parse(i.replace(/'/g, '"')));
+		actionArgs = (actionArgs || '')
+			.replace(/^\(/, '') // Remove preceeding '('
+			.replace(/\)$/, '') // Remove succeeding ')'
+			.split(',')
+			.map(i => i && JSON.parse(i.replace(/'/g, '"')));
 
 		if (func.apply($macgyver.$forms[id], [actionArgs, ...params])) return;
 	}
