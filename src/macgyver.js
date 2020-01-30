@@ -533,7 +533,7 @@ $macgyver.utils.fetch = (url, options) =>
 					.forEach((pair) => {
 						var [k, v] = pair;
 						if (k.startsWith('$')) {
-							session.mappings[k] = {required: true, from: v};
+							session.mappings[k.substr(1)] = {required: false, from: v};
 							session.parsedUrl.searchParams.delete(k);
 						}
 					});
