@@ -42,6 +42,7 @@ export default Vue.component('mgToggle', {
 
 <template>
 	<toggle-button
+		class="mg-toggle"
 		:value="data"
 		:color="{checked: $props.config.onColor, unchecked: $props.config.offColor, disabled: $props.config.disabledColor}"
 		:labels="{checked: $props.config.onText, unchecked: $props.config.offText}"
@@ -49,3 +50,9 @@ export default Vue.component('mgToggle', {
 		@change="change"
 	/>
 </template>
+
+<style>
+.mg-toggle {
+	margin-top: 7px;
+}
+</style>

@@ -105,5 +105,8 @@ export default Vue.component('mgIcon', {
 	width: 32px;
 	height: 32px;
 	padding: 7px 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 </style>
