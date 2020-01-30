@@ -173,7 +173,7 @@ $macgyver.forms.run = (id, action, context, ...params) => {
 
 	// 1. Emit mgRun to parents and see if they want to handle it {{{
 	var handled = false;
-	$macgyver.$forms[id].$emitUp('mgRun', {action, params}, isHandled => {
+	$macgyver.$forms[id].$emit.up.call($macgyver.$forms[id], 'mgRun', {action, params}, isHandled => {
 		if (isHandled) handled = true;
 	});
 	if (handled) return;

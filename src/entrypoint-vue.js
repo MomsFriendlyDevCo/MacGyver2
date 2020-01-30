@@ -4,6 +4,7 @@
 import MacGyver from './macgyver.vue';
 window.macgyver = MacGyver;
 
+import('./services/emit');
 import('./services/watchAll');
 
 // Import all MacGyver components
