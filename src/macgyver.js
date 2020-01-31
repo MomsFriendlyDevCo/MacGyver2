@@ -171,6 +171,12 @@ $macgyver.forms.getPrototype = (id) =>
 $macgyver.forms.run = (id, action, context, ...params) => {
 	if (!context) context = $macgyver.$forms[id];
 
+	// 0. See if what we've been passed is already a function {{{
+	if (typeof action == 'function') {
+		return action.call(context || $macgyver.$forms[id]);
+	}
+	// }}}
+
 	// 1. Emit mgRun to parents and see if they want to handle it {{{
 	var handled = false;
 	$macgyver.$forms[id].$emit.up.call($macgyver.$forms[id], 'mgRun', {action, params}, isHandled => {
@@ -534,7 +540,7 @@ $macgyver.utils.fetch = (url, options) =>
 				session.mappings = options.mappings;
 			} else { // Try to extract mappings if options doesn't already have a parsed set
 				Array.from(session.parsedUrl.searchParams.entries())
-					.forEach((pair) => {
+					.forEach(pair => {
 						var [k, v] = pair;
 						if (k.startsWith('$')) {
 							session.mappings[k.substr(1)] = {required: false, from: v};

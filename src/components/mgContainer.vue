@@ -3,13 +3,19 @@
 * MacGyver component loader
 * This is a meta component that loads other dynamic components as an array
 * @param {Object} config The config specification
-* @param {array} config.items A collection of sub-item objects to display
+* @param {array<Object>} config.items A collection of sub-item objects to display
 * @param {string} [config.title] The title of the container to display
 * @param {string} [config.layout="form"] The layout profile to use. ENUM: form = A standard horizontal form layout, card = a Bootstrap 4 card with header and footer, columns = vertically sorted column display, query = an inline query constructor
+*
 * @param {boolean} [config.items[].help] Optional help text to show under the element
 * @param {boolean} [config.items[].showTitle=true] Whether to show the left-hand-side form title for the item
 * @param {string} [config.items[].title] Optional title to display for the widget
 * @param {string} config.items[].type The type of the object to render. This corresponds to a `mg*` component
+*
+* @param {array<Object>} [config.verbs] Optional verbs to display for cards
+* @param {string} [config.verbs[].tooltip] Tooltip to display per verb
+* @param {string} [config.verbs[].icon] Icon to display per verb
+* @param {string} [config.verbs[].class=""] Class to apply per verb
 */
 
 macgyver.register('mgContainer', {
@@ -37,6 +43,17 @@ macgyver.register('mgContainer', {
 		collapsable: {type: 'mgToggle', default: false, help: 'This card can be hidden', showIf: "layout == 'card'"},
 		collapsed: {type: 'mgToggle', default: false, help: 'This card is collapsed by default', showIf: "layout == 'card'"},
 		border: {type: 'mgToggle', default: true, help: 'Show a border around the container', showIf: "layout == 'columns'"},
+		verbs: {
+			type: 'mgTable',
+			advanced: true,
+			showIf: "layout == 'card'",
+			items: [
+				{id: 'icon', type: 'mgIcon'},
+				{id: 'tooltip', type: 'mgText'},
+				{id: 'class', type: 'mgText'},
+				{id: 'action', type: 'mgText'},
+			],
+		},
 	},
 	configChildren: {
 		help: {type: 'mgText', title: 'Help text', help: 'Optional help text for the item - just like what you are reading now'},
@@ -110,7 +127,18 @@ export default Vue.component('mgContainer', {
 	</div>
 	<div v-else-if="$props.config.layout == 'card'">
 		<div class="card mg-container" :class="{'card-collapsable': $props.config.collapsable, 'card-collapsed': $props.config.collapsed}">
-			<div class="card-header">{{$props.config.title}}</div>
+			<div class="card-header">
+				{{$props.config.title}}
+				<div v-if="$props.config.verbs && $props.config.verbs.length" class="card-verbs">
+					<a
+						v-for="(verb, verbIndex) in $props.config.verbs"
+						:key="verbIndex"
+						:class="[verb.class, verb.icon]"
+						v-tooltip="verb.tooltip"
+						@click="$macgyver.forms.run(form, verb.action)"
+					/>
+				</div>
+			</div>
 			<div class="card-body">
 				<div
 					v-for="(widget, widgetIndex) in $props.config.items"
@@ -235,6 +263,24 @@ export default Vue.component('mgContainer', {
 	display: none;
 }
 /* }}} */
+/* }}} */
+
+/* Card verbs {{{ */
+.mg-container.card .card-header .card-verbs {
+	position: absolute;
+	right: 15px;
+	top: 10px;
+	font-size: 20px;
+}
+
+.mg-container.card .card-header .card-verbs > a {
+	color: #999;
+	padding: 5px;
+}
+
+.mg-container.card .card-header .card-verbs > a:hover {
+	color: #000;
+}
 /* }}} */
 /* }}} */
 
