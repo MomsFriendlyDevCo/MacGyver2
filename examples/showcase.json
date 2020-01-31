@@ -362,6 +362,16 @@
 					"type": "mgContainer",
 					"layout": "card",
 					"title": "Card",
+					"verbs": [
+						{
+							"icon": "far fa-sun",
+							"tooltip": "This is card verb #1"
+						},
+						{
+							"icon": "far fa-moon",
+							"tooltip": "This is card verb #2"
+						}
+					],
 					"items": [
 						{
 							"id": "containerLayoutCardFormFoo",
