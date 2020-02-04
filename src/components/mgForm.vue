@@ -121,25 +121,7 @@ export default Vue.component('mgForm', {
 		this.$watch('$props.data', ()=> {
 			console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
 			this.rebuildData();
-		}, {immediate: true});
-	},
-	watchDISABLED: {
-		'$props.config': {
-			immediate: false, // This actually gets called after $prop injection anyway
-			deep: true,
-			handler() { // Config has been clobbered - rebuild the layout
-				console.log('mgForm config clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
-				this.rebuild();
-			},
-		},
-		'$props.data': {
-			immediate: true, // This actually gets called after $prop injection anyway
-			deep: true,
-			handler() { // Config has been clobbered - rebuild the layout
-				console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
-				this.rebuildData();
-			},
-		},
+		}, {immediate: true, deep: true});
 	},
 });
 </script>
