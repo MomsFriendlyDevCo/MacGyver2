@@ -83,7 +83,7 @@ Vue.prototype.$macgyver = (()=> {
 
 
 	// Auto-bind to Axios if its defined
-	if (window.axios) $macgyver.$http = window.axios;
+	if ($macgyver.utils.global.axios) $macgyver.$http = $macgyver.utils.global.axios;
 
 	return $macgyver;
 })();
