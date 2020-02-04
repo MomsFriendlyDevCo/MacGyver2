@@ -79,7 +79,7 @@ $macgyver.forms = {};
 */
 $macgyver.forms.setConfig = (id, config) => {
 	if (!$macgyver.$forms[id]) $macgyver.$forms[id] = {config: {}, data: {}};
-	$macgyver.$forms[id].config = $macgyver.neatenSpec(config);
+	$macgyver.$forms[id].config = $macgyver.compileSpec(config).spec;
 	return $macgyver;
 };
 
