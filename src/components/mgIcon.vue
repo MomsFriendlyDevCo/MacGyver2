@@ -78,6 +78,7 @@ export default Vue.component('mgIcon', {
 			:form="$props.form"
 			:data="data"
 			:config="{
+				$dataPath: $props.config.$dataPath,
 				enumSource: 'url',
 				enumUrl: {
 					url: $props.config.iconFeed,
