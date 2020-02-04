@@ -42,7 +42,7 @@ export default Vue.component('mgChoiceDropdown', {
 	},
 	methods: {
 		change(val) {
-			this.data = val.id;
+			this.data = val?.id;
 			this.value = val;
 		},
 
@@ -98,6 +98,7 @@ export default Vue.component('mgChoiceDropdown', {
 		label="title"
 		:options="enumIter"
 		:placeholder="$props.config.placeholder"
+		:clearable="!$props.config.required"
 		@input="change"
 	>
 		<template #selected-option="option">
