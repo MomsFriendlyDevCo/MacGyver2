@@ -21,12 +21,6 @@ export default Vue.component('mgCodeEditor', {
 		config: Object,
 		form: String,
 	},
-	watch: {
-		config() {
-			this.editor.getSession().setMode(`ace/mode/${this.$props.config.syntax}`);
-			this.editor.setTheme(`ace/theme/${this.$props.config.theme}`);
-		},
-	},
 	created() {
 		this.$macgyver.inject(this);
 	},
@@ -64,6 +58,11 @@ export default Vue.component('mgCodeEditor', {
 		});
 
 		this.$nextTick(()=> this.editor.resize());
+
+		this.$watch('config', ()=> {
+			this.editor.getSession().setMode(`ace/mode/${this.$props.config.syntax}`);
+			this.editor.setTheme(`ace/theme/${this.$props.config.theme}`);
+		}, {immediate: true});
 	},
 	render(h) {
 		return h('div', {
