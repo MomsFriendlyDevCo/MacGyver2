@@ -87,6 +87,8 @@ export default Vue.component('mgNumber', {
 .mg-number .btn {
 	box-shadow: none;
 	border: 1px solid #f0f0f0;
+	display: flex;
+	align-items: center;
 }
 
 /* Hide the spin button in mgNumber controls */
