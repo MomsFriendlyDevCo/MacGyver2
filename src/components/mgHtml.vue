@@ -5,7 +5,7 @@ macgyver.register('mgHtml', {
 	category: 'General Decoration',
 	preferId: false,
 	config: {
-		text: {type: 'mgTextArea'},
+		text: {type: 'mgCodeEditor', syntax: 'html'},
 	},
 });
 

@@ -6,7 +6,7 @@ macgyver.register('mgCodeEditor', {
 	category: 'Complex Inputs',
 	preferId: true,
 	config: {
-		syntax: {type: 'mgChoiceDropdown', enum: ['text', 'json', 'javascript'], default: 'json'},
+		syntax: {type: 'mgChoiceDropdown', enum: ['text', 'json', 'javascript', 'html'], default: 'json'},
 		convert: {type: 'mgToggle', default: true, showIf: 'syntax == "json"', help: 'Convert data back to a native JS object'},
 		theme: {type: 'mgChoiceDropdown', enum: ['chrome'], advanced: true, default: 'chrome', help: 'The syntax color scheme to use'},
 		height: {type: 'mgText', default: '400px', help: 'The size of the editing window as a valid CSS measurement', advanced: true},
