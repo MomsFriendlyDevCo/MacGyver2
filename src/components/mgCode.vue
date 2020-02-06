@@ -1,5 +1,5 @@
 <script>
-macgyver.register('mgCodeEditor', {
+macgyver.register('mgCode', {
 	requires: 'node_modules/ace-builds/src-noconflict/ace.js',
 	title: 'Code Editor',
 	icon: 'fal fa-code',
@@ -13,7 +13,7 @@ macgyver.register('mgCodeEditor', {
 	},
 });
 
-export default Vue.component('mgCodeEditor', {
+export default Vue.component('mgCode', {
 	inject: ['$mgForm'],
 	data() { return {
 		data: undefined,
@@ -52,7 +52,7 @@ export default Vue.component('mgCodeEditor', {
 					// Silently fail as the JSON is invalid
 				}
 			} else {
-				this.$mgFormemit('mgChange', this.$props.config.id, val)
+				this.$mgForm.$emit('mgChange', this.$props.config.id, val)
 			}
 			return true;
 		});
@@ -60,14 +60,14 @@ export default Vue.component('mgCodeEditor', {
 		this.$nextTick(()=> this.editor.resize());
 
 		this.$watch('config', ()=> {
-			this.editor.getSession().setMode(`ace/mode/${this.$props.config.syntax}`);
-			this.editor.setTheme(`ace/theme/${this.$props.config.theme}`);
+			if (this.$props.config.syntax) this.editor.getSession().setMode(`ace/mode/${this.$props.config.syntax}`);
+			if (this.$props.config.theme) this.editor.setTheme(`ace/theme/${this.$props.config.theme}`);
 		}, {immediate: true});
 	},
 	render(h) {
 		return h('div', {
 			attrs: {
-				class: 'mg-code-editor',
+				class: 'mg-code',
 				style: `height: ${this.$props.config.height}; width: 100%`,
 			},
 		});
@@ -76,7 +76,7 @@ export default Vue.component('mgCodeEditor', {
 </script>
 
 <style>
-.mg-code-editor {
+.mg-code {
 	border: 1px solid #f0f0f0;
 	border-radius: 5px;
 }
