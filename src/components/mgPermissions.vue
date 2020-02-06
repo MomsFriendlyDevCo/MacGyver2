@@ -12,15 +12,15 @@ macgyver.register('mgPermissions', {
 });
 
 export default Vue.component('mgPermissions', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: undefined,
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
 	},
 	created() {
-		this.$macgyver.inject(this);
+		this.$mgForm.inject(this);
 
 		this.$watch('data', ()=> {
 			if (_.isString(this.data)) this.$set(this, 'data',

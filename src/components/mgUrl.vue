@@ -17,15 +17,15 @@ macgyver.register('mgUrl', {
 });
 
 export default Vue.component('mgUrl', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: undefined,
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
 	},
 	created() {
-		this.$macgyver.inject(this);
+		this.$mgForm.inject(this);
 		this.$on('mgValidate', reply => {
 			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
 		});

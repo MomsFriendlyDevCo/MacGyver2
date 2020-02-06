@@ -43,16 +43,16 @@ macgyver.register('mgInfoBlock', {
 });
 
 export default Vue.component('mgInfoBlock', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: undefined,
 		isLoading: false,
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
 	},
 	created() {
-		this.$macgyver.inject(this);
+		this.$mgForm.inject(this);
 
 		this.$watch('$props.config.url', ()=> {
 			if (!this.$props.config.url) return;

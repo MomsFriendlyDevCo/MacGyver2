@@ -19,15 +19,15 @@ macgyver.register('mgDate', {
 });
 
 export default Vue.component('mgDate', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: undefined,
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
 	},
 	created() {
-		this.$macgyver.inject(this);
+		this.$mgForm.inject(this);
 		this.$on('mgValidate', reply => {
 			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
 			if (this.$props.config.min && _.isString(this.data) && this.data < this.$props.config.min) return reply(`${$props.config.title} is too early (earliest date is ${this.$props.config.min})`);

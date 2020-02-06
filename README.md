@@ -52,6 +52,45 @@ $macgyver.register('mgText', {
 }));
 ```
 
+The Vue component should be at least the following spec:
+
+```javascript
+Vue.component('mgText', {
+	inject: ['$mgForm'],
+	data() { return {
+		data: undefined,
+	}},
+	created() {
+		this.$mgForm.inject(this);
+	},
+});
+```
+
+**NOTES:**
+* The `$mgForm` element needs injecting into each vue component so it knows its parent form
+* `vm.$mgForm.inject(this)` must be called to register this component instance to the form
+* The `data.data` property (accessed as `vm.data`) holds the current value of the form node. `$props.data` is not used as this means the rebuild of the component on each node value change which is expensive, instead data is populated and watchers are used to broadcast changes into the `mgForm` component
+
+
+**Injectables:**
+The following injectables can be subscribed to within each component:
+
+| Injectable      | Description                                                                                  |
+|-----------------|----------------------------------------------------------------------------------------------|
+| `$mgForm`       | The parent `mgForm` component, must be subscribed to then used via `vm.$mgForm.inject(this)` |
+| `$mgFormEditor` | The optional wrapping `mgFormEditor` component, if present. This is outside the `mgForm` parent, its presense can be used to determine whether to display special edit component features |
+
+
+**Events:**
+Each MacGyver component injected with `$mgForm.inject(vm)` can respond to the following events:
+
+| Event        | Cardinality | Params               | Description                                                                                                           |
+|--------------|-------------|----------------------|-----------------------------------------------------------------------------------------------------------------------|
+| `mgChange`   | Always      | `(path, value)`      | Used to respond to changes in the component state                                                                     |
+| `mgIdentify` | Always      | `(reply <function>)` | Used to retrieve all components, component will reply with its `VueComponent` instance                                |
+| `mgRefresh`  | Always      | `()`                 | Used to force refresh the state of a component                                                                        |
+| `mgValidate` | Optional    | `(reply <function>)` | Used to validate each child component, each component should call `reply()` with string errors should validation fail |
+
 
 $macgyver
 ---------

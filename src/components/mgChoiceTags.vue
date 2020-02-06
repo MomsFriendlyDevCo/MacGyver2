@@ -32,23 +32,17 @@ macgyver.register('mgChoiceTags', {
 });
 
 export default Vue.component('mgChoiceTags', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: undefined,
 		value: [],
 		enumIter: [],
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
-	},
-	methods: {
-		change(val) {
-			this.data = val.map(i => i.id);
-			this.value = val;
-		},
 	},
 	created() {
-		this.$macgyver.inject(this);
+		this.$mgForm.inject(this);
 		this.$on('mgValidate', reply => {
 			if (this.$props.config.required && !this.data || !this.data.length) return reply(`${this.$props.config.title} is required`);
 		});
@@ -66,6 +60,12 @@ export default Vue.component('mgChoiceTags', {
 				this.value = this.enumIter.filter(e => e.id == this.$props.config.default) || this.$props.config.default;
 			}
 		}, {immediate: true});
+	},
+	methods: {
+		change(val) {
+			this.data = val.map(i => i.id);
+			this.value = val;
+		},
 	},
 });
 </script>

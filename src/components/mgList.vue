@@ -17,16 +17,16 @@ macgyver.register('mgList', {
 });
 
 export default Vue.component('mgList', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: undefined,
 		newItem: '',
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
 	},
 	created() {
-		this.$macgyver.inject(this);
+		this.$mgForm.inject(this);
 		this.$on('mgValidate', reply => {
 			if (this.$props.config.required && (!this.data || !this.data.length)) return reply(`${this.$props.config.title} is required`);
 			if (this.$props.config.min && _.isString(this.data) && this.data.length < this.$props.config.min) return reply(`${this.$props.config.title} must have at least ${this.$props.config.min} items`);

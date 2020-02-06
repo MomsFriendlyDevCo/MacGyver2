@@ -145,72 +145,18 @@ $macgyver.forms.getPath = (id, path, fallback) => {
 /**
 * Compute the data prototype of the form
 * This is an empty object with all the defaults populated
-* @param {string|Object} id Either the form ID to use or the form spec object to exmaine
+* @param {Object} spec The form spec object to exmaine
 * @returns {Object} A prototype data object with all defaults populated
 */
-$macgyver.forms.getPrototype = (id) =>
+$macgyver.forms.getPrototype = spec =>
 	$macgyver
-		.flatten(_.isString(id) ? $macgyver.$forms[id].config : id, {type: 'spec', want: 'array', wantDataPath: true})
+		.flatten(spec, {type: 'spec', want: 'array', wantDataPath: true})
 		.reduce((data, node) => {
 			if (!node.default) return data; // No default speciifed - skip
 
 			$macgyver.utils.setPath(data, node.path, node.default);
 			return data;
 		}, {});
-
-
-/**
-* Execute a function on a form
-* The default behaviour of this function is documented within the function
-* @param {string} id The ID of the form to execute the function on
-* @param {string} action The action to execute
-* @param {*} [context] The context of the action, defaults to the form component
-* @param {*} [params...] Additional parameters to execute
-* @emits mgRun Event fired at the form level only with a single object of the form `{action, params}`. Use the form property handleActions to specify if the form should handle or trap the event to override
-*/
-$macgyver.forms.run = (id, action, context, ...params) => {
-	if (!context) context = $macgyver.$forms[id];
-
-	// 0. See if what we've been passed is already a function {{{
-	if (typeof action == 'function') {
-		return action.call(context || $macgyver.$forms[id]);
-	}
-	// }}}
-
-	// 1. Emit mgRun to parents and see if they want to handle it {{{
-	var handled = false;
-	$macgyver.$forms[id].$emit.up.call($macgyver.$forms[id], 'mgRun', {action, params}, isHandled => {
-		if (isHandled) handled = true;
-	});
-	if (handled) return;
-	// }}}
-
-	// 2. Use FORM.$props.onAction(action) and see if returns truthy {{{
-	if ($macgyver.$forms[id].$props.onAction && $macgyver.$forms[id].$props.onAction.call(context, action, ...params)) return;
-	// }}}
-
-	// 3. See if FORM.$props.actions[action] exists and if so whether it returns truthy {{{
-	var [junk, actionReadable, actionArgs] = /^([a-z0-9\_]*?)(\(.*\))?$/i.exec(action) || [];
-	if (actionReadable && $macgyver.$forms[id].$props.actions && $macgyver.$forms[id].$props.actions[actionReadable]) {
-		// Collapse strings to functions
-		var func = _.isString($macgyver.$forms[id].$props.actions[actionReadable]) ? $macgyver.$forms[id][actionReadable]
-			: $macgyver.$forms[id].$props.actions[actionReadable];
-
-		// Tidy up actionArgs
-		actionArgs = (actionArgs || '')
-			.replace(/^\(/, '') // Remove preceeding '('
-			.replace(/\)$/, '') // Remove succeeding ')'
-			.split(',')
-			.map(i => i && JSON.parse(i.replace(/'/g, '"')));
-
-		if (func.apply($macgyver.$forms[id], [actionArgs, ...params])) return;
-	}
-	// }}}
-
-	// 4. If all else failed and FORM.$props.actionsFallback is true - handle it via vm.$eval {{{
-	$macgyver.$forms[id].$eval.call(context, action, ...params);
-	// }}}
-};
 
 
 // $macgyver.notify{} {{{

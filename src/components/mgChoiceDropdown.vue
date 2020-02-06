@@ -31,14 +31,34 @@ macgyver.register('mgChoiceDropdown', {
 });
 
 export default Vue.component('mgChoiceDropdown', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: undefined,
 		value: [],
 		enumIter: [],
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
+	},
+	created() {
+		this.$mgForm.inject(this);
+		this.$on('mgValidate', reply => {
+			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
+		});
+
+		this.$watch('$props.config.enumUrl', ()=> {
+			if (!this.$props.config.enumUrl) return;
+			this.$macgyver.utils.fetch(this.$props.config.enumUrl, {type: 'array'})
+				.then(data => this.setEnum(data))
+		}, {immediate: true});
+
+		this.$watch('$props.config.enum', ()=> {
+			if (_.isArray(this.$props.config.enum) && _.isString(this.$props.config.enum[0])) { // Array of strings
+				this.setEnum(this.$props.config.enum.map(i => ({id: _.camelCase(i), title: i})));
+			} else if (_.isArray(this.$props.config.enum) && _.isObject(this.$props.config.enum[0])) { // Collection
+				this.setEnum(this.$props.config.enum);
+			}
+		}, {immediate: true});
 	},
 	methods: {
 		change(val) {
@@ -61,26 +81,6 @@ export default Vue.component('mgChoiceDropdown', {
 				this.value = this.enumIter.find(e => e.id == this.$props.config.default) || this.$props.config.default;
 			}
 		},
-	},
-	created() {
-		this.$macgyver.inject(this);
-		this.$on('mgValidate', reply => {
-			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
-		});
-
-		this.$watch('$props.config.enumUrl', ()=> {
-			if (!this.$props.config.enumUrl) return;
-			this.$macgyver.utils.fetch(this.$props.config.enumUrl, {type: 'array'})
-				.then(data => this.setEnum(data))
-		}, {immediate: true});
-
-		this.$watch('$props.config.enum', ()=> {
-			if (_.isArray(this.$props.config.enum) && _.isString(this.$props.config.enum[0])) { // Array of strings
-				this.setEnum(this.$props.config.enum.map(i => ({id: _.camelCase(i), title: i})));
-			} else if (_.isArray(this.$props.config.enum) && _.isObject(this.$props.config.enum[0])) { // Collection
-				this.setEnum(this.$props.config.enum);
-			}
-		}, {immediate: true});
 	},
 	mounted() {
 		if (this.$props.config.focus) {

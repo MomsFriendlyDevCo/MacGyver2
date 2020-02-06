@@ -12,6 +12,9 @@
 * @param {string} [asideClassModeEditing=""] Class to associate with the editing sidebar when editing
 */
 export default Vue.component('mgFormEditor', {
+	provide() { return {
+		$mgFormEditor: this,
+	}},
 	data() { return {
 		mode: 'normal', // ENUM: normal, editing, adding
 		id: this.$macgyver.nextId(), // ID of the editing form item
@@ -104,6 +107,141 @@ export default Vue.component('mgFormEditor', {
 				];
 			},
 		},
+	},
+	mounted() {
+		// Intercept all click events and trap them
+
+		// Set the form as in editing mode
+		this.$macgyver.$forms[this.id].editing = true;
+
+		// Event: Main Form > mgComponent.click (edit the widget) {{{
+		this.$macgyver.$forms[this.id].$on('mgComponent.click', (component, e) => {
+			e.preventDefault();
+			e.stopPropagation();
+			this.editWidget(component);
+		});
+		// }}}
+
+		// Events: Main Form > mgComponent.mouse{Down,Up,Move} {{{
+		var mainDownEvent; // {start, component} when the user clicks on something - can be converted into mgComponent.click if the user doesn't move their mouse
+		this.$macgyver.$forms[this.id].$on('mgComponent.mouseDown', (component, e) => {
+			mainDownEvent = {start: Date.now(), component};
+		});
+
+		this.$macgyver.$forms[this.id].$on('mgComponent.mouseUp', (component, e) => {
+			if (!mainDownEvent) return; // Stray click
+			this.$macgyver.$forms[this.id].$emit('mgComponent.click', component, e);
+			mainDownEvent = undefined;
+		});
+
+		this.$macgyver.$forms[this.id].$on('mgComponent.mouseMove', (component, e) => {
+			if (dragEvent) return this.$macgyver.$forms[this.id].$emit('mgComponent.dragOver', component, e);
+
+			if (!mainDownEvent) return; // Mouse not pressed anyway
+			mainDownEvent = undefined;
+			this.$macgyver.$forms[this.id].$emit('mgComponent.dragStart', component, e);
+
+			e.stopPropagation();
+			e.preventDefault();
+		});
+
+		this.$macgyver.$forms[this.id].$on('mgComponent.mouseOut', (component, e) => {
+			if (dragEvent) return this.$macgyver.$forms[this.id].$emit('mgComponent.dragLeave', component, e);
+		});
+		// }}}
+
+		// Events: Main Form > mgComponent.drag{Start,Over,Leave,Drop} {{{
+		var dragEvent; // Drag related object, if truhty we are moving something
+		this.$macgyver.$forms[this.id].$on('mgComponent.dragStart', (component, e) => {
+			var $component = $(e.target);
+			
+			// Already dragging - cancel that
+			if (dragEvent) return this.$macgyver.$forms[this.id].$emit('mgComponent.dragDrop', component, e);
+
+			dragEvent = {
+				dragable: $(
+					`<div id="mg-form-editor-drag"><i class="${this.$macgyver.widgets[component.$props.config.type].icon}"></i> ${component.$props.config.id || component.$props.config.type}</div>`
+				)
+					.appendTo('body')
+					.offset({left: e.pageX + 5, top: e.pageY + 5}),
+				mouseWatcher: e => dragEvent.dragable.offset({left: e.pageX + 5, top: e.pageY + 5}),
+				mouseAction: e => {
+					e.preventDefault();
+					e.stopPropagation();
+					this.$macgyver.$forms[this.id].$emit('mgComponent.dragDrop', component, e);
+				},
+				start: ()=> {
+					$(document)
+						.on('mousemove', dragEvent.mouseWatcher)
+						.on('mousedown', '*', dragEvent.mouseAction)
+						.on('mouseup', '*', dragEvent.mouseAction)
+
+					$('body').addClass('mg-form-editor-dragging');
+				},
+				stop: ()=> {
+					dragEvent.dragable.remove();
+					$(document)
+						.off('mousemove', dragEvent.mouseWatcher)
+						.off('mousedown', '*', dragEvent.mouseAction)
+						.off('mouseup', '*', dragEvent.mouseAction)
+
+					$('body').removeClass('mg-form-editor-dragging');
+
+					dragEvent = undefined;
+				},
+				source: component,
+				target: undefined, // Tracker for the last component the user was hovering over
+				targetLocation: undefined, // ENUM: 'before', 'after'
+			};
+
+			dragEvent.start();
+		});
+
+		this.$macgyver.$forms[this.id].$on('mgComponent.dragOver', (component, e) => {
+			e.stopPropagation(); // Don't propagate upwards into container classes
+			if (!dragEvent) return; // Not already dragging
+			var $component = $(e.target);
+			dragEvent.target = component;
+			if (e.pageY < $component.height() / 2 + $component.offset().top) { // MouseY is less than half way up the component - assume the user wants to move BEFORE
+				this.setHighlightClass(component, 'mg-form-editor-drop-target mg-form-editor-drop-target-before');
+				dragEvent.targetLocation = 'before';
+			} else { // Otherwise assume the user wants to move AFTER
+				this.setHighlightClass(component, 'mg-form-editor-drop-target mg-form-editor-drop-target-after');
+				dragEvent.targetLocation = 'after';
+			}
+		});
+
+		this.$macgyver.$forms[this.id].$on('mgComponent.dragLeave', (component, e) => {
+			if (!dragEvent) return; // Not already dragging
+			this.setHighlightClass(component, '');
+			dragEvent.target = undefined;
+		});
+
+		this.$macgyver.$forms[this.id].$on('mgComponent.dragDrop', (component, e) => {
+			if (!dragEvent) return; // Not already dragging
+
+			if (dragEvent.target) {
+				this.setHighlightClass(dragEvent.target, ''); // Remove the highlight effect
+				this.removeWidget(dragEvent.source.$props.config.$specPath);
+				this.insertWidget(dragEvent.source.$props.config, {
+					specPath: dragEvent.target.$props.config.$specPath,
+					orientation: dragEvent.targetLocation,
+				});
+			}
+			dragEvent.stop();
+		});
+		// }}}
+
+		// Events: Add Form > mgComponent.mouse{Down,Up,Move} {{{
+		this.$macgyver.$forms[`${this.id}-add`].$on('mgComponent.mouseDown', (component, e) => {
+			e.stopPropagation();
+			e.preventDefault();
+
+			setTimeout(()=> { // Let the mgForm react to the click then handle the insert
+				this.insertWidget({type: this.addData.addType});
+			}, 100);
+		});
+		// }}}
 	},
 	methods: {
 		/**
@@ -323,141 +461,6 @@ export default Vue.component('mgFormEditor', {
 			})
 				.then(res => this.$set(this, 'config', JSON.parse(res)))
 		},
-	},
-	mounted() {
-		// Intercept all click events and trap them
-
-		// Set the form as in editing mode
-		this.$macgyver.$forms[this.id].editing = true;
-
-		// Event: Main Form > mgComponent.click (edit the widget) {{{
-		this.$macgyver.$forms[this.id].$on('mgComponent.click', (component, e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			this.editWidget(component);
-		});
-		// }}}
-
-		// Events: Main Form > mgComponent.mouse{Down,Up,Move} {{{
-		var mainDownEvent; // {start, component} when the user clicks on something - can be converted into mgComponent.click if the user doesn't move their mouse
-		this.$macgyver.$forms[this.id].$on('mgComponent.mouseDown', (component, e) => {
-			mainDownEvent = {start: Date.now(), component};
-		});
-
-		this.$macgyver.$forms[this.id].$on('mgComponent.mouseUp', (component, e) => {
-			if (!mainDownEvent) return; // Stray click
-			this.$macgyver.$forms[this.id].$emit('mgComponent.click', component, e);
-			mainDownEvent = undefined;
-		});
-
-		this.$macgyver.$forms[this.id].$on('mgComponent.mouseMove', (component, e) => {
-			if (dragEvent) return this.$macgyver.$forms[this.id].$emit('mgComponent.dragOver', component, e);
-
-			if (!mainDownEvent) return; // Mouse not pressed anyway
-			mainDownEvent = undefined;
-			this.$macgyver.$forms[this.id].$emit('mgComponent.dragStart', component, e);
-
-			e.stopPropagation();
-			e.preventDefault();
-		});
-
-		this.$macgyver.$forms[this.id].$on('mgComponent.mouseOut', (component, e) => {
-			if (dragEvent) return this.$macgyver.$forms[this.id].$emit('mgComponent.dragLeave', component, e);
-		});
-		// }}}
-
-		// Events: Main Form > mgComponent.drag{Start,Over,Leave,Drop} {{{
-		var dragEvent; // Drag related object, if truhty we are moving something
-		this.$macgyver.$forms[this.id].$on('mgComponent.dragStart', (component, e) => {
-			var $component = $(e.target);
-			
-			// Already dragging - cancel that
-			if (dragEvent) return this.$macgyver.$forms[this.id].$emit('mgComponent.dragDrop', component, e);
-
-			dragEvent = {
-				dragable: $(
-					`<div id="mg-form-editor-drag"><i class="${this.$macgyver.widgets[component.$props.config.type].icon}"></i> ${component.$props.config.id || component.$props.config.type}</div>`
-				)
-					.appendTo('body')
-					.offset({left: e.pageX + 5, top: e.pageY + 5}),
-				mouseWatcher: e => dragEvent.dragable.offset({left: e.pageX + 5, top: e.pageY + 5}),
-				mouseAction: e => {
-					e.preventDefault();
-					e.stopPropagation();
-					this.$macgyver.$forms[this.id].$emit('mgComponent.dragDrop', component, e);
-				},
-				start: ()=> {
-					$(document)
-						.on('mousemove', dragEvent.mouseWatcher)
-						.on('mousedown', '*', dragEvent.mouseAction)
-						.on('mouseup', '*', dragEvent.mouseAction)
-
-					$('body').addClass('mg-form-editor-dragging');
-				},
-				stop: ()=> {
-					dragEvent.dragable.remove();
-					$(document)
-						.off('mousemove', dragEvent.mouseWatcher)
-						.off('mousedown', '*', dragEvent.mouseAction)
-						.off('mouseup', '*', dragEvent.mouseAction)
-
-					$('body').removeClass('mg-form-editor-dragging');
-
-					dragEvent = undefined;
-				},
-				source: component,
-				target: undefined, // Tracker for the last component the user was hovering over
-				targetLocation: undefined, // ENUM: 'before', 'after'
-			};
-
-			dragEvent.start();
-		});
-
-		this.$macgyver.$forms[this.id].$on('mgComponent.dragOver', (component, e) => {
-			e.stopPropagation(); // Don't propagate upwards into container classes
-			if (!dragEvent) return; // Not already dragging
-			var $component = $(e.target);
-			dragEvent.target = component;
-			if (e.pageY < $component.height() / 2 + $component.offset().top) { // MouseY is less than half way up the component - assume the user wants to move BEFORE
-				this.setHighlightClass(component, 'mg-form-editor-drop-target mg-form-editor-drop-target-before');
-				dragEvent.targetLocation = 'before';
-			} else { // Otherwise assume the user wants to move AFTER
-				this.setHighlightClass(component, 'mg-form-editor-drop-target mg-form-editor-drop-target-after');
-				dragEvent.targetLocation = 'after';
-			}
-		});
-
-		this.$macgyver.$forms[this.id].$on('mgComponent.dragLeave', (component, e) => {
-			if (!dragEvent) return; // Not already dragging
-			this.setHighlightClass(component, '');
-			dragEvent.target = undefined;
-		});
-
-		this.$macgyver.$forms[this.id].$on('mgComponent.dragDrop', (component, e) => {
-			if (!dragEvent) return; // Not already dragging
-
-			if (dragEvent.target) {
-				this.setHighlightClass(dragEvent.target, ''); // Remove the highlight effect
-				this.removeWidget(dragEvent.source.$props.config.$specPath);
-				this.insertWidget(dragEvent.source.$props.config, {
-					specPath: dragEvent.target.$props.config.$specPath,
-					orientation: dragEvent.targetLocation,
-				});
-			}
-			dragEvent.stop();
-		});
-		// }}}
-
-		// Events: Add Form > mgComponent.mouse{Down,Up,Move} {{{
-		this.$macgyver.$forms[`${this.id}-add`].$on('mgComponent.mouseDown', (component, e) => {
-			e.stopPropagation();
-			e.preventDefault();
-
-			setTimeout(()=> { // Let the mgForm react to the click then handle the insert
-				this.insertWidget({type: this.addData.addType});
-			}, 100);
-		});
-		// }}}
 	},
 });
 </script>

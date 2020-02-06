@@ -15,15 +15,15 @@ macgyver.register('mgButton', {
 });
 
 export default Vue.component('mgButton', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: undefined,
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
 	},
 	created() {
-		this.$macgyver.inject(this);
+		this.$mgForm.inject(this);
 	},
 });
 </script>
@@ -31,7 +31,7 @@ export default Vue.component('mgButton', {
 <template>
 	<a
 		:class="$props.config.class"
-		@click="$macgyver.forms.run(form, $props.config.action)"
+		@click="$mgForm.run($props.config.action)"
 		v-tooltip="$props.config.tooltip"
 	>
 		<i v-if="$props.config.icon" :class="$props.config.icon"/>

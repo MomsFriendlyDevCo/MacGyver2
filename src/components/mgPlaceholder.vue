@@ -21,15 +21,15 @@ macgyver.register('mgPlaceholder', {
 });
 
 export default Vue.component('mgPlaceholder', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: undefined,
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
 	},
 	created() {
-		this.$macgyver.inject(this);
+		this.$mgForm.inject(this);
 	},
 });
 </script>

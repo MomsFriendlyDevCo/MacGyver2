@@ -30,17 +30,17 @@ macgyver.register('mgTable', {
 });
 
 export default Vue.component('mgTable', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: [],
 		newRow: [],
 		isAdding: false,
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
 	},
 	created() {
-		this.$macgyver.inject(this);
+		this.$mgForm.inject(this);
 	},
 	mounted() {
 		this.$watch('$props.config.url', ()=> {

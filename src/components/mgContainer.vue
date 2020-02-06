@@ -70,16 +70,16 @@ macgyver.register('mgContainer', {
 });
 
 export default Vue.component('mgContainer', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		highlights: {}, // Lookup of extra classes to add to widgets
 		localData: {}, // Lookup of immediate child data values, used when `$props.config.layout == 'formFloating'`
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
 	},
 	created() {
-		this.$macgyver.inject(this);
+		this.$mgForm.inject(this);
 	},
 	mounted() {
 		if (this.$props.config.collapsable) {
@@ -97,7 +97,7 @@ export default Vue.component('mgContainer', {
 
 		if (this.$props.config.layout == 'formFloating') {
 			// When in floating mode we need to keep track of child data so we copy its value into our `localData` object lookup
-			this.$macgyver.$forms[this.$props.form].$on('changeItem', v => { // Bind to parent form handler
+			this.$mgForm.$on('changeItem', v => { // Bind to parent form handler
 				if (this.$props.config.items.some(item => item.$dataPath == v.path)) { // Is this widget one of our immediate children?
 					this.$set(this.localData, v.path, v.value); // Copy its data against our local copy
 				}
@@ -120,7 +120,7 @@ export default Vue.component('mgContainer', {
 				{{widget.title}}
 			</label>
 			<div :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'">
-				<mg-component :form="$props.form" :config="widget"/>
+				<mg-component :config="widget"/>
 			</div>
 			<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
 		</div>
@@ -135,7 +135,7 @@ export default Vue.component('mgContainer', {
 						:key="verbIndex"
 						:class="[verb.class, verb.icon]"
 						v-tooltip="verb.tooltip"
-						@click="$macgyver.forms.run(form, verb.action)"
+						@click="$mgForm.run(form, verb.action)"
 					/>
 				</div>
 			</div>
@@ -151,7 +151,7 @@ export default Vue.component('mgContainer', {
 						{{widget.title}}
 					</label>
 					<div :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'">
-						<mg-component :form="$props.form" :config="widget"/>
+						<mg-component :config="widget"/>
 					</div>
 					<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
 				</div>
@@ -168,7 +168,6 @@ export default Vue.component('mgContainer', {
 		>
 			<div class="col-12">
 				<mg-component
-					:form="$props.form"
 					:config="widget"
 					class="control-input"
 					:class="!localData[widget.$dataPath] && 'blank'"
@@ -199,7 +198,7 @@ export default Vue.component('mgContainer', {
 						v-if="widget.show"
 						:class="[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]"
 					>
-						<mg-component :form="$props.form" :config="widget"/>
+						<mg-component :config="widget"/>
 						<div class="help-block" v-if="widget.help">{{widget.help}}</div>
 					</td>
 				</tr>
@@ -211,7 +210,7 @@ export default Vue.component('mgContainer', {
 			<div v-for="rowWidget in $props.config.items" :key="rowWidget.id">
 				<div v-if="rowWidget.type == 'mgContainer' && rowWidget.layout == 'query-row'" class="row">
 					<div v-for="colWidget in rowWidget.items" :key="colWidget.id" class="col mgComponent">
-						<mg-component :form="$props.form" :config="colWidget"/>
+						<mg-component :config="colWidget"/>
 					</div>
 				</div>
 				<div v-else class="alert alert-danger">

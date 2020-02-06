@@ -16,13 +16,13 @@ macgyver.register('mgQuery', {
 });
 
 export default Vue.component('mgQuery', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: undefined,
 		queryComponent: [],
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
 		spec: {type: String, default() { return {
 			_id: {type: 'objectId'},
 			name: {type: 'string'},
@@ -46,7 +46,7 @@ export default Vue.component('mgQuery', {
 		}}},
 	},
 	created() {
-		this.$macgyver.inject(this);
+		this.$mgForm.inject(this);
 
 		this.$watchAll([
 			'$props.config.url',

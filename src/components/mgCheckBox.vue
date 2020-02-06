@@ -10,15 +10,15 @@ macgyver.register('mgCheckBox', {
 });
 
 export default Vue.component('mgCheckBox', {
+	inject: ['$mgForm'],
 	data: ()=> ({
 		data: undefined,
 	}),
 	props: {
 		config: Object,
-		form: String,
 	},
 	created() {
-		this.$macgyver.inject(this);
+		this.$mgForm.inject(this);
 	},
 });
 </script>

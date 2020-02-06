@@ -22,19 +22,19 @@ macgyver.register('mgToggle', {
 });
 
 export default Vue.component('mgToggle', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: undefined,
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
 	},
 	created() {
-		this.$macgyver.inject(this);
+		this.$mgForm.inject(this);
 	},
 	methods: {
 		change(e) {
-			this.$macgyver.forms.emit(this.form, 'mgChange', this.config.id, e.value);
+			this.$mgForm.$emit('mgChange', this.config.id, e.value);
 		},
 	},
 });

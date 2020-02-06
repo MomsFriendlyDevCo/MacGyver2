@@ -16,15 +16,15 @@ macgyver.register('mgGrid', {
 });
 
 export default Vue.component('mgGrid', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: undefined,
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
 	},
 	created() {
-		this.$macgyver.inject(this);
+		this.$mgForm.inject(this);
 	},
 });
 </script>

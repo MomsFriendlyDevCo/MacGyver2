@@ -27,13 +27,21 @@ macgyver.register('mgChoiceCheckbox', {
 });
 
 export default Vue.component('mgChoiceCheckbox', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: undefined,
 		enumIter: [],
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
+	},
+	created() {
+		this.$mgForm.inject(this);
+		this.$on('mgValidate', reply => {
+			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
+		});
+
+		if (!_.isArray(this.data)) this.data = [];
 	},
 	methods: {
 		change(id) {
@@ -51,14 +59,6 @@ export default Vue.component('mgChoiceCheckbox', {
 				}
 			}
 		},
-	},
-	created() {
-		this.$macgyver.inject(this);
-		this.$on('mgValidate', reply => {
-			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
-		});
-
-		if (!_.isArray(this.data)) this.data = [];
 	},
 	watch: {
 		'$props.config.enum': {

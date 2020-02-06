@@ -22,14 +22,20 @@ macgyver.register('mgChoicePopup', {
 });
 
 export default Vue.component('mgChoicePopup', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: undefined,
 		activeTitle: undefined,
 		enumIter: [],
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
+	},
+	created() {
+		this.$mgForm.inject(this);
+		this.$on('mgValidate', reply => {
+			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
+		});
 	},
 	methods: {
 		select(id) {
@@ -57,12 +63,6 @@ export default Vue.component('mgChoicePopup', {
 			})
 				.then(form => this.$set(this, 'data', form.selected))
 		},
-	},
-	created() {
-		this.$macgyver.inject(this);
-		this.$on('mgValidate', reply => {
-			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
-		});
 	},
 	watch: {
 		data() {

@@ -13,6 +13,9 @@
 * @emits onAction Emitted as `({action, params})` when any action is fired
 */
 export default Vue.component('mgForm', {
+	provide() { return {
+		$mgForm: this,
+	}},
 	data() { return {
 		id: undefined, // Set on create
 		editing: false, // Set by mgFormEditor when its this components parent
@@ -22,7 +25,7 @@ export default Vue.component('mgForm', {
 		inRefresh: false, // Whether we are doing a refresh from the top-down, prevents recursive refreshing
 	}},
 	props: {
-		form: String,
+		form: String, // Optional overriding form ID
 		config: [Object, Array], // Can be a single object, array of objects or shorthand style
 		data: Object,
 
@@ -36,7 +39,6 @@ export default Vue.component('mgForm', {
 	},
 	created() {
 		this.id = this.id || this.$props.form || this.$macgyver.nextId();
-		this.$macgyver.injectForm(this);
 
 		this.$on('mgChange', (path, value) => {
 			if (this.inRefresh) return;
@@ -48,7 +50,18 @@ export default Vue.component('mgForm', {
 		});
 
 		this.$on('mgErrors', errors => this.errors = errors);
-		this.$on('mgForm.rebuild', ()=> this.rebuild());
+		// this.$on('mgForm.rebuild', ()=> this.rebuild()); // FIXME: Needed after new mgForm config clobber detection?
+	},
+	mounted() {
+		this.$watch('$props.config', ()=> {
+			console.log('mgForm config clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
+			this.rebuild();
+		}, {immediate: true});
+
+		this.$watch('$props.data', ()=> {
+			console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
+			this.rebuildData();
+		}, {immediate: true, deep: true});
 	},
 	methods: {
 		/**
@@ -109,19 +122,92 @@ export default Vue.component('mgForm', {
 		*/
 		getPrototype() {
 			if (!this.id) return {}; // Form not yet ready
-			return this.$macgyver.forms.getPrototype(this.id);
+			return this.$macgyver.forms.getPrototype(this.config);
 		},
-	},
-	mounted() {
-		this.$watch('$props.config', ()=> {
-			console.log('mgForm config clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
-			this.rebuild();
-		}, {immediate: true});
 
-		this.$watch('$props.data', ()=> {
-			console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
-			this.rebuildData();
-		}, {immediate: true, deep: true});
+
+		/**
+		* Execute a function within a form
+		* The default behaviour of this function is documented within the function
+		* @param {string|function} action The action(s) to execute
+		* @param {*} [context] The context of the action, defaults to the form component
+		* @param {*} [params...] Additional parameters to execute
+		* @emits mgRun Event fired at the form level only with a single object of the form `{action, params}`. Use the form property handleActions to specify if the form should handle or trap the event to override
+		*/
+		run(action, context, ...params) {
+			// 0. See if what we've been passed is already a function {{{
+			if (typeof action == 'function') {
+				return action.call(context ?? this);
+			}
+			// }}}
+
+			// 1. Emit mgRun to parents and see if they want to handle it {{{
+			var handled = false;
+			this.$emit.up.call(context ?? this, 'mgRun', {action, params}, isHandled => {
+				if (isHandled) handled = true;
+			});
+			if (handled) return;
+			// }}}
+
+			// 2. Use FORM.$props.onAction(action) and see if returns truthy {{{
+			if (this.$props.onAction && this.$props.onAction.call(context ?? this, action, ...params)) return;
+			// }}}
+
+			// 3. See if FORM.$props.actions[action] exists and if so whether it returns truthy {{{
+			var [junk, actionReadable, actionArgs] = /^([a-z0-9\_]*?)(\(.*\))?$/i.exec(action) || [];
+			if (actionReadable && this.$props.actions && this.$props.actions[actionReadable]) {
+				// Collapse strings to functions
+				var func = _.isString(this.$props.actions[actionReadable]) ? this[actionReadable]
+					: this.$props.actions[actionReadable];
+
+				// Tidy up actionArgs
+				actionArgs = (actionArgs || '')
+					.replace(/^\(/, '') // Remove preceeding '('
+					.replace(/\)$/, '') // Remove succeeding ')'
+					.split(',')
+					.map(i => i && JSON.parse(i.replace(/'/g, '"')));
+
+				if (func.apply(context ?? this, [actionArgs, ...params])) return;
+			}
+			// }}}
+
+			// 4. If all else failed and FORM.$props.actionsFallback is true - handle it via vm.$eval {{{
+			this.$macgyver.$eval.call(context ?? this, action, ...params);
+			// }}}
+		},
+
+
+		/**
+		* Inject common component functionality into a new child component
+		* @param {VueComponent} component The Vue component we should inject
+		*/
+		inject(component) {
+			component.$on('mgIdentify', reply => reply(component));
+
+			// Read in initial data value
+			if (component.$props.config.$dataPath) {
+				var refresher = ()=> {
+					component.data = _.get(component.$mgForm.formData, component.$props.config.$dataPath);
+				};
+
+				component.$on('mgRefresh', refresher);
+				component.$mgForm.$on('mgRefreshForm', refresher);
+
+				refresher();
+			} else if (component.$props.config.default) { // No data path but there IS a default - link to that instead
+				component.data = _.clone(component.$props.config.default);
+			}
+
+			// Inject data watcher which transforms change operations into emitters to the nearest parent form {{{
+			component.$watch('data', val => {
+				// Emit `mgChange` to form element
+				component.$mgForm.$emit('mgChange', component.$props.config.$dataPath, val);
+
+				// If the component also has a .onChange binding fire that
+				if (component.$props.config.onChange) component.$props.config.onChange.call(component, val);
+			});
+			// }}}
+		},
 	},
 });
 </script>

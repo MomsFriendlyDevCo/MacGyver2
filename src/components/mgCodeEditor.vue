@@ -14,15 +14,15 @@ macgyver.register('mgCodeEditor', {
 });
 
 export default Vue.component('mgCodeEditor', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: undefined,
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
 	},
 	created() {
-		this.$macgyver.inject(this);
+		this.$mgForm.inject(this);
 	},
 	beforeDestroy() {
 		this.editor.destroy();
@@ -47,12 +47,12 @@ export default Vue.component('mgCodeEditor', {
 			if (this.$props.config.convert && this.$props.config.syntax == 'json') {
 				try {
 					val = JSON.parse(val);
-					this.$macgyver.forms.emit(this.form, 'mgChange', this.$props.config.id, val)
+					this.$mgForm.$emit('mgChange', this.$props.config.id, val)
 				} catch (e) {
 					// Silently fail as the JSON is invalid
 				}
 			} else {
-				this.$macgyver.forms.emit(this.form, 'mgChange', this.$props.config.id, val)
+				this.$mgFormemit('mgChange', this.$props.config.id, val)
 			}
 			return true;
 		});

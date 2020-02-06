@@ -11,6 +11,16 @@ macgyver.register('mgError', {
 });
 
 export default Vue.component('mgError', {
+	inject: ['$mgForm'],
+	data() { return {
+		data: undefined,
+	}},
+	props: {
+		config: Object,
+	},
+	created() {
+		this.$mgForm.inject(this);
+	},
 	computed: {
 		// Mutate the incomming config back to what the original object probably was
 		displayConfig() {
@@ -19,16 +29,6 @@ export default Vue.component('mgError', {
 				|> v => _.pickBy(v, (v, k) => !k.startsWith('error'))
 				|> v => _.set(v, 'type', this.$props.config.errorWidgetType)
 		},
-	},
-	data: ()=> ({
-		data: undefined,
-	}),
-	props: {
-		config: Object,
-		form: String,
-	},
-	created() {
-		this.$macgyver.inject(this);
 	},
 });
 </script>

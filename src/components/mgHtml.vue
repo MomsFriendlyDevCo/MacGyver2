@@ -10,15 +10,15 @@ macgyver.register('mgHtml', {
 });
 
 export default Vue.component('mgHtml', {
-	data: ()=> ({
+	inject: ['$mgForm', '$mgFormEditor'],
+	data() { return {
 		data: undefined,
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
 	},
 	created() {
-		this.$macgyver.inject(this);
+		this.$mgForm.inject(this);
 	},
 });
 </script>

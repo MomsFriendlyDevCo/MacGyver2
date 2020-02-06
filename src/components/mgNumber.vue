@@ -31,12 +31,20 @@ macgyver.register('mgNumber', {
 });
 
 export default Vue.component('mgNumber', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: undefined,
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
+	},
+	created() {
+		this.$mgForm.inject(this);
+		this.$on('mgValidate', reply => {
+			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
+			if (this.$props.config.min && this.data < this.$props.config.min) return reply(`${this.$props.config.title} is too small (minimum value is ${this.$props.config.min})`);
+			if (this.$props.config.max && this.data > this.$props.config.max) return reply(`${this.$props.config.title} is too large (maximum value is ${this.$props.config.max})`);
+		});
 	},
 	methods: {
 		add(steps) {
@@ -46,14 +54,6 @@ export default Vue.component('mgNumber', {
 			if (this.$props.config.max && this.data > this.$props.config.max) this.data = this.$props.config.max;
 			if (this.$props.config.min && this.data < this.$props.config.min) this.data = this.$props.config.min;
 		},
-	},
-	created() {
-		this.$macgyver.inject(this);
-		this.$on('mgValidate', reply => {
-			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
-			if (this.$props.config.min && this.data < this.$props.config.min) return reply(`${this.$props.config.title} is too small (minimum value is ${this.$props.config.min})`);
-			if (this.$props.config.max && this.data > this.$props.config.max) return reply(`${this.$props.config.title} is too large (maximum value is ${this.$props.config.max})`);
-		});
 	},
 });
 </script>

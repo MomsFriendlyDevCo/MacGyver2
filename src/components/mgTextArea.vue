@@ -15,15 +15,15 @@ macgyver.register('mgTextArea', {
 });
 
 export default Vue.component('mgTextArea', {
-	data: ()=> ({
+	inject: ['$mgForm'],
+	data() { return {
 		data: undefined,
-	}),
+	}},
 	props: {
 		config: Object,
-		form: String,
 	},
 	created() {
-		this.$macgyver.inject(this);
+		this.$mgForm.inject(this);
 		this.$on('mgValidate', reply => {
 			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
 			if (this.$props.config.lengthMin && _.isString(this.data) && this.data.length < this.$props.config.lengthMin) return reply(`${this.$props.config.title} is too small (minimum length is ${this.$props.config.lengthMin})`);

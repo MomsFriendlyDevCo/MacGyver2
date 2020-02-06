@@ -25,7 +25,7 @@ import('./components/mgContainer');
 import('./components/mgDate');
 import('./components/mgEmail');
 import('./components/mgError');
-//... import('./components/mgFormEditor');
+import('./components/mgFormEditor');
 import('./components/mgForm');
 //... import('./components/mgGridDashboard');
 import('./components/mgGrid');
