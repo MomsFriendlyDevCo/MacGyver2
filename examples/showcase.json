@@ -114,6 +114,19 @@
 					"title": "Icon (dropdown interface)",
 					"default": "fa fa-biohazard",
 					"interface": "dropdown"
+				},
+				{
+					"id": "demoColor",
+					"type": "mgColor",
+					"title": "Color",
+					"default": "#6D9EEB"
+				},
+				{
+					"id": "demoColorOnly",
+					"type": "mgColor",
+					"interface": "colorOnly",
+					"title": "Color (color select only)",
+					"default": "#B4A7D6"
 				}
 			]
 		},

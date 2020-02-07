@@ -20,6 +20,7 @@ import('./components/mgChoicePopup'); // FIXME: Needs $prompt
 import('./components/mgChoiceRadio'); // FIXME: Not working
 import('./components/mgChoiceTags');
 import('./components/mgCode');
+import('./components/mgColor');
 import('./components/mgComponent');
 import('./components/mgContainer');
 import('./components/mgDate');
