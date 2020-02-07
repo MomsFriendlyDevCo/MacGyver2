@@ -38,6 +38,14 @@ export default {
 <template>
 	<div class="window-panes">
 		<div class="window-pane-left">
+			<mg-form
+				:config="config"
+				:data="data"
+				@change="data = $event"
+			/>
+		</div>
+
+		<div class="window-pane-right">
 			<div class="row">
 				<div class="col-12">
 					<div class="card">
@@ -78,14 +86,6 @@ export default {
 					</div>
 				</div>
 			</div>
-		</div>
-
-		<div class="window-pane-right">
-			<mg-form
-				:config="config"
-				:data="data"
-				@change="data = $event"
-			/>
 		</div>
 	</div>
 </template>
