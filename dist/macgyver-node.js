@@ -5999,7 +5999,7 @@ $macgyver.forms.setConfig = function (id, config) {
     config: {},
     data: {}
   };
-  $macgyver.$forms[id].config = $macgyver.neatenSpec(config);
+  $macgyver.$forms[id].config = $macgyver.compileSpec(config).spec;
   return $macgyver;
 };
 /**
@@ -6077,13 +6077,13 @@ $macgyver.forms.getPath = function (id, path, fallback) {
 /**
 * Compute the data prototype of the form
 * This is an empty object with all the defaults populated
-* @param {string|Object} id Either the form ID to use or the form spec object to exmaine
+* @param {Object} spec The form spec object to exmaine
 * @returns {Object} A prototype data object with all defaults populated
 */
 
 
-$macgyver.forms.getPrototype = function (id) {
-  return $macgyver.flatten(isString_1(id) ? $macgyver.$forms[id].config : id, {
+$macgyver.forms.getPrototype = function (spec) {
+  return $macgyver.flatten(spec, {
     type: 'spec',
     want: 'array',
     wantDataPath: true
@@ -6093,61 +6093,6 @@ $macgyver.forms.getPrototype = function (id) {
     $macgyver.utils.setPath(data, node.path, node["default"]);
     return data;
   }, {});
-};
-/**
-* Execute a function on a form
-* The default behaviour of this function is documented within the function
-* @param {string} id The ID of the form to execute the function on
-* @param {string} action The action to execute
-* @param {*} [context] The context of the action, defaults to the form component
-* @param {*} [params...] Additional parameters to execute
-* @emits mgRun Event fired at the form level only with a single object of the form `{action, params}`. Use the form property handleActions to specify if the form should handle or trap the event to override
-*/
-
-
-$macgyver.forms.run = function (id, action, context) {
-  var _$macgyver$$forms$id$, _$macgyver$$forms$id$2;
-
-  if (!context) context = $macgyver.$forms[id]; // 1. Emit mgRun to parents and see if they want to handle it {{{
-
-  var handled = false;
-
-  for (var _len3 = arguments.length, params = new Array(_len3 > 3 ? _len3 - 3 : 0), _key3 = 3; _key3 < _len3; _key3++) {
-    params[_key3 - 3] = arguments[_key3];
-  }
-
-  $macgyver.$forms[id].$emitUp('mgRun', {
-    action: action,
-    params: params
-  }, function (isHandled) {
-    if (isHandled) handled = true;
-  });
-  if (handled) return; // }}}
-  // 2. Use FORM.$props.onAction(action) and see if returns truthy {{{
-
-  if ($macgyver.$forms[id].$props.onAction && (_$macgyver$$forms$id$ = $macgyver.$forms[id].$props.onAction).call.apply(_$macgyver$$forms$id$, [context, action].concat(params))) return; // }}}
-  // 3. See if FORM.$props.actions[action] exists and if so whether it returns truthy {{{
-
-  var _ref2 = /^([a-z0-9\_]*?)(\(.*\))?$/i.exec(action) || [],
-      _ref3 = _slicedToArray(_ref2, 3),
-      junk = _ref3[0],
-      actionReadable = _ref3[1],
-      actionArgs = _ref3[2];
-
-  if (actionReadable && $macgyver.$forms[id].$props.actions && $macgyver.$forms[id].$props.actions[actionReadable]) {
-    // Collapse strings to functions
-    var func = isString_1($macgyver.$forms[id].$props.actions[actionReadable]) ? $macgyver.$forms[id][actionReadable] : $macgyver.$forms[id].$props.actions[actionReadable]; // Tidy up actionArgs
-
-    actionArgs = (actionArgs || '').trim('()').split(',').map(function (i) {
-      return i && JSON.parse(i.replace(/'/g, '"'));
-    });
-    if (func.apply($macgyver.$forms[id], [actionArgs].concat(params))) return;
-  } // }}}
-  // 4. If all else failed and FORM.$props.actionsFallback is true - handle it via vm.$eval {{{
-
-
-  (_$macgyver$$forms$id$2 = $macgyver.$forms[id].$eval).call.apply(_$macgyver$$forms$id$2, [context, action].concat(params)); // }}}
-
 }; // $macgyver.notify{} {{{
 
 /**
@@ -6399,11 +6344,11 @@ $macgyver.compileSpec = function (spec, options) {
       widget.errorWidgetType = widget.type;
       widget.type = 'mgError';
     } else if (settings.widgetDefaults) {
-      var _ref4, _$macgyver$widgets$wi;
+      var _ref2, _$macgyver$widgets$wi;
 
-      Object.assign(widget, (_ref4 = (_$macgyver$widgets$wi = $macgyver.widgets[widget.type].config, pickBy_1(_$macgyver$widgets$wi, function (v, k) {
+      Object.assign(widget, (_ref2 = (_$macgyver$widgets$wi = $macgyver.widgets[widget.type].config, pickBy_1(_$macgyver$widgets$wi, function (v, k) {
         return !has_1(widget, k) && has_1(v, 'default');
-      })), mapValues_1(_ref4, function (v) {
+      })), mapValues_1(_ref2, function (v) {
         return v["default"];
       })));
     } // Glue .show property to all elements that omit it
@@ -6499,9 +6444,9 @@ $macgyver.utils.fetch = function (url, options) {
   // Injection options from URL {{{
   .then(function () {
     if (isPlainObject_1(url)) {
-      var _ref5 = [url.url, url];
-      url = _ref5[0];
-      options = _ref5[1];
+      var _ref3 = [url.url, url];
+      url = _ref3[0];
+      options = _ref3[1];
     } else {
       options.url = url;
     }
@@ -6540,8 +6485,8 @@ $macgyver.utils.fetch = function (url, options) {
             v = _pair[1];
 
         if (k.startsWith('$')) {
-          session.mappings[k] = {
-            required: true,
+          session.mappings[k.substr(1)] = {
+            required: false,
             from: v
           };
           session.parsedUrl.searchParams["delete"](k);
@@ -15182,66 +15127,28 @@ if (inBrowser) {
 
 Vue$1.prototype.$macgyver = function () {
   var $macgyver$1 = $macgyver;
+  /**
+  * Generic fallback action handler
+  * @var {function} Called as `(action, params...)`
+  i*/
+
+  $macgyver$1.$eval = function () {
+    var _console;
+
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    return (_console = console).warn.apply(_console, ['Fallback $macgyver.$eval('].concat(args, [')']));
+  }; // Absorb various methods from a Vue prototype
+
 
   var vInstance = new Vue$1();
   ['$on', '$off', '$once', '$emit'].forEach(function (method) {
     return $macgyver$1[method] = vInstance[method].bind(vInstance);
-  });
-  /**
-  * Glue various MacGyver emitter handlers to a registered component
-  * Registers a few universal handles, which can be called via $macgyver.forms.emitDown(id, EVENT):
-  *   - mgIdentify - component will respond with its Vue instance
-  *   - mgRefresh - component with refresh its data state
-  *
-  * Adds a watcher which will emit `mgChange` when the `data` property changes (basically transforms the change event to `mgChange`)
-  *
-  * @param {VueInstance} component The component to register against
-  */
+  }); // Auto-bind to Axios if its defined
 
-  $macgyver$1.inject = function (component) {
-    // Sanity checks {{{
-    if (!component.$props.form) throw new Error('Cannot locate $props.form <string>, make sure that vm{props: {form: String, config: Object}} is declared'); // }}}
-
-    component.$on('mgIdentify', function (reply) {
-      return reply(component);
-    }); // Read in initial data value
-
-    if (component.$props.config.$dataPath) {
-      var refresher = function refresher() {
-        component.data = _.get($macgyver$1.$forms[component.$props.form].formData, component.$props.config.$dataPath);
-      };
-
-      component.$on('mgRefresh', refresher);
-      $macgyver$1.$forms[component.$props.form].$on('mgRefreshForm', refresher);
-      refresher();
-    } else if (component.$props.config["default"]) {
-      // No data path but there IS a default - link to that instead
-      component.data = _.clone(component.$props.config["default"]);
-    } // Inject data watcher which transforms change operations into emitters to the nearest parent form {{{
-
-
-    component.$watch('data', function (val) {
-      // Emit `mgChange` to form element
-      $macgyver$1.$forms[component.$props.form].$emit('mgChange', component.$props.config.$dataPath, val); // If the component also has a .onChange binding fire that
-
-      if (component.$props.config.onChange) component.$props.config.onChange.call(component, val);
-    }); // }}}
-  };
-  /**
-  * Registeres a MacGyver form by its generated ID
-  * @params {VueInstance} component The Vue component to register
-  */
-
-
-  $macgyver$1.injectForm = function (component) {
-    $macgyver$1.$forms[component.id] = component;
-    component.$on('mgIdentify', function (reply) {
-      return reply(component);
-    });
-  }; // Auto-bind to Axios if its defined
-
-
-  if (window.axios) $macgyver$1.$http = window.axios;
+  if ($macgyver$1.utils.global.axios) $macgyver$1.$http = $macgyver$1.utils.global.axios;
   return $macgyver$1;
 }();
 
