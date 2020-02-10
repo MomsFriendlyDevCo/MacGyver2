@@ -3,6 +3,7 @@ export default {
 	data() { return {
 		config: {},
 		examples: [
+			'examples/html.json',
 			'examples/mgQuery.json',
 			'examples/simple.json',
 			'examples/shorthand.json',
