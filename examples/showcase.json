@@ -520,6 +520,24 @@
 			]
 		},
 		{
+			"id": "containerInteraction",
+			"type": "mgContainer",
+			"layout": "card",
+			"title": "Interaction",
+			"showTitle": false,
+			"items": [
+				{
+					"id": "demoButton",
+					"title": "Button",
+					"type": "mgButton",
+					"style": "alert-danger",
+					"text": "Alert",
+					"icon": "far fa-comment",
+					"action": "alert('hello')"
+				}
+			]
+		},
+		{
 			"id": "containerQuery",
 			"type": "mgContainer",
 			"layout": "card",
