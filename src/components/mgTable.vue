@@ -15,9 +15,11 @@ macgyver.register('mgTable', {
 			type: 'mgTableEditor',
 			title: 'Column setup',
 			default: [
+				/* e.g.
 				{id: 'col1', type: 'mgText'},
 				{id: 'col2', title: 'mgText'},
 				{id: 'col3', title: 'mgText'},
+				*/
 			],
 		},
 		addButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},
