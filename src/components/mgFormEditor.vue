@@ -109,139 +109,9 @@ export default Vue.component('mgFormEditor', {
 		},
 	},
 	mounted() {
-		// Intercept all click events and trap them
-
-		// Set the form as in editing mode
-		this.$macgyver.$forms[this.id].editing = true;
-
-		// Event: Main Form > mgComponent.click (edit the widget) {{{
-		this.$macgyver.$forms[this.id].$on('mgComponent.click', (component, e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			this.editWidget(component);
+		this.$refs.form.$on('mgComponent.mouseEnter', (component, e) => {
+			this.setComponentHighlight(component, ['editHover']);
 		});
-		// }}}
-
-		// Events: Main Form > mgComponent.mouse{Down,Up,Move} {{{
-		var mainDownEvent; // {start, component} when the user clicks on something - can be converted into mgComponent.click if the user doesn't move their mouse
-		this.$macgyver.$forms[this.id].$on('mgComponent.mouseDown', (component, e) => {
-			mainDownEvent = {start: Date.now(), component};
-		});
-
-		this.$macgyver.$forms[this.id].$on('mgComponent.mouseUp', (component, e) => {
-			if (!mainDownEvent) return; // Stray click
-			this.$macgyver.$forms[this.id].$emit('mgComponent.click', component, e);
-			mainDownEvent = undefined;
-		});
-
-		this.$macgyver.$forms[this.id].$on('mgComponent.mouseMove', (component, e) => {
-			if (dragEvent) return this.$macgyver.$forms[this.id].$emit('mgComponent.dragOver', component, e);
-
-			if (!mainDownEvent) return; // Mouse not pressed anyway
-			mainDownEvent = undefined;
-			this.$macgyver.$forms[this.id].$emit('mgComponent.dragStart', component, e);
-
-			e.stopPropagation();
-			e.preventDefault();
-		});
-
-		this.$macgyver.$forms[this.id].$on('mgComponent.mouseOut', (component, e) => {
-			if (dragEvent) return this.$macgyver.$forms[this.id].$emit('mgComponent.dragLeave', component, e);
-		});
-		// }}}
-
-		// Events: Main Form > mgComponent.drag{Start,Over,Leave,Drop} {{{
-		var dragEvent; // Drag related object, if truhty we are moving something
-		this.$macgyver.$forms[this.id].$on('mgComponent.dragStart', (component, e) => {
-			var $component = $(e.target);
-			
-			// Already dragging - cancel that
-			if (dragEvent) return this.$macgyver.$forms[this.id].$emit('mgComponent.dragDrop', component, e);
-
-			dragEvent = {
-				dragable: $(
-					`<div id="mg-form-editor-drag"><i class="${this.$macgyver.widgets[component.$props.config.type].icon}"></i> ${component.$props.config.id || component.$props.config.type}</div>`
-				)
-					.appendTo('body')
-					.offset({left: e.pageX + 5, top: e.pageY + 5}),
-				mouseWatcher: e => dragEvent.dragable.offset({left: e.pageX + 5, top: e.pageY + 5}),
-				mouseAction: e => {
-					e.preventDefault();
-					e.stopPropagation();
-					this.$macgyver.$forms[this.id].$emit('mgComponent.dragDrop', component, e);
-				},
-				start: ()=> {
-					$(document)
-						.on('mousemove', dragEvent.mouseWatcher)
-						.on('mousedown', '*', dragEvent.mouseAction)
-						.on('mouseup', '*', dragEvent.mouseAction)
-
-					$('body').addClass('mg-form-editor-dragging');
-				},
-				stop: ()=> {
-					dragEvent.dragable.remove();
-					$(document)
-						.off('mousemove', dragEvent.mouseWatcher)
-						.off('mousedown', '*', dragEvent.mouseAction)
-						.off('mouseup', '*', dragEvent.mouseAction)
-
-					$('body').removeClass('mg-form-editor-dragging');
-
-					dragEvent = undefined;
-				},
-				source: component,
-				target: undefined, // Tracker for the last component the user was hovering over
-				targetLocation: undefined, // ENUM: 'before', 'after'
-			};
-
-			dragEvent.start();
-		});
-
-		this.$macgyver.$forms[this.id].$on('mgComponent.dragOver', (component, e) => {
-			e.stopPropagation(); // Don't propagate upwards into container classes
-			if (!dragEvent) return; // Not already dragging
-			var $component = $(e.target);
-			dragEvent.target = component;
-			if (e.pageY < $component.height() / 2 + $component.offset().top) { // MouseY is less than half way up the component - assume the user wants to move BEFORE
-				this.setHighlightClass(component, 'mg-form-editor-drop-target mg-form-editor-drop-target-before');
-				dragEvent.targetLocation = 'before';
-			} else { // Otherwise assume the user wants to move AFTER
-				this.setHighlightClass(component, 'mg-form-editor-drop-target mg-form-editor-drop-target-after');
-				dragEvent.targetLocation = 'after';
-			}
-		});
-
-		this.$macgyver.$forms[this.id].$on('mgComponent.dragLeave', (component, e) => {
-			if (!dragEvent) return; // Not already dragging
-			this.setHighlightClass(component, '');
-			dragEvent.target = undefined;
-		});
-
-		this.$macgyver.$forms[this.id].$on('mgComponent.dragDrop', (component, e) => {
-			if (!dragEvent) return; // Not already dragging
-
-			if (dragEvent.target) {
-				this.setHighlightClass(dragEvent.target, ''); // Remove the highlight effect
-				this.removeWidget(dragEvent.source.$props.config.$specPath);
-				this.insertWidget(dragEvent.source.$props.config, {
-					specPath: dragEvent.target.$props.config.$specPath,
-					orientation: dragEvent.targetLocation,
-				});
-			}
-			dragEvent.stop();
-		});
-		// }}}
-
-		// Events: Add Form > mgComponent.mouse{Down,Up,Move} {{{
-		this.$macgyver.$forms[`${this.id}-add`].$on('mgComponent.mouseDown', (component, e) => {
-			e.stopPropagation();
-			e.preventDefault();
-
-			setTimeout(()=> { // Let the mgForm react to the click then handle the insert
-				this.insertWidget({type: this.addData.addType});
-			}, 100);
-		});
-		// }}}
 	},
 	methods: {
 		/**
@@ -250,7 +120,7 @@ export default Vue.component('mgFormEditor', {
 		resetMode() {
 			// Deselect the existing item (if we have one)
 			if (this.editing) {
-				this.setHighlightClass(this.editing, '');
+				this.setComponentHighlight(this.editing, []);
 				this.$set(this, 'editing', undefined);
 			}
 
@@ -264,7 +134,6 @@ export default Vue.component('mgFormEditor', {
 		* @param {string} mode The mode to switch to, this can be any value supported by this.$data.mode
 		*/
 		setMode(mode) {
-			console.log('SET MODE', mode);
 			this.$set(this, 'mode', mode);
 			return true; // Signal to mgForm that we have handled this action
 		},
@@ -285,22 +154,33 @@ export default Vue.component('mgFormEditor', {
 
 
 		/**
-		* Locate a parents and its place within the mgContainer and set the mgComponent offset class
-		* @param {VueComponent} component The component class to locate
-		* @param {string} highlightClass The CSS class to add to the component
+		* Set the component.highlight[index] to the given list of CSS classes
+		* @param {VueController} component The VueController to set the highlight of within its mgContainer
+		* @param {array<string>} classes Array of string classes to set
 		*/
-		setHighlightClass(component, highlightClass) {
-			var parents = [];
-			component.$emit.up.call(component, 'mgIdentify', component => parents.push(component));
+		setComponentHighlight(component, classes) {
+			if (!_.isArray(classes)) throw new Error('setComponentHighlight must be passed an array');
 
-			var childOffset = parents[0].$children.findIndex(c => c._uid == component._uid);
+			var container = false;
+			component.$emit.up.call(component, 'mgIdentify', component => {
+				if (!container && component.$props.config.type == 'mgContainer') container = component;
+			});
+			if (!container) return console.warn('[mgFormEditor] setComponentHighlight component failed to find enclosing container');
 
-			if (!_.has(parents, [0, 'highlights'])) return; // Invalid parent to highlight
+			var childOffset = container.$children.findIndex(c => c._uid == component._uid);
 
-			parents[0].$set(parents[0].highlights, childOffset, highlightClass);
+			container.$set(container.highlights, childOffset, classes);
 		},
 
-		
+
+		/**
+		* Mutate the config of a widget by its specPath
+		*/
+		setWidget(specPath, config) {
+			console.log('MUTATE', widget, '=', config);
+		},
+
+
 		/**
 		* Edit a widget by its specPath or component
 		* @param {Object|array|string} widget The widget to edit either as a Vue component or lodash compatible path
@@ -317,7 +197,7 @@ export default Vue.component('mgFormEditor', {
 
 			this.$set(this, 'editing', component);
 			this.$set(this, 'mode', 'editing');
-			this.setHighlightClass(component, 'mg-form-editor-target');
+			this.setComponentHighlight(component, ['mg-form-editor-target']);
 
 			var widget = this.$macgyver.widgets[component.$props.config.type];
 			if (widget) {
@@ -454,12 +334,16 @@ export default Vue.component('mgFormEditor', {
 		},
 
 		rawEdit() {
-			this.$prompt.codeEditor({
-				title: `Template JSON`,
-				type: 'json',
-				body: this.config,
+			this.$prompt.macgyver({
+				title: 'Template JSON',
+				form: {
+					id: 'code',
+					type: 'mgCode',
+					syntax: 'json',
+					value: this.value,
+				},
 			})
-				.then(res => this.$set(this, 'config', JSON.parse(res)))
+				.then(form => this.$set(this, 'config', JSON.parse(form.code)))
 		},
 	},
 });
@@ -479,7 +363,7 @@ export default Vue.component('mgFormEditor', {
 		<!-- Aside widget library (add widget) {{{ -->
 		<aside :class="[mode == 'adding' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeAdding]">
 			<mg-form
-				:form="`${id}-add`"
+				ref="formAdd"
 				:config="addConfig"
 				:data="addData"
 				:actions="{resetMode}"
@@ -499,7 +383,7 @@ export default Vue.component('mgFormEditor', {
 		<!-- }}} -->
 
 		<mg-form
-			:form="id"
+			ref="form"
 			:config="$props.config"
 			:data="$props.data"
 		/>

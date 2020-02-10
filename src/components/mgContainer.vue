@@ -72,7 +72,7 @@ macgyver.register('mgContainer', {
 export default Vue.component('mgContainer', {
 	inject: ['$mgForm'],
 	data() { return {
-		highlights: {}, // Lookup of extra classes to add to widgets
+		highlights: {}, // Lookup of extra classes to add to widgets, each key is the array offset of the widget within this container, the value is an array of classes to add
 		localData: {}, // Lookup of immediate child data values, used when `$props.config.layout == 'formFloating'`
 	}},
 	props: {
@@ -114,7 +114,7 @@ export default Vue.component('mgContainer', {
 			:key="widget.id"
 			v-if="widget.show"
 			class="form-group row mgComponent"
-			:class="[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]"
+			:class="[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])"
 		>
 			<label v-if="widget.showTitle || $props.config.showTitles" class="col-form-label text-left col-sm-3">
 				{{widget.title}}
@@ -145,7 +145,7 @@ export default Vue.component('mgContainer', {
 					:key="widget.id"
 					v-if="widget.show"
 					class="form-group row mgComponent"
-					:class="[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]"
+					:class="[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])"
 				>
 					<label v-if="widget.showTitle || $props.config.showTitles" class="col-form-label text-left col-sm-3">
 						{{widget.title}}
@@ -164,7 +164,7 @@ export default Vue.component('mgContainer', {
 			:key="widget.id"
 			v-if="widget.show"
 			class="form-group mgContainer-formFloating row mgComponent"
-			:class="[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]"
+			:class="[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])"
 		>
 			<div class="col-12">
 				<mg-component
@@ -196,7 +196,7 @@ export default Vue.component('mgContainer', {
 						v-for="(widget, widgetIndex) in $props.config.items"
 						:key="widget.id"
 						v-if="widget.show"
-						:class="[highlights[widgetIndex], widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass]"
+						:class="[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])"
 					>
 						<mg-component :config="widget"/>
 						<div class="help-block" v-if="widget.help">{{widget.help}}</div>
