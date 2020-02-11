@@ -129,7 +129,7 @@ export default Vue.component('mgContainer', {
 				} else if (v._uid == child._uid) { // Found by UID
 					return {...t, found: true};
 				} else if (v.$mgForm) { // Is an mgComponent {
-					return {...t, mgIndex: t.mgIndex++};
+					return {...t, mgIndex: t.mgIndex + 1};
 				} else { // Implied else - regular Vue component - skip incrementing when calculating the offset
 					return t;
 				}
