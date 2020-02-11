@@ -6,7 +6,7 @@ macgyver.register('mgTextArea', {
 	preferId: true,
 	config: {
 		rows: {type: 'mgNumber', title: 'Line height', default: 3},
-		lengthMin: {type: 'mgNumber', title: 'Minimum Length'},
+		lengthMin: {type: 'mgNumber', title: 'Minimum Length', min: 0},
 		lengthMax: {type: 'mgNumber', title: 'Maximum Length'},
 		placeholder: {type: 'mgTextArea', help: 'Ghost text to display when there is no value'},
 		required: {type: 'mgToggle', default: false},

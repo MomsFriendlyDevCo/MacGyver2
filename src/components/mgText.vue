@@ -5,7 +5,7 @@ macgyver.register('mgText', {
 	category: 'Simple Inputs',
 	preferId: true,
 	config: {
-		lengthMin: {type: 'mgNumber', title: 'Minimum Length'},
+		lengthMin: {type: 'mgNumber', title: 'Minimum Length', min: 0},
 		lengthMax: {type: 'mgNumber', title: 'Maximum Length'},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
 		required: {type: 'mgToggle', default: false},
