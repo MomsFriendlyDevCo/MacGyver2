@@ -49,7 +49,7 @@ export default Vue.component('mgFormEditor', {
 						showTitle: false,
 						rowClass: 'aside-actions',
 						items: [
-							{type: 'mgButton', action: 'resetMode', text: '', icon: '', class: 'btn btn-link btn-xs far fa-times'},
+							{type: 'mgButton', action: 'setMode', text: '', icon: '', class: 'btn btn-link btn-xs far fa-times'},
 						],
 					},
 				],
@@ -97,7 +97,7 @@ export default Vue.component('mgFormEditor', {
 				return [
 					{
 						type: 'mgButton',
-						action: "resetMode()",
+						action: "setMode()",
 						class: 'btn btn-primary',
 						icon: 'fa fa-mouse-pointer fa-fw',
 						showTitle: false,
@@ -178,7 +178,6 @@ export default Vue.component('mgFormEditor', {
 			var childOffset = container.findChildIndex(component);
 			if (childOffset === false) return console.warn('[mgFormEditor]', 'Cannot locate component within container', {container, component});
 
-			console.log('Set container offset', childOffset, '=', classes);
 			container.$set(container.highlights, childOffset, classes);
 		},
 
@@ -262,7 +261,7 @@ export default Vue.component('mgFormEditor', {
 			this.$emit('changeItem', path, value);
 		},
 
-		
+
 		/**
 		* Insert a widget at a given path
 		* @param {Object} widget The widget to insert
@@ -334,20 +333,92 @@ export default Vue.component('mgFormEditor', {
 		* @param {string|array} specPath The lodash notation specPath to remove
 		*/
 		removeWidget(specPath) {
-			var widgetPath = _.isString(specPath) ? ['config'].concat(specPath.split('.')) : `config.${specPath}`;
-			var widgetGrandParent = _.get(this.$props, widgetPath.slice(0, -2));
-			var widgetGrandParentIndex = widgetPath.slice(-2, -1)[0];
-			var widgetParent = _.get(this.$props, widgetPath.slice(0, -1));
-			var widgetTargetIndex = widgetPath.slice(-1)[0];
+			this.setMode(); // Reset mode to close edit panel
 
-			if (!_.isArray(widgetParent)) throw 'Widget parent is not an array';
+			var parentItems = _.isArray(specPath) ? specPath : specPath.split('.');
+			var targetIndex = parentItems.pop();
 
-			this.$set(widgetGrandParent, widgetGrandParentIndex, widgetParent.filter((v, k) => k != widgetTargetIndex));
-
-			if (_.get(this, ['editing', '$props', 'config', '$specPath']) == specPath) this.setMode(); // User editing this widget - reset back to normal mode
-
-			this.$emit.down('mgForm.rebuild'); // Tell the mgForm under us to rebuild itself
+			this.mutatePath(
+				parentItems,
+				_.get(this.config, parentItems).filter((v, i) => i != targetIndex),
+			);
 		},
+
+
+		/**
+		* Duplicate a widget by its specPath
+		* @param {string|array} specPath The lodash notation specPath to remove
+		*/
+		duplicateWidget(specPath) {
+			var parentItems = _.isArray(specPath) ? specPath : specPath.split('.');
+			var targetIndex = parentItems.pop();
+
+			this.setMode(); // Reset mode to close edit panel
+			this.mutatePath(
+				parentItems,
+				_(_.get(this.config, parentItems))
+					.map((v, i) => i == targetIndex // Duplicate this item when we find its index
+						? [
+							v, // Original object
+							_.chain(v)
+								.cloneDeep()
+								.pickBy((v, k) => !k.startsWith('$'))
+								.set('id', this.$macgyver.utils.incrementId(v.id)) // Also increment its ID
+								.value(),
+						]
+						: v
+					)
+					.flatten()
+					.value()
+			);
+		},
+
+
+		/**
+		* Move a widget in a given direction
+		* @param {string|array} specPath The lodash notation SpecPath to move
+		* @param {string} direction The direction to move. ENUM: 'up', 'down'
+		*/
+		moveWidget(specPath, direction) {
+			if (!['up', 'down'].includes(direction)) throw new Error('Unsupported direction');
+
+			var parentItems = _.isArray(specPath) ? specPath : specPath.split('.');
+			var targetIndex = parentItems.pop();
+
+			this.setMode(); // Reset mode to close edit panel
+			this.mutatePath(
+				parentItems,
+				_.chain(_.get(this.config, parentItems))
+					.clone()
+					.thru(v => {
+						if (direction == 'up' && targetIndex > 0) {
+							[v[targetIndex], v[targetIndex-1]]
+							=
+							[v[targetIndex-1], v[targetIndex]]
+						} else if (direction == 'down' && targetIndex < v.length) {
+							console.log('SWAP', targetIndex, targetIndex + 1);
+							[v[targetIndex], v[targetIndex+1]]
+							=
+							[v[targetIndex+1], v[targetIndex]]
+						}
+						return v;
+					})
+					.tap(v => {
+						console.log('WILL USE ORDER', v);
+					})
+					.value()
+			);
+		},
+
+
+		/**
+		* Begin drag sequence for a widget
+		* @param {string|array} specPath The lodash notation SpecPath to drag
+		*/
+		dragWidget(specPath) {
+			console.warn('FIXME: dragWidget() not yet supported');
+		},
+
 
 		rawEdit() {
 			this.$prompt.macgyver({
@@ -414,6 +485,8 @@ export default Vue.component('mgFormEditor', {
 :root {
 	--mg-form-editor-selected-bg: #007bff;
 	--mg-form-editor-selected-fg: #fff;;
+	--mg-form-editor-selected-highlight: #5dabff;
+	--mg-form-editor-selected-danger: #dc3545;
 	--mg-form-editor-hover-bg: #77b9ff;
 	--mg-form-editor-hover-fg: #fff;
 }

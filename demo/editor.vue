@@ -96,6 +96,7 @@ a {
 	position: fixed;
 	left: 10px;
 	width: calc(50% - 20px);
+	z-index: 100; /* Place above right so the sidepanel is visible */
 }
 
 .window-panes > .window-pane-right {

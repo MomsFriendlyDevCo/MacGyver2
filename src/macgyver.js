@@ -659,4 +659,23 @@ $macgyver.utils.getPath = (target, path, fallback) => {
 };
 
 
+/**
+* Attempt to increment a string ID
+* This is usually used when we have a base ID and want to duplicate the widget
+* If ID is blank, blank is returned (assumes base parent also has no ID)
+* @param {string} str The string to increment
+* @returns {string} An incremented version of str
+*/
+$macgyver.utils.incrementId = str => {
+	if (!str) {
+		return str;
+	} else if (/[0-9]$/.test(str)) { // Ends in a number
+		var extracted = /^(?<prefix>.*)(?<numeric>[0-9]+)$/.exec(str); // Extract numeric suffix
+		return extracted.groups.prefix + (parseInt(extracted.groups.prefix) + 1);
+	} else { // No idea - just append '2'
+		return str + '2';
+	}
+};
+
+
 export default $macgyver;

@@ -1,12 +1,8 @@
 <script>
 export default Vue.component('mgFormEditorControls', {
 	inject: ['$mgFormEditor'],
-	data() { return {
-	}},
 	props: {
 		config: {type: Object, required: true},
-	},
-	methods: {
 	},
 });
 </script>
@@ -17,6 +13,17 @@ export default Vue.component('mgFormEditorControls', {
 	>
 		<div class="mg-form-editor-controls-title">
 			{{$props.config.type}}
+			<span v-if="$props.config.id" class="mg-form-editor-controls-id">
+				#{{$props.config.id}}
+			</span>
+		</div>
+		<div class="mg-form-editor-controls-buttons">
+			<!-- FIXME: Not yet working <a @click="$mgFormEditor.insertWidget($props.config.$specPath)" class="far fa-plus" v-tooltip="'Insert widget after here'"/> -->
+			<!-- FIXME: Not yet working <a @click="$mgFormEditor.dragWidget($props.config.$specPath)" class="far fa-arrows-alt" v-tooltip="'Move widget'"/> -->
+			<a @click="$mgFormEditor.moveWidget($props.config.$specPath, 'up')" class="far fa-arrow-up" v-tooltip="'Move widget up'"/>
+			<a @click="$mgFormEditor.moveWidget($props.config.$specPath, 'down')" class="far fa-arrow-down" v-tooltip="'Move widget down'"/>
+			<a @click="$mgFormEditor.duplicateWidget($props.config.$specPath)" class="far fa-clone" v-tooltip="'Duplicate widget'"/>
+			<a @click="$mgFormEditor.removeWidget($props.config.$specPath)" class="far fa-trash danger" v-tooltip="'Delete widget'"/>
 		</div>
 	</div>
 </template>
@@ -43,26 +50,62 @@ export default Vue.component('mgFormEditorControls', {
 
 /* Edit controls {{{ */
 .mg-form-editor-controls {
-	pointer-events: none;
 	position: absolute;
 	transform: translate(2px, -30px);
+	width: calc(100% - 20px);
+}
+
+/* Title {{{ */
+.mg-form-editor-controls .mg-form-editor-controls-title,
+.mg-form-editor-controls .mg-form-editor-controls-buttons {
 	border-top-left-radius: 5px;
 	border-top-right-radius: 5px;
 	padding: 2px 8px;
 }
 
-.mg-component.editHover .mg-form-editor-controls {
+.mg-form-editor-controls .mg-form-editor-controls-title {
+	display: inline-block;
+}
+
+.mg-component.editHover .mg-form-editor-controls-title {
 	background: var(--mg-form-editor-hover-bg);
 	color: var(--mg-form-editor-hover-fg);
 }
 
-.mg-component.editEditing .mg-form-editor-controls {
+.mg-component.editEditing .mg-form-editor-controls-title {
 	background: var(--mg-form-editor-selected-bg);
 	color: var(--mg-form-editor-selected-fg);
 }
 
-.mg-form-editor-controls .mg-form-editor-controls-title {
+.mg-component .mg-form-editor-controls-title .mg-form-editor-controls-id {
+	font-weight: bold;
+}
+/* }}} */
+
+/* Buttons {{{ */
+.mg-form-editor-controls .mg-form-editor-controls-buttons {
+	display: none;
+	float: right;
+	background: var(--mg-form-editor-selected-bg);
+	color: var(--mg-form-editor-selected-fg);
+}
+
+.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons {
 	display: inline-block;
 }
+
+.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons > a {
+	border-radius: 50%;
+	padding: 4px 5px;
+}
+
+.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons > a:hover {
+	background: var(--mg-form-editor-selected-highlight);
+}
+
+.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons > a.danger:hover {
+	background: var(--mg-form-editor-selected-danger);
+}
+/* }}} */
 /* }}} */
 </style>
