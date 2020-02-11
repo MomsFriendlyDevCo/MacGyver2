@@ -10,7 +10,7 @@
 * @param {boolean} [options.needAllLock=true] WHether, after seeing all paths, we ALWAYS route to the callback in future, even if the values become undefined. Set to falsy to always check for the paths presence
 * @param {boolean} [options.preventLoops=true] Assume that the watcher can effect a peer expression and that we should not keep retriggering this watch expression
 */
-Vue.prototype.$watchAll = function(props, callback, options) {
+export default Vue.prototype.$watchAll = function(props, callback, options) {
 	var settings = {
 		needAll: false,
 		needAllLock: true,
@@ -46,7 +46,5 @@ Vue.prototype.$watchAll = function(props, callback, options) {
 
 	// Run handler immediately if needed
 	if (settings.immediate) handler();
-}
-
-export default {};
+};
 </script>

@@ -11,6 +11,9 @@ import mgFormEditorControls from './mgFormEditorControls';
 * @param {string} [asideClassModeNormal="aside-sm"] Class to associate with the smaller toolkit display when editing
 * @param {string} [asideClassModeAdding=""] Class to associate with the editing sidebar when adding
 * @param {string} [asideClassModeEditing=""] Class to associate with the editing sidebar when editing
+*
+* @emits change Emitted as `(config)` on any item configuration change. WARNING, subscribing to this involves an entire deep copy of the config structure, subscribe to changeItem if possible
+* @emits changeItem Emitted as `({path, value})` when a single config item changes, inexpensive compared to `change`
 */
 export default Vue.component('mgFormEditor', {
 	provide() { return {
@@ -167,7 +170,7 @@ export default Vue.component('mgFormEditor', {
 			if (!_.isArray(classes)) throw new Error('setComponentHighlight must be passed an array');
 
 			var container = false;
-			component.$emitUp('mgIdentify', component => {
+			component.$emit.up('mgIdentify', component => {
 				if (!container && component.$props.config.type == 'mgContainer') container = component;
 			});
 			if (!container) return console.warn('[mgFormEditor] setComponentHighlight component failed to find enclosing container', {component});
@@ -177,14 +180,6 @@ export default Vue.component('mgFormEditor', {
 
 			console.log('Set container offset', childOffset, '=', classes);
 			container.$set(container.highlights, childOffset, classes);
-		},
-
-
-		/**
-		* Mutate the config of a widget by its specPath
-		*/
-		setWidget(specPath, config) {
-			console.log('MUTATE', widget, '=', config);
 		},
 
 
@@ -250,6 +245,23 @@ export default Vue.component('mgFormEditor', {
 			}
 		},
 
+
+		/**
+		* Change the value of a nested config path
+		* @param {string} path The dotted / array notation path to mutate
+		* @param {*} value The value to set, if undefined the key is removed
+		*/
+		mutatePath(path, value) {
+			// Only bother cloning the entire object if something is listening to 'change'
+			if (this.$emit.hasListeners('change')) {
+				var configCopy = _.cloneDeep(this.config);
+				this.$setPath(configCopy, path, value);
+				this.$emit('change', configCopy);
+			}
+
+			this.$emit('changeItem', path, value);
+		},
+
 		
 		/**
 		* Insert a widget at a given path
@@ -313,7 +325,7 @@ export default Vue.component('mgFormEditor', {
 				this.$props.config.items.push(widget);
 			}
 
-			this.$emit.down.call(this, 'mgForm.rebuild'); // Tell the mgForm under us to rebuild itself
+			this.$emit.down('mgForm.rebuild'); // Tell the mgForm under us to rebuild itself
 		},
 
 
@@ -334,7 +346,7 @@ export default Vue.component('mgFormEditor', {
 
 			if (_.get(this, ['editing', '$props', 'config', '$specPath']) == specPath) this.setMode(); // User editing this widget - reset back to normal mode
 
-			this.$emit.down.call(this, 'mgForm.rebuild'); // Tell the mgForm under us to rebuild itself
+			this.$emit.down('mgForm.rebuild'); // Tell the mgForm under us to rebuild itself
 		},
 
 		rawEdit() {
@@ -382,15 +394,18 @@ export default Vue.component('mgFormEditor', {
 				:config="editConfig"
 				:data="editData"
 				:actions="{setMode, deleteWidget}"
+				@changeItem="mutatePath(`${editing.config.$specPath}.${$event.path}`, $event.value)"
 			/>
 		</aside>
 		<!-- }}} -->
 
+		<!-- Display form {{{ -->
 		<mg-form
 			ref="form"
 			:config="$props.config"
 			:data="$props.data"
 		/>
+		<!-- }}} -->
 	</div>
 </template>
 

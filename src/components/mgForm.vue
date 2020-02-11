@@ -202,7 +202,7 @@ export default Vue.component('mgForm', {
 				};
 
 				component.$on('mgRefresh', refresher);
-				component.$mgForm.$on('mgRefreshForm', refresher);
+				this.$on('mgRefreshForm', refresher);
 
 				refresher();
 			} else if (component.$props.config.default) { // No data path but there IS a default - link to that instead
@@ -212,7 +212,7 @@ export default Vue.component('mgForm', {
 			// Inject data watcher which transforms change operations into emitters to the nearest parent form {{{
 			component.$watch('data', val => {
 				// Emit `mgChange` to form element
-				component.$mgForm.$emit('mgChange', component.$props.config.$dataPath, val);
+				this.$emit('mgChange', component.$props.config.$dataPath, val);
 
 				// If the component also has a .onChange binding fire that
 				if (component.$props.config.onChange) component.$props.config.onChange.call(component, val);
