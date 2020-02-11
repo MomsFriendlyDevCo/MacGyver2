@@ -1,4 +1,5 @@
 <script>
+import mgFormEditorControls from './mgFormEditorControls';
 /**
 * mg-form-editor - Drag-and-drop form designer for MacGyver
 *
@@ -15,6 +16,9 @@ export default Vue.component('mgFormEditor', {
 	provide() { return {
 		$mgFormEditor: this,
 	}},
+	components: {
+		mgFormEditorControls,
+	},
 	data() { return {
 		mode: 'normal', // ENUM: normal, editing, adding
 		id: this.$macgyver.nextId(), // ID of the editing form item
@@ -109,31 +113,32 @@ export default Vue.component('mgFormEditor', {
 		},
 	},
 	mounted() {
-		this.$refs.form.$on('mgComponent.mouseEnter', (component, e) => {
-			this.setComponentHighlight(component, ['editHover']);
+		this.$refs.form.$on('mgContainer.click', (container, componentIndex, e) => {
+			e.stopPropagation();
+			e.preventDefault();
+			this.editWidget(container.$refs[`child-${componentIndex}`][0]);
+		});
+
+		this.$refs.form.$on('mgContainer.mouseEnter', (container, componentIndex, e) => {
+			container.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).concat(['editHover']));
+		});
+
+		this.$refs.form.$on('mgContainer.mouseLeave', (container, componentIndex, e) => {
+			container.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).filter(c => c != 'editHover'));
 		});
 	},
 	methods: {
 		/**
 		* Stop editing / adding and return to regular mode
+		* @param {string} [mode="normal"] Mode to switch to
 		*/
-		resetMode() {
+		setMode(mode = 'normal') {
 			// Deselect the existing item (if we have one)
 			if (this.editing) {
 				this.setComponentHighlight(this.editing, []);
-				this.$set(this, 'editing', undefined);
+				this.editing = undefined;
 			}
 
-			this.$set(this, 'mode', 'normal');
-			return true; // Signal to mgForm that we have handled this action
-		},
-
-
-		/**
-		* Switch to a specific mode
-		* @param {string} mode The mode to switch to, this can be any value supported by this.$data.mode
-		*/
-		setMode(mode) {
 			this.$set(this, 'mode', mode);
 			return true; // Signal to mgForm that we have handled this action
 		},
@@ -162,13 +167,15 @@ export default Vue.component('mgFormEditor', {
 			if (!_.isArray(classes)) throw new Error('setComponentHighlight must be passed an array');
 
 			var container = false;
-			component.$emit.up.call(component, 'mgIdentify', component => {
+			component.$emitUp('mgIdentify', component => {
 				if (!container && component.$props.config.type == 'mgContainer') container = component;
 			});
-			if (!container) return console.warn('[mgFormEditor] setComponentHighlight component failed to find enclosing container');
+			if (!container) return console.warn('[mgFormEditor] setComponentHighlight component failed to find enclosing container', {component});
 
-			var childOffset = container.$children.findIndex(c => c._uid == component._uid);
+			var childOffset = container.findChildIndex(component);
+			if (childOffset === false) return console.warn('[mgFormEditor]', 'Cannot locate component within container', {container, component});
 
+			console.log('Set container offset', childOffset, '=', classes);
 			container.$set(container.highlights, childOffset, classes);
 		},
 
@@ -183,21 +190,18 @@ export default Vue.component('mgFormEditor', {
 
 		/**
 		* Edit a widget by its specPath or component
-		* @param {Object|array|string} widget The widget to edit either as a Vue component or lodash compatible path
+		* @param {VueComponent} component The VueComponent to edit either as a Vue component or lodash compatible path
 		*/
-		editWidget(widget) {
+		editWidget(component) {
 			var component; // The Vue component from the widget path
-			if (_.isObject(widget)) {
-				component = widget;
-			} else {
-				throw 'FIXME: editWidget(path) with string / array notation is not yet supported';
-			}
+			if (!_.isObject(component) || !component._uid) throw new Error('editWidget() requires a VueComponent');
 
-			this.resetMode();
+			this.setMode();
 
 			this.$set(this, 'editing', component);
 			this.$set(this, 'mode', 'editing');
-			this.setComponentHighlight(component, ['mg-form-editor-target']);
+
+			this.setComponentHighlight(component, ['editEditing']);
 
 			var widget = this.$macgyver.widgets[component.$props.config.type];
 			if (widget) {
@@ -219,7 +223,7 @@ export default Vue.component('mgFormEditor', {
 								rowClass: 'aside-actions',
 								items: [
 									{type: 'mgButton', action: 'deleteWidget', class: 'btn btn-link btn-link-danger btn-xs', icon: 'far fa-trash', tooltip: 'Delete this widget'},
-									{type: 'mgButton', action: 'resetMode', text: '', icon: '', class: 'btn btn-link btn-xs far fa-times'},
+									{type: 'mgButton', action: 'setMode', text: '', icon: '', class: 'btn btn-link btn-xs far fa-times'},
 								],
 							},
 						],
@@ -242,7 +246,7 @@ export default Vue.component('mgFormEditor', {
 				);
 			} else {
 				this.$macgyver.notify.warn(`Cannot edit unknown widget "${component.$props.config.type}"`);
-				this.resetMode();
+				this.setMode();
 			}
 		},
 
@@ -328,7 +332,7 @@ export default Vue.component('mgFormEditor', {
 
 			this.$set(widgetGrandParent, widgetGrandParentIndex, widgetParent.filter((v, k) => k != widgetTargetIndex));
 
-			if (_.get(this, ['editing', '$props', 'config', '$specPath']) == specPath) this.resetMode(); // User editing this widget - reset back to normal mode
+			if (_.get(this, ['editing', '$props', 'config', '$specPath']) == specPath) this.setMode(); // User editing this widget - reset back to normal mode
 
 			this.$emit.down.call(this, 'mgForm.rebuild'); // Tell the mgForm under us to rebuild itself
 		},
@@ -356,7 +360,7 @@ export default Vue.component('mgFormEditor', {
 			<mg-form
 				:form="`${id}-normal`"
 				:config="$props.generalVerbs"
-				:actions="{resetMode, setMode}"
+				:actions="{setMode, setMode}"
 			/>
 		</aside>
 		<!-- }}} -->
@@ -366,7 +370,7 @@ export default Vue.component('mgFormEditor', {
 				ref="formAdd"
 				:config="addConfig"
 				:data="addData"
-				:actions="{resetMode}"
+				:actions="{setMode}"
 			/>
 		</aside>
 		<!-- }}} -->
@@ -377,7 +381,7 @@ export default Vue.component('mgFormEditor', {
 				:form="`${id}-edit`"
 				:config="editConfig"
 				:data="editData"
-				:actions="{resetMode, deleteWidget}"
+				:actions="{setMode, deleteWidget}"
 			/>
 		</aside>
 		<!-- }}} -->
@@ -391,6 +395,15 @@ export default Vue.component('mgFormEditor', {
 </template>
 
 <style>
+/* Variables {{{ */
+:root {
+	--mg-form-editor-selected-bg: #007bff;
+	--mg-form-editor-selected-fg: #fff;;
+	--mg-form-editor-hover-bg: #77b9ff;
+	--mg-form-editor-hover-fg: #fff;
+}
+/* }}} */
+
 /* Aside styles - .mgfe-aside {{{ */
 .mgfe-aside {
 	transition: transform 0.2s ease-out;
@@ -499,6 +512,7 @@ export default Vue.component('mgFormEditor', {
 /* }}} */
 
 /* Component highlighting {{{
+
 /* Highlight applied to active elements inside an mgContainer */
 .mg-form-editor-target {
 	border: 2px solid var(--blue);

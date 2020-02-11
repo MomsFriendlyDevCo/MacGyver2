@@ -11,6 +11,17 @@
 * @emits change Emitted as `(data)` whenever any data changes
 * @emits changeItem Emitted as `({path, value})` when any single item changes
 * @emits onAction Emitted as `({action, params})` when any action is fired
+* @emits mgComponent.click Emitted as `(component, event)` on native clicks of a component
+* @emits mgComponent.mouseDown Emitted as `(component, event)` on the native mouseDown event of a component
+* @emits mgComponent.mouseUp Emitted as `(component, event)` on the native mouseUp event of a component
+* @emits mgComponent.mouseMove Emitted as `(component, event)` on the native mouseMove event of a component
+* @emits mgComponent.mouseEnter Emitted as `(component, event)` on the native mouseEnter event of a component
+* @emits mgComponent.mouseLeave Emitted as `(component, event)` on the native mouseLeave event of a component
+* @emits mgComponent.mouseOver Emitted as `(component, event)` on the native mouseOver event of a component
+* @emits mgComponent.mouseOut Emitted as `(component, event)` on the native mouseOut event of a component
+* @emits mgContainer.click Emitted as `(container, componentIndex, event)` on the native click event of a component within a container
+* @emits mgContainer.mouseEnter Emitted as `(container, componentIndex, event)` on the native mouseEnter event of a component within a container
+* @emits mgContainer.mouseLeave Emitted as `(container, componentIndex, event)` on the native mouseLeave event of a component within a container
 */
 export default Vue.component('mgForm', {
 	provide() { return {

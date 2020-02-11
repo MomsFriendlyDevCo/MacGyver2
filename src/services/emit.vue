@@ -41,6 +41,15 @@ Vue.prototype.$emit.up = function(msg, ...payload) {
 	}
 };
 
+Vue.prototype.$emitUp = function(msg, ...payload) {
+	if (!this || !this.$parent) throw new Error('Unable to $emit.up() on non Vue component');
+	var node = this;
+	while (node.$parent) {
+		node = node.$parent;
+		node.$emit.call(node, msg, ...payload);
+	}
+};
+
 
 /**
 * Extend the base Vue.prototype.$emit with promise support
