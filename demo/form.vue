@@ -129,6 +129,7 @@ a {
 	position: fixed;
 	left: 10px;
 	width: calc(50% - 20px);
+	z-index: 100;
 }
 
 .window-panes > .window-pane-right {
