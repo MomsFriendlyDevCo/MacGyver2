@@ -474,6 +474,12 @@
 					"syntax": "json",
 					"convert": "true",
 					"default": {"foo": 1, "bar": {"baz": [2, 3, "hello"]}}
+				},
+				{
+					"id": "demoWysiwyg",
+					"type": "mgWysiwyg",
+					"title": "WYSIWYG",
+					"default": "<h1>Hello</h1><p>Hello <strong>world</strong></p>"
 				}
 			]
 		},
