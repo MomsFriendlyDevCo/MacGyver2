@@ -512,7 +512,7 @@ export default Vue.component('mgFormEditor', {
 	bottom: 0px;
 	background: #FFF;
 	z-index: 100;
-	box-shadow: 0 1px 40px rgba(0,0,0,.3);
+	box-shadow: 0 1px 5px rgba(0,0,0,.3);
 	width: 350px;
 	transform: translateX(380px);
 }
