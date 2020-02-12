@@ -11,8 +11,7 @@ export default {
 			'examples/showcase.json',
 			'examples/showIf.json',
 		],
-		example: 'examples/showcase.json',
-		// example: 'examples/mgQuery.json',
+		example: this.$route.query.example || 'examples/showcase.json',
 	}},
 	methods: {
 		randomizeData() {
@@ -26,6 +25,8 @@ export default {
 		example: {
 			immediate: true,
 			handler() {
+				this.$router.push({query: {...this.$route.query, example: this.example}});
+
 				this.$http.get(this.example)
 					.then(res => {
 						this.data = {};
@@ -41,9 +42,15 @@ export default {
 	<div class="window-panes">
 		<div class="window-pane-left">
 			<mg-form
+				v-if="!$route.query.edit"
 				:config="config"
 				:data="data"
 				@change="data = $event"
+			/>
+			<mg-form-editor
+				v-else
+				:config="config"
+				@change="config = $event"
 			/>
 		</div>
 

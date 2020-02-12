@@ -12,10 +12,16 @@ export default {
 		<div class="collapse navbar-collapse" id="navbarAreas">
 			<ul class="navbar-nav">
 				<li class="navbar-item mr-1">
-					<a :class="$route.path == '/' ? 'btn btn-primary' : 'btn btn-light'" href="/">Form view</a>
+					<a
+						:class="$route.path == '/' && !$route.query.edit ? 'btn btn-primary text-white' : 'btn btn-light'"
+						@click="$router.push({query: {...$route.query, edit: undefined}})"
+					>Form view</a>
 				</li>
 				<li class="navbar-item">
-					<a :class="$route.path == '/editor' ? 'btn btn-primary' : 'btn btn-light'" href="/#/editor">Editor</a>
+					<a
+						:class="$route.path == '/' && $route.query.edit  ? 'btn btn-primary text-white' : 'btn btn-light'"
+						@click="$router.push({query: {...$route.query, edit: 1}})"
+					>Editor</a>
 				</li>
 			</ul>
 		</div>
