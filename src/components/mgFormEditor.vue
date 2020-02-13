@@ -242,6 +242,7 @@ export default Vue.component('mgFormEditor', {
 					{ // Body area
 						type: 'mgContainer',
 						layout: 'form',
+						formClass: 'titles-above',
 						rowClass: 'aside-body',
 						showTitle: false,
 						items: _.map(widget.config, (v, k) => _.set(v, 'id', k)),
@@ -618,11 +619,11 @@ export default Vue.component('mgFormEditor', {
 /* Body {{{ */
 .mgfe-aside .aside-body {
 	margin-left: 0;
-	margin: 10px 0;
+	margin: 10px 0 0;
 
 	/* Body scrolling */
 	overflow: auto;
-	height: calc(100vh - 100px);
+	height: calc(100vh - 80px);
 }
 /* }}} */
 /* }}} */

@@ -38,6 +38,16 @@ macgyver.register('mgContainer', {
 				{id: 'query', title: 'Query constructor'},
 			],
 		},
+		formClass: {
+			type: 'mgChoiceDropdown',
+			title: 'Form style',
+			showIf: {layout: {$in: ['form', 'card']}},
+			default: 'normal',
+			enum: [
+				{id: 'normal', title: 'Normal'},
+				{id: 'titles-above', title: 'Titles above'},
+			],
+		},
 		showTitles: {type: 'mgToggle', default: true, help: 'Show titles for fields', showIf: {layout: {$in: ['form', 'card']}}},
 		columnHeaders: {type: 'mgToggle', default: false, help: 'Show column headers', showIf: "layout == 'columns'"},
 		collapsable: {type: 'mgToggle', default: false, help: 'This card can be hidden', showIf: "layout == 'card'"},
@@ -147,7 +157,11 @@ export default Vue.component('mgContainer', {
 </script>
 
 <template>
-	<div v-if="$props.config.layout == 'form' || $props.config.layout === undefined">
+	<div
+		v-if="$props.config.layout == 'form' || $props.config.layout === undefined"
+		class="mg-container"
+		:class="$props.config.formClass"
+	>
 		<div
 			v-for="(widget, widgetIndex) in $props.config.items"
 			:key="widget.id"
@@ -158,7 +172,7 @@ export default Vue.component('mgContainer', {
 			<label v-if="widget.showTitle || $props.config.showTitles" class="col-form-label text-left col-sm-3">
 				{{widget.title}}
 			</label>
-			<div :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'">
+			<div class="col-form-value" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'">
 				<mg-component
 					:ref="widgetIndex"
 					:config="widget"
@@ -167,7 +181,11 @@ export default Vue.component('mgContainer', {
 			<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
 		</div>
 	</div>
-	<div v-else-if="$props.config.layout == 'card'">
+	<div
+		v-else-if="$props.config.layout == 'card'"
+		class="mg-container"
+		:class="$props.config.formClass"
+	>
 		<div class="card mg-container" :class="{'card-collapsable': $props.config.collapsable, 'card-collapsed': $props.config.collapsed}">
 			<div class="card-header">
 				{{$props.config.title}}
@@ -200,7 +218,7 @@ export default Vue.component('mgContainer', {
 					<label v-if="widget.showTitle || $props.config.showTitles" class="col-form-label text-left col-sm-3">
 						{{widget.title}}
 					</label>
-					<div :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'">
+					<div class="col-form-value" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'">
 						<mg-component
 							:ref="widgetIndex"
 							:config="widget"
@@ -288,6 +306,23 @@ export default Vue.component('mgContainer', {
 </template>
 
 <style>
+/* formClass > .titles-above {{{ */
+.mg-container.titles-above > .form-group,
+.mg-container.titles-above > .form-group,
+.mg-container.titles-above > .card > .card-body > .form-group,
+.mg-container.titles-above > .card > .card-body > .form-group {
+	display: block;
+}
+
+.mg-container.titles-above > .form-group > .col-form-label,
+.mg-container.titles-above > .form-group > .col-form-value,
+.mg-container.titles-above > .card > .card-body > .form-group > .col-form-label,
+.mg-container.titles-above > .card > .card-body > .form-group > .col-form-value {
+	width: 100%;
+	max-width: none;
+}
+/* }}} */
+
 /* Card layout {{{ */
 /* Collapsable card {{{ */
 .mg-container.card.card-collapsable {
