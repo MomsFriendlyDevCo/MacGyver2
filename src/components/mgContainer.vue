@@ -108,11 +108,12 @@ export default Vue.component('mgContainer', {
 		/**
 		* Emit an event passing this container as a scope
 		* This is really just a wrapper to be able to pass this VueComponent to mgContainer.* emitters
-		* @param {string} e Event to emit
+		* @param {string} eventName Event to emit
+		* @param {string} specPath The widget specPath
 		* @param {number} widgetIndex The widget sending the message
 		*/
-		componentEvent(e, widgetIndex, vueEvent) {
-			this.$mgForm.$emit(e, this, widgetIndex, vueEvent);
+		componentEvent(eventName, specPath, widgetIndex, vueEvent) {
+			this.$mgForm.$emit(eventName, this, specPath, widgetIndex, vueEvent);
 		},
 
 
@@ -123,17 +124,21 @@ export default Vue.component('mgContainer', {
 		* @returns {number} The offset of the component or boolean `false`
 		*/
 		findChildIndex(child) {
-			var result = this.$children.reduce((t, v) => {
-				if (t.found) { // Already found the child
-					return t;
-				} else if (v._uid == child._uid) { // Found by UID
-					return {...t, found: true};
-				} else if (v.$mgForm) { // Is an mgComponent {
-					return {...t, mgIndex: t.mgIndex + 1};
-				} else { // Implied else - regular Vue component - skip incrementing when calculating the offset
-					return t;
-				}
-			}, {found: false, mgIndex: 0});
+			var result = _(this.$refs)
+				.map(v => v[0]) // Dynamic refs always end up as an array of 1 item, so unpack that
+				.reduce((t, v, i) => {
+					if (t.found) { // Already found the child
+						return t;
+					} else if (v._uid == child._uid) { // Found by direct UID
+						return {...t, found: true};
+					} else if (v.$children && v.$children.length == 1 && v.$children[0]._uid == child._uid) { // Check into mgComponent wrappers
+						return {...t, found: true};
+					} else if (v.$mgForm) { // Is an mgComponent {
+						return {...t, mgIndex: t.mgIndex + 1};
+					} else { // Implied else - regular Vue component - skip incrementing when calculating the offset
+						return t;
+					}
+				}, {found: false, mgIndex: 0});
 
 			return (result.found ? result.mgIndex : false);
 		},
@@ -154,7 +159,10 @@ export default Vue.component('mgContainer', {
 				{{widget.title}}
 			</label>
 			<div :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'">
-				<mg-component :config="widget"/>
+				<mg-component
+					:ref="widgetIndex"
+					:config="widget"
+				/>
 			</div>
 			<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
 		</div>
@@ -180,9 +188,9 @@ export default Vue.component('mgContainer', {
 					v-if="widget.show"
 					class="form-group row mg-component"
 					:class="[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])"
-					@click="componentEvent('mgContainer.click', widgetIndex, $event)"
-					@mouseenter="componentEvent('mgContainer.mouseEnter', widgetIndex, $event)"
-					@mouseleave="componentEvent('mgContainer.mouseLeave', widgetIndex, $event)"
+					@click="componentEvent('mgContainer.click', widget.$specPath, widgetIndex, $event)"
+					@mouseenter="componentEvent('mgContainer.mouseEnter', widget.$specPath, widgetIndex, $event)"
+					@mouseleave="componentEvent('mgContainer.mouseLeave', widget.$specPath, widgetIndex, $event)"
 				>
 					<mg-form-editor-controls
 						v-if="$mgFormEditor"
@@ -194,7 +202,7 @@ export default Vue.component('mgContainer', {
 					</label>
 					<div :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'">
 						<mg-component
-							:ref="`child-${widgetIndex}`"
+							:ref="widgetIndex"
 							:config="widget"
 						/>
 					</div>
@@ -243,7 +251,10 @@ export default Vue.component('mgContainer', {
 						v-if="widget.show"
 						:class="[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])"
 					>
-						<mg-component :config="widget"/>
+						<mg-component
+							:ref="widgetIndex"
+							:config="widget"
+						/>
 						<div class="help-block" v-if="widget.help">{{widget.help}}</div>
 					</td>
 				</tr>
@@ -255,7 +266,10 @@ export default Vue.component('mgContainer', {
 			<div v-for="rowWidget in $props.config.items" :key="rowWidget.id">
 				<div v-if="rowWidget.type == 'mgContainer' && rowWidget.layout == 'query-row'" class="row">
 					<div v-for="colWidget in rowWidget.items" :key="colWidget.id" class="col mg-component">
-						<mg-component :config="colWidget"/>
+						<mg-component
+							:ref="widgetIndex"
+							:config="colWidget"
+						/>
 					</div>
 				</div>
 				<div v-else class="alert alert-danger">

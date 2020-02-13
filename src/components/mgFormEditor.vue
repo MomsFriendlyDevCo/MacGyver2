@@ -32,6 +32,8 @@ export default Vue.component('mgFormEditor', {
 		editConfig: [],
 		editData: {},
 
+		addTarget: undefined, // Spec path to add after, if any
+		addOrientation: 'after',
 		// Add widget UI {{{
 		addConfig: [
 			{ // Header area
@@ -62,20 +64,24 @@ export default Vue.component('mgFormEditor', {
 				items: [
 					{
 						id: 'addType',
-						type: 'mgChoiceButtons',
+						type: 'mgChoiceList',
 						title: 'Widget type to add',
-						classWrapper: '',
-						itemClassActive: 'btn btn-primary',
-						itemClassInactive: 'btn btn-light',
 						enum: _(this.$macgyver.widgets)
 							.map((w, k) => ({
 								id: k,
-								tooltip: `${w.title} (${k})`,
-								classActive: `btn btn-primary m-1 ${w.icon} fa-fw`,
-								classInactive: `btn btn-light m-1 ${w.icon} fa-fw`,
+								title: w.title,
+								icon: `${w.icon} fa-fw`,
 							}))
-							.sortBy('tooltip')
+							.sortBy('title')
 							.value(),
+						onChange: type => {
+							var inserted = this.insertWidget({type}, {
+								specPath: this.addTarget,
+								orientation: this.addOrientation,
+							});
+							console.log('INSERTED AS', inserted);
+							// this.editWidget(inserted.id);
+						},
 					},
 				],
 			},
@@ -116,17 +122,23 @@ export default Vue.component('mgFormEditor', {
 		},
 	},
 	mounted() {
-		this.$refs.form.$on('mgContainer.click', (container, componentIndex, e) => {
+		this.$refs.form.$on('mgContainer.click', (container, specPath, componentIndex, e) => {
 			e.stopPropagation();
 			e.preventDefault();
-			this.editWidget(container.$refs[`child-${componentIndex}`][0]);
+			this.editWidget(specPath);
 		});
 
-		this.$refs.form.$on('mgContainer.mouseEnter', (container, componentIndex, e) => {
+		this.$refs.form.$on('mgContainer.mouseEnter', (container, specPath, componentIndex, e) => {
+			var component = this.$refs.form.getComponentBySpecPath(specPath);
+			var componentIndex = container.findChildIndex(component);
+
 			container.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).concat(['editHover']));
 		});
 
-		this.$refs.form.$on('mgContainer.mouseLeave', (container, componentIndex, e) => {
+		this.$refs.form.$on('mgContainer.mouseLeave', (container, specPath, componentIndex, e) => {
+			var component = this.$refs.form.getComponentBySpecPath(specPath);
+			var componentIndex = container.findChildIndex(component);
+
 			container.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).filter(c => c != 'editHover'));
 		});
 	},
@@ -134,10 +146,11 @@ export default Vue.component('mgFormEditor', {
 		/**
 		* Stop editing / adding and return to regular mode
 		* @param {string} [mode="normal"] Mode to switch to
+		* @param {boolean} [clearHighlight=true] Also attempt to clear out any highlight and reset the aside panes
 		*/
-		setMode(mode = 'normal') {
+		setMode(mode = 'normal', clearHighlight = true) {
 			// Deselect the existing item (if we have one)
-			if (this.editing) {
+			if (this.editing && clearHighlight) {
 				this.setComponentHighlight(this.editing, []);
 				this.editing = undefined;
 			}
@@ -178,17 +191,21 @@ export default Vue.component('mgFormEditor', {
 			var childOffset = container.findChildIndex(component);
 			if (childOffset === false) return console.warn('[mgFormEditor]', 'Cannot locate component within container', {container, component});
 
+			console.log('Set highlight', childOffset, classes);
 			container.$set(container.highlights, childOffset, classes);
 		},
 
 
 		/**
 		* Edit a widget by its specPath or component
-		* @param {VueComponent} component The VueComponent to edit either as a Vue component or lodash compatible path
+		* @param {VueComponent|string} component Either the VueComponent to edit or the specPath of the widget to edit
 		*/
 		editWidget(component) {
 			var component; // The Vue component from the widget path
-			if (!_.isObject(component) || !component._uid) throw new Error('editWidget() requires a VueComponent');
+			if (!_.isObject(component) && !_.isString(component)) throw new Error('editWidget requires either a specPath or VueComponent');
+			if (_.isObject(component) && !component._uid) throw new Error('editWidget() requires a valid VueComponent object (or specPath string)');
+
+			if (_.isString(component) || _.isArray(component)) component = this.$refs.form.getComponentBySpecPath(component); // Resolve specPath into actual component if eneded
 
 			this.setMode();
 
@@ -264,13 +281,14 @@ export default Vue.component('mgFormEditor', {
 
 		/**
 		* Insert a widget at a given path
-		* @param {Object} widget The widget to insert
+		* @param {Object} widget The widget to insert, this must contain at least a `type` key
 		* @param {Object} [options] Additional options
 		* @param {string|array} [options.specPath] The lodash notation specPath to target instead of the last element on the form
 		* @param {string} [options.orientation='after'] Where to insert. ENUM: 'before', 'after'
-		* @param {boolean} [options.useContainer=true] If appending, try and fit the new widget within the last container if one exists
+		* @param {boolean} [options.useContainer=true] If no spec path, try and fit the new widget within the last container if one exists
 		* @param {boolean} [options.allocateTitle=true] Try to allocate a title if not supplied
 		* @param {boolean} [options.allocateId=true] Try to allocate an ID if not supplied and the widget has `preferId`
+		* @returns {Object} The inserted widget object (complete with ID if allocateId is specified)
 		*/
 		insertWidget(widget, options) {
 			var settings = {
@@ -281,6 +299,8 @@ export default Vue.component('mgFormEditor', {
 				allocateId: true,
 				...options,
 			};
+
+			if (!widget.type) throw new Error('Widget.type must be specified as a minimum for insertWidget()');
 
 			// options.allocateTitle / settings.alloacteId {{{
 			if (
@@ -306,25 +326,34 @@ export default Vue.component('mgFormEditor', {
 			// }}}
 
 			if (settings.specPath) { // Insert relative to another widget
-				var targetPath = _.isString(settings.specPath) ? ['config'].concat(settings.specPath.split('.')) : `config.${settings.specPath}`;
-				var targetParent = _.get(this.$props, targetPath.slice(0, -1));
-				var targetIndex = targetPath.slice(-1)[0];
-				if (options.orientation == 'before' && targetIndex > 0) targetIndex--;
+				var parentItems = _.isArray(settings.specPath) ? settings.specPath : settings.specPath.split('.');
+				var targetWidget = parentItems.pop();
 
-				targetParent.splice(targetIndex, 0, widget);
+				this.mutatePath(parentItems,
+					_.chain(_.get(this.$props.config, parentItems))
+						.thru(v => {
+							if (settings.orientation == 'after') {
+								v.splice(+targetWidget + 1, 0, widget);
+							} else if (settings.orientation == 'before') {
+								v.splice(targetWidget, 0, widget);
+							} else {
+								throw new Error(`Unsupported insert orientation "${settings.orientation}"`);
+							}
+							return v;
+						})
+						.value()
+				);
 			} else if ( // Insert within container?
 				settings.useContainer
-				&& this.$props.config
-				&& this.$props.config.items.length
-				&& this.$props.config.items.slice(-1)[0].type == 'mgContainer'
 			) {
-				this.$props.config.items.slice(-1)[0].items.push(widget);
+				console.warn('FIXME: Unsupported inserting within container');
 			} else { // Blind insert as last item
-				console.log('FIXME: Untested - insert last', widget);
-				this.$props.config.items.push(widget);
+				console.log('FIXME: Unsupported - insert last', widget);
 			}
 
 			this.$emit.down('mgForm.rebuild'); // Tell the mgForm under us to rebuild itself
+
+			return widget;
 		},
 
 
@@ -391,6 +420,7 @@ export default Vue.component('mgFormEditor', {
 				_.chain(_.get(this.config, parentItems))
 					.clone()
 					.thru(v => {
+						targetIndex = +targetIndex; // Splat into number
 						if (direction == 'up' && targetIndex > 0) {
 							[v[targetIndex], v[targetIndex-1]]
 							=
@@ -402,9 +432,6 @@ export default Vue.component('mgFormEditor', {
 							[v[targetIndex+1], v[targetIndex]]
 						}
 						return v;
-					})
-					.tap(v => {
-						console.log('WILL USE ORDER', v);
 					})
 					.value()
 			);
@@ -454,6 +481,7 @@ export default Vue.component('mgFormEditor', {
 				:config="addConfig"
 				:data="addData"
 				:actions="{setMode}"
+				@change="addData = $event"
 			/>
 		</aside>
 		<!-- }}} -->

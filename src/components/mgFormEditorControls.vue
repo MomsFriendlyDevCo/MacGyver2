@@ -18,12 +18,13 @@ export default Vue.component('mgFormEditorControls', {
 			</span>
 		</div>
 		<div class="mg-form-editor-controls-buttons">
-			<!-- FIXME: Not yet working <a @click="$mgFormEditor.insertWidget($props.config.$specPath)" class="far fa-plus" v-tooltip="'Insert widget after here'"/> -->
+			<!-- NOTE: Add .stop to ignore next mouse click which would select the element under the cursor -->
+			<a @click.stop="$mgFormEditor.addTarget = $props.config.$specPath; $mgFormEditor.addOrientation = 'after'; $mgFormEditor.setMode('adding', false)" class="far fa-plus" v-tooltip="'Insert widget after here'"/>
+			<a @click="$mgFormEditor.duplicateWidget($props.config.$specPath)" class="far fa-clone" v-tooltip="'Duplicate widget'"/>
 			<!-- FIXME: Not yet working <a @click="$mgFormEditor.dragWidget($props.config.$specPath)" class="far fa-arrows-alt" v-tooltip="'Move widget'"/> -->
 			<a @click="$mgFormEditor.moveWidget($props.config.$specPath, 'up')" class="far fa-arrow-up" v-tooltip="'Move widget up'"/>
 			<a @click="$mgFormEditor.moveWidget($props.config.$specPath, 'down')" class="far fa-arrow-down" v-tooltip="'Move widget down'"/>
-			<a @click="$mgFormEditor.duplicateWidget($props.config.$specPath)" class="far fa-clone" v-tooltip="'Duplicate widget'"/>
-			<a @click="$mgFormEditor.removeWidget($props.config.$specPath)" class="far fa-trash danger" v-tooltip="'Delete widget'"/>
+			<a @click.stop="$mgFormEditor.removeWidget($props.config.$specPath)" class="far fa-trash danger" v-tooltip="'Delete widget'"/>
 		</div>
 	</div>
 </template>

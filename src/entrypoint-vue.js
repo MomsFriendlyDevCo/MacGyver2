@@ -17,8 +17,9 @@ import('./components/mgCheckBox');
 import('./components/mgChoiceButtons');
 import('./components/mgChoiceCheckbox');
 import('./components/mgChoiceDropdown');
+import('./components/mgChoiceList');
 import('./components/mgChoicePopup'); // FIXME: Needs $prompt
-import('./components/mgChoiceRadio'); // FIXME: Not working
+import('./components/mgChoiceRadio');
 import('./components/mgChoiceTags');
 import('./components/mgCode');
 import('./components/mgColor');

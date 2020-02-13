@@ -176,9 +176,9 @@
 					"default": 3
 				},
 				{
-					"id": "demoChoiceTags",
-					"type": "mgChoiceTags",
-					"title": "Mulitiple tag choice",
+					"id": "demoChoiceList",
+					"type": "mgChoiceList",
+					"title": "Choice List",
 					"enum": ["Foo", "Bar", "Baz"],
 					"default": "Foo"
 				},
@@ -188,6 +188,13 @@
 					"title": "Choice Radio",
 					"enum": ["Foo", "Bar", "Baz"],
 					"default": "Baz"
+				},
+				{
+					"id": "demoChoiceTags",
+					"type": "mgChoiceTags",
+					"title": "Mulitiple tag choice",
+					"enum": ["Foo", "Bar", "Baz"],
+					"default": "Foo"
 				}
 			]
 		},

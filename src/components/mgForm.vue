@@ -19,9 +19,9 @@
 * @emits mgComponent.mouseLeave Emitted as `(component, event)` on the native mouseLeave event of a component
 * @emits mgComponent.mouseOver Emitted as `(component, event)` on the native mouseOver event of a component
 * @emits mgComponent.mouseOut Emitted as `(component, event)` on the native mouseOut event of a component
-* @emits mgContainer.click Emitted as `(container, componentIndex, event)` on the native click event of a component within a container
-* @emits mgContainer.mouseEnter Emitted as `(container, componentIndex, event)` on the native mouseEnter event of a component within a container
-* @emits mgContainer.mouseLeave Emitted as `(container, componentIndex, event)` on the native mouseLeave event of a component within a container
+* @emits mgContainer.click Emitted as `(container, specPath, event)` on the native click event of a component within a container
+* @emits mgContainer.mouseEnter Emitted as `(container, specPath, event)` on the native mouseEnter event of a component within a container
+* @emits mgContainer.mouseLeave Emitted as `(container, specPath, event)` on the native mouseLeave event of a component within a container
 */
 export default Vue.component('mgForm', {
 	provide() { return {
@@ -218,6 +218,23 @@ export default Vue.component('mgForm', {
 				if (component.$props.config.onChange) component.$props.config.onChange.call(component, val);
 			});
 			// }}}
+		},
+
+
+		/**
+		* Find a VueComponent instance from a specPath
+		* @param {string|array} specPath The specPath to search for
+		* @param {boolean} [throws=true] Throw an error if the path cannot be found (avoid downstream checking if the specPath is valid)
+		* @returns {VueComponent} Either the found VueComponent or `false` if not found
+		*/
+		getComponentBySpecPath(specPath, throws = true) {
+			var found = false;
+			this.$emit.down('mgIdentify', widget => {
+				if (!found && widget.$props.config.$specPath == specPath)
+					found = widget;
+			});
+			if (!found && throws) throw new Error(`Cannot edit component by non-existant specPath "${specPath}"`);
+			return found;
 		},
 	},
 });
