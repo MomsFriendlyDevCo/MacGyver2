@@ -1,7 +1,7 @@
 <script>
 macgyver.register('mgChoicePopup', {
 	title: 'Choice Popup',
-	icon: 'fas fa-window',
+	icon: 'fas fa-window-maximize',
 	category: 'Choice Selectors',
 	preferId: true,
 	config: {

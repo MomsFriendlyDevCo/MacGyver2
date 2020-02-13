@@ -1,7 +1,7 @@
 <script>
 macgyver.register('mgPlaceholder', {
 	title: 'Placeholder',
-	icon: 'far fa-traffic-cone',
+	icon: 'far fa-construction',
 	category: 'General Decoration',
 	preferId: true,
 	config: {

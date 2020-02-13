@@ -1,7 +1,7 @@
 <script>
 macgyver.register('mgChoiceButtons', {
 	title: 'Choice Buttons',
-	icon: 'fas fa-rectangle-landscape',
+	icon: 'fas fa-ellipsis-h',
 	category: 'Choice Selectors',
 	preferId: true,
 	config: {
