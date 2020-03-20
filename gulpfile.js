@@ -2,7 +2,7 @@ var _ = require('lodash');
 var babel = require('gulp-babel');
 var cleanCSS = require('gulp-clean-css');
 var concat = require('gulp-concat');
-var ghPages = require('gulp-gh-pages');
+var del = require('del');
 var gulp = require('@momsfriendlydevco/gulpy');
 var fs = require('fs');
 var nodemon = require('gulp-nodemon');
@@ -21,7 +21,7 @@ var isProduction = !!process.env.NODE_ENV && process.env.NODE_ENV=='production';
 
 gulp.task('default', gulp.series('serve'));
 gulp.task('build', gulp.parallel('build:demo', 'build:vue', 'build:node'));
-gulp.task('build:demo', gulp.parallel('build:demo:vue', 'build:demo:fa'));
+gulp.task('build:demo', gulp.parallel('build:demo:vue', 'build:demo:fa', 'build:docs'));
 
 
 /**
@@ -284,31 +284,28 @@ gulp.task('build:demo:fa', ()=>
 
 
 /**
-* Compile the gh-pages branch in GitHub
+* Compile the docs branch which contains the self-contained demo
 */
-gulp.task('gh-pages', 'build', ()=> del('./gh-pages'), ()=>
-	// FIXME: Need to compile the list of FA icons from somewhere
+gulp.task('build:docs', ()=> del('./docs'), ()=>
 	gulp.src([
 		'./LICENSE',
 		'./demo/_config.yml',
-		'./demo/app.js',
-		'./demo/app.css',
-		'./demo/editor.html',
+		'./demo/webfonts-fa.json',
 		'./demo/index.html',
-		'./demo/style.css',
-		'./demo/webfonts-fa.css',
 		'./dist/**/*',
 		'./examples/**/*',
-		'./node_modules/popper.js/dist/popper.min.js',
+		'./node_modules/ace-builds/src-noconflict/ace.js',
+		'./node_modules/axios/dist/axios.min.js',
 		'./node_modules/bootstrap/dist/css/bootstrap.min.css',
 		'./node_modules/bootstrap/dist/js/bootstrap.min.js',
-		'./node_modules/font-awesome/css/font-awesome.min.css',
-		'./node_modules/font-awesome/fonts/fontawesome-webfont.ttf',
-		'./node_modules/font-awesome/fonts/fontawesome-webfont.woff',
-		'./node_modules/font-awesome/fonts/fontawesome-webfont.woff2',
+		'./node_modules/@fortawesome/fontawesome-free/css/all.css',
+		'./node_modules/@fortawesome/fontawesome-free/webfonts/*',
 		'./node_modules/jquery/dist/jquery.min.js',
 		'./node_modules/lodash/lodash.min.js',
-		'./node_modules/tree-tools/dist/ngTreeTools.js',
+		'./node_modules/popper.js/dist/umd/popper.min.js',
+		'./node_modules/vue/dist/vue.min.js',
+		'./node_modules/vue-js-toggle-button/dist/index.js',
+		'./node_modules/vue-router/dist/vue-router.min.js',
 	], {base: __dirname})
 		.pipe(rename(function(path) {
 			if (path.dirname == 'demo' && path.basename == 'webfonts-fa.css') { // Move webfont dir into server api path
@@ -319,8 +316,5 @@ gulp.task('gh-pages', 'build', ()=> del('./gh-pages'), ()=>
 			}
 			return path;
 		}))
-		.pipe(ghPages({
-			cacheDir: 'gh-pages',
-			push: true, // Change to false for dryrun (files dumped to cacheDir)
-		}))
+		.pipe(gulp.dest('./docs'))
 );
