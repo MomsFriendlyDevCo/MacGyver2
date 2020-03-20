@@ -8,7 +8,15 @@ macgyver.register('mgChoiceCheckbox', {
 		enum: {
 			type: 'mgList',
 			title: 'List items',
-			default: ['Item One', 'Item Two', 'Item Three'],
+			enum: {
+				type: 'mgTable',
+				title: 'List items',
+				items: [
+					{id: 'id', title: 'ID'},
+					{id: 'title', title: 'Title'},
+					{id: 'tooltip', title: 'Tooltip'},
+				],
+			},
 		},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 		sort: {

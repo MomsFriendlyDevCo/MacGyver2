@@ -6,9 +6,12 @@ macgyver.register('mgChoiceRadio', {
 	preferId: true,
 	config: {
 		enum: {
-			type: 'mgList',
+			type: 'mgTable',
 			title: 'List items',
-			default: ['Item One', 'Item Two', 'Item Three'],
+			items: [
+				{id: 'id', title: 'ID'},
+				{id: 'title', title: 'Title'},
+			],
 		},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 	},

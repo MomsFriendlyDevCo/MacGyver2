@@ -18,9 +18,12 @@ macgyver.register('mgChoiceTags', {
 	preferId: true,
 	config: {
 		enum: {
-			type: 'mgList',
+			type: 'mgTable',
 			title: 'List items',
-			default: ['Item One', 'Item Two', 'Item Three'],
+			items: [
+				{id: 'id', title: 'ID'},
+				{id: 'title', title: 'Title'},
+			],
 		},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},

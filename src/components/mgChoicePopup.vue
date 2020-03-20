@@ -5,10 +5,16 @@ macgyver.register('mgChoicePopup', {
 	category: 'Choice Selectors',
 	preferId: true,
 	config: {
-		enum: { // Each item is in the form {id, [title], [class], [classActive], [classInactive]}
-			type: 'mgList',
+		enum: {
+			type: 'mgTable',
 			title: 'List items',
-			default: ['Item One', 'Item Two', 'Item Three'],
+			items: [
+				{id: 'id', title: 'ID'},
+				{id: 'title', title: 'Title'},
+				{id: 'class', title: 'Classes'},
+				{id: 'classActive', title: 'Active Class'},
+				{id: 'classInactive', title: 'Inactive Class'},
+			],
 		},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 		popupTitle: {type: 'mgText', default: 'Select item', advanced: true},

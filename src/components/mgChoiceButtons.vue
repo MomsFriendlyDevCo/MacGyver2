@@ -5,10 +5,17 @@ macgyver.register('mgChoiceButtons', {
 	category: 'Choice Selectors',
 	preferId: true,
 	config: {
-		enum: { // Each item is in the form {id, [title], [class], [classActive], [classInactive], [tooltip]}
-			type: 'mgList',
+		enum: {
+			type: 'mgTable',
 			title: 'List items',
-			default: [],
+			items: [
+				{id: 'id', title: 'ID'},
+				{id: 'title', title: 'Title'},
+				{id: 'tooltip', title: 'Tooltip'},
+				{id: 'class', title: 'Classes'},
+				{id: 'classActive', title: 'Active Class'},
+				{id: 'classInactive', title: 'Inactive Class'},
+			],
 		},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 		classWrapper: {type: 'mgText', default: 'btn-group', title: 'Group CSS class', advanced: true},
