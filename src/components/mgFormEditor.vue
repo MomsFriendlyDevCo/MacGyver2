@@ -454,24 +454,11 @@ export default Vue.component('mgFormEditor', {
 					showTitles: false,
 					items: [
 						{
-							id: 'addType',
-							type: 'mgChoiceList',
-							title: 'Widget type to add',
-							enum: _(this.$macgyver.widgets)
-								.map((w, k) => ({
-									id: k,
-									title: w.title,
-									icon: `${w.icon} fa-fw`,
-								}))
-								.sortBy('title')
-								.value(),
-							onChange: type => {
-								var inserted = this.insertWidget({type}, {
-									specPath: this.addTarget,
-									orientation: this.addOrientation,
-								});
-								console.log('INSERTED AS', inserted);
-								// this.editWidget(inserted.id);
+							type: 'mgChoiceTree',
+							title: 'Layout tree',
+							default: {foo: 1, bar: 2},
+							onChange: item => {
+								console.log('TREE CLICK', item);
 							},
 						},
 					],

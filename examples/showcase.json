@@ -195,6 +195,38 @@
 					"title": "Mulitiple tag choice",
 					"enum": ["Foo", "Bar", "Baz"],
 					"default": "Foo"
+				},
+				{
+					"id": "exampleTree",
+					"type": "mgChoiceTree",
+					"enum": [
+						{
+							"id": "australia",
+							"title": "Australia",
+							"enum": [
+								{
+									"id": "queensland",
+									"title": "Queensland",
+									"enum": ["Brisbane", "Gold Coast"]
+								},
+								{
+									"id": "newSouthWales",
+									"title": "New South Wales",
+									"enum": ["Newcastle", "Sydney"]
+								},
+								{
+									"id": "victoria",
+									"title": "Victoria",
+									"enum": ["Melbourne"]
+								}
+							]
+						},
+						{
+							"id": "uk",
+							"title": "United Kingdom",
+							"enum": ["London", "Not london"]
+						}
+					]
 				}
 			]
 		},

@@ -21,6 +21,7 @@ import('./components/mgChoiceList');
 import('./components/mgChoicePopup'); // FIXME: Needs $prompt
 import('./components/mgChoiceRadio');
 import('./components/mgChoiceTags');
+import('./components/mgChoiceTree');
 import('./components/mgCode');
 import('./components/mgColor');
 import('./components/mgComponent');

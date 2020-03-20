@@ -5,6 +5,7 @@ export default {
 		data: {},
 		examples: [
 			'examples/html.json',
+			'examples/mgChoiceTree.json',
 			'examples/mgQuery.json',
 			'examples/simple.json',
 			'examples/shorthand.json',
