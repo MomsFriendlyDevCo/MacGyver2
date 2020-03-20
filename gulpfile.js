@@ -19,9 +19,9 @@ var yaml = require('yaml');
 var cache = {}; // Caches for various Rollup builds
 var isProduction = !!process.env.NODE_ENV && process.env.NODE_ENV=='production';
 
-gulp.task('default', gulp.series('serve'));
-gulp.task('build', gulp.parallel('build:demo', 'build:vue', 'build:node'));
-gulp.task('build:demo', gulp.parallel('build:demo:vue', 'build:demo:fa', 'build:docs'));
+gulp.task('default', 'serve');
+gulp.task('build', ['build:demo', 'build:vue', 'build:node']);
+gulp.task('build:demo', ['build:demo:vue', 'build:demo:fa', 'build:docs']);
 
 
 /**
