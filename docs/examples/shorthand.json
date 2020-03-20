@@ -1,0 +1,16 @@
+{
+	"name": {
+		"required": true,
+		"help": "Your full name"
+	},
+	"age": {
+		"type": "number",
+		"min": 18,
+		"help": "How old are you in years?"
+	},
+	"developer": "boolean",
+	"sex": {
+		"type": "choice",
+		"enum": ["male", "female", "other"]
+	}
+}

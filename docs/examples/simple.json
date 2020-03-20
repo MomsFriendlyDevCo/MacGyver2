@@ -1,0 +1,22 @@
+{
+	"id": "containerMain",
+	"type": "mgContainer",
+	"showTitles": false,
+	"items": [
+		{
+			"id": "containerInputs",
+			"type": "mgContainer",
+			"layout": "card",
+			"title": "Simple inputs",
+			"showTitle": false,
+			"items": [
+				{
+					"id": "demoText",
+					"type": "mgText",
+					"title": "Text",
+					"default": "Hello World"
+				}
+			]
+		}
+	]
+}

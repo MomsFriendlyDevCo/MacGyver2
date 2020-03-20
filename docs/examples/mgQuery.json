@@ -1,0 +1,28 @@
+{
+	"id": "containerMain",
+	"type": "mgContainer",
+	"showTitles": false,
+	"items": [
+		{
+			"id": "containerQuery",
+			"type": "mgContainer",
+			"layout": "card",
+			"title": "mgQuery",
+			"showTitles": false,
+			"items": [
+				{
+					"id": "query",
+					"type": "mgQuery",
+					"default": {
+						"email": {"$exists": true},
+						"role": "user",
+						"status": {"$in": ["pending", "active"]},
+						"sort": "username",
+						"splonk": "Yes",
+						"limit": 10
+					}
+				}
+			]
+		}
+	]
+}
