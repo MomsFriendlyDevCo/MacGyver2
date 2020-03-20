@@ -178,7 +178,7 @@ export default Vue.component('mgForm', {
 					.split(',')
 					.map(i => i && JSON.parse(i.replace(/'/g, '"')));
 
-				if (func.apply(context ?? this, [actionArgs, ...params])) return;
+				if (func.call(context ?? this, ...actionArgs, ...params)) return;
 			}
 			// }}}
 
