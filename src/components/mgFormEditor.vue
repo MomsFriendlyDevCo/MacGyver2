@@ -8,7 +8,8 @@ import mgFormEditorControls from './mgFormEditorControls';
 * @param {array<Object>} [verbs] Verb edit mgForm to show in the small edit sidebar, defaults to selecting widgets / adding widgets buttons
 * @param {string} [asideClassActive="mgfe-aside aside-right open"] Class to set all editing sidebars to when inactive
 * @param {string} [asideClassInactive="mgfe-aside aside-right"] Class to set all editing sidebar to when inactive
-* @param {string} [asideClassModeNormal="aside-sm"] Class to associate with the smaller toolkit display when editing
+* @param {string} [asideClassModeCollapsed="aside-sm"] Class to associate with the smaller toolkit display when editing
+* @param {string} [asideClassModeToc="aside-sm"] Class to associate with the Table-Of-Contents sidebar
 * @param {string} [asideClassModeAdding=""] Class to associate with the editing sidebar when adding
 * @param {string} [asideClassModeEditing=""] Class to associate with the editing sidebar when editing
 *
@@ -23,7 +24,7 @@ export default Vue.component('mgFormEditor', {
 		mgFormEditorControls,
 	},
 	data() { return {
-		mode: 'normal', // ENUM: normal, editing, adding
+		mode: 'collapsed', // ENUM: collapsed, toc, editing, adding
 		id: this.$macgyver.nextId(), // ID of the editing form item
 		editing: undefined, // The active item we are editing
 		widgetListMode: 'grid',
@@ -34,67 +35,17 @@ export default Vue.component('mgFormEditor', {
 
 		addTarget: undefined, // Spec path to add after, if any
 		addOrientation: 'after',
-		// Add widget UI {{{
-		addConfig: [
-			{ // Header area
-				type: 'mgContainer',
-				layout: 'columns',
-				border: false,
-				rowClass: 'aside-header',
-				showTitle: false,
-				items: [
-					{type: 'mgHeading', text: 'Add widget'},
-					{
-						type: 'mgContainer',
-						layout: 'columns',
-						border: false,
-						showTitle: false,
-						rowClass: 'aside-actions',
-						items: [
-							{type: 'mgButton', action: 'setMode', text: '', icon: '', class: 'btn btn-link btn-xs far fa-times'},
-						],
-					},
-				],
-			},
-			{ // Body area
-				type: 'mgContainer',
-				layout: 'form',
-				rowClass: 'aside-body',
-				showTitles: false,
-				items: [
-					{
-						id: 'addType',
-						type: 'mgChoiceList',
-						title: 'Widget type to add',
-						enum: _(this.$macgyver.widgets)
-							.map((w, k) => ({
-								id: k,
-								title: w.title,
-								icon: `${w.icon} fa-fw`,
-							}))
-							.sortBy('title')
-							.value(),
-						onChange: type => {
-							var inserted = this.insertWidget({type}, {
-								specPath: this.addTarget,
-								orientation: this.addOrientation,
-							});
-							console.log('INSERTED AS', inserted);
-							// this.editWidget(inserted.id);
-						},
-					},
-				],
-			},
-		],
+
+		// Holding data for various form states
 		addData: {},
-		// }}}
 	}},
 	props: {
 		data: Object,
 		config: Object,
 		asideClassActive: {type: String, default: 'mgfe-aside aside-right open'},
 		asideClassInactive: {type: String, default: 'mgfe-aside aside-right'},
-		asideClassModeNormal: {type: String, default: 'aside-sm'},
+		asideClassModeCollapsed: {type: String, default: 'aside-sm'},
+		asideClassModeToc: {type: String, default: ''},
 		asideClassModeAdding: {type: String, default: ''},
 		asideClassModeEditing: {type: String, default: ''},
 		generalVerbs: {
@@ -104,15 +55,23 @@ export default Vue.component('mgFormEditor', {
 					{
 						type: 'mgButton',
 						action: "setMode()",
-						class: 'btn btn-primary',
+						class: 'btn btn-primary text-white px-2',
 						icon: 'fa fa-mouse-pointer fa-fw',
 						showTitle: false,
 						tooltip: {content: 'Select widgets to edit', placement: 'left'},
 					},
 					{
 						type: 'mgButton',
+						action: "setMode('toc')",
+						class: 'btn btn-light px-2',
+						icon: 'fa fa-stream fa-fw',
+						showTitle: false,
+						tooltip: {content: 'Select widgets to edit', placement: 'left'},
+					},
+					{
+						type: 'mgButton',
 						action: "setMode('adding')",
-						class: 'btn btn-light',
+						class: 'btn btn-light px-2',
 						icon: 'far fa-plus fa-fw',
 						showTitle: false,
 						tooltip: {content: 'Add a new widget', placement: 'left'},
@@ -145,17 +104,17 @@ export default Vue.component('mgFormEditor', {
 	methods: {
 		/**
 		* Stop editing / adding and return to regular mode
-		* @param {string} [mode="normal"] Mode to switch to
+		* @param {string} [mode="collapsed"] Mode to switch to
 		* @param {boolean} [clearHighlight=true] Also attempt to clear out any highlight and reset the aside panes
 		*/
-		setMode(mode = 'normal', clearHighlight = true) {
+		setMode(mode = 'collapsed', clearHighlight = true) {
 			// Deselect the existing item (if we have one)
 			if (this.editing && clearHighlight) {
 				this.setComponentHighlight(this.editing, []);
 				this.editing = undefined;
 			}
 
-			this.$set(this, 'mode', mode);
+			this.$set(this, 'mode', mode || 'collapsed');
 			return true; // Signal to mgForm that we have handled this action
 		},
 
@@ -460,26 +419,156 @@ export default Vue.component('mgFormEditor', {
 			})
 				.then(form => this.$set(this, 'config', JSON.parse(form.code)))
 		},
+
+
+		// Form layouts {{{
+		/**
+		* Generate the config layout for the Table-Of-Contents sidebar
+		*/
+		generateConfigToc() {
+			return [
+				{ // Header area
+					type: 'mgContainer',
+					layout: 'columns',
+					border: false,
+					rowClass: 'aside-header',
+					showTitle: false,
+					items: [
+						{type: 'mgHeading', text: 'Form layout'},
+						{
+							type: 'mgContainer',
+							layout: 'columns',
+							border: false,
+							showTitle: false,
+							rowClass: 'aside-actions',
+							items: [
+								{type: 'mgButton', action: 'setMode', text: '', icon: '', class: 'btn btn-link btn-xs far fa-times'},
+							],
+						},
+					],
+				},
+				{ // Body area
+					type: 'mgContainer',
+					layout: 'form',
+					rowClass: 'aside-body',
+					showTitles: false,
+					items: [
+						{
+							id: 'addType',
+							type: 'mgChoiceList',
+							title: 'Widget type to add',
+							enum: _(this.$macgyver.widgets)
+								.map((w, k) => ({
+									id: k,
+									title: w.title,
+									icon: `${w.icon} fa-fw`,
+								}))
+								.sortBy('title')
+								.value(),
+							onChange: type => {
+								var inserted = this.insertWidget({type}, {
+									specPath: this.addTarget,
+									orientation: this.addOrientation,
+								});
+								console.log('INSERTED AS', inserted);
+								// this.editWidget(inserted.id);
+							},
+						},
+					],
+				},
+			];
+		},
+
+
+		/**
+		* Generate the config layout for the "add widget" sidebar
+		*/
+		generateConfigAdding() {
+			return [
+				{ // Header area
+					type: 'mgContainer',
+					layout: 'columns',
+					border: false,
+					rowClass: 'aside-header',
+					showTitle: false,
+					items: [
+						{type: 'mgHeading', text: 'Add widget'},
+						{
+							type: 'mgContainer',
+							layout: 'columns',
+							border: false,
+							showTitle: false,
+							rowClass: 'aside-actions',
+							items: [
+								{type: 'mgButton', action: 'setMode', text: '', icon: '', class: 'btn btn-link btn-xs far fa-times'},
+							],
+						},
+					],
+				},
+				{ // Body area
+					type: 'mgContainer',
+					layout: 'form',
+					rowClass: 'aside-body',
+					showTitles: false,
+					items: [
+						{
+							id: 'addType',
+							type: 'mgChoiceList',
+							title: 'Widget type to add',
+							enum: _(this.$macgyver.widgets)
+								.map((w, k) => ({
+									id: k,
+									title: w.title,
+									icon: `${w.icon} fa-fw`,
+								}))
+								.sortBy('title')
+								.value(),
+							onChange: type => {
+								var inserted = this.insertWidget({type}, {
+									specPath: this.addTarget,
+									orientation: this.addOrientation,
+								});
+								console.log('INSERTED AS', inserted);
+								// this.editWidget(inserted.id);
+							},
+						},
+					],
+				},
+			];
+		},
+		// }}}
 	},
 });
 </script>
 
 <template>
 	<div class="mg-form-editor">
-		<!-- Aside normal mode {{{ -->
-		<aside :class="[mode == 'normal' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeNormal]">
+		<!-- Aside collapsed mode {{{ -->
+		<aside :class="[mode == 'collapsed' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeCollapsed]">
 			<mg-form
-				:form="`${id}-normal`"
+				v-if="mode == 'collapsed'"
+				:form="`${id}-collapsed`"
 				:config="$props.generalVerbs"
-				:actions="{setMode, setMode}"
+				:actions="{setMode}"
+			/>
+		</aside>
+		<!-- }}} -->
+		<!-- Aside toc (table-of-contents) mode {{{ -->
+		<aside :class="[mode == 'toc' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeToc]">
+			<mg-form
+				v-if="mode == 'toc'"
+				:form="`${id}-toc`"
+				:config="generateConfigToc()"
+				:actions="{setMode}"
 			/>
 		</aside>
 		<!-- }}} -->
 		<!-- Aside widget library (add widget) {{{ -->
 		<aside :class="[mode == 'adding' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeAdding]">
 			<mg-form
+				v-if="mode == 'adding'"
 				ref="formAdd"
-				:config="addConfig"
+				:config="generateConfigAdding()"
 				:data="addData"
 				:actions="{setMode}"
 				@change="addData = $event"
@@ -489,7 +578,7 @@ export default Vue.component('mgFormEditor', {
 		<!-- Aside item editor (edit widget) {{{ -->
 		<aside :class="[mode == 'editing' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeEditing]">
 			<mg-form
-				v-if="editing"
+				v-if="mode == 'editing'"
 				:form="`${id}-edit`"
 				:config="editConfig"
 				:data="editData"
@@ -552,7 +641,7 @@ export default Vue.component('mgFormEditor', {
 	transform: translateX(50px);
 	top: calc(50% - 30px); /* Approx middle of the screen */
 	bottom: inherit;
-	border-radius: 50px;
+	border-radius: 5px;
 }
 
 .mgfe-aside.aside-right.aside-sm .form-group {
