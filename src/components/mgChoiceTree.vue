@@ -72,6 +72,8 @@ export default Vue.component('mgChoiceTree', {
 		'$props.config.enum': {
 			immediate: true,
 			handler() {
+				if (!this.$props.config.enum) return; // Nothing to render yet
+
 				var walkBranch = items => {
 					return items.map(item => {
 						if (typeof item == 'string') item = {title: item, id: _.camelCase(item)};
