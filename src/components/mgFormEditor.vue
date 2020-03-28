@@ -63,23 +63,23 @@ export default Vue.component('mgFormEditor', {
 					{
 						type: 'mgButton',
 						action: "setMode('toc')",
-						class: 'btn btn-light px-2',
+						class: 'btn btn-outline-light border-0 px-2',
 						icon: 'fa fa-stream fa-fw',
 						showTitle: false,
 						tooltip: {content: 'Select widgets to edit', placement: 'left'},
 					},
-					...(this.$prompt?.macgyver ? { // Include JSON editing if $prompt.macgyver() is available
+					...(this.$prompt?.macgyver ? [{ // Include JSON editing if $prompt.macgyver() is available
 						type: 'mgButton',
 						action: "rawEdit()",
-						class: 'btn btn-light px-2',
+						class: 'btn btn-outline-light border-0 px-2',
 						icon: 'fa fa-code fa-fw',
 						showTitle: false,
 						tooltip: {content: 'Edit the form contents as JSON', placement: 'left'},
-					} : []),
+					}] : []),
 					{
 						type: 'mgButton',
 						action: "setMode('adding')",
-						class: 'btn btn-light px-2',
+						class: 'btn btn-outline-light border-0 px-2',
 						icon: 'far fa-plus fa-fw',
 						showTitle: false,
 						tooltip: {content: 'Add a new widget', placement: 'left'},
@@ -418,14 +418,14 @@ export default Vue.component('mgFormEditor', {
 		rawEdit() {
 			this.$prompt.macgyver({
 				title: 'Template JSON',
-				form: {
+				macgyver: {
 					id: 'code',
 					type: 'mgCode',
 					syntax: 'json',
-					value: this.value,
+					convert: true,
+					default: this.$props.config,
 				},
-			})
-				.then(form => this.$set(this, 'config', JSON.parse(form.code)))
+			}).then(form => this.$set(this, 'config', form.code))
 		},
 
 
