@@ -68,6 +68,14 @@ export default Vue.component('mgFormEditor', {
 						showTitle: false,
 						tooltip: {content: 'Select widgets to edit', placement: 'left'},
 					},
+					...(this.$prompt?.macgyver ? { // Include JSON editing if $prompt.macgyver() is available
+						type: 'mgButton',
+						action: "rawEdit()",
+						class: 'btn btn-light px-2',
+						icon: 'fa fa-code fa-fw',
+						showTitle: false,
+						tooltip: {content: 'Edit the form contents as JSON', placement: 'left'},
+					} : []),
 					{
 						type: 'mgButton',
 						action: "setMode('adding')",
@@ -536,7 +544,7 @@ export default Vue.component('mgFormEditor', {
 				v-if="mode == 'collapsed'"
 				:form="`${id}-collapsed`"
 				:config="$props.generalVerbs"
-				:actions="{setMode}"
+				:actions="{setMode, rawEdit}"
 			/>
 		</aside>
 		<!-- }}} -->
