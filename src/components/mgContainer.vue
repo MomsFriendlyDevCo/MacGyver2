@@ -80,7 +80,10 @@ macgyver.register('mgContainer', {
 });
 
 export default Vue.component('mgContainer', {
-	inject: ['$mgForm', '$mgFormEditor'],
+	inject: {
+		$mgForm: {from: '$mgForm'},
+		$mgFormEditor: {from: '$mgFormEditor', default: false},
+	},
 	data() { return {
 		highlights: {}, // Lookup of extra classes to add to widgets, each key is the array offset of the widget within this container, the value is an array of classes to add
 		localData: {}, // Lookup of immediate child data values, used when `$props.config.layout == 'formFloating'`

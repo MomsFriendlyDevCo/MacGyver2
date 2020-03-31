@@ -10,7 +10,10 @@ macgyver.register('mgHtml', {
 });
 
 export default Vue.component('mgHtml', {
-	inject: ['$mgForm', '$mgFormEditor'],
+	inject: {
+		$mgForm: {from: '$mgForm'},
+		$mgFormEditor: {from: '$mgFormEditor', default: false},
+	},
 	data() { return {
 		data: undefined,
 	}},

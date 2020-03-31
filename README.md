@@ -80,6 +80,17 @@ The following injectables can be subscribed to within each component:
 | `$mgForm`       | The parent `mgForm` component, must be subscribed to then used via `vm.$mgForm.inject(this)` |
 | `$mgFormEditor` | The optional wrapping `mgFormEditor` component, if present. This is outside the `mgForm` parent, its presense can be used to determine whether to display special edit component features |
 
+To specify optional injectables (e.g. that `$mgFormEditor` _may_ be included but is not essencial) use:
+
+```javascript
+{
+	inject: {
+		$mgForm: {from: '$mgForm'},
+		$mgFormEditor: {from: '$mgFormEditor', default: false},
+	},
+}
+```
+
 
 **Events:**
 Each MacGyver component injected with `$mgForm.inject(vm)` can respond to the following events:
