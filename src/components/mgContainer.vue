@@ -181,13 +181,14 @@ export default Vue.component('mgContainer', {
 			<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
 		</div>
 	</div>
+	<!-- Layout: card {{{ -->
 	<div
 		v-else-if="$props.config.layout == 'card'"
 		class="mg-container"
 		:class="$props.config.formClass"
 	>
 		<div class="card mg-container" :class="{'card-collapsable': $props.config.collapsable, 'card-collapsed': $props.config.collapsed}">
-			<div class="card-header">
+			<div v-if="$props.config.title || ($props.config.verbs && $props.config.verbs.length)" class="card-header">
 				{{$props.config.title}}
 				<div v-if="$props.config.verbs && $props.config.verbs.length" class="card-verbs">
 					<a
@@ -229,6 +230,8 @@ export default Vue.component('mgContainer', {
 			</div>
 		</div>
 	</div>
+	<!-- }}} -->
+	<!-- Layout: formFloating {{{ -->
 	<div v-else-if="$props.config.layout == 'formFloating'">
 		<div
 			v-for="(widget, widgetIndex) in $props.config.items"
@@ -250,6 +253,8 @@ export default Vue.component('mgContainer', {
 			<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
 		</div>
 	</div>
+	<!-- }}} -->
+	<!-- Layout: columns {{{ -->
 	<div v-else-if="$props.config.layout == 'columns'">
 		<table class="mg-container" :class="$props.config.border ? 'table table-bordered' : 'mg-container-columns-no-border'" style="width: 100%">
 			<thead v-if="$props.config.columnHeaders">
@@ -279,6 +284,8 @@ export default Vue.component('mgContainer', {
 			</tbody>
 		</table>
 	</div>
+	<!-- }}} -->
+	<!-- Layout: query {{{ -->
 	<div v-else-if="$props.config.layout == 'query'">
 		<div class="mg-container mg-container-query">
 			<div v-for="rowWidget in $props.config.items" :key="rowWidget.id">
@@ -297,12 +304,15 @@ export default Vue.component('mgContainer', {
 			</div>
 		</div>
 	</div>
+	<!-- }}} -->
+	<!-- Layout: unknown {{{ -->
 	<div v-else class="mg-container">
 		<div class="alert alert-danger">
 			Unsupported mgContainer layout "{{$props.config.layout || 'Unspecified'}}"
 			<pre>{{$props.config}}</pre>
 		</div>
 	</div>
+	<!-- }}} -->
 </template>
 
 <style>
