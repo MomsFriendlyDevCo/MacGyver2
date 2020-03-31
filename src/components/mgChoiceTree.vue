@@ -11,7 +11,8 @@ macgyver.register('mgChoiceTree', {
 			items: [
 				{id: 'id', title: 'ID'},
 				{id: 'title', title: 'Title'},
-				// FIXME: We can't recursively edit children yet
+				{id: 'icon', title: 'Icon'}, // Icon used to override both item.iconOpen + item.iconClosed
+				// 'enum': FIXME: We can't recursively edit children yet
 			],
 		},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
@@ -119,7 +120,14 @@ export default Vue.component('mgChoiceTree', {
 					},
 					[
 						h('i', {
-							class: (item.isOpen ? this.$props.config.iconClassBranchOpen : this.$props.config.iconClassBranchClosed) || this.$props.config.iconClassBranch,
+							class:
+								item.isOpen && item.iconOpen ? item.iconOpen
+								: item.isOpen && item.icon ? item.icon
+								: item.isOpen && this.$props.config.iconClassBranchOpen ? this.$props.config.iconClassBranchOpen
+								: !item.isOpen && item.iconClosed ? item.iconClosed
+								: !item.isOpen && item.icon ? item.icon
+								: !item.isOpen && this.$props.config.iconClassBranchClosed ? this.$props.config.iconClassBranchClosed
+								: this.$props.config.iconClassBranch,
 							on: {
 								click: e => {
 									this.toggleOpen(item);
