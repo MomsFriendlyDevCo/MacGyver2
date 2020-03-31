@@ -387,6 +387,30 @@
 					]
 				},
 				{
+					"id": "containerLayoutFormAbove",
+					"type": "mgContainer",
+					"layout": "form",
+					"formClass": "titles-above",
+					"title": "Form (with titles above)",
+					"items": [
+						{
+							"id": "containerLayoutFormFormAboveFoo",
+							"type": "mgText",
+							"title": "Foo"
+						},
+						{
+							"id": "containerLayoutFormFormAboveBar",
+							"type": "mgText",
+							"title": "Bar"
+						},
+						{
+							"id": "containerLayoutFormFormAboveBaz",
+							"type": "mgText",
+							"title": "Baz"
+						}
+					]
+				},
+				{
 					"id": "containerLayoutCardFloating",
 					"type": "mgContainer",
 					"layout": "formFloating",
