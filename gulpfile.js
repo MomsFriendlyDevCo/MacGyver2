@@ -54,6 +54,24 @@ gulp.task('serve', 'build', ()=> {
 
 
 /**
+* Create a monitored server specifially to check the GitHub /docs deployment
+*/
+gulp.task('serve:docs', 'build:docs', ()=> {
+	var monitor = nodemon({
+		script: './docs/server.js',
+		ext: 'js css',
+		watch: ['./docs/server.js'], // Only watch the main server as the rest are handled below anyway
+	})
+		.on('start', function() {
+			console.log('Server started');
+		})
+		.on('restart', function() {
+			console.log('Server restarted');
+		});
+});
+
+
+/**
 * Build main MacGyver stack for Node
 */
 gulp.task('build:node', ()=>
@@ -292,6 +310,7 @@ gulp.task('build:docs', ()=> del('./docs'), ()=>
 		'./demo/_config.yml',
 		'./demo/webfonts-fa.json',
 		'./demo/index.html',
+		'./demo/server-docs.js',
 		'./dist/**/*',
 		'./examples/**/*',
 		'./node_modules/ace-builds/src-noconflict/ace.js',
@@ -308,9 +327,13 @@ gulp.task('build:docs', ()=> del('./docs'), ()=>
 		'./node_modules/vue-router/dist/vue-router.min.js',
 	], {base: __dirname})
 		.pipe(rename(function(path) {
-			if (path.dirname == 'demo' && path.basename == 'webfonts-fa.css') { // Move webfont dir into server api path
+			if (path.dirname == 'demo' && path.basename == 'webfonts-fa' && path.extname == '.json') { // Move webfont dir into server api path
 				path.dirname = 'api/webfonts';
-				path.basename = 'fa.json';
+				path.basename = 'fa';
+				path.extname = '.json';
+			} else if (path.dirname == 'demo' && path.basename == 'server-docs' && path.extname == '.js') { // Move webfont dir into server api path
+				path.dirname = '.';
+				path.basename = 'server';
 			} else if (path.dirname == 'demo') { // Move all demo files into root
 				path.dirname = '.';
 			}
