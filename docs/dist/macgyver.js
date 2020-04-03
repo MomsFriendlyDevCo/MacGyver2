@@ -6914,6 +6914,7 @@
 
             Promise.resolve().then(function () { return mgChoiceRadio; });
             Promise.resolve().then(function () { return mgChoiceTags; });
+            Promise.resolve().then(function () { return mgChoiceTree; });
             Promise.resolve().then(function () { return mgCode; });
             Promise.resolve().then(function () { return mgColor; });
             Promise.resolve().then(function () { return mgComponent; });
@@ -9058,6 +9059,245 @@
                         'default': __vue_component__$d
             });
 
+            macgyver.register('mgChoiceTree', {
+              title: 'Choice Tree',
+              icon: 'fas fa-stream',
+              category: 'Choice Selectors',
+              preferId: true,
+              config: {
+                "enum": {
+                  type: 'mgTable',
+                  title: 'List items',
+                  items: [{
+                    id: 'id',
+                    title: 'ID'
+                  }, {
+                    id: 'title',
+                    title: 'Title'
+                  }, {
+                    id: 'icon',
+                    title: 'Icon'
+                  } // Icon used to override both item.iconOpen + item.iconClosed
+                  // 'enum': FIXME: We can't recursively edit children yet
+                  ]
+                },
+                required: {
+                  type: 'mgToggle',
+                  "default": false,
+                  help: 'One choice must be selected'
+                },
+                collapsable: {
+                  type: 'mgToggle',
+                  "default": true,
+                  help: 'Allow branches to be closed'
+                },
+                selectBranches: {
+                  type: 'mgToggle',
+                  "default": false,
+                  help: 'Allow selection of tree branches rather than just end leaves'
+                },
+                classWrapper: {
+                  type: 'mgText',
+                  "default": 'mg-choice-tree',
+                  title: 'Group CSS class',
+                  advanced: true
+                },
+                branchClass: {
+                  type: 'mgText',
+                  "default": 'mg-choice-tree-branch list-group',
+                  title: 'Branch CSS class',
+                  advanced: true
+                },
+                itemClassActive: {
+                  type: 'mgText',
+                  title: 'Item class active',
+                  "default": 'btn btn-primary text-left',
+                  advanced: true
+                },
+                itemClassInactive: {
+                  type: 'mgText',
+                  title: 'Item class inactive',
+                  "default": 'btn btn-light text-left',
+                  advanced: true
+                },
+                iconClassBranch: {
+                  type: 'mgIcon',
+                  title: 'Branch icon base',
+                  "default": 'far fa-folder fa-lg',
+                  advanced: true
+                },
+                iconClassBranchOpen: {
+                  type: 'mgIcon',
+                  title: 'Branch icon open (overrides base)',
+                  "default": '',
+                  advanced: true
+                },
+                iconClassBranchClosed: {
+                  type: 'mgIcon',
+                  title: 'Branch icon closed (overrides base)',
+                  "default": '',
+                  advanced: true
+                }
+              },
+              format: true // FIXME: Not sure about this, what if we need to lookup the value by the enum ID?
+
+            });
+            var script$d = Vue.component('mgChoiceTree', {
+              inject: ['$mgForm'],
+              data: function data() {
+                return {
+                  data: undefined,
+                  enumIter: undefined
+                };
+              },
+              props: {
+                config: Object
+              },
+              created: function created() {
+                var _this = this;
+
+                this.$mgForm.inject(this);
+                this.$on('mgValidate', function (reply) {
+                  if (_this.$props.config.required && !_this.data) return reply("".concat(_this.$props.config.title, " is required"));
+                });
+              },
+              methods: {
+                select: function select(item) {
+                  if (this.$props.config.collapsable && !item.isLeaf && !item.open) {
+                    // Item is closed - user probably wants it open
+                    console.log('Toggle open (node is closed)');
+                    item.isOpen = !item.isOpen;
+                  } else if ((item.isLeaf || this.$props.config.selectBranches) && item.active != item.id) {
+                    // Item is selectable but not selected - user probably wants it selected
+                    if (!this.$props.config.required && this.data == item.id) {
+                      console.log('Deselect');
+                      this.data = undefined;
+                    } else {
+                      console.log('Select');
+                      this.data = item.id;
+                      console.log('DATA', this.data);
+                    }
+                  } else if (this.$props.config.collapsable && !item.isLeaf) {
+                    // No idea, but item is not a leaf, maybe the user wants to toggle it?
+                    console.log('Toggle open');
+                    item.open = !item.isOpen;
+                  } else {
+                    // Give up
+                    console.warn('FIXME: No idea what the user wants to do when clicking on item', item);
+                  }
+
+                  this.$forceUpdate(); // FIXME: Not happy with this but no idea how to make the render function selectively update yet
+                },
+                toggleOpen: function toggleOpen(item) {
+                  item.isOpen = !item.isOpen;
+                  this.$forceUpdate(); // FIXME: Again, not happy
+                }
+              },
+              watch: {
+                /**
+                * Remap the incomming `enum` into an iterable array-of-arrays
+                * Each child will be of the form {id, title, enum?, isOpen, isLeaf}
+                */
+                '$props.config.enum': {
+                  immediate: true,
+                  handler: function handler() {
+                    if (!this.$props.config["enum"]) return; // Nothing to render yet
+
+                    var walkBranch = function walkBranch(items) {
+                      return items.map(function (item) {
+                        if (typeof item == 'string') item = {
+                          title: item,
+                          id: _.camelCase(item)
+                        };
+                        item.isOpen = true;
+                        item.isLeaf = !item["enum"] || item["enum"].length < 1;
+                        if (!item.isLeaf) item["enum"] = walkBranch(item["enum"]);
+                        return item;
+                      });
+                    };
+
+                    this.enumIter = walkBranch(this.$props.config["enum"]);
+                  }
+                }
+              },
+              render: function render(h) {
+                var _this2 = this;
+
+                var renderBranch = function renderBranch(items, isOpen) {
+                  return h('div', {
+                    "class": [_this2.$props.config.branchClass, isOpen && 'open']
+                  }, items.map(function (item) {
+                    return [h('div', {
+                      "class": _this2.data == item.id ? _this2.$props.config.itemClassActive : _this2.$props.config.itemClassInactive,
+                      on: {
+                        click: function click(e) {
+                          _this2.select(item);
+
+                          e.stopPropagation();
+                        }
+                      }
+                    }, [h('i', {
+                      "class": item.isOpen && item.iconOpen ? item.iconOpen : item.isOpen && item.icon ? item.icon : item.isOpen && _this2.$props.config.iconClassBranchOpen ? _this2.$props.config.iconClassBranchOpen : !item.isOpen && item.iconClosed ? item.iconClosed : !item.isOpen && item.icon ? item.icon : !item.isOpen && _this2.$props.config.iconClassBranchClosed ? _this2.$props.config.iconClassBranchClosed : _this2.$props.config.iconClassBranch,
+                      on: {
+                        click: function click(e) {
+                          _this2.toggleOpen(item);
+
+                          e.stopPropagation();
+                        }
+                      }
+                    }), h('span', {
+                      "class": 'mg-choice-tree-title'
+                    }, item.title), item["enum"] ? renderBranch(item["enum"], item.isOpen) : undefined])];
+                  }));
+                };
+
+                return h('div', {
+                  "class": this.$props.config.classWrapper
+                }, [renderBranch(this.enumIter, true)]);
+              }
+            });
+
+            /* script */
+            const __vue_script__$e = script$d;
+
+            /* template */
+
+              /* style */
+              const __vue_inject_styles__$e = function (inject) {
+                if (!inject) return
+                inject("data-v-ca155128_0", { source: "\n.mg-choice-tree-branch {\n\tmargin-left: 32px;\n}\n.mg-choice-tree-branch:not(.open) {\n\tdisplay: none;\n}\n.mg-choice-tree-branch i {\n\tmargin-right: 5px;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgChoiceTree.vue"],"names":[],"mappings":";AAsJA;CACA,iBAAA;AACA;AAEA;CACA,aAAA;AACA;AAEA;CACA,iBAAA;AACA","file":"mgChoiceTree.vue","sourcesContent":["<script>\nmacgyver.register('mgChoiceTree', {\n\ttitle: 'Choice Tree',\n\ticon: 'fas fa-stream',\n\tcategory: 'Choice Selectors',\n\tpreferId: true,\n\tconfig: {\n\t\tenum: {\n\t\t\ttype: 'mgTable',\n\t\t\ttitle: 'List items',\n\t\t\titems: [\n\t\t\t\t{id: 'id', title: 'ID'},\n\t\t\t\t{id: 'title', title: 'Title'},\n\t\t\t\t{id: 'icon', title: 'Icon'}, // Icon used to override both item.iconOpen + item.iconClosed\n\t\t\t\t// 'enum': FIXME: We can't recursively edit children yet\n\t\t\t],\n\t\t},\n\t\trequired: {type: 'mgToggle', default: false, help: 'One choice must be selected'},\n\t\tcollapsable: {type: 'mgToggle', default: true, help: 'Allow branches to be closed'},\n\t\tselectBranches: {type: 'mgToggle', default: false, help: 'Allow selection of tree branches rather than just end leaves'},\n\t\tclassWrapper: {type: 'mgText', default: 'mg-choice-tree', title: 'Group CSS class', advanced: true},\n\t\tbranchClass: {type: 'mgText', default: 'mg-choice-tree-branch list-group', title: 'Branch CSS class', advanced: true},\n\t\titemClassActive: {type: 'mgText', title: 'Item class active', default: 'btn btn-primary text-left', advanced: true},\n\t\titemClassInactive: {type: 'mgText', title: 'Item class inactive', default: 'btn btn-light text-left', advanced: true},\n\t\ticonClassBranch: {type: 'mgIcon', title: 'Branch icon base', default: 'far fa-folder fa-lg', advanced: true},\n\t\ticonClassBranchOpen: {type: 'mgIcon', title: 'Branch icon open (overrides base)', default: '', advanced: true},\n\t\ticonClassBranchClosed: {type: 'mgIcon', title: 'Branch icon closed (overrides base)', default: '', advanced: true},\n\t},\n\tformat: true, // FIXME: Not sure about this, what if we need to lookup the value by the enum ID?\n});\n\nexport default Vue.component('mgChoiceTree', {\n\tinject: ['$mgForm'],\n\tdata() { return {\n\t\tdata: undefined,\n\t\tenumIter: undefined,\n\t}},\n\tprops: {\n\t\tconfig: Object,\n\t},\n\tcreated() {\n\t\tthis.$mgForm.inject(this);\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);\n\t\t});\n\t},\n\tmethods: {\n\t\tselect(item) {\n\t\t\tif (this.$props.config.collapsable && !item.isLeaf && !item.open) { // Item is closed - user probably wants it open\n\t\t\t\tconsole.log('Toggle open (node is closed)');\n\t\t\t\titem.isOpen = !item.isOpen;\n\t\t\t} else if ((item.isLeaf || this.$props.config.selectBranches) && item.active != item.id) { // Item is selectable but not selected - user probably wants it selected\n\t\t\t\tif (!this.$props.config.required && this.data == item.id) {\n\t\t\t\t\tconsole.log('Deselect');\n\t\t\t\t\tthis.data = undefined;\n\t\t\t\t} else {\n\t\t\t\t\tconsole.log('Select');\n\t\t\t\t\tthis.data = item.id;\n\t\t\t\t\tconsole.log('DATA', this.data);\n\t\t\t\t}\n\t\t\t} else if (this.$props.config.collapsable && !item.isLeaf) { // No idea, but item is not a leaf, maybe the user wants to toggle it?\n\t\t\t\tconsole.log('Toggle open');\n\t\t\t\titem.open = !item.isOpen;\n\t\t\t} else { // Give up\n\t\t\t\tconsole.warn('FIXME: No idea what the user wants to do when clicking on item', item);\n\t\t\t}\n\n\t\t\tthis.$forceUpdate(); // FIXME: Not happy with this but no idea how to make the render function selectively update yet\n\t\t},\n\n\t\ttoggleOpen(item) {\n\t\t\titem.isOpen = !item.isOpen;\n\t\t\tthis.$forceUpdate(); // FIXME: Again, not happy\n\t\t},\n\t},\n\twatch: {\n\t\t/**\n\t\t* Remap the incomming `enum` into an iterable array-of-arrays\n\t\t* Each child will be of the form {id, title, enum?, isOpen, isLeaf}\n\t\t*/\n\t\t'$props.config.enum': {\n\t\t\timmediate: true,\n\t\t\thandler() {\n\t\t\t\tif (!this.$props.config.enum) return; // Nothing to render yet\n\n\t\t\t\tvar walkBranch = items => {\n\t\t\t\t\treturn items.map(item => {\n\t\t\t\t\t\tif (typeof item == 'string') item = {title: item, id: _.camelCase(item)};\n\t\t\t\t\t\titem.isOpen = true;\n\n\t\t\t\t\t\titem.isLeaf = !item.enum || item.enum.length < 1;\n\t\t\t\t\t\tif (!item.isLeaf) item.enum = walkBranch(item.enum);\n\n\t\t\t\t\t\treturn item;\n\t\t\t\t\t});\n\t\t\t\t}\n\n\t\t\t\tthis.enumIter = walkBranch(this.$props.config.enum);\n\t\t\t},\n\t\t},\n\t},\n\trender(h) {\n\t\tvar renderBranch = (items, isOpen) => h(\n\t\t\t'div',\n\t\t\t{class: [\n\t\t\t\tthis.$props.config.branchClass,\n\t\t\t\tisOpen && 'open',\n\t\t\t]},\n\t\t\titems.map(item => [\n\t\t\t\th(\n\t\t\t\t\t'div',\n\t\t\t\t\t{\n\t\t\t\t\t\tclass: this.data == item.id ? this.$props.config.itemClassActive : this.$props.config.itemClassInactive,\n\t\t\t\t\t\ton: {\n\t\t\t\t\t\t\tclick: e => {\n\t\t\t\t\t\t\t\tthis.select(item);\n\t\t\t\t\t\t\t\te.stopPropagation();\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t\t[\n\t\t\t\t\t\th('i', {\n\t\t\t\t\t\t\tclass:\n\t\t\t\t\t\t\t\titem.isOpen && item.iconOpen ? item.iconOpen\n\t\t\t\t\t\t\t\t: item.isOpen && item.icon ? item.icon\n\t\t\t\t\t\t\t\t: item.isOpen && this.$props.config.iconClassBranchOpen ? this.$props.config.iconClassBranchOpen\n\t\t\t\t\t\t\t\t: !item.isOpen && item.iconClosed ? item.iconClosed\n\t\t\t\t\t\t\t\t: !item.isOpen && item.icon ? item.icon\n\t\t\t\t\t\t\t\t: !item.isOpen && this.$props.config.iconClassBranchClosed ? this.$props.config.iconClassBranchClosed\n\t\t\t\t\t\t\t\t: this.$props.config.iconClassBranch,\n\t\t\t\t\t\t\ton: {\n\t\t\t\t\t\t\t\tclick: e => {\n\t\t\t\t\t\t\t\t\tthis.toggleOpen(item);\n\t\t\t\t\t\t\t\t\te.stopPropagation();\n\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t}),\n\t\t\t\t\t\th('span', {class: 'mg-choice-tree-title'}, item.title),\n\t\t\t\t\t\titem.enum ? renderBranch(item.enum, item.isOpen) : undefined,\n\t\t\t\t\t],\n\t\t\t\t),\n\t\t\t])\n\t\t);\n\n\t\treturn h('div', {class: this.$props.config.classWrapper}, [renderBranch(this.enumIter, true)]);\n\t},\n});\n</script>\n\n<style>\n.mg-choice-tree-branch {\n\tmargin-left: 32px;\n}\n\n.mg-choice-tree-branch:not(.open) {\n\tdisplay: none;\n}\n\n.mg-choice-tree-branch i {\n\tmargin-right: 5px;\n}\n</style>\n"]}, media: undefined });
+
+              };
+              /* scoped */
+              const __vue_scope_id__$e = undefined;
+              /* module identifier */
+              const __vue_module_identifier__$e = undefined;
+              /* functional template */
+              const __vue_is_functional_template__$e = undefined;
+              /* style inject SSR */
+              
+              /* style inject shadow dom */
+              
+
+              
+              const __vue_component__$e = normalizeComponent(
+                {},
+                __vue_inject_styles__$e,
+                __vue_script__$e,
+                __vue_scope_id__$e,
+                __vue_is_functional_template__$e,
+                __vue_module_identifier__$e,
+                false,
+                createInjector,
+                undefined,
+                undefined
+              );
+
+            var mgChoiceTree = /*#__PURE__*/Object.freeze({
+                        __proto__: null,
+                        'default': __vue_component__$e
+            });
+
             macgyver.register('mgCode', {
               requires: 'node_modules/ace-builds/src-noconflict/ace.js',
               title: 'Code Editor',
@@ -9091,7 +9331,7 @@
                 }
               }
             });
-            var script$d = Vue.component('mgCode', {
+            var script$e = Vue.component('mgCode', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -9155,35 +9395,35 @@
             });
 
             /* script */
-            const __vue_script__$e = script$d;
+            const __vue_script__$f = script$e;
 
             /* template */
 
               /* style */
-              const __vue_inject_styles__$e = function (inject) {
+              const __vue_inject_styles__$f = function (inject) {
                 if (!inject) return
                 inject("data-v-ef32937c_0", { source: "\n.mg-code {\n\tborder: 1px solid #f0f0f0;\n\tborder-radius: 5px;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgCode.vue"],"names":[],"mappings":";AA8EA;CACA,yBAAA;CACA,kBAAA;AACA","file":"mgCode.vue","sourcesContent":["<script>\nmacgyver.register('mgCode', {\n\trequires: 'node_modules/ace-builds/src-noconflict/ace.js',\n\ttitle: 'Code Editor',\n\ticon: 'fal fa-code',\n\tcategory: 'Complex Inputs',\n\tpreferId: true,\n\tconfig: {\n\t\tsyntax: {type: 'mgChoiceDropdown', enum: ['text', 'json', 'javascript', 'html'], default: 'json'},\n\t\tconvert: {type: 'mgToggle', default: true, showIf: 'syntax == \"json\"', help: 'Convert data back to a native JS object'},\n\t\ttheme: {type: 'mgChoiceDropdown', enum: ['chrome'], advanced: true, default: 'chrome', help: 'The syntax color scheme to use'},\n\t\theight: {type: 'mgText', default: '400px', help: 'The size of the editing window as a valid CSS measurement', advanced: true},\n\t},\n});\n\nexport default Vue.component('mgCode', {\n\tinject: ['$mgForm'],\n\tdata() { return {\n\t\tdata: undefined,\n\t}},\n\tprops: {\n\t\tconfig: Object,\n\t},\n\tcreated() {\n\t\tthis.$mgForm.inject(this);\n\t},\n\tbeforeDestroy() {\n\t\tthis.editor.destroy();\n\t\tthis.editor.container.remove();\n\t},\n\tmounted() {\n\t\tthis.editor = ace.edit(this.$el);\n\t\tthis.editor.$blockScrolling = Infinity;\n\n\t\tthis.editor.setValue(\n\t\t\t_.isObject(this.data) ? JSON.stringify(this.data, null, '\\t') // Parse raw objects into JSON\n\t\t\t: this.data ? this.data\n\t\t\t: ''\n\t\t, 1);\n\n\t\tthis.editor.setOptions({\n\t\t\tshowPrintMargin: false,\n\t\t});\n\n\t\tthis.editor.on('change', ()=> {\n\t\t\tvar val = this.editor.getValue();\n\t\t\tif (this.$props.config.convert && this.$props.config.syntax == 'json') {\n\t\t\t\ttry {\n\t\t\t\t\tval = JSON.parse(val);\n\t\t\t\t\tthis.$mgForm.$emit('mgChange', this.$props.config.id, val)\n\t\t\t\t} catch (e) {\n\t\t\t\t\t// Silently fail as the JSON is invalid\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tthis.$mgForm.$emit('mgChange', this.$props.config.id, val)\n\t\t\t}\n\t\t\treturn true;\n\t\t});\n\n\t\tthis.$nextTick(()=> this.editor.resize());\n\n\t\tthis.$watch('config', ()=> {\n\t\t\tif (this.$props.config.syntax) this.editor.getSession().setMode(`ace/mode/${this.$props.config.syntax}`);\n\t\t\tif (this.$props.config.theme) this.editor.setTheme(`ace/theme/${this.$props.config.theme}`);\n\t\t}, {immediate: true});\n\t},\n\trender(h) {\n\t\treturn h('div', {\n\t\t\tattrs: {\n\t\t\t\tclass: 'mg-code',\n\t\t\t\tstyle: `height: ${this.$props.config.height}; width: 100%`,\n\t\t\t},\n\t\t});\n\t},\n});\n</script>\n\n<style>\n.mg-code {\n\tborder: 1px solid #f0f0f0;\n\tborder-radius: 5px;\n}\n</style>\n"]}, media: undefined });
 
               };
               /* scoped */
-              const __vue_scope_id__$e = undefined;
+              const __vue_scope_id__$f = undefined;
               /* module identifier */
-              const __vue_module_identifier__$e = undefined;
+              const __vue_module_identifier__$f = undefined;
               /* functional template */
-              const __vue_is_functional_template__$e = undefined;
+              const __vue_is_functional_template__$f = undefined;
               /* style inject SSR */
               
               /* style inject shadow dom */
               
 
               
-              const __vue_component__$e = normalizeComponent(
+              const __vue_component__$f = normalizeComponent(
                 {},
-                __vue_inject_styles__$e,
-                __vue_script__$e,
-                __vue_scope_id__$e,
-                __vue_is_functional_template__$e,
-                __vue_module_identifier__$e,
+                __vue_inject_styles__$f,
+                __vue_script__$f,
+                __vue_scope_id__$f,
+                __vue_is_functional_template__$f,
+                __vue_module_identifier__$f,
                 false,
                 createInjector,
                 undefined,
@@ -9192,7 +9432,7 @@
 
             var mgCode = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$e
+                        'default': __vue_component__$f
             });
 
             var vueSwatches_min = createCommonjsModule(function (module, exports) {
@@ -9244,7 +9484,7 @@
               format: true,
               shorthand: ['color', 'hue', 'swatch']
             });
-            var script$e = Vue.component('mgColor', {
+            var script$f = Vue.component('mgColor', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -9277,7 +9517,7 @@
             });
 
             /* script */
-            const __vue_script__$f = script$e;
+            const __vue_script__$g = script$f;
 
             /* template */
             var __vue_render__$a = function() {
@@ -9341,30 +9581,30 @@
             __vue_render__$a._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$f = function (inject) {
+              const __vue_inject_styles__$g = function (inject) {
                 if (!inject) return
                 inject("data-v-7d987b28_0", { source: "\n.mg-color .input-group > .input-group-prepend .vue-swatches {\n\tpadding: 3px;\n}\n.mg-color .input-group > .input-group-prepend .vue-swatches .vue-swatches__trigger {\n\twidth: 30px !important;\n\theight: 30px !important;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgColor.vue"],"names":[],"mappings":";AA6EA;CACA,YAAA;AACA;AAEA;CACA,sBAAA;CACA,uBAAA;AACA","file":"mgColor.vue","sourcesContent":["<script>\nimport Swatches from 'vue-swatches';\nimport 'vue-swatches/dist/vue-swatches.min.css';\n\nmacgyver.register('mgColor', {\n\ttitle: 'Color',\n\ticon: 'far fa-paint-roller',\n\tcategory: 'Simple Inputs',\n\tpreferId: true,\n\tconfig: {\n\t\trequired: {type: 'mgToggle', default: false},\n\t\tcolorSet: {type: 'mgChoiceDropdown', enum: [{id: 'basic', title: 'Basic'}, {id: 'material-light', title: 'Material'}, {id: 'text-advanced', title: 'Full swatch'}], default: 'text-advanced'},\n\t\tinterface: {type: 'mgChoiceDropdown', default: 'input', enum: ['input', 'colorOnly']},\n\t\tplaceholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},\n\t\tpopoverSide: {type: 'mgChoiceButtons', enum: ['left', 'right'], advanced: true},\n\t},\n\tformat: true,\n\tshorthand: ['color', 'hue', 'swatch'],\n});\n\nexport default Vue.component('mgColor', {\n\tinject: ['$mgForm'],\n\tdata() {return {\n\t\tdata: undefined,\n\t}},\n\tprops: {\n\t\tconfig: Object,\n\t},\n\tcomponents: {Swatches},\n\tcreated() {\n\t\tthis.$mgForm.inject(this);\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);\n\t\t});\n\t},\n\tmethods: {\n\t\tchange(e) {\n\t\t\tvar value = e.target.value;\n\t\t\tif (value && /^#[0-9A-F]+$/i.test(value)) {\n\t\t\t\tthis.data = value;\n\t\t\t}\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-color\">\n\t\t<div v-if=\"$props.config.interface == 'input'\" class=\"input-group\">\n\t\t\t<div class=\"input-group-prepend\">\n\t\t\t\t<swatches\n\t\t\t\t\t:value=\"data\"\n\t\t\t\t\t:colors=\"$props.config.colorSet\"\n\t\t\t\t\t:popover-to=\"$props.config.popoverSide\"\n\t\t\t\t\tclass=\"input-group-text\"\n\t\t\t\t\t@input=\"data = $event.toUpperCase()\"\n\t\t\t\t/>\n\t\t\t</div>\n\t\t\t<input\n\t\t\t\t:value=\"data\"\n\t\t\t\ttype=\"text\"\n\t\t\t\tclass=\"form-control\"\n\t\t\t\t:placeholder=\"$props.config.placeholder\"\n\t\t\t\t@input=\"change\"\n\t\t\t/>\n\t\t</div>\n\t\t<swatches\n\t\t\tv-else\n\t\t\t:value=\"data\"\n\t\t\t:colors=\"$props.config.colorSet\"\n\t\t\t:popover-to=\"$props.config.popoverSide\"\n\t\t\t@input=\"data = $event.toUpperCase()\"\n\t\t/>\n\t</div>\n</template>\n\n<style>\n.mg-color .input-group > .input-group-prepend .vue-swatches {\n\tpadding: 3px;\n}\n\n.mg-color .input-group > .input-group-prepend .vue-swatches .vue-swatches__trigger {\n\twidth: 30px !important;\n\theight: 30px !important;\n}\n</style>\n"]}, media: undefined });
 
               };
               /* scoped */
-              const __vue_scope_id__$f = undefined;
+              const __vue_scope_id__$g = undefined;
               /* module identifier */
-              const __vue_module_identifier__$f = undefined;
+              const __vue_module_identifier__$g = undefined;
               /* functional template */
-              const __vue_is_functional_template__$f = false;
+              const __vue_is_functional_template__$g = false;
               /* style inject SSR */
               
               /* style inject shadow dom */
               
 
               
-              const __vue_component__$f = normalizeComponent(
+              const __vue_component__$g = normalizeComponent(
                 { render: __vue_render__$a, staticRenderFns: __vue_staticRenderFns__$a },
-                __vue_inject_styles__$f,
-                __vue_script__$f,
-                __vue_scope_id__$f,
-                __vue_is_functional_template__$f,
-                __vue_module_identifier__$f,
+                __vue_inject_styles__$g,
+                __vue_script__$g,
+                __vue_scope_id__$g,
+                __vue_is_functional_template__$g,
+                __vue_module_identifier__$g,
                 false,
                 createInjector,
                 undefined,
@@ -9373,14 +9613,14 @@
 
             var mgColor = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$f
+                        'default': __vue_component__$g
             });
 
             /**
             * Instance of a MacGyver widget
             * This is the parent of all other mg* components except mgContainer
             */
-            var script$f = Vue.component('mgComponent', {
+            var script$g = Vue.component('mgComponent', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -9436,18 +9676,18 @@
             });
 
             /* script */
-            const __vue_script__$g = script$f;
+            const __vue_script__$h = script$g;
 
             /* template */
 
               /* style */
-              const __vue_inject_styles__$g = undefined;
+              const __vue_inject_styles__$h = undefined;
               /* scoped */
-              const __vue_scope_id__$g = undefined;
+              const __vue_scope_id__$h = undefined;
               /* module identifier */
-              const __vue_module_identifier__$g = undefined;
+              const __vue_module_identifier__$h = undefined;
               /* functional template */
-              const __vue_is_functional_template__$g = undefined;
+              const __vue_is_functional_template__$h = undefined;
               /* style inject */
               
               /* style inject SSR */
@@ -9456,13 +9696,13 @@
               
 
               
-              const __vue_component__$g = normalizeComponent(
+              const __vue_component__$h = normalizeComponent(
                 {},
-                __vue_inject_styles__$g,
-                __vue_script__$g,
-                __vue_scope_id__$g,
-                __vue_is_functional_template__$g,
-                __vue_module_identifier__$g,
+                __vue_inject_styles__$h,
+                __vue_script__$h,
+                __vue_scope_id__$h,
+                __vue_is_functional_template__$h,
+                __vue_module_identifier__$h,
                 false,
                 undefined,
                 undefined,
@@ -9471,7 +9711,7 @@
 
             var mgComponent = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$g
+                        'default': __vue_component__$h
             });
 
             /**
@@ -9641,8 +9881,16 @@
                 }
               }
             });
-            var script$g = Vue.component('mgContainer', {
-              inject: ['$mgForm', '$mgFormEditor'],
+            var script$h = Vue.component('mgContainer', {
+              inject: {
+                $mgForm: {
+                  from: '$mgForm'
+                },
+                $mgFormEditor: {
+                  from: '$mgFormEditor',
+                  "default": false
+                }
+              },
               data: function data() {
                 return {
                   highlights: {},
@@ -9751,7 +9999,7 @@
             });
 
             /* script */
-            const __vue_script__$h = script$g;
+            const __vue_script__$i = script$h;
 
             /* template */
             var __vue_render__$b = function() {
@@ -9837,40 +10085,43 @@
                           }
                         },
                         [
-                          _c("div", { staticClass: "card-header" }, [
-                            _vm._v(
-                              "\n\t\t\t" + _vm._s(_vm.$props.config.title) + "\n\t\t\t"
-                            ),
-                            _vm.$props.config.verbs && _vm.$props.config.verbs.length
-                              ? _c(
-                                  "div",
-                                  { staticClass: "card-verbs" },
-                                  _vm._l(_vm.$props.config.verbs, function(
-                                    verb,
-                                    verbIndex
-                                  ) {
-                                    return _c("a", {
-                                      directives: [
-                                        {
-                                          name: "tooltip",
-                                          rawName: "v-tooltip",
-                                          value: verb.tooltip,
-                                          expression: "verb.tooltip"
-                                        }
-                                      ],
-                                      key: verbIndex,
-                                      class: [verb.class, verb.icon],
-                                      on: {
-                                        click: function($event) {
-                                          return _vm.$mgForm.run(_vm.form, verb.action)
-                                        }
-                                      }
-                                    })
-                                  }),
-                                  0
-                                )
-                              : _vm._e()
-                          ]),
+                          _vm.$props.config.title ||
+                          (_vm.$props.config.verbs && _vm.$props.config.verbs.length)
+                            ? _c("div", { staticClass: "card-header" }, [
+                                _vm._v(
+                                  "\n\t\t\t" + _vm._s(_vm.$props.config.title) + "\n\t\t\t"
+                                ),
+                                _vm.$props.config.verbs && _vm.$props.config.verbs.length
+                                  ? _c(
+                                      "div",
+                                      { staticClass: "card-verbs" },
+                                      _vm._l(_vm.$props.config.verbs, function(
+                                        verb,
+                                        verbIndex
+                                      ) {
+                                        return _c("a", {
+                                          directives: [
+                                            {
+                                              name: "tooltip",
+                                              rawName: "v-tooltip",
+                                              value: verb.tooltip,
+                                              expression: "verb.tooltip"
+                                            }
+                                          ],
+                                          key: verbIndex,
+                                          class: [verb.class, verb.icon],
+                                          on: {
+                                            click: function($event) {
+                                              return _vm.$mgForm.run(_vm.form, verb.action)
+                                            }
+                                          }
+                                        })
+                                      }),
+                                      0
+                                    )
+                                  : _vm._e()
+                              ])
+                            : _vm._e(),
                           _vm._v(" "),
                           _c(
                             "div",
@@ -10179,30 +10430,30 @@
             __vue_render__$b._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$h = function (inject) {
+              const __vue_inject_styles__$i = function (inject) {
                 if (!inject) return
-                inject("data-v-0780801f_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* formClass > .titles-above {{{ */\n.mg-container.titles-above > .form-group,\n.mg-container.titles-above > .form-group,\n.mg-container.titles-above > .card > .card-body > .form-group,\n.mg-container.titles-above > .card > .card-body > .form-group {\n\tdisplay: block;\n}\n.mg-container.titles-above > .form-group > .col-form-label,\n.mg-container.titles-above > .form-group > .col-form-value,\n.mg-container.titles-above > .card > .card-body > .form-group > .col-form-label,\n.mg-container.titles-above > .card > .card-body > .form-group > .col-form-value {\n\twidth: 100%;\n\tmax-width: none;\n}\n/* }}} */\n\n/* Card layout {{{ */\n/* Collapsable card {{{ */\n.mg-container.card.card-collapsable {\n\ttransition: all 0.2s ease-in;\n}\n.mg-container.card.card-collapsable .card-header {\n\tcursor: pointer;\n}\n.mg-container.card.card-collapsable .card-header::after {\n\tfont-family: \"Font Awesome 5 Pro\";\n\tcontent: '\\f054';\n\tfloat: right;\n\ttransition: transform 0.4s;\n}\n.mg-container.card.card-collapsable:not(.card-collapsed) .card-header::after {\n\ttransform: rotate(90deg);\n}\n\n\n/* Collapsed card {{{ */\n.mg-container.card.card-collapsable.card-collapsed {\n\tbox-shadow: none;\n\tborder-bottom: none;\n\tmargin-bottom: 0px;\n}\n.mg-container.card.card-collapsable.card-collapsed .card-body {\n\tdisplay: none;\n}\n/* }}} */\n/* }}} */\n\n/* Card verbs {{{ */\n.mg-container.card .card-header .card-verbs {\n\tposition: absolute;\n\tright: 15px;\n\ttop: 10px;\n\tfont-size: 20px;\n}\n.mg-container.card .card-header .card-verbs > a {\n\tcolor: #999;\n\tpadding: 5px;\n}\n.mg-container.card .card-header .card-verbs > a:hover {\n\tcolor: #000;\n}\n/* }}} */\n/* }}} */\n\n/* formFloating {{{ */\n.mgContainer-formFloating > .col-12 {\n\tposition: relative;\n\tline-height: 14px;\n\tmargin: 0 0px;\n\tdisplay: inline-block;\n\twidth: 100%;\n}\n.mgContainer-formFloating > .col-12 > .control-input {\n\theight: 45px;\n\tpadding-top: 8px;\n\tpadding-bottom: 2px;\n\tpadding-left: 2px;\n\tpadding-right: 12px;\n\tfont-size: 15px;\n\tline-height: 1.42857143;\n\tcolor: #333333;\n\tbackground-color: #ffffff;\n\tbackground-image: none;\n\toutline: none;\n\t/* border: 1px solid rgba(120, 120, 120, 0.5);\n\t*/\n\tborder: none;\n\tborder-bottom: 1px solid #bbb;\n\t-moz-box-shadow: none;\n\t-webkit-box-shadow: none;\n\tbox-shadow: none;\n\tborder-radius: 0;\n\tposition: relative;\n}\n.mgContainer-formFloating > .col-12 > .control-input.blank + .col-form-label {\n\ttransform: translateY(0px);\n\tcolor: #bbb;\n\tfont-size: 15px;\n\tfont-weight: 100;\n\topacity: 1;\n}\n.mgContainer-formFloating > .col-12 > .control-input.control-input:focus + .col-form-label {\n\ttransform: translateY(-21px);\n\tcolor: #66afe9;\n\tfont-size: 14px;\n\topacity: 1;\n\tfont-weight: 100;\n\tbackground-color: white;\n}\n.mgContainer-formFloating > .col-12 > .col-form-label {\n\tcolor: #aaa;\n\tdisplay: inline-block;\n\tfont-size: 12px;\n\tposition: absolute;\n\tz-index: 2;\n\tleft: 2px;\n\ttop: 16px;\n\tpadding: 0 0px;\n\tpointer-events: none;\n\tbackground: white;\n\ttransition: all 300ms ease;\n\ttransform: translateY(-21px);\n\tfont-weight: 500;\n}\n/* }}} */\n\n/* Columns layout {{{ */\n.mg-container.mg-container-columns-no-border th,\n.mg-container.mg-container-columns-no-border td {\n\tpadding: 5px;\n}\n/* }}} */\n\n/* Query layout {{{ */\n.mg-container.mg-container-query .row {\n\tdisplay: block;\n}\n.mg-container.mg-container-query .col {\n\tdisplay: inline-flex;\n\twidth: 200px;\n\theight: 35px;\n\tmin-width: 200px;\n\tmargin-left: 30px;\n\tmargin-bottom: 10px;\n\tmax-width: 400px;\n\tposition: relative;\n\talign-items: center;\n\tbox-shadow: 1px 3px 5px 0px rgba(50, 50, 50, 0.75);\n\tborder-radius: 3px;\n\tcolor: #FFF;\n\theight: 38px;\n\tpadding: 5px 15px;\n\tbackground: #FFF;\n}\n\n/* Query > Background color scale {{{ */\n.mg-container.mg-container-query .col:nth-child(1) {\n\tbackground: #104E8B;\n}\n.mg-container.mg-container-query .col:nth-child(2) {\n\tbackground: #1874CD;\n}\n.mg-container.mg-container-query .col:nth-child(3) {\n\tbackground: #1C86EE;\n}\n/* }}} */\n\n/* Query > Connecting lines {{{ */\n/* Vertical */\n.mg-container.mg-container-query .row::before {\n\tbackground-color: #CCC;\n\tcontent: '';\n\tdisplay: block;\n\tposition: absolute;\n\twidth: 4px;\n\ttop: 17px;\n\tbottom: 30px;\n}\n\n/* Horizontal */\n.mg-container.mg-container-query .col::before {\n\tleft: -30px;\n\theight: 4px;\n\ttop: calc(50% - 2px);\n\twidth: 30px;\n\tbackground-color: #CCC;\n\tcontent: '';\n\tdisplay: block;\n\tposition: absolute;\n}\n/* }}} */\n\n/* Query > Basic Inputs {{{ */\n.mg-container.mg-container-query .col input {\n\tbackground: transparent;\n\tborder: 1px solid transparent;\n\tcolor: #FFF;\n\theight: 1.8em;\n\tborder-radius: 0px;\n}\n.mg-container.mg-container-query .col input[type=text] {\n\tborder-bottom: 1px solid #CCC;\n}\n.mg-container.mg-container-query .col input[type=number] {\n\ttext-align: center;\n}\n.mg-container.mg-container-query .col input:focus {\n\tbox-shadow: none;\n\tborder: 1px solid #CCC;\n}\n/* }}} */\n\n/* Query > Buttons {{{ */\n.mg-container.mg-container-query .col .btn {\n\tbox-shadow: none;\n\tpadding: 1px 5px;\n\tbackground: transparent;\n\tborder: 1px solid #003e7b;\n}\n.mg-container.mg-container-query .col .btn,\n.mg-container.mg-container-query .col svg {\n\topacity: 0.2;\n\ttransition: opacity 0.5s;\n}\n.mg-container.mg-container-query .row:hover .col .btn,\n.mg-container.mg-container-query .row:hover .col svg {\n\topacity: 1;\n}\n.mg-container.mg-container-query .col .vs__clear {\n\tdisplay: none;\n}\n/* }}} */\n\n/* Query > Dropdowns {{{ */\n.mg-container.mg-container-query .v-select {\n\twidth: 100%;\n}\n.mg-container.mg-container-query .v-select,\n.mg-container.mg-container-query .v-select .vs--searchable .vs__dropdown-toggle,\n.mg-container.mg-container-query .v-select .vs__selected,\n.mg-container.mg-container-query .v-select input,\n.mg-container.mg-container-query .v-select .vs__actions {\n\tcursor: pointer !important;\n}\n.mg-container.mg-container-query .v-select .vs__dropdown-toggle {\n\tborder: none;\n}\n.mg-container.mg-container-query .col .v-select .vs__selected {\n\tcolor: #FFF;\n}\n.mg-container.mg-container-query .col .v-select .vs__selected {\n\ttop: 3px;\n}\n.mg-container.mg-container-query .col .v-select .vs__actions svg,\n.mg-container.mg-container-query .col .v-select .vs__deselect {\n\tstroke: #FFF;\n\tfill: #FFF;\n}\n.mg-container.mg-container-query .col .v-select.mg-choice-tags .vs__selected-options .vs__selected {\n\tbackground-color: #5bc0de;\n\tborder-radius: 10px;\n\tcolor: #fff;\n\tdisplay: inline-block;\n\tfont-size: 12px;\n\tline-height: 1rem;\n\tmin-width: 10px;\n\tpadding: 1px 10px;\n\ttext-align: center;\n\tvertical-align: middle;\n\twhite-space: nowrap;\n\tborder: none;\n}\n/* }}} */\n\n/* Query > Toggle {{{ */\n.mg-container.mg-container-query .col .vue-js-switch {\n\tmargin: auto;\n\theight: 10px;\n\ttop: -5px;\n}\n/* }}} */\n/* }}} */\n\n/* Misc utility types {{{ */\n.mg-form .help-block {\n\tfont-size: 80%;\n\tcolor: #6c757d !important;\n}\n/* }}} */\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgContainer.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAoTA,kCAAA;AACA;;;;CAIA,cAAA;AACA;AAEA;;;;CAIA,WAAA;CACA,eAAA;AACA;AACA,QAAA;;AAEA,oBAAA;AACA,yBAAA;AACA;CACA,4BAAA;AACA;AAEA;CACA,eAAA;AACA;AAEA;CACA,iCAAA;CACA,gBAAA;CACA,YAAA;CACA,0BAAA;AACA;AAEA;CACA,wBAAA;AACA;;;AAGA,uBAAA;AACA;CACA,gBAAA;CACA,mBAAA;CACA,kBAAA;AACA;AAEA;CACA,aAAA;AACA;AACA,QAAA;AACA,QAAA;;AAEA,mBAAA;AACA;CACA,kBAAA;CACA,WAAA;CACA,SAAA;CACA,eAAA;AACA;AAEA;CACA,WAAA;CACA,YAAA;AACA;AAEA;CACA,WAAA;AACA;AACA,QAAA;AACA,QAAA;;AAEA,qBAAA;AACA;CACA,kBAAA;CACA,iBAAA;CACA,aAAA;CACA,qBAAA;CACA,WAAA;AACA;AAEA;CACA,YAAA;CACA,gBAAA;CACA,mBAAA;CACA,iBAAA;CACA,mBAAA;CACA,eAAA;CACA,uBAAA;CACA,cAAA;CACA,yBAAA;CACA,sBAAA;CACA,aAAA;CACA;EACA;CACA,YAAA;CACA,6BAAA;CACA,qBAAA;CACA,wBAAA;CACA,gBAAA;CACA,gBAAA;CACA,kBAAA;AACA;AAEA;CACA,0BAAA;CACA,WAAA;CACA,eAAA;CACA,gBAAA;CACA,UAAA;AACA;AAEA;CACA,4BAAA;CACA,cAAA;CACA,eAAA;CACA,UAAA;CACA,gBAAA;CACA,uBAAA;AACA;AAEA;CACA,WAAA;CACA,qBAAA;CACA,eAAA;CACA,kBAAA;CACA,UAAA;CACA,SAAA;CACA,SAAA;CACA,cAAA;CACA,oBAAA;CACA,iBAAA;CACA,0BAAA;CACA,4BAAA;CACA,gBAAA;AACA;AACA,QAAA;;AAEA,uBAAA;AACA;;CAEA,YAAA;AACA;AACA,QAAA;;AAEA,qBAAA;AACA;CACA,cAAA;AACA;AAEA;CACA,oBAAA;CACA,YAAA;CACA,YAAA;CACA,gBAAA;CACA,iBAAA;CACA,mBAAA;CACA,gBAAA;CACA,kBAAA;CACA,mBAAA;CACA,kDAAA;CACA,kBAAA;CACA,WAAA;CACA,YAAA;CACA,iBAAA;CACA,gBAAA;AACA;;AAEA,uCAAA;AACA;CACA,mBAAA;AACA;AAEA;CACA,mBAAA;AACA;AAEA;CACA,mBAAA;AACA;AACA,QAAA;;AAEA,iCAAA;AACA,aAAA;AACA;CACA,sBAAA;CACA,WAAA;CACA,cAAA;CACA,kBAAA;CACA,UAAA;CACA,SAAA;CACA,YAAA;AACA;;AAEA,eAAA;AACA;CACA,WAAA;CACA,WAAA;CACA,oBAAA;CACA,WAAA;CACA,sBAAA;CACA,WAAA;CACA,cAAA;CACA,kBAAA;AACA;AACA,QAAA;;AAEA,6BAAA;AACA;CACA,uBAAA;CACA,6BAAA;CACA,WAAA;CACA,aAAA;CACA,kBAAA;AACA;AAEA;CACA,6BAAA;AACA;AAEA;CACA,kBAAA;AACA;AAEA;CACA,gBAAA;CACA,sBAAA;AACA;AACA,QAAA;;AAEA,wBAAA;AACA;CACA,gBAAA;CACA,gBAAA;CACA,uBAAA;CACA,yBAAA;AACA;AAEA;;CAEA,YAAA;CACA,wBAAA;AACA;AAEA;;CAEA,UAAA;AACA;AAEA;CACA,aAAA;AACA;AACA,QAAA;;AAEA,0BAAA;AACA;CACA,WAAA;AACA;AAEA;;;;;CAKA,0BAAA;AACA;AAEA;CACA,YAAA;AACA;AAEA;CACA,WAAA;AACA;AAEA;CACA,QAAA;AACA;AAEA;;CAEA,YAAA;CACA,UAAA;AACA;AAEA;CACA,yBAAA;CACA,mBAAA;CACA,WAAA;CACA,qBAAA;CACA,eAAA;CACA,iBAAA;CACA,eAAA;CACA,iBAAA;CACA,kBAAA;CACA,sBAAA;CACA,mBAAA;CACA,YAAA;AACA;AACA,QAAA;;AAEA,uBAAA;AACA;CACA,YAAA;CACA,YAAA;CACA,SAAA;AACA;AACA,QAAA;AACA,QAAA;;AAEA,2BAAA;AACA;CACA,cAAA;CACA,yBAAA;AACA;AACA,QAAA","file":"mgContainer.vue","sourcesContent":["<script>\n/**\n* MacGyver component loader\n* This is a meta component that loads other dynamic components as an array\n* @param {Object} config The config specification\n* @param {array<Object>} config.items A collection of sub-item objects to display\n* @param {string} [config.title] The title of the container to display\n* @param {string} [config.layout=\"form\"] The layout profile to use. ENUM: form = A standard horizontal form layout, card = a Bootstrap 4 card with header and footer, columns = vertically sorted column display, query = an inline query constructor\n*\n* @param {boolean} [config.items[].help] Optional help text to show under the element\n* @param {boolean} [config.items[].showTitle=true] Whether to show the left-hand-side form title for the item\n* @param {string} [config.items[].title] Optional title to display for the widget\n* @param {string} config.items[].type The type of the object to render. This corresponds to a `mg*` component\n*\n* @param {array<Object>} [config.verbs] Optional verbs to display for cards\n* @param {string} [config.verbs[].tooltip] Tooltip to display per verb\n* @param {string} [config.verbs[].icon] Icon to display per verb\n* @param {string} [config.verbs[].class=\"\"] Class to apply per verb\n*/\n\nmacgyver.register('mgContainer', {\n\ttitle: 'Container layout',\n\ticon: 'far fa-th-large',\n\tcategory: 'Layout',\n\tisContainer: true,\n\tpreferId: false,\n\tconfig: {\n\t\tlayout: {\n\t\t\ttype: 'mgChoiceRadio',\n\t\t\ttitle: 'Layout profile',\n\t\t\thelp: 'How to layout child elements',\n\t\t\tdefault: 'form',\n\t\t\tenum: [\n\t\t\t\t{id: 'form', title: 'Simple form layout'},\n\t\t\t\t{id: 'formFloating', title: 'Form with floating labels'},\n\t\t\t\t{id: 'card', title: 'Card based layout'},\n\t\t\t\t{id: 'columns', title: 'Vertical column layout'},\n\t\t\t\t{id: 'query', title: 'Query constructor'},\n\t\t\t],\n\t\t},\n\t\tformClass: {\n\t\t\ttype: 'mgChoiceDropdown',\n\t\t\ttitle: 'Form style',\n\t\t\tshowIf: {layout: {$in: ['form', 'card']}},\n\t\t\tdefault: 'normal',\n\t\t\tenum: [\n\t\t\t\t{id: 'normal', title: 'Normal'},\n\t\t\t\t{id: 'titles-above', title: 'Titles above'},\n\t\t\t],\n\t\t},\n\t\tshowTitles: {type: 'mgToggle', default: true, help: 'Show titles for fields', showIf: {layout: {$in: ['form', 'card']}}},\n\t\tcolumnHeaders: {type: 'mgToggle', default: false, help: 'Show column headers', showIf: \"layout == 'columns'\"},\n\t\tcollapsable: {type: 'mgToggle', default: false, help: 'This card can be hidden', showIf: \"layout == 'card'\"},\n\t\tcollapsed: {type: 'mgToggle', default: false, help: 'This card is collapsed by default', showIf: \"layout == 'card'\"},\n\t\tborder: {type: 'mgToggle', default: true, help: 'Show a border around the container', showIf: \"layout == 'columns'\"},\n\t\tverbs: {\n\t\t\ttype: 'mgTable',\n\t\t\tadvanced: true,\n\t\t\tshowIf: \"layout == 'card'\",\n\t\t\titems: [\n\t\t\t\t{id: 'icon', type: 'mgIcon'},\n\t\t\t\t{id: 'tooltip', type: 'mgText'},\n\t\t\t\t{id: 'class', type: 'mgText'},\n\t\t\t\t{id: 'action', type: 'mgText'},\n\t\t\t],\n\t\t},\n\t},\n\tconfigChildren: {\n\t\thelp: {type: 'mgText', title: 'Help text', help: 'Optional help text for the item - just like what you are reading now'},\n\t\tshowTitle: {type: 'mgToggle', default: true, title: 'Show Title', help: 'Whether to show the side title for this element'},\n\t\ttitle: {type: 'mgText', title: 'Title'},\n\t\trowClass: {type: 'mgChoiceDropdown', title: 'Styling', help: 'Additional styling to apply to the widget', default: '', advanced: true, enum: [\n\t\t\t{id: '', title: 'Normal'},\n\t\t\t{id: 'mgContainerRowLarge', title: 'Large text'},\n\t\t]},\n\t\tonChange: {type: 'string', title: 'Change action', help: 'Action to trigger when the value of this component changes', advanced: true},\n\t\tshow: {type: 'mgToggle', default: true, advanced: true, help: 'Whether the item is visible by default'},\n\t\tshowIf: {type: 'mgCodeEditor', syntax: 'text', advanced: true, help: 'A simple equality expression or Sift object to deteremine visibility'},\n\t},\n});\n\nexport default Vue.component('mgContainer', {\n\tinject: ['$mgForm', '$mgFormEditor'],\n\tdata() { return {\n\t\thighlights: {}, // Lookup of extra classes to add to widgets, each key is the array offset of the widget within this container, the value is an array of classes to add\n\t\tlocalData: {}, // Lookup of immediate child data values, used when `$props.config.layout == 'formFloating'`\n\t}},\n\tprops: {\n\t\tconfig: Object,\n\t},\n\tcreated() {\n\t\tthis.$mgForm.inject(this);\n\t},\n\tmounted() {\n\t\tif (this.$props.config.collapsable) {\n\t\t\tvar $card = $(this.$el).find('.card').first();\n\n\t\t\t$card.find('.card-header').first().on('click', ()=> {\n\t\t\t\tvar $body = $(this.$el).find('.card-body');\n\t\t\t\tif ($card.hasClass('card-collapsed')) {\n\t\t\t\t\t$body.slideDown({complete: ()=> $card.removeClass('card-collapsed')});\n\t\t\t\t} else {\n\t\t\t\t\t$body.slideUp({complete: ()=> $card.addClass('card-collapsed')});\n\t\t\t\t}\n\t\t\t});\n\t\t}\n\n\t\tif (this.$props.config.layout == 'formFloating') {\n\t\t\t// When in floating mode we need to keep track of child data so we copy its value into our `localData` object lookup\n\t\t\tthis.$mgForm.$on('changeItem', v => { // Bind to parent form handler\n\t\t\t\tif (this.$props.config.items.some(item => item.$dataPath == v.path)) { // Is this widget one of our immediate children?\n\t\t\t\t\tthis.$set(this.localData, v.path, v.value); // Copy its data against our local copy\n\t\t\t\t}\n\t\t\t});\n\t\t}\n\t},\n\tmethods: {\n\t\t/**\n\t\t* Emit an event passing this container as a scope\n\t\t* This is really just a wrapper to be able to pass this VueComponent to mgContainer.* emitters\n\t\t* @param {string} eventName Event to emit\n\t\t* @param {string} specPath The widget specPath\n\t\t* @param {number} widgetIndex The widget sending the message\n\t\t*/\n\t\tcomponentEvent(eventName, specPath, widgetIndex, vueEvent) {\n\t\t\tthis.$mgForm.$emit(eventName, this, specPath, widgetIndex, vueEvent);\n\t\t},\n\n\n\t\t/**\n\t\t* Find the child index by its component\n\t\t* This works like findIndex only with Magyver components, ignoring all non-mg children when computing the index\n\t\t* @param {VueComponent} child The child offset to find\n\t\t* @returns {number} The offset of the component or boolean `false`\n\t\t*/\n\t\tfindChildIndex(child) {\n\t\t\tvar result = _(this.$refs)\n\t\t\t\t.map(v => v[0]) // Dynamic refs always end up as an array of 1 item, so unpack that\n\t\t\t\t.reduce((t, v, i) => {\n\t\t\t\t\tif (t.found) { // Already found the child\n\t\t\t\t\t\treturn t;\n\t\t\t\t\t} else if (v._uid == child._uid) { // Found by direct UID\n\t\t\t\t\t\treturn {...t, found: true};\n\t\t\t\t\t} else if (v.$children && v.$children.length == 1 && v.$children[0]._uid == child._uid) { // Check into mgComponent wrappers\n\t\t\t\t\t\treturn {...t, found: true};\n\t\t\t\t\t} else if (v.$mgForm) { // Is an mgComponent {\n\t\t\t\t\t\treturn {...t, mgIndex: t.mgIndex + 1};\n\t\t\t\t\t} else { // Implied else - regular Vue component - skip incrementing when calculating the offset\n\t\t\t\t\t\treturn t;\n\t\t\t\t\t}\n\t\t\t\t}, {found: false, mgIndex: 0});\n\n\t\t\treturn (result.found ? result.mgIndex : false);\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div\n\t\tv-if=\"$props.config.layout == 'form' || $props.config.layout === undefined\"\n\t\tclass=\"mg-container\"\n\t\t:class=\"$props.config.formClass\"\n\t>\n\t\t<div\n\t\t\tv-for=\"(widget, widgetIndex) in $props.config.items\"\n\t\t\t:key=\"widget.id\"\n\t\t\tv-if=\"widget.show\"\n\t\t\tclass=\"form-group row mg-component\"\n\t\t\t:class=\"[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])\"\n\t\t>\n\t\t\t<label v-if=\"widget.showTitle || $props.config.showTitles\" class=\"col-form-label text-left col-sm-3\">\n\t\t\t\t{{widget.title}}\n\t\t\t</label>\n\t\t\t<div class=\"col-form-value\" :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'\">\n\t\t\t\t<mg-component\n\t\t\t\t\t:ref=\"widgetIndex\"\n\t\t\t\t\t:config=\"widget\"\n\t\t\t\t/>\n\t\t\t</div>\n\t\t\t<div class=\"help-block\" v-if=\"widget.help\" :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'\">{{widget.help}}</div>\n\t\t</div>\n\t</div>\n\t<div\n\t\tv-else-if=\"$props.config.layout == 'card'\"\n\t\tclass=\"mg-container\"\n\t\t:class=\"$props.config.formClass\"\n\t>\n\t\t<div class=\"card mg-container\" :class=\"{'card-collapsable': $props.config.collapsable, 'card-collapsed': $props.config.collapsed}\">\n\t\t\t<div class=\"card-header\">\n\t\t\t\t{{$props.config.title}}\n\t\t\t\t<div v-if=\"$props.config.verbs && $props.config.verbs.length\" class=\"card-verbs\">\n\t\t\t\t\t<a\n\t\t\t\t\t\tv-for=\"(verb, verbIndex) in $props.config.verbs\"\n\t\t\t\t\t\t:key=\"verbIndex\"\n\t\t\t\t\t\t:class=\"[verb.class, verb.icon]\"\n\t\t\t\t\t\tv-tooltip=\"verb.tooltip\"\n\t\t\t\t\t\t@click=\"$mgForm.run(form, verb.action)\"\n\t\t\t\t\t/>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"card-body\">\n\t\t\t\t<div\n\t\t\t\t\tv-for=\"(widget, widgetIndex) in $props.config.items\"\n\t\t\t\t\t:key=\"widget.id\"\n\t\t\t\t\tv-if=\"widget.show\"\n\t\t\t\t\tclass=\"form-group row mg-component\"\n\t\t\t\t\t:class=\"[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])\"\n\t\t\t\t\t@click=\"componentEvent('mgContainer.click', widget.$specPath, widgetIndex, $event)\"\n\t\t\t\t\t@mouseenter=\"componentEvent('mgContainer.mouseEnter', widget.$specPath, widgetIndex, $event)\"\n\t\t\t\t\t@mouseleave=\"componentEvent('mgContainer.mouseLeave', widget.$specPath, widgetIndex, $event)\"\n\t\t\t\t>\n\t\t\t\t\t<mg-form-editor-controls\n\t\t\t\t\t\tv-if=\"$mgFormEditor\"\n\t\t\t\t\t\tv-show=\"highlights[widgetIndex] && highlights[widgetIndex].some(c => c == 'editHover' || c == 'editEditing')\"\n\t\t\t\t\t\t:config=\"widget\"\n\t\t\t\t\t/>\n\t\t\t\t\t<label v-if=\"widget.showTitle || $props.config.showTitles\" class=\"col-form-label text-left col-sm-3\">\n\t\t\t\t\t\t{{widget.title}}\n\t\t\t\t\t</label>\n\t\t\t\t\t<div class=\"col-form-value\" :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'\">\n\t\t\t\t\t\t<mg-component\n\t\t\t\t\t\t\t:ref=\"widgetIndex\"\n\t\t\t\t\t\t\t:config=\"widget\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"help-block\" v-if=\"widget.help\" :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'\">{{widget.help}}</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<div v-else-if=\"$props.config.layout == 'formFloating'\">\n\t\t<div\n\t\t\tv-for=\"(widget, widgetIndex) in $props.config.items\"\n\t\t\t:key=\"widget.id\"\n\t\t\tv-if=\"widget.show\"\n\t\t\tclass=\"form-group mgContainer-formFloating row mg-component\"\n\t\t\t:class=\"[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])\"\n\t\t>\n\t\t\t<div class=\"col-12\">\n\t\t\t\t<mg-component\n\t\t\t\t\t:config=\"widget\"\n\t\t\t\t\tclass=\"control-input\"\n\t\t\t\t\t:class=\"!localData[widget.$dataPath] && 'blank'\"\n\t\t\t\t/>\n\t\t\t\t<label v-if=\"$props.config.showTitles\" class=\"col-form-label text-left col-sm-3\">\n\t\t\t\t\t{{widget.title}}\n\t\t\t\t</label>\n\t\t\t</div>\n\t\t\t<div class=\"help-block\" v-if=\"widget.help\" :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'\">{{widget.help}}</div>\n\t\t</div>\n\t</div>\n\t<div v-else-if=\"$props.config.layout == 'columns'\">\n\t\t<table class=\"mg-container\" :class=\"$props.config.border ? 'table table-bordered' : 'mg-container-columns-no-border'\" style=\"width: 100%\">\n\t\t\t<thead v-if=\"$props.config.columnHeaders\">\n\t\t\t\t<tr>\n\t\t\t\t\t<th\n\t\t\t\t\t\tv-for=\"widget in config.items\"\n\t\t\t\t\t\t:key=\"widget.id\"\n\t\t\t\t\t\tv-if=\"widget.show\"\n\t\t\t\t\t>{{widget.title}}</th>\n\t\t\t\t</tr>\n\t\t\t</thead>\n\t\t\t<tbody>\n\t\t\t\t<tr>\n\t\t\t\t\t<td\n\t\t\t\t\t\tv-for=\"(widget, widgetIndex) in $props.config.items\"\n\t\t\t\t\t\t:key=\"widget.id\"\n\t\t\t\t\t\tv-if=\"widget.show\"\n\t\t\t\t\t\t:class=\"[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])\"\n\t\t\t\t\t>\n\t\t\t\t\t\t<mg-component\n\t\t\t\t\t\t\t:ref=\"widgetIndex\"\n\t\t\t\t\t\t\t:config=\"widget\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<div class=\"help-block\" v-if=\"widget.help\">{{widget.help}}</div>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t</tbody>\n\t\t</table>\n\t</div>\n\t<div v-else-if=\"$props.config.layout == 'query'\">\n\t\t<div class=\"mg-container mg-container-query\">\n\t\t\t<div v-for=\"rowWidget in $props.config.items\" :key=\"rowWidget.id\">\n\t\t\t\t<div v-if=\"rowWidget.type == 'mgContainer' && rowWidget.layout == 'query-row'\" class=\"row\">\n\t\t\t\t\t<div v-for=\"colWidget in rowWidget.items\" :key=\"colWidget.id\" class=\"col mg-component\">\n\t\t\t\t\t\t<mg-component\n\t\t\t\t\t\t\t:ref=\"widgetIndex\"\n\t\t\t\t\t\t\t:config=\"colWidget\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div v-else class=\"alert alert-danger\">\n\t\t\t\t\tAll children of mgContainer[layout=query] must match the mgContainer[layout=queryRow]\n\t\t\t\t\t<pre>{{widget}}</pre>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<div v-else class=\"mg-container\">\n\t\t<div class=\"alert alert-danger\">\n\t\t\tUnsupported mgContainer layout \"{{$props.config.layout || 'Unspecified'}}\"\n\t\t\t<pre>{{$props.config}}</pre>\n\t\t</div>\n\t</div>\n</template>\n\n<style>\n/* formClass > .titles-above {{{ */\n.mg-container.titles-above > .form-group,\n.mg-container.titles-above > .form-group,\n.mg-container.titles-above > .card > .card-body > .form-group,\n.mg-container.titles-above > .card > .card-body > .form-group {\n\tdisplay: block;\n}\n\n.mg-container.titles-above > .form-group > .col-form-label,\n.mg-container.titles-above > .form-group > .col-form-value,\n.mg-container.titles-above > .card > .card-body > .form-group > .col-form-label,\n.mg-container.titles-above > .card > .card-body > .form-group > .col-form-value {\n\twidth: 100%;\n\tmax-width: none;\n}\n/* }}} */\n\n/* Card layout {{{ */\n/* Collapsable card {{{ */\n.mg-container.card.card-collapsable {\n\ttransition: all 0.2s ease-in;\n}\n\n.mg-container.card.card-collapsable .card-header {\n\tcursor: pointer;\n}\n\n.mg-container.card.card-collapsable .card-header::after {\n\tfont-family: \"Font Awesome 5 Pro\";\n\tcontent: '\\f054';\n\tfloat: right;\n\ttransition: transform 0.4s;\n}\n\n.mg-container.card.card-collapsable:not(.card-collapsed) .card-header::after {\n\ttransform: rotate(90deg);\n}\n\n\n/* Collapsed card {{{ */\n.mg-container.card.card-collapsable.card-collapsed {\n\tbox-shadow: none;\n\tborder-bottom: none;\n\tmargin-bottom: 0px;\n}\n\n.mg-container.card.card-collapsable.card-collapsed .card-body {\n\tdisplay: none;\n}\n/* }}} */\n/* }}} */\n\n/* Card verbs {{{ */\n.mg-container.card .card-header .card-verbs {\n\tposition: absolute;\n\tright: 15px;\n\ttop: 10px;\n\tfont-size: 20px;\n}\n\n.mg-container.card .card-header .card-verbs > a {\n\tcolor: #999;\n\tpadding: 5px;\n}\n\n.mg-container.card .card-header .card-verbs > a:hover {\n\tcolor: #000;\n}\n/* }}} */\n/* }}} */\n\n/* formFloating {{{ */\n.mgContainer-formFloating > .col-12 {\n\tposition: relative;\n\tline-height: 14px;\n\tmargin: 0 0px;\n\tdisplay: inline-block;\n\twidth: 100%;\n}\n\n.mgContainer-formFloating > .col-12 > .control-input {\n\theight: 45px;\n\tpadding-top: 8px;\n\tpadding-bottom: 2px;\n\tpadding-left: 2px;\n\tpadding-right: 12px;\n\tfont-size: 15px;\n\tline-height: 1.42857143;\n\tcolor: #333333;\n\tbackground-color: #ffffff;\n\tbackground-image: none;\n\toutline: none;\n\t/* border: 1px solid rgba(120, 120, 120, 0.5);\n\t*/\n\tborder: none;\n\tborder-bottom: 1px solid #bbb;\n\t-moz-box-shadow: none;\n\t-webkit-box-shadow: none;\n\tbox-shadow: none;\n\tborder-radius: 0;\n\tposition: relative;\n}\n\n.mgContainer-formFloating > .col-12 > .control-input.blank + .col-form-label {\n\ttransform: translateY(0px);\n\tcolor: #bbb;\n\tfont-size: 15px;\n\tfont-weight: 100;\n\topacity: 1;\n}\n\n.mgContainer-formFloating > .col-12 > .control-input.control-input:focus + .col-form-label {\n\ttransform: translateY(-21px);\n\tcolor: #66afe9;\n\tfont-size: 14px;\n\topacity: 1;\n\tfont-weight: 100;\n\tbackground-color: white;\n}\n\n.mgContainer-formFloating > .col-12 > .col-form-label {\n\tcolor: #aaa;\n\tdisplay: inline-block;\n\tfont-size: 12px;\n\tposition: absolute;\n\tz-index: 2;\n\tleft: 2px;\n\ttop: 16px;\n\tpadding: 0 0px;\n\tpointer-events: none;\n\tbackground: white;\n\ttransition: all 300ms ease;\n\ttransform: translateY(-21px);\n\tfont-weight: 500;\n}\n/* }}} */\n\n/* Columns layout {{{ */\n.mg-container.mg-container-columns-no-border th,\n.mg-container.mg-container-columns-no-border td {\n\tpadding: 5px;\n}\n/* }}} */\n\n/* Query layout {{{ */\n.mg-container.mg-container-query .row {\n\tdisplay: block;\n}\n\n.mg-container.mg-container-query .col {\n\tdisplay: inline-flex;\n\twidth: 200px;\n\theight: 35px;\n\tmin-width: 200px;\n\tmargin-left: 30px;\n\tmargin-bottom: 10px;\n\tmax-width: 400px;\n\tposition: relative;\n\talign-items: center;\n\tbox-shadow: 1px 3px 5px 0px rgba(50, 50, 50, 0.75);\n\tborder-radius: 3px;\n\tcolor: #FFF;\n\theight: 38px;\n\tpadding: 5px 15px;\n\tbackground: #FFF;\n}\n\n/* Query > Background color scale {{{ */\n.mg-container.mg-container-query .col:nth-child(1) {\n\tbackground: #104E8B;\n}\n\n.mg-container.mg-container-query .col:nth-child(2) {\n\tbackground: #1874CD;\n}\n\n.mg-container.mg-container-query .col:nth-child(3) {\n\tbackground: #1C86EE;\n}\n/* }}} */\n\n/* Query > Connecting lines {{{ */\n/* Vertical */\n.mg-container.mg-container-query .row::before {\n\tbackground-color: #CCC;\n\tcontent: '';\n\tdisplay: block;\n\tposition: absolute;\n\twidth: 4px;\n\ttop: 17px;\n\tbottom: 30px;\n}\n\n/* Horizontal */\n.mg-container.mg-container-query .col::before {\n\tleft: -30px;\n\theight: 4px;\n\ttop: calc(50% - 2px);\n\twidth: 30px;\n\tbackground-color: #CCC;\n\tcontent: '';\n\tdisplay: block;\n\tposition: absolute;\n}\n/* }}} */\n\n/* Query > Basic Inputs {{{ */\n.mg-container.mg-container-query .col input {\n\tbackground: transparent;\n\tborder: 1px solid transparent;\n\tcolor: #FFF;\n\theight: 1.8em;\n\tborder-radius: 0px;\n}\n\n.mg-container.mg-container-query .col input[type=text] {\n\tborder-bottom: 1px solid #CCC;\n}\n\n.mg-container.mg-container-query .col input[type=number] {\n\ttext-align: center;\n}\n\n.mg-container.mg-container-query .col input:focus {\n\tbox-shadow: none;\n\tborder: 1px solid #CCC;\n}\n/* }}} */\n\n/* Query > Buttons {{{ */\n.mg-container.mg-container-query .col .btn {\n\tbox-shadow: none;\n\tpadding: 1px 5px;\n\tbackground: transparent;\n\tborder: 1px solid #003e7b;\n}\n\n.mg-container.mg-container-query .col .btn,\n.mg-container.mg-container-query .col svg {\n\topacity: 0.2;\n\ttransition: opacity 0.5s;\n}\n\n.mg-container.mg-container-query .row:hover .col .btn,\n.mg-container.mg-container-query .row:hover .col svg {\n\topacity: 1;\n}\n\n.mg-container.mg-container-query .col .vs__clear {\n\tdisplay: none;\n}\n/* }}} */\n\n/* Query > Dropdowns {{{ */\n.mg-container.mg-container-query .v-select {\n\twidth: 100%;\n}\n\n.mg-container.mg-container-query .v-select,\n.mg-container.mg-container-query .v-select .vs--searchable .vs__dropdown-toggle,\n.mg-container.mg-container-query .v-select .vs__selected,\n.mg-container.mg-container-query .v-select input,\n.mg-container.mg-container-query .v-select .vs__actions {\n\tcursor: pointer !important;\n}\n\n.mg-container.mg-container-query .v-select .vs__dropdown-toggle {\n\tborder: none;\n}\n\n.mg-container.mg-container-query .col .v-select .vs__selected {\n\tcolor: #FFF;\n}\n\n.mg-container.mg-container-query .col .v-select .vs__selected {\n\ttop: 3px;\n}\n\n.mg-container.mg-container-query .col .v-select .vs__actions svg,\n.mg-container.mg-container-query .col .v-select .vs__deselect {\n\tstroke: #FFF;\n\tfill: #FFF;\n}\n\n.mg-container.mg-container-query .col .v-select.mg-choice-tags .vs__selected-options .vs__selected {\n\tbackground-color: #5bc0de;\n\tborder-radius: 10px;\n\tcolor: #fff;\n\tdisplay: inline-block;\n\tfont-size: 12px;\n\tline-height: 1rem;\n\tmin-width: 10px;\n\tpadding: 1px 10px;\n\ttext-align: center;\n\tvertical-align: middle;\n\twhite-space: nowrap;\n\tborder: none;\n}\n/* }}} */\n\n/* Query > Toggle {{{ */\n.mg-container.mg-container-query .col .vue-js-switch {\n\tmargin: auto;\n\theight: 10px;\n\ttop: -5px;\n}\n/* }}} */\n/* }}} */\n\n/* Misc utility types {{{ */\n.mg-form .help-block {\n\tfont-size: 80%;\n\tcolor: #6c757d !important;\n}\n/* }}} */\n</style>\n"]}, media: undefined });
+                inject("data-v-57926260_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* formClass > .titles-above {{{ */\n.mg-container.titles-above > .form-group,\n.mg-container.titles-above > .form-group,\n.mg-container.titles-above > .card > .card-body > .form-group,\n.mg-container.titles-above > .card > .card-body > .form-group {\n\tdisplay: block;\n}\n.mg-container.titles-above > .form-group > .col-form-label,\n.mg-container.titles-above > .form-group > .col-form-value,\n.mg-container.titles-above > .card > .card-body > .form-group > .col-form-label,\n.mg-container.titles-above > .card > .card-body > .form-group > .col-form-value {\n\twidth: 100%;\n\tmax-width: none;\n}\n/* }}} */\n\n/* Card layout {{{ */\n/* Collapsable card {{{ */\n.mg-container.card.card-collapsable {\n\ttransition: all 0.2s ease-in;\n}\n.mg-container.card.card-collapsable .card-header {\n\tcursor: pointer;\n}\n.mg-container.card.card-collapsable .card-header::after {\n\tfont-family: \"Font Awesome 5 Pro\";\n\tcontent: '\\f054';\n\tfloat: right;\n\ttransition: transform 0.4s;\n}\n.mg-container.card.card-collapsable:not(.card-collapsed) .card-header::after {\n\ttransform: rotate(90deg);\n}\n\n\n/* Collapsed card {{{ */\n.mg-container.card.card-collapsable.card-collapsed {\n\tbox-shadow: none;\n\tborder-bottom: none;\n\tmargin-bottom: 0px;\n}\n.mg-container.card.card-collapsable.card-collapsed .card-body {\n\tdisplay: none;\n}\n/* }}} */\n/* }}} */\n\n/* Card verbs {{{ */\n.mg-container.card .card-header .card-verbs {\n\tposition: absolute;\n\tright: 15px;\n\ttop: 10px;\n\tfont-size: 20px;\n}\n.mg-container.card .card-header .card-verbs > a {\n\tcolor: #999;\n\tpadding: 5px;\n}\n.mg-container.card .card-header .card-verbs > a:hover {\n\tcolor: #000;\n}\n/* }}} */\n/* }}} */\n\n/* formFloating {{{ */\n.mgContainer-formFloating > .col-12 {\n\tposition: relative;\n\tline-height: 14px;\n\tmargin: 0 0px;\n\tdisplay: inline-block;\n\twidth: 100%;\n}\n.mgContainer-formFloating > .col-12 > .control-input {\n\theight: 45px;\n\tpadding-top: 8px;\n\tpadding-bottom: 2px;\n\tpadding-left: 2px;\n\tpadding-right: 12px;\n\tfont-size: 15px;\n\tline-height: 1.42857143;\n\tcolor: #333333;\n\tbackground-color: #ffffff;\n\tbackground-image: none;\n\toutline: none;\n\t/* border: 1px solid rgba(120, 120, 120, 0.5);\n\t*/\n\tborder: none;\n\tborder-bottom: 1px solid #bbb;\n\t-moz-box-shadow: none;\n\t-webkit-box-shadow: none;\n\tbox-shadow: none;\n\tborder-radius: 0;\n\tposition: relative;\n}\n.mgContainer-formFloating > .col-12 > .control-input.blank + .col-form-label {\n\ttransform: translateY(0px);\n\tcolor: #bbb;\n\tfont-size: 15px;\n\tfont-weight: 100;\n\topacity: 1;\n}\n.mgContainer-formFloating > .col-12 > .control-input.control-input:focus + .col-form-label {\n\ttransform: translateY(-21px);\n\tcolor: #66afe9;\n\tfont-size: 14px;\n\topacity: 1;\n\tfont-weight: 100;\n\tbackground-color: white;\n}\n.mgContainer-formFloating > .col-12 > .col-form-label {\n\tcolor: #aaa;\n\tdisplay: inline-block;\n\tfont-size: 12px;\n\tposition: absolute;\n\tz-index: 2;\n\tleft: 2px;\n\ttop: 16px;\n\tpadding: 0 0px;\n\tpointer-events: none;\n\tbackground: white;\n\ttransition: all 300ms ease;\n\ttransform: translateY(-21px);\n\tfont-weight: 500;\n}\n/* }}} */\n\n/* Columns layout {{{ */\n.mg-container.mg-container-columns-no-border th,\n.mg-container.mg-container-columns-no-border td {\n\tpadding: 5px;\n}\n/* }}} */\n\n/* Query layout {{{ */\n.mg-container.mg-container-query .row {\n\tdisplay: block;\n}\n.mg-container.mg-container-query .col {\n\tdisplay: inline-flex;\n\twidth: 200px;\n\theight: 35px;\n\tmin-width: 200px;\n\tmargin-left: 30px;\n\tmargin-bottom: 10px;\n\tmax-width: 400px;\n\tposition: relative;\n\talign-items: center;\n\tbox-shadow: 1px 3px 5px 0px rgba(50, 50, 50, 0.75);\n\tborder-radius: 3px;\n\tcolor: #FFF;\n\theight: 38px;\n\tpadding: 5px 15px;\n\tbackground: #FFF;\n}\n\n/* Query > Background color scale {{{ */\n.mg-container.mg-container-query .col:nth-child(1) {\n\tbackground: #104E8B;\n}\n.mg-container.mg-container-query .col:nth-child(2) {\n\tbackground: #1874CD;\n}\n.mg-container.mg-container-query .col:nth-child(3) {\n\tbackground: #1C86EE;\n}\n/* }}} */\n\n/* Query > Connecting lines {{{ */\n/* Vertical */\n.mg-container.mg-container-query .row::before {\n\tbackground-color: #CCC;\n\tcontent: '';\n\tdisplay: block;\n\tposition: absolute;\n\twidth: 4px;\n\ttop: 17px;\n\tbottom: 30px;\n}\n\n/* Horizontal */\n.mg-container.mg-container-query .col::before {\n\tleft: -30px;\n\theight: 4px;\n\ttop: calc(50% - 2px);\n\twidth: 30px;\n\tbackground-color: #CCC;\n\tcontent: '';\n\tdisplay: block;\n\tposition: absolute;\n}\n/* }}} */\n\n/* Query > Basic Inputs {{{ */\n.mg-container.mg-container-query .col input {\n\tbackground: transparent;\n\tborder: 1px solid transparent;\n\tcolor: #FFF;\n\theight: 1.8em;\n\tborder-radius: 0px;\n}\n.mg-container.mg-container-query .col input[type=text] {\n\tborder-bottom: 1px solid #CCC;\n}\n.mg-container.mg-container-query .col input[type=number] {\n\ttext-align: center;\n}\n.mg-container.mg-container-query .col input:focus {\n\tbox-shadow: none;\n\tborder: 1px solid #CCC;\n}\n/* }}} */\n\n/* Query > Buttons {{{ */\n.mg-container.mg-container-query .col .btn {\n\tbox-shadow: none;\n\tpadding: 1px 5px;\n\tbackground: transparent;\n\tborder: 1px solid #003e7b;\n}\n.mg-container.mg-container-query .col .btn,\n.mg-container.mg-container-query .col svg {\n\topacity: 0.2;\n\ttransition: opacity 0.5s;\n}\n.mg-container.mg-container-query .row:hover .col .btn,\n.mg-container.mg-container-query .row:hover .col svg {\n\topacity: 1;\n}\n.mg-container.mg-container-query .col .vs__clear {\n\tdisplay: none;\n}\n/* }}} */\n\n/* Query > Dropdowns {{{ */\n.mg-container.mg-container-query .v-select {\n\twidth: 100%;\n}\n.mg-container.mg-container-query .v-select,\n.mg-container.mg-container-query .v-select .vs--searchable .vs__dropdown-toggle,\n.mg-container.mg-container-query .v-select .vs__selected,\n.mg-container.mg-container-query .v-select input,\n.mg-container.mg-container-query .v-select .vs__actions {\n\tcursor: pointer !important;\n}\n.mg-container.mg-container-query .v-select .vs__dropdown-toggle {\n\tborder: none;\n}\n.mg-container.mg-container-query .col .v-select .vs__selected {\n\tcolor: #FFF;\n}\n.mg-container.mg-container-query .col .v-select .vs__selected {\n\ttop: 3px;\n}\n.mg-container.mg-container-query .col .v-select .vs__actions svg,\n.mg-container.mg-container-query .col .v-select .vs__deselect {\n\tstroke: #FFF;\n\tfill: #FFF;\n}\n.mg-container.mg-container-query .col .v-select.mg-choice-tags .vs__selected-options .vs__selected {\n\tbackground-color: #5bc0de;\n\tborder-radius: 10px;\n\tcolor: #fff;\n\tdisplay: inline-block;\n\tfont-size: 12px;\n\tline-height: 1rem;\n\tmin-width: 10px;\n\tpadding: 1px 10px;\n\ttext-align: center;\n\tvertical-align: middle;\n\twhite-space: nowrap;\n\tborder: none;\n}\n/* }}} */\n\n/* Query > Toggle {{{ */\n.mg-container.mg-container-query .col .vue-js-switch {\n\tmargin: auto;\n\theight: 10px;\n\ttop: -5px;\n}\n/* }}} */\n/* }}} */\n\n/* Misc utility types {{{ */\n.mg-form .help-block {\n\tfont-size: 80%;\n\tcolor: #6c757d !important;\n}\n/* }}} */\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgContainer.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAiUA,kCAAA;AACA;;;;CAIA,cAAA;AACA;AAEA;;;;CAIA,WAAA;CACA,eAAA;AACA;AACA,QAAA;;AAEA,oBAAA;AACA,yBAAA;AACA;CACA,4BAAA;AACA;AAEA;CACA,eAAA;AACA;AAEA;CACA,iCAAA;CACA,gBAAA;CACA,YAAA;CACA,0BAAA;AACA;AAEA;CACA,wBAAA;AACA;;;AAGA,uBAAA;AACA;CACA,gBAAA;CACA,mBAAA;CACA,kBAAA;AACA;AAEA;CACA,aAAA;AACA;AACA,QAAA;AACA,QAAA;;AAEA,mBAAA;AACA;CACA,kBAAA;CACA,WAAA;CACA,SAAA;CACA,eAAA;AACA;AAEA;CACA,WAAA;CACA,YAAA;AACA;AAEA;CACA,WAAA;AACA;AACA,QAAA;AACA,QAAA;;AAEA,qBAAA;AACA;CACA,kBAAA;CACA,iBAAA;CACA,aAAA;CACA,qBAAA;CACA,WAAA;AACA;AAEA;CACA,YAAA;CACA,gBAAA;CACA,mBAAA;CACA,iBAAA;CACA,mBAAA;CACA,eAAA;CACA,uBAAA;CACA,cAAA;CACA,yBAAA;CACA,sBAAA;CACA,aAAA;CACA;EACA;CACA,YAAA;CACA,6BAAA;CACA,qBAAA;CACA,wBAAA;CACA,gBAAA;CACA,gBAAA;CACA,kBAAA;AACA;AAEA;CACA,0BAAA;CACA,WAAA;CACA,eAAA;CACA,gBAAA;CACA,UAAA;AACA;AAEA;CACA,4BAAA;CACA,cAAA;CACA,eAAA;CACA,UAAA;CACA,gBAAA;CACA,uBAAA;AACA;AAEA;CACA,WAAA;CACA,qBAAA;CACA,eAAA;CACA,kBAAA;CACA,UAAA;CACA,SAAA;CACA,SAAA;CACA,cAAA;CACA,oBAAA;CACA,iBAAA;CACA,0BAAA;CACA,4BAAA;CACA,gBAAA;AACA;AACA,QAAA;;AAEA,uBAAA;AACA;;CAEA,YAAA;AACA;AACA,QAAA;;AAEA,qBAAA;AACA;CACA,cAAA;AACA;AAEA;CACA,oBAAA;CACA,YAAA;CACA,YAAA;CACA,gBAAA;CACA,iBAAA;CACA,mBAAA;CACA,gBAAA;CACA,kBAAA;CACA,mBAAA;CACA,kDAAA;CACA,kBAAA;CACA,WAAA;CACA,YAAA;CACA,iBAAA;CACA,gBAAA;AACA;;AAEA,uCAAA;AACA;CACA,mBAAA;AACA;AAEA;CACA,mBAAA;AACA;AAEA;CACA,mBAAA;AACA;AACA,QAAA;;AAEA,iCAAA;AACA,aAAA;AACA;CACA,sBAAA;CACA,WAAA;CACA,cAAA;CACA,kBAAA;CACA,UAAA;CACA,SAAA;CACA,YAAA;AACA;;AAEA,eAAA;AACA;CACA,WAAA;CACA,WAAA;CACA,oBAAA;CACA,WAAA;CACA,sBAAA;CACA,WAAA;CACA,cAAA;CACA,kBAAA;AACA;AACA,QAAA;;AAEA,6BAAA;AACA;CACA,uBAAA;CACA,6BAAA;CACA,WAAA;CACA,aAAA;CACA,kBAAA;AACA;AAEA;CACA,6BAAA;AACA;AAEA;CACA,kBAAA;AACA;AAEA;CACA,gBAAA;CACA,sBAAA;AACA;AACA,QAAA;;AAEA,wBAAA;AACA;CACA,gBAAA;CACA,gBAAA;CACA,uBAAA;CACA,yBAAA;AACA;AAEA;;CAEA,YAAA;CACA,wBAAA;AACA;AAEA;;CAEA,UAAA;AACA;AAEA;CACA,aAAA;AACA;AACA,QAAA;;AAEA,0BAAA;AACA;CACA,WAAA;AACA;AAEA;;;;;CAKA,0BAAA;AACA;AAEA;CACA,YAAA;AACA;AAEA;CACA,WAAA;AACA;AAEA;CACA,QAAA;AACA;AAEA;;CAEA,YAAA;CACA,UAAA;AACA;AAEA;CACA,yBAAA;CACA,mBAAA;CACA,WAAA;CACA,qBAAA;CACA,eAAA;CACA,iBAAA;CACA,eAAA;CACA,iBAAA;CACA,kBAAA;CACA,sBAAA;CACA,mBAAA;CACA,YAAA;AACA;AACA,QAAA;;AAEA,uBAAA;AACA;CACA,YAAA;CACA,YAAA;CACA,SAAA;AACA;AACA,QAAA;AACA,QAAA;;AAEA,2BAAA;AACA;CACA,cAAA;CACA,yBAAA;AACA;AACA,QAAA","file":"mgContainer.vue","sourcesContent":["<script>\n/**\n* MacGyver component loader\n* This is a meta component that loads other dynamic components as an array\n* @param {Object} config The config specification\n* @param {array<Object>} config.items A collection of sub-item objects to display\n* @param {string} [config.title] The title of the container to display\n* @param {string} [config.layout=\"form\"] The layout profile to use. ENUM: form = A standard horizontal form layout, card = a Bootstrap 4 card with header and footer, columns = vertically sorted column display, query = an inline query constructor\n*\n* @param {boolean} [config.items[].help] Optional help text to show under the element\n* @param {boolean} [config.items[].showTitle=true] Whether to show the left-hand-side form title for the item\n* @param {string} [config.items[].title] Optional title to display for the widget\n* @param {string} config.items[].type The type of the object to render. This corresponds to a `mg*` component\n*\n* @param {array<Object>} [config.verbs] Optional verbs to display for cards\n* @param {string} [config.verbs[].tooltip] Tooltip to display per verb\n* @param {string} [config.verbs[].icon] Icon to display per verb\n* @param {string} [config.verbs[].class=\"\"] Class to apply per verb\n*/\n\nmacgyver.register('mgContainer', {\n\ttitle: 'Container layout',\n\ticon: 'far fa-th-large',\n\tcategory: 'Layout',\n\tisContainer: true,\n\tpreferId: false,\n\tconfig: {\n\t\tlayout: {\n\t\t\ttype: 'mgChoiceRadio',\n\t\t\ttitle: 'Layout profile',\n\t\t\thelp: 'How to layout child elements',\n\t\t\tdefault: 'form',\n\t\t\tenum: [\n\t\t\t\t{id: 'form', title: 'Simple form layout'},\n\t\t\t\t{id: 'formFloating', title: 'Form with floating labels'},\n\t\t\t\t{id: 'card', title: 'Card based layout'},\n\t\t\t\t{id: 'columns', title: 'Vertical column layout'},\n\t\t\t\t{id: 'query', title: 'Query constructor'},\n\t\t\t],\n\t\t},\n\t\tformClass: {\n\t\t\ttype: 'mgChoiceDropdown',\n\t\t\ttitle: 'Form style',\n\t\t\tshowIf: {layout: {$in: ['form', 'card']}},\n\t\t\tdefault: 'normal',\n\t\t\tenum: [\n\t\t\t\t{id: 'normal', title: 'Normal'},\n\t\t\t\t{id: 'titles-above', title: 'Titles above'},\n\t\t\t],\n\t\t},\n\t\tshowTitles: {type: 'mgToggle', default: true, help: 'Show titles for fields', showIf: {layout: {$in: ['form', 'card']}}},\n\t\tcolumnHeaders: {type: 'mgToggle', default: false, help: 'Show column headers', showIf: \"layout == 'columns'\"},\n\t\tcollapsable: {type: 'mgToggle', default: false, help: 'This card can be hidden', showIf: \"layout == 'card'\"},\n\t\tcollapsed: {type: 'mgToggle', default: false, help: 'This card is collapsed by default', showIf: \"layout == 'card'\"},\n\t\tborder: {type: 'mgToggle', default: true, help: 'Show a border around the container', showIf: \"layout == 'columns'\"},\n\t\tverbs: {\n\t\t\ttype: 'mgTable',\n\t\t\tadvanced: true,\n\t\t\tshowIf: \"layout == 'card'\",\n\t\t\titems: [\n\t\t\t\t{id: 'icon', type: 'mgIcon'},\n\t\t\t\t{id: 'tooltip', type: 'mgText'},\n\t\t\t\t{id: 'class', type: 'mgText'},\n\t\t\t\t{id: 'action', type: 'mgText'},\n\t\t\t],\n\t\t},\n\t},\n\tconfigChildren: {\n\t\thelp: {type: 'mgText', title: 'Help text', help: 'Optional help text for the item - just like what you are reading now'},\n\t\tshowTitle: {type: 'mgToggle', default: true, title: 'Show Title', help: 'Whether to show the side title for this element'},\n\t\ttitle: {type: 'mgText', title: 'Title'},\n\t\trowClass: {type: 'mgChoiceDropdown', title: 'Styling', help: 'Additional styling to apply to the widget', default: '', advanced: true, enum: [\n\t\t\t{id: '', title: 'Normal'},\n\t\t\t{id: 'mgContainerRowLarge', title: 'Large text'},\n\t\t]},\n\t\tonChange: {type: 'string', title: 'Change action', help: 'Action to trigger when the value of this component changes', advanced: true},\n\t\tshow: {type: 'mgToggle', default: true, advanced: true, help: 'Whether the item is visible by default'},\n\t\tshowIf: {type: 'mgCodeEditor', syntax: 'text', advanced: true, help: 'A simple equality expression or Sift object to deteremine visibility'},\n\t},\n});\n\nexport default Vue.component('mgContainer', {\n\tinject: {\n\t\t$mgForm: {from: '$mgForm'},\n\t\t$mgFormEditor: {from: '$mgFormEditor', default: false},\n\t},\n\tdata() { return {\n\t\thighlights: {}, // Lookup of extra classes to add to widgets, each key is the array offset of the widget within this container, the value is an array of classes to add\n\t\tlocalData: {}, // Lookup of immediate child data values, used when `$props.config.layout == 'formFloating'`\n\t}},\n\tprops: {\n\t\tconfig: Object,\n\t},\n\tcreated() {\n\t\tthis.$mgForm.inject(this);\n\t},\n\tmounted() {\n\t\tif (this.$props.config.collapsable) {\n\t\t\tvar $card = $(this.$el).find('.card').first();\n\n\t\t\t$card.find('.card-header').first().on('click', ()=> {\n\t\t\t\tvar $body = $(this.$el).find('.card-body');\n\t\t\t\tif ($card.hasClass('card-collapsed')) {\n\t\t\t\t\t$body.slideDown({complete: ()=> $card.removeClass('card-collapsed')});\n\t\t\t\t} else {\n\t\t\t\t\t$body.slideUp({complete: ()=> $card.addClass('card-collapsed')});\n\t\t\t\t}\n\t\t\t});\n\t\t}\n\n\t\tif (this.$props.config.layout == 'formFloating') {\n\t\t\t// When in floating mode we need to keep track of child data so we copy its value into our `localData` object lookup\n\t\t\tthis.$mgForm.$on('changeItem', v => { // Bind to parent form handler\n\t\t\t\tif (this.$props.config.items.some(item => item.$dataPath == v.path)) { // Is this widget one of our immediate children?\n\t\t\t\t\tthis.$set(this.localData, v.path, v.value); // Copy its data against our local copy\n\t\t\t\t}\n\t\t\t});\n\t\t}\n\t},\n\tmethods: {\n\t\t/**\n\t\t* Emit an event passing this container as a scope\n\t\t* This is really just a wrapper to be able to pass this VueComponent to mgContainer.* emitters\n\t\t* @param {string} eventName Event to emit\n\t\t* @param {string} specPath The widget specPath\n\t\t* @param {number} widgetIndex The widget sending the message\n\t\t*/\n\t\tcomponentEvent(eventName, specPath, widgetIndex, vueEvent) {\n\t\t\tthis.$mgForm.$emit(eventName, this, specPath, widgetIndex, vueEvent);\n\t\t},\n\n\n\t\t/**\n\t\t* Find the child index by its component\n\t\t* This works like findIndex only with Magyver components, ignoring all non-mg children when computing the index\n\t\t* @param {VueComponent} child The child offset to find\n\t\t* @returns {number} The offset of the component or boolean `false`\n\t\t*/\n\t\tfindChildIndex(child) {\n\t\t\tvar result = _(this.$refs)\n\t\t\t\t.map(v => v[0]) // Dynamic refs always end up as an array of 1 item, so unpack that\n\t\t\t\t.reduce((t, v, i) => {\n\t\t\t\t\tif (t.found) { // Already found the child\n\t\t\t\t\t\treturn t;\n\t\t\t\t\t} else if (v._uid == child._uid) { // Found by direct UID\n\t\t\t\t\t\treturn {...t, found: true};\n\t\t\t\t\t} else if (v.$children && v.$children.length == 1 && v.$children[0]._uid == child._uid) { // Check into mgComponent wrappers\n\t\t\t\t\t\treturn {...t, found: true};\n\t\t\t\t\t} else if (v.$mgForm) { // Is an mgComponent {\n\t\t\t\t\t\treturn {...t, mgIndex: t.mgIndex + 1};\n\t\t\t\t\t} else { // Implied else - regular Vue component - skip incrementing when calculating the offset\n\t\t\t\t\t\treturn t;\n\t\t\t\t\t}\n\t\t\t\t}, {found: false, mgIndex: 0});\n\n\t\t\treturn (result.found ? result.mgIndex : false);\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div\n\t\tv-if=\"$props.config.layout == 'form' || $props.config.layout === undefined\"\n\t\tclass=\"mg-container\"\n\t\t:class=\"$props.config.formClass\"\n\t>\n\t\t<div\n\t\t\tv-for=\"(widget, widgetIndex) in $props.config.items\"\n\t\t\t:key=\"widget.id\"\n\t\t\tv-if=\"widget.show\"\n\t\t\tclass=\"form-group row mg-component\"\n\t\t\t:class=\"[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])\"\n\t\t>\n\t\t\t<label v-if=\"widget.showTitle || $props.config.showTitles\" class=\"col-form-label text-left col-sm-3\">\n\t\t\t\t{{widget.title}}\n\t\t\t</label>\n\t\t\t<div class=\"col-form-value\" :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'\">\n\t\t\t\t<mg-component\n\t\t\t\t\t:ref=\"widgetIndex\"\n\t\t\t\t\t:config=\"widget\"\n\t\t\t\t/>\n\t\t\t</div>\n\t\t\t<div class=\"help-block\" v-if=\"widget.help\" :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'\">{{widget.help}}</div>\n\t\t</div>\n\t</div>\n\t<!-- Layout: card {{{ -->\n\t<div\n\t\tv-else-if=\"$props.config.layout == 'card'\"\n\t\tclass=\"mg-container\"\n\t\t:class=\"$props.config.formClass\"\n\t>\n\t\t<div class=\"card mg-container\" :class=\"{'card-collapsable': $props.config.collapsable, 'card-collapsed': $props.config.collapsed}\">\n\t\t\t<div v-if=\"$props.config.title || ($props.config.verbs && $props.config.verbs.length)\" class=\"card-header\">\n\t\t\t\t{{$props.config.title}}\n\t\t\t\t<div v-if=\"$props.config.verbs && $props.config.verbs.length\" class=\"card-verbs\">\n\t\t\t\t\t<a\n\t\t\t\t\t\tv-for=\"(verb, verbIndex) in $props.config.verbs\"\n\t\t\t\t\t\t:key=\"verbIndex\"\n\t\t\t\t\t\t:class=\"[verb.class, verb.icon]\"\n\t\t\t\t\t\tv-tooltip=\"verb.tooltip\"\n\t\t\t\t\t\t@click=\"$mgForm.run(form, verb.action)\"\n\t\t\t\t\t/>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"card-body\">\n\t\t\t\t<div\n\t\t\t\t\tv-for=\"(widget, widgetIndex) in $props.config.items\"\n\t\t\t\t\t:key=\"widget.id\"\n\t\t\t\t\tv-if=\"widget.show\"\n\t\t\t\t\tclass=\"form-group row mg-component\"\n\t\t\t\t\t:class=\"[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])\"\n\t\t\t\t\t@click=\"componentEvent('mgContainer.click', widget.$specPath, widgetIndex, $event)\"\n\t\t\t\t\t@mouseenter=\"componentEvent('mgContainer.mouseEnter', widget.$specPath, widgetIndex, $event)\"\n\t\t\t\t\t@mouseleave=\"componentEvent('mgContainer.mouseLeave', widget.$specPath, widgetIndex, $event)\"\n\t\t\t\t>\n\t\t\t\t\t<mg-form-editor-controls\n\t\t\t\t\t\tv-if=\"$mgFormEditor\"\n\t\t\t\t\t\tv-show=\"highlights[widgetIndex] && highlights[widgetIndex].some(c => c == 'editHover' || c == 'editEditing')\"\n\t\t\t\t\t\t:config=\"widget\"\n\t\t\t\t\t/>\n\t\t\t\t\t<label v-if=\"widget.showTitle || $props.config.showTitles\" class=\"col-form-label text-left col-sm-3\">\n\t\t\t\t\t\t{{widget.title}}\n\t\t\t\t\t</label>\n\t\t\t\t\t<div class=\"col-form-value\" :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'\">\n\t\t\t\t\t\t<mg-component\n\t\t\t\t\t\t\t:ref=\"widgetIndex\"\n\t\t\t\t\t\t\t:config=\"widget\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div class=\"help-block\" v-if=\"widget.help\" :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'\">{{widget.help}}</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<!-- }}} -->\n\t<!-- Layout: formFloating {{{ -->\n\t<div v-else-if=\"$props.config.layout == 'formFloating'\">\n\t\t<div\n\t\t\tv-for=\"(widget, widgetIndex) in $props.config.items\"\n\t\t\t:key=\"widget.id\"\n\t\t\tv-if=\"widget.show\"\n\t\t\tclass=\"form-group mgContainer-formFloating row mg-component\"\n\t\t\t:class=\"[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])\"\n\t\t>\n\t\t\t<div class=\"col-12\">\n\t\t\t\t<mg-component\n\t\t\t\t\t:config=\"widget\"\n\t\t\t\t\tclass=\"control-input\"\n\t\t\t\t\t:class=\"!localData[widget.$dataPath] && 'blank'\"\n\t\t\t\t/>\n\t\t\t\t<label v-if=\"$props.config.showTitles\" class=\"col-form-label text-left col-sm-3\">\n\t\t\t\t\t{{widget.title}}\n\t\t\t\t</label>\n\t\t\t</div>\n\t\t\t<div class=\"help-block\" v-if=\"widget.help\" :class=\"widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'\">{{widget.help}}</div>\n\t\t</div>\n\t</div>\n\t<!-- }}} -->\n\t<!-- Layout: columns {{{ -->\n\t<div v-else-if=\"$props.config.layout == 'columns'\">\n\t\t<table class=\"mg-container\" :class=\"$props.config.border ? 'table table-bordered' : 'mg-container-columns-no-border'\" style=\"width: 100%\">\n\t\t\t<thead v-if=\"$props.config.columnHeaders\">\n\t\t\t\t<tr>\n\t\t\t\t\t<th\n\t\t\t\t\t\tv-for=\"widget in config.items\"\n\t\t\t\t\t\t:key=\"widget.id\"\n\t\t\t\t\t\tv-if=\"widget.show\"\n\t\t\t\t\t>{{widget.title}}</th>\n\t\t\t\t</tr>\n\t\t\t</thead>\n\t\t\t<tbody>\n\t\t\t\t<tr>\n\t\t\t\t\t<td\n\t\t\t\t\t\tv-for=\"(widget, widgetIndex) in $props.config.items\"\n\t\t\t\t\t\t:key=\"widget.id\"\n\t\t\t\t\t\tv-if=\"widget.show\"\n\t\t\t\t\t\t:class=\"[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])\"\n\t\t\t\t\t>\n\t\t\t\t\t\t<mg-component\n\t\t\t\t\t\t\t:ref=\"widgetIndex\"\n\t\t\t\t\t\t\t:config=\"widget\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<div class=\"help-block\" v-if=\"widget.help\">{{widget.help}}</div>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t</tbody>\n\t\t</table>\n\t</div>\n\t<!-- }}} -->\n\t<!-- Layout: query {{{ -->\n\t<div v-else-if=\"$props.config.layout == 'query'\">\n\t\t<div class=\"mg-container mg-container-query\">\n\t\t\t<div v-for=\"rowWidget in $props.config.items\" :key=\"rowWidget.id\">\n\t\t\t\t<div v-if=\"rowWidget.type == 'mgContainer' && rowWidget.layout == 'query-row'\" class=\"row\">\n\t\t\t\t\t<div v-for=\"colWidget in rowWidget.items\" :key=\"colWidget.id\" class=\"col mg-component\">\n\t\t\t\t\t\t<mg-component\n\t\t\t\t\t\t\t:ref=\"widgetIndex\"\n\t\t\t\t\t\t\t:config=\"colWidget\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div v-else class=\"alert alert-danger\">\n\t\t\t\t\tAll children of mgContainer[layout=query] must match the mgContainer[layout=queryRow]\n\t\t\t\t\t<pre>{{widget}}</pre>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n\t<!-- }}} -->\n\t<!-- Layout: unknown {{{ -->\n\t<div v-else class=\"mg-container\">\n\t\t<div class=\"alert alert-danger\">\n\t\t\tUnsupported mgContainer layout \"{{$props.config.layout || 'Unspecified'}}\"\n\t\t\t<pre>{{$props.config}}</pre>\n\t\t</div>\n\t</div>\n\t<!-- }}} -->\n</template>\n\n<style>\n/* formClass > .titles-above {{{ */\n.mg-container.titles-above > .form-group,\n.mg-container.titles-above > .form-group,\n.mg-container.titles-above > .card > .card-body > .form-group,\n.mg-container.titles-above > .card > .card-body > .form-group {\n\tdisplay: block;\n}\n\n.mg-container.titles-above > .form-group > .col-form-label,\n.mg-container.titles-above > .form-group > .col-form-value,\n.mg-container.titles-above > .card > .card-body > .form-group > .col-form-label,\n.mg-container.titles-above > .card > .card-body > .form-group > .col-form-value {\n\twidth: 100%;\n\tmax-width: none;\n}\n/* }}} */\n\n/* Card layout {{{ */\n/* Collapsable card {{{ */\n.mg-container.card.card-collapsable {\n\ttransition: all 0.2s ease-in;\n}\n\n.mg-container.card.card-collapsable .card-header {\n\tcursor: pointer;\n}\n\n.mg-container.card.card-collapsable .card-header::after {\n\tfont-family: \"Font Awesome 5 Pro\";\n\tcontent: '\\f054';\n\tfloat: right;\n\ttransition: transform 0.4s;\n}\n\n.mg-container.card.card-collapsable:not(.card-collapsed) .card-header::after {\n\ttransform: rotate(90deg);\n}\n\n\n/* Collapsed card {{{ */\n.mg-container.card.card-collapsable.card-collapsed {\n\tbox-shadow: none;\n\tborder-bottom: none;\n\tmargin-bottom: 0px;\n}\n\n.mg-container.card.card-collapsable.card-collapsed .card-body {\n\tdisplay: none;\n}\n/* }}} */\n/* }}} */\n\n/* Card verbs {{{ */\n.mg-container.card .card-header .card-verbs {\n\tposition: absolute;\n\tright: 15px;\n\ttop: 10px;\n\tfont-size: 20px;\n}\n\n.mg-container.card .card-header .card-verbs > a {\n\tcolor: #999;\n\tpadding: 5px;\n}\n\n.mg-container.card .card-header .card-verbs > a:hover {\n\tcolor: #000;\n}\n/* }}} */\n/* }}} */\n\n/* formFloating {{{ */\n.mgContainer-formFloating > .col-12 {\n\tposition: relative;\n\tline-height: 14px;\n\tmargin: 0 0px;\n\tdisplay: inline-block;\n\twidth: 100%;\n}\n\n.mgContainer-formFloating > .col-12 > .control-input {\n\theight: 45px;\n\tpadding-top: 8px;\n\tpadding-bottom: 2px;\n\tpadding-left: 2px;\n\tpadding-right: 12px;\n\tfont-size: 15px;\n\tline-height: 1.42857143;\n\tcolor: #333333;\n\tbackground-color: #ffffff;\n\tbackground-image: none;\n\toutline: none;\n\t/* border: 1px solid rgba(120, 120, 120, 0.5);\n\t*/\n\tborder: none;\n\tborder-bottom: 1px solid #bbb;\n\t-moz-box-shadow: none;\n\t-webkit-box-shadow: none;\n\tbox-shadow: none;\n\tborder-radius: 0;\n\tposition: relative;\n}\n\n.mgContainer-formFloating > .col-12 > .control-input.blank + .col-form-label {\n\ttransform: translateY(0px);\n\tcolor: #bbb;\n\tfont-size: 15px;\n\tfont-weight: 100;\n\topacity: 1;\n}\n\n.mgContainer-formFloating > .col-12 > .control-input.control-input:focus + .col-form-label {\n\ttransform: translateY(-21px);\n\tcolor: #66afe9;\n\tfont-size: 14px;\n\topacity: 1;\n\tfont-weight: 100;\n\tbackground-color: white;\n}\n\n.mgContainer-formFloating > .col-12 > .col-form-label {\n\tcolor: #aaa;\n\tdisplay: inline-block;\n\tfont-size: 12px;\n\tposition: absolute;\n\tz-index: 2;\n\tleft: 2px;\n\ttop: 16px;\n\tpadding: 0 0px;\n\tpointer-events: none;\n\tbackground: white;\n\ttransition: all 300ms ease;\n\ttransform: translateY(-21px);\n\tfont-weight: 500;\n}\n/* }}} */\n\n/* Columns layout {{{ */\n.mg-container.mg-container-columns-no-border th,\n.mg-container.mg-container-columns-no-border td {\n\tpadding: 5px;\n}\n/* }}} */\n\n/* Query layout {{{ */\n.mg-container.mg-container-query .row {\n\tdisplay: block;\n}\n\n.mg-container.mg-container-query .col {\n\tdisplay: inline-flex;\n\twidth: 200px;\n\theight: 35px;\n\tmin-width: 200px;\n\tmargin-left: 30px;\n\tmargin-bottom: 10px;\n\tmax-width: 400px;\n\tposition: relative;\n\talign-items: center;\n\tbox-shadow: 1px 3px 5px 0px rgba(50, 50, 50, 0.75);\n\tborder-radius: 3px;\n\tcolor: #FFF;\n\theight: 38px;\n\tpadding: 5px 15px;\n\tbackground: #FFF;\n}\n\n/* Query > Background color scale {{{ */\n.mg-container.mg-container-query .col:nth-child(1) {\n\tbackground: #104E8B;\n}\n\n.mg-container.mg-container-query .col:nth-child(2) {\n\tbackground: #1874CD;\n}\n\n.mg-container.mg-container-query .col:nth-child(3) {\n\tbackground: #1C86EE;\n}\n/* }}} */\n\n/* Query > Connecting lines {{{ */\n/* Vertical */\n.mg-container.mg-container-query .row::before {\n\tbackground-color: #CCC;\n\tcontent: '';\n\tdisplay: block;\n\tposition: absolute;\n\twidth: 4px;\n\ttop: 17px;\n\tbottom: 30px;\n}\n\n/* Horizontal */\n.mg-container.mg-container-query .col::before {\n\tleft: -30px;\n\theight: 4px;\n\ttop: calc(50% - 2px);\n\twidth: 30px;\n\tbackground-color: #CCC;\n\tcontent: '';\n\tdisplay: block;\n\tposition: absolute;\n}\n/* }}} */\n\n/* Query > Basic Inputs {{{ */\n.mg-container.mg-container-query .col input {\n\tbackground: transparent;\n\tborder: 1px solid transparent;\n\tcolor: #FFF;\n\theight: 1.8em;\n\tborder-radius: 0px;\n}\n\n.mg-container.mg-container-query .col input[type=text] {\n\tborder-bottom: 1px solid #CCC;\n}\n\n.mg-container.mg-container-query .col input[type=number] {\n\ttext-align: center;\n}\n\n.mg-container.mg-container-query .col input:focus {\n\tbox-shadow: none;\n\tborder: 1px solid #CCC;\n}\n/* }}} */\n\n/* Query > Buttons {{{ */\n.mg-container.mg-container-query .col .btn {\n\tbox-shadow: none;\n\tpadding: 1px 5px;\n\tbackground: transparent;\n\tborder: 1px solid #003e7b;\n}\n\n.mg-container.mg-container-query .col .btn,\n.mg-container.mg-container-query .col svg {\n\topacity: 0.2;\n\ttransition: opacity 0.5s;\n}\n\n.mg-container.mg-container-query .row:hover .col .btn,\n.mg-container.mg-container-query .row:hover .col svg {\n\topacity: 1;\n}\n\n.mg-container.mg-container-query .col .vs__clear {\n\tdisplay: none;\n}\n/* }}} */\n\n/* Query > Dropdowns {{{ */\n.mg-container.mg-container-query .v-select {\n\twidth: 100%;\n}\n\n.mg-container.mg-container-query .v-select,\n.mg-container.mg-container-query .v-select .vs--searchable .vs__dropdown-toggle,\n.mg-container.mg-container-query .v-select .vs__selected,\n.mg-container.mg-container-query .v-select input,\n.mg-container.mg-container-query .v-select .vs__actions {\n\tcursor: pointer !important;\n}\n\n.mg-container.mg-container-query .v-select .vs__dropdown-toggle {\n\tborder: none;\n}\n\n.mg-container.mg-container-query .col .v-select .vs__selected {\n\tcolor: #FFF;\n}\n\n.mg-container.mg-container-query .col .v-select .vs__selected {\n\ttop: 3px;\n}\n\n.mg-container.mg-container-query .col .v-select .vs__actions svg,\n.mg-container.mg-container-query .col .v-select .vs__deselect {\n\tstroke: #FFF;\n\tfill: #FFF;\n}\n\n.mg-container.mg-container-query .col .v-select.mg-choice-tags .vs__selected-options .vs__selected {\n\tbackground-color: #5bc0de;\n\tborder-radius: 10px;\n\tcolor: #fff;\n\tdisplay: inline-block;\n\tfont-size: 12px;\n\tline-height: 1rem;\n\tmin-width: 10px;\n\tpadding: 1px 10px;\n\ttext-align: center;\n\tvertical-align: middle;\n\twhite-space: nowrap;\n\tborder: none;\n}\n/* }}} */\n\n/* Query > Toggle {{{ */\n.mg-container.mg-container-query .col .vue-js-switch {\n\tmargin: auto;\n\theight: 10px;\n\ttop: -5px;\n}\n/* }}} */\n/* }}} */\n\n/* Misc utility types {{{ */\n.mg-form .help-block {\n\tfont-size: 80%;\n\tcolor: #6c757d !important;\n}\n/* }}} */\n</style>\n"]}, media: undefined });
 
               };
               /* scoped */
-              const __vue_scope_id__$h = undefined;
+              const __vue_scope_id__$i = undefined;
               /* module identifier */
-              const __vue_module_identifier__$h = undefined;
+              const __vue_module_identifier__$i = undefined;
               /* functional template */
-              const __vue_is_functional_template__$h = false;
+              const __vue_is_functional_template__$i = false;
               /* style inject SSR */
               
               /* style inject shadow dom */
               
 
               
-              const __vue_component__$h = normalizeComponent(
+              const __vue_component__$i = normalizeComponent(
                 { render: __vue_render__$b, staticRenderFns: __vue_staticRenderFns__$b },
-                __vue_inject_styles__$h,
-                __vue_script__$h,
-                __vue_scope_id__$h,
-                __vue_is_functional_template__$h,
-                __vue_module_identifier__$h,
+                __vue_inject_styles__$i,
+                __vue_script__$i,
+                __vue_scope_id__$i,
+                __vue_is_functional_template__$i,
+                __vue_module_identifier__$i,
                 false,
                 createInjector,
                 undefined,
@@ -10211,7 +10462,7 @@
 
             var mgContainer = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$h
+                        'default': __vue_component__$i
             });
 
             macgyver.register('mgDate', {
@@ -10241,7 +10492,7 @@
               },
               formatAlign: 'center'
             });
-            var script$h = Vue.component('mgDate', {
+            var script$i = Vue.component('mgDate', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -10264,7 +10515,7 @@
             });
 
             /* script */
-            const __vue_script__$i = script$h;
+            const __vue_script__$j = script$i;
 
             /* template */
             var __vue_render__$c = function() {
@@ -10292,13 +10543,13 @@
             __vue_render__$c._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$i = undefined;
+              const __vue_inject_styles__$j = undefined;
               /* scoped */
-              const __vue_scope_id__$i = undefined;
+              const __vue_scope_id__$j = undefined;
               /* module identifier */
-              const __vue_module_identifier__$i = undefined;
+              const __vue_module_identifier__$j = undefined;
               /* functional template */
-              const __vue_is_functional_template__$i = false;
+              const __vue_is_functional_template__$j = false;
               /* style inject */
               
               /* style inject SSR */
@@ -10307,13 +10558,13 @@
               
 
               
-              const __vue_component__$i = normalizeComponent(
+              const __vue_component__$j = normalizeComponent(
                 { render: __vue_render__$c, staticRenderFns: __vue_staticRenderFns__$c },
-                __vue_inject_styles__$i,
-                __vue_script__$i,
-                __vue_scope_id__$i,
-                __vue_is_functional_template__$i,
-                __vue_module_identifier__$i,
+                __vue_inject_styles__$j,
+                __vue_script__$j,
+                __vue_scope_id__$j,
+                __vue_is_functional_template__$j,
+                __vue_module_identifier__$j,
                 false,
                 undefined,
                 undefined,
@@ -10322,7 +10573,7 @@
 
             var mgDate = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$i
+                        'default': __vue_component__$j
             });
 
             macgyver.register('mgEmail', {
@@ -10345,7 +10596,7 @@
                 return "<a href=\"mailto:".concat(v, "\">").concat(v, "</a>");
               }
             });
-            var script$i = Vue.component('mgEmail', {
+            var script$j = Vue.component('mgEmail', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -10366,7 +10617,7 @@
             });
 
             /* script */
-            const __vue_script__$j = script$i;
+            const __vue_script__$k = script$j;
 
             /* template */
             var __vue_render__$d = function() {
@@ -10394,13 +10645,13 @@
             __vue_render__$d._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$j = undefined;
+              const __vue_inject_styles__$k = undefined;
               /* scoped */
-              const __vue_scope_id__$j = undefined;
+              const __vue_scope_id__$k = undefined;
               /* module identifier */
-              const __vue_module_identifier__$j = undefined;
+              const __vue_module_identifier__$k = undefined;
               /* functional template */
-              const __vue_is_functional_template__$j = false;
+              const __vue_is_functional_template__$k = false;
               /* style inject */
               
               /* style inject SSR */
@@ -10409,13 +10660,13 @@
               
 
               
-              const __vue_component__$j = normalizeComponent(
+              const __vue_component__$k = normalizeComponent(
                 { render: __vue_render__$d, staticRenderFns: __vue_staticRenderFns__$d },
-                __vue_inject_styles__$j,
-                __vue_script__$j,
-                __vue_scope_id__$j,
-                __vue_is_functional_template__$j,
-                __vue_module_identifier__$j,
+                __vue_inject_styles__$k,
+                __vue_script__$k,
+                __vue_scope_id__$k,
+                __vue_is_functional_template__$k,
+                __vue_module_identifier__$k,
                 false,
                 undefined,
                 undefined,
@@ -10424,7 +10675,7 @@
 
             var mgEmail = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$j
+                        'default': __vue_component__$k
             });
 
             macgyver.register('mgError', {
@@ -10439,7 +10690,7 @@
                 }
               }
             });
-            var script$j = Vue.component('mgError', {
+            var script$k = Vue.component('mgError', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -10466,7 +10717,7 @@
             });
 
             /* script */
-            const __vue_script__$k = script$j;
+            const __vue_script__$l = script$k;
 
             /* template */
             var __vue_render__$e = function() {
@@ -10484,13 +10735,13 @@
             __vue_render__$e._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$k = undefined;
+              const __vue_inject_styles__$l = undefined;
               /* scoped */
-              const __vue_scope_id__$k = undefined;
+              const __vue_scope_id__$l = undefined;
               /* module identifier */
-              const __vue_module_identifier__$k = undefined;
+              const __vue_module_identifier__$l = undefined;
               /* functional template */
-              const __vue_is_functional_template__$k = false;
+              const __vue_is_functional_template__$l = false;
               /* style inject */
               
               /* style inject SSR */
@@ -10499,13 +10750,13 @@
               
 
               
-              const __vue_component__$k = normalizeComponent(
+              const __vue_component__$l = normalizeComponent(
                 { render: __vue_render__$e, staticRenderFns: __vue_staticRenderFns__$e },
-                __vue_inject_styles__$k,
-                __vue_script__$k,
-                __vue_scope_id__$k,
-                __vue_is_functional_template__$k,
-                __vue_module_identifier__$k,
+                __vue_inject_styles__$l,
+                __vue_script__$l,
+                __vue_scope_id__$l,
+                __vue_is_functional_template__$l,
+                __vue_module_identifier__$l,
                 false,
                 undefined,
                 undefined,
@@ -10514,10 +10765,10 @@
 
             var mgError = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$k
+                        'default': __vue_component__$l
             });
 
-            var script$k = Vue.component('mgFormEditorControls', {
+            var script$l = Vue.component('mgFormEditorControls', {
               inject: ['$mgFormEditor'],
               props: {
                 config: {
@@ -10528,7 +10779,7 @@
             });
 
             /* script */
-            const __vue_script__$l = script$k;
+            const __vue_script__$m = script$l;
 
             /* template */
             var __vue_render__$f = function() {
@@ -10649,30 +10900,30 @@
             __vue_render__$f._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$l = function (inject) {
+              const __vue_inject_styles__$m = function (inject) {
                 if (!inject) return
                 inject("data-v-18cb58c9_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Component outlines {{{ */\n/* Neutral / Deselected {{{ */\n.mg-form-editor .mg-component {\n\tborder: 2px solid transparent;\n\tborder-radius: 5px;\n}\n/* }}} */\n/* Hover {{{ */\n.mg-form-editor .mg-component.editHover {\n\tborder: 2px dashed var(--mg-form-editor-hover-bg);\n}\n/* }}} */\n/* Editing {{{ */\n.mg-form-editor .mg-component.editEditing {\n\tborder: 2px solid var(--mg-form-editor-selected-bg);\n}\n/* }}} */\n/* }}} */\n\n/* Edit controls {{{ */\n.mg-form-editor-controls {\n\tposition: absolute;\n\ttransform: translate(2px, -30px);\n\twidth: calc(100% - 20px);\n}\n\n/* Title {{{ */\n.mg-form-editor-controls .mg-form-editor-controls-title,\n.mg-form-editor-controls .mg-form-editor-controls-buttons {\n\tborder-top-left-radius: 5px;\n\tborder-top-right-radius: 5px;\n\tpadding: 2px 8px;\n}\n.mg-form-editor-controls .mg-form-editor-controls-title {\n\tdisplay: inline-block;\n}\n.mg-component.editHover .mg-form-editor-controls-title {\n\tbackground: var(--mg-form-editor-hover-bg);\n\tcolor: var(--mg-form-editor-hover-fg);\n}\n.mg-component.editEditing .mg-form-editor-controls-title {\n\tbackground: var(--mg-form-editor-selected-bg);\n\tcolor: var(--mg-form-editor-selected-fg);\n}\n.mg-component .mg-form-editor-controls-title .mg-form-editor-controls-id {\n\tfont-weight: bold;\n}\n/* }}} */\n\n/* Buttons {{{ */\n.mg-form-editor-controls .mg-form-editor-controls-buttons {\n\tdisplay: none;\n\tfloat: right;\n\tbackground: var(--mg-form-editor-selected-bg);\n\tcolor: var(--mg-form-editor-selected-fg);\n}\n.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons {\n\tdisplay: inline-block;\n}\n.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons > a {\n\tborder-radius: 50%;\n\tpadding: 4px 5px;\n}\n.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons > a:hover {\n\tbackground: var(--mg-form-editor-selected-highlight);\n}\n.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons > a.danger:hover {\n\tbackground: var(--mg-form-editor-selected-danger);\n}\n/* }}} */\n/* }}} */\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgFormEditorControls.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAgCA,2BAAA;AACA,6BAAA;AACA;CACA,6BAAA;CACA,kBAAA;AACA;AACA,QAAA;AACA,cAAA;AACA;CACA,iDAAA;AACA;AACA,QAAA;AACA,gBAAA;AACA;CACA,mDAAA;AACA;AACA,QAAA;AACA,QAAA;;AAEA,sBAAA;AACA;CACA,kBAAA;CACA,gCAAA;CACA,wBAAA;AACA;;AAEA,cAAA;AACA;;CAEA,2BAAA;CACA,4BAAA;CACA,gBAAA;AACA;AAEA;CACA,qBAAA;AACA;AAEA;CACA,0CAAA;CACA,qCAAA;AACA;AAEA;CACA,6CAAA;CACA,wCAAA;AACA;AAEA;CACA,iBAAA;AACA;AACA,QAAA;;AAEA,gBAAA;AACA;CACA,aAAA;CACA,YAAA;CACA,6CAAA;CACA,wCAAA;AACA;AAEA;CACA,qBAAA;AACA;AAEA;CACA,kBAAA;CACA,gBAAA;AACA;AAEA;CACA,oDAAA;AACA;AAEA;CACA,iDAAA;AACA;AACA,QAAA;AACA,QAAA","file":"mgFormEditorControls.vue","sourcesContent":["<script>\nexport default Vue.component('mgFormEditorControls', {\n\tinject: ['$mgFormEditor'],\n\tprops: {\n\t\tconfig: {type: Object, required: true},\n\t},\n});\n</script>\n\n<template>\n\t<div\n\t\tclass=\"mg-form-editor-controls\"\n\t>\n\t\t<div class=\"mg-form-editor-controls-title\">\n\t\t\t{{$props.config.type}}\n\t\t\t<span v-if=\"$props.config.id\" class=\"mg-form-editor-controls-id\">\n\t\t\t\t#{{$props.config.id}}\n\t\t\t</span>\n\t\t</div>\n\t\t<div class=\"mg-form-editor-controls-buttons\">\n\t\t\t<!-- NOTE: Add .stop to ignore next mouse click which would select the element under the cursor -->\n\t\t\t<a @click.stop=\"$mgFormEditor.addTarget = $props.config.$specPath; $mgFormEditor.addOrientation = 'after'; $mgFormEditor.setMode('adding', false)\" class=\"far fa-plus\" v-tooltip=\"'Insert widget after here'\"/>\n\t\t\t<a @click=\"$mgFormEditor.duplicateWidget($props.config.$specPath)\" class=\"far fa-clone\" v-tooltip=\"'Duplicate widget'\"/>\n\t\t\t<!-- FIXME: Not yet working <a @click=\"$mgFormEditor.dragWidget($props.config.$specPath)\" class=\"far fa-arrows-alt\" v-tooltip=\"'Move widget'\"/> -->\n\t\t\t<a @click=\"$mgFormEditor.moveWidget($props.config.$specPath, 'up')\" class=\"far fa-arrow-up\" v-tooltip=\"'Move widget up'\"/>\n\t\t\t<a @click=\"$mgFormEditor.moveWidget($props.config.$specPath, 'down')\" class=\"far fa-arrow-down\" v-tooltip=\"'Move widget down'\"/>\n\t\t\t<a @click.stop=\"$mgFormEditor.removeWidget($props.config.$specPath)\" class=\"far fa-trash danger\" v-tooltip=\"'Delete widget'\"/>\n\t\t</div>\n\t</div>\n</template>\n\n<style>\n/* Component outlines {{{ */\n/* Neutral / Deselected {{{ */\n.mg-form-editor .mg-component {\n\tborder: 2px solid transparent;\n\tborder-radius: 5px;\n}\n/* }}} */\n/* Hover {{{ */\n.mg-form-editor .mg-component.editHover {\n\tborder: 2px dashed var(--mg-form-editor-hover-bg);\n}\n/* }}} */\n/* Editing {{{ */\n.mg-form-editor .mg-component.editEditing {\n\tborder: 2px solid var(--mg-form-editor-selected-bg);\n}\n/* }}} */\n/* }}} */\n\n/* Edit controls {{{ */\n.mg-form-editor-controls {\n\tposition: absolute;\n\ttransform: translate(2px, -30px);\n\twidth: calc(100% - 20px);\n}\n\n/* Title {{{ */\n.mg-form-editor-controls .mg-form-editor-controls-title,\n.mg-form-editor-controls .mg-form-editor-controls-buttons {\n\tborder-top-left-radius: 5px;\n\tborder-top-right-radius: 5px;\n\tpadding: 2px 8px;\n}\n\n.mg-form-editor-controls .mg-form-editor-controls-title {\n\tdisplay: inline-block;\n}\n\n.mg-component.editHover .mg-form-editor-controls-title {\n\tbackground: var(--mg-form-editor-hover-bg);\n\tcolor: var(--mg-form-editor-hover-fg);\n}\n\n.mg-component.editEditing .mg-form-editor-controls-title {\n\tbackground: var(--mg-form-editor-selected-bg);\n\tcolor: var(--mg-form-editor-selected-fg);\n}\n\n.mg-component .mg-form-editor-controls-title .mg-form-editor-controls-id {\n\tfont-weight: bold;\n}\n/* }}} */\n\n/* Buttons {{{ */\n.mg-form-editor-controls .mg-form-editor-controls-buttons {\n\tdisplay: none;\n\tfloat: right;\n\tbackground: var(--mg-form-editor-selected-bg);\n\tcolor: var(--mg-form-editor-selected-fg);\n}\n\n.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons {\n\tdisplay: inline-block;\n}\n\n.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons > a {\n\tborder-radius: 50%;\n\tpadding: 4px 5px;\n}\n\n.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons > a:hover {\n\tbackground: var(--mg-form-editor-selected-highlight);\n}\n\n.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons > a.danger:hover {\n\tbackground: var(--mg-form-editor-selected-danger);\n}\n/* }}} */\n/* }}} */\n</style>\n"]}, media: undefined });
 
               };
               /* scoped */
-              const __vue_scope_id__$l = undefined;
+              const __vue_scope_id__$m = undefined;
               /* module identifier */
-              const __vue_module_identifier__$l = undefined;
+              const __vue_module_identifier__$m = undefined;
               /* functional template */
-              const __vue_is_functional_template__$l = false;
+              const __vue_is_functional_template__$m = false;
               /* style inject SSR */
               
               /* style inject shadow dom */
               
 
               
-              const __vue_component__$l = normalizeComponent(
+              const __vue_component__$m = normalizeComponent(
                 { render: __vue_render__$f, staticRenderFns: __vue_staticRenderFns__$f },
-                __vue_inject_styles__$l,
-                __vue_script__$l,
-                __vue_scope_id__$l,
-                __vue_is_functional_template__$l,
-                __vue_module_identifier__$l,
+                __vue_inject_styles__$m,
+                __vue_script__$m,
+                __vue_scope_id__$m,
+                __vue_is_functional_template__$m,
+                __vue_module_identifier__$m,
                 false,
                 createInjector,
                 undefined,
@@ -10687,7 +10938,8 @@
             * @param {array<Object>} [verbs] Verb edit mgForm to show in the small edit sidebar, defaults to selecting widgets / adding widgets buttons
             * @param {string} [asideClassActive="mgfe-aside aside-right open"] Class to set all editing sidebars to when inactive
             * @param {string} [asideClassInactive="mgfe-aside aside-right"] Class to set all editing sidebar to when inactive
-            * @param {string} [asideClassModeNormal="aside-sm"] Class to associate with the smaller toolkit display when editing
+            * @param {string} [asideClassModeCollapsed="aside-sm"] Class to associate with the smaller toolkit display when editing
+            * @param {string} [asideClassModeToc="aside-sm"] Class to associate with the Table-Of-Contents sidebar
             * @param {string} [asideClassModeAdding=""] Class to associate with the editing sidebar when adding
             * @param {string} [asideClassModeEditing=""] Class to associate with the editing sidebar when editing
             *
@@ -10695,21 +10947,19 @@
             * @emits changeItem Emitted as `({path, value})` when a single config item changes, inexpensive compared to `change`
             */
 
-            var script$l = Vue.component('mgFormEditor', {
+            var script$m = Vue.component('mgFormEditor', {
               provide: function provide() {
                 return {
                   $mgFormEditor: this
                 };
               },
               components: {
-                mgFormEditorControls: __vue_component__$l
+                mgFormEditorControls: __vue_component__$m
               },
               data: function data() {
-                var _this = this;
-
                 return {
-                  mode: 'normal',
-                  // ENUM: normal, editing, adding
+                  mode: 'toc',
+                  // ENUM: collapsed, toc, editing, adding
                   id: this.$macgyver.nextId(),
                   // ID of the editing form item
                   editing: undefined,
@@ -10721,62 +10971,8 @@
                   addTarget: undefined,
                   // Spec path to add after, if any
                   addOrientation: 'after',
-                  // Add widget UI {{{
-                  addConfig: [{
-                    // Header area
-                    type: 'mgContainer',
-                    layout: 'columns',
-                    border: false,
-                    rowClass: 'aside-header',
-                    showTitle: false,
-                    items: [{
-                      type: 'mgHeading',
-                      text: 'Add widget'
-                    }, {
-                      type: 'mgContainer',
-                      layout: 'columns',
-                      border: false,
-                      showTitle: false,
-                      rowClass: 'aside-actions',
-                      items: [{
-                        type: 'mgButton',
-                        action: 'setMode',
-                        text: '',
-                        icon: '',
-                        "class": 'btn btn-link btn-xs far fa-times'
-                      }]
-                    }]
-                  }, {
-                    // Body area
-                    type: 'mgContainer',
-                    layout: 'form',
-                    rowClass: 'aside-body',
-                    showTitles: false,
-                    items: [{
-                      id: 'addType',
-                      type: 'mgChoiceList',
-                      title: 'Widget type to add',
-                      "enum": _(this.$macgyver.widgets).map(function (w, k) {
-                        return {
-                          id: k,
-                          title: w.title,
-                          icon: "".concat(w.icon, " fa-fw")
-                        };
-                      }).sortBy('title').value(),
-                      onChange: function onChange(type) {
-                        var inserted = _this.insertWidget({
-                          type: type
-                        }, {
-                          specPath: _this.addTarget,
-                          orientation: _this.addOrientation
-                        });
-
-                        console.log('INSERTED AS', inserted); // this.editWidget(inserted.id);
-                      }
-                    }]
-                  }],
-                  addData: {} // }}}
-
+                  // Holding data for various form states
+                  addData: {}
                 };
               },
               props: {
@@ -10790,9 +10986,13 @@
                   type: String,
                   "default": 'mgfe-aside aside-right'
                 },
-                asideClassModeNormal: {
+                asideClassModeCollapsed: {
                   type: String,
                   "default": 'aside-sm'
+                },
+                asideClassModeToc: {
+                  type: String,
+                  "default": ''
                 },
                 asideClassModeAdding: {
                   type: String,
@@ -10805,10 +11005,12 @@
                 generalVerbs: {
                   type: Array,
                   "default": function _default() {
+                    var _this$$prompt;
+
                     return [{
                       type: 'mgButton',
                       action: "setMode()",
-                      "class": 'btn btn-primary',
+                      "class": 'btn btn-primary text-white px-2',
                       icon: 'fa fa-mouse-pointer fa-fw',
                       showTitle: false,
                       tooltip: {
@@ -10817,35 +11019,56 @@
                       }
                     }, {
                       type: 'mgButton',
+                      action: "setMode('toc')",
+                      "class": 'btn btn-outline-light border-0 px-2',
+                      icon: 'fa fa-stream fa-fw',
+                      showTitle: false,
+                      tooltip: {
+                        content: 'Select widgets to edit',
+                        placement: 'left'
+                      }
+                    }].concat(_toConsumableArray(((_this$$prompt = this.$prompt) === null || _this$$prompt === void 0 ? void 0 : _this$$prompt.macgyver) ? [{
+                      // Include JSON editing if $prompt.macgyver() is available
+                      type: 'mgButton',
+                      action: "rawEdit()",
+                      "class": 'btn btn-outline-light border-0 px-2',
+                      icon: 'fa fa-code fa-fw',
+                      showTitle: false,
+                      tooltip: {
+                        content: 'Edit the form contents as JSON',
+                        placement: 'left'
+                      }
+                    }] : []), [{
+                      type: 'mgButton',
                       action: "setMode('adding')",
-                      "class": 'btn btn-light',
+                      "class": 'btn btn-outline-light border-0 px-2',
                       icon: 'far fa-plus fa-fw',
                       showTitle: false,
                       tooltip: {
                         content: 'Add a new widget',
                         placement: 'left'
                       }
-                    }];
+                    }]);
                   }
                 }
               },
               mounted: function mounted() {
-                var _this2 = this;
+                var _this = this;
 
                 this.$refs.form.$on('mgContainer.click', function (container, specPath, componentIndex, e) {
                   e.stopPropagation();
                   e.preventDefault();
 
-                  _this2.editWidget(specPath);
+                  _this.editWidget(specPath);
                 });
                 this.$refs.form.$on('mgContainer.mouseEnter', function (container, specPath, componentIndex, e) {
-                  var component = _this2.$refs.form.getComponentBySpecPath(specPath);
+                  var component = _this.$refs.form.getComponentBySpecPath(specPath);
 
                   var componentIndex = container.findChildIndex(component);
                   container.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).concat(['editHover']));
                 });
                 this.$refs.form.$on('mgContainer.mouseLeave', function (container, specPath, componentIndex, e) {
-                  var component = _this2.$refs.form.getComponentBySpecPath(specPath);
+                  var component = _this.$refs.form.getComponentBySpecPath(specPath);
 
                   var componentIndex = container.findChildIndex(component);
                   container.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).filter(function (c) {
@@ -10856,11 +11079,11 @@
               methods: {
                 /**
                 * Stop editing / adding and return to regular mode
-                * @param {string} [mode="normal"] Mode to switch to
+                * @param {string} [mode="collapsed"] Mode to switch to
                 * @param {boolean} [clearHighlight=true] Also attempt to clear out any highlight and reset the aside panes
                 */
                 setMode: function setMode() {
-                  var mode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'normal';
+                  var mode = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'collapsed';
                   var clearHighlight = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
                   // Deselect the existing item (if we have one)
@@ -10869,7 +11092,7 @@
                     this.editing = undefined;
                   }
 
-                  this.$set(this, 'mode', mode);
+                  this.$set(this, 'mode', mode || 'collapsed');
                   return true; // Signal to mgForm that we have handled this action
                 },
 
@@ -11012,7 +11235,7 @@
                 * @returns {Object} The inserted widget object (complete with ID if allocateId is specified)
                 */
                 insertWidget: function insertWidget(widget, options) {
-                  var _this3 = this;
+                  var _this2 = this;
 
                   var settings = _objectSpread2({
                     specPath: undefined,
@@ -11031,7 +11254,7 @@
                     this.$macgyver.flatten(this.$props.config, {
                       want: 'array'
                     }).reduce(function (offset, widget) {
-                      return widget.type == _this3.addData.addType ? offset + 1 : offset;
+                      return widget.type == _this2.addData.addType ? offset + 1 : offset;
                     }, 0);
                     if (settings.allocateTitle && !widget.title) widget.title = this.$macgyver.widgets[this.addData.addType].title + String(widgetOffset == 0 ? '' : widgetOffset);
                     if (settings.allocateId && !widget.id) widget.id = this.addData.addType + String(widgetOffset == 0 ? '' : widgetOffset);
@@ -11085,7 +11308,7 @@
                 * @param {string|array} specPath The lodash notation specPath to remove
                 */
                 duplicateWidget: function duplicateWidget(specPath) {
-                  var _this4 = this;
+                  var _this3 = this;
 
                   var parentItems = _.isArray(specPath) ? specPath : specPath.split('.');
                   var targetIndex = parentItems.pop();
@@ -11096,7 +11319,7 @@
                     ? [v, // Original object
                     _.chain(v).cloneDeep().pickBy(function (v, k) {
                       return !k.startsWith('$');
-                    }).set('id', _this4.$macgyver.utils.incrementId(v.id)) // Also increment its ID
+                    }).set('id', _this3.$macgyver.utils.incrementId(v.id)) // Also increment its ID
                     .value()] : v;
                   }).flatten().value());
                 },
@@ -11138,25 +11361,148 @@
                   console.warn('FIXME: dragWidget() not yet supported');
                 },
                 rawEdit: function rawEdit() {
-                  var _this5 = this;
+                  var _this4 = this;
 
                   this.$prompt.macgyver({
                     title: 'Template JSON',
-                    form: {
+                    macgyver: {
                       id: 'code',
                       type: 'mgCode',
                       syntax: 'json',
-                      value: this.value
+                      convert: true,
+                      "default": this.$props.config
                     }
                   }).then(function (form) {
-                    return _this5.$set(_this5, 'config', JSON.parse(form.code));
+                    return _this4.$set(_this4, 'config', form.code);
                   });
-                }
+                },
+                // Form layouts {{{
+
+                /**
+                * Generate the config layout for the Table-Of-Contents sidebar
+                */
+                generateConfigToc: function generateConfigToc() {
+                  var _this5 = this;
+
+                  var genTreeBranch = function genTreeBranch(root) {
+                    return root.map(function (widget) {
+                      return {
+                        title: "".concat(widget.type, " #").concat(widget.id),
+                        icon: _this5.$macgyver.widgets[widget.type].icon,
+                        "enum": widget.items ? genTreeBranch(widget.items) : undefined
+                      };
+                    });
+                  };
+
+                  return [{
+                    // Header area
+                    type: 'mgContainer',
+                    layout: 'columns',
+                    border: false,
+                    rowClass: 'aside-header',
+                    showTitle: false,
+                    items: [{
+                      type: 'mgHeading',
+                      text: 'Form layout'
+                    }, {
+                      type: 'mgContainer',
+                      layout: 'columns',
+                      border: false,
+                      showTitle: false,
+                      rowClass: 'aside-actions',
+                      items: [{
+                        type: 'mgButton',
+                        action: 'setMode',
+                        text: '',
+                        icon: '',
+                        "class": 'btn btn-link btn-xs far fa-times'
+                      }]
+                    }]
+                  }, {
+                    // Body area
+                    type: 'mgContainer',
+                    layout: 'form',
+                    rowClass: 'aside-body',
+                    showTitles: false,
+                    items: [{
+                      type: 'mgChoiceTree',
+                      title: 'Layout tree',
+                      onChange: function onChange(item) {
+                        console.log('TREE CLICK', item);
+                      },
+                      "enum": genTreeBranch([this.$macgyver.compileSpec(this.$props.config, {
+                        clone: false
+                      }).spec])
+                    }]
+                  }];
+                },
+
+                /**
+                * Generate the config layout for the "add widget" sidebar
+                */
+                generateConfigAdding: function generateConfigAdding() {
+                  var _this6 = this;
+
+                  return [{
+                    // Header area
+                    type: 'mgContainer',
+                    layout: 'columns',
+                    border: false,
+                    rowClass: 'aside-header',
+                    showTitle: false,
+                    items: [{
+                      type: 'mgHeading',
+                      text: 'Add widget'
+                    }, {
+                      type: 'mgContainer',
+                      layout: 'columns',
+                      border: false,
+                      showTitle: false,
+                      rowClass: 'aside-actions',
+                      items: [{
+                        type: 'mgButton',
+                        action: 'setMode',
+                        text: '',
+                        icon: '',
+                        "class": 'btn btn-link btn-xs far fa-times'
+                      }]
+                    }]
+                  }, {
+                    // Body area
+                    type: 'mgContainer',
+                    layout: 'form',
+                    rowClass: 'aside-body',
+                    showTitles: false,
+                    items: [{
+                      id: 'addType',
+                      type: 'mgChoiceList',
+                      title: 'Widget type to add',
+                      "enum": _(this.$macgyver.widgets).map(function (w, k) {
+                        return {
+                          id: k,
+                          title: w.title,
+                          icon: "".concat(w.icon, " fa-fw")
+                        };
+                      }).sortBy('title').value(),
+                      onChange: function onChange(type) {
+                        var inserted = _this6.insertWidget({
+                          type: type
+                        }, {
+                          specPath: _this6.addTarget,
+                          orientation: _this6.addOrientation
+                        });
+
+                        console.log('INSERTED AS', inserted); // this.editWidget(inserted.id);
+                      }
+                    }]
+                  }];
+                } // }}}
+
               }
             });
 
             /* script */
-            const __vue_script__$m = script$l;
+            const __vue_script__$n = script$m;
 
             /* template */
             var __vue_render__$g = function() {
@@ -11171,20 +11517,46 @@
                     "aside",
                     {
                       class: [
-                        _vm.mode == "normal"
+                        _vm.mode == "collapsed"
                           ? _vm.$props.asideClassActive
                           : _vm.$props.asideClassInactive,
-                        _vm.$props.asideClassModeNormal
+                        _vm.$props.asideClassModeCollapsed
                       ]
                     },
                     [
-                      _c("mg-form", {
-                        attrs: {
-                          form: _vm.id + "-normal",
-                          config: _vm.$props.generalVerbs,
-                          actions: { setMode: _vm.setMode, setMode: _vm.setMode }
-                        }
-                      })
+                      _vm.mode == "collapsed"
+                        ? _c("mg-form", {
+                            attrs: {
+                              form: _vm.id + "-collapsed",
+                              config: _vm.$props.generalVerbs,
+                              actions: { setMode: _vm.setMode, rawEdit: _vm.rawEdit }
+                            }
+                          })
+                        : _vm._e()
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "aside",
+                    {
+                      class: [
+                        _vm.mode == "toc"
+                          ? _vm.$props.asideClassActive
+                          : _vm.$props.asideClassInactive,
+                        _vm.$props.asideClassModeToc
+                      ]
+                    },
+                    [
+                      _vm.mode == "toc"
+                        ? _c("mg-form", {
+                            attrs: {
+                              form: _vm.id + "-toc",
+                              config: _vm.generateConfigToc(),
+                              actions: { setMode: _vm.setMode }
+                            }
+                          })
+                        : _vm._e()
                     ],
                     1
                   ),
@@ -11200,19 +11572,21 @@
                       ]
                     },
                     [
-                      _c("mg-form", {
-                        ref: "formAdd",
-                        attrs: {
-                          config: _vm.addConfig,
-                          data: _vm.addData,
-                          actions: { setMode: _vm.setMode }
-                        },
-                        on: {
-                          change: function($event) {
-                            _vm.addData = $event;
-                          }
-                        }
-                      })
+                      _vm.mode == "adding"
+                        ? _c("mg-form", {
+                            ref: "formAdd",
+                            attrs: {
+                              config: _vm.generateConfigAdding(),
+                              data: _vm.addData,
+                              actions: { setMode: _vm.setMode }
+                            },
+                            on: {
+                              change: function($event) {
+                                _vm.addData = $event;
+                              }
+                            }
+                          })
+                        : _vm._e()
                     ],
                     1
                   ),
@@ -11228,7 +11602,7 @@
                       ]
                     },
                     [
-                      _vm.editing
+                      _vm.mode == "editing"
                         ? _c("mg-form", {
                             attrs: {
                               form: _vm.id + "-edit",
@@ -11265,30 +11639,30 @@
             __vue_render__$g._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$m = function (inject) {
+              const __vue_inject_styles__$n = function (inject) {
                 if (!inject) return
-                inject("data-v-14385f1d_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Variables {{{ */\n:root {\n\t--mg-form-editor-selected-bg: #007bff;\n\t--mg-form-editor-selected-fg: #fff;;\n\t--mg-form-editor-selected-highlight: #5dabff;\n\t--mg-form-editor-selected-danger: #dc3545;\n\t--mg-form-editor-hover-bg: #77b9ff;\n\t--mg-form-editor-hover-fg: #fff;\n}\n/* }}} */\n\n/* Aside styles - .mgfe-aside {{{ */\n.mgfe-aside {\n\ttransition: transform 0.2s ease-out;\n}\n.mgfe-aside .mg-form {\n\tmargin: 0;\n}\n.mgfe-aside.aside-right.open.open { /* Silly hack to force the transform when open (overrides .asign-sm in priority) */\n\ttransform: translateX(0px);\n}\n.mgfe-aside.aside-right {\n\tposition: fixed;\n\ttop: 0px;\n\tright: 0px;\n\tbottom: 0px;\n\tbackground: #FFF;\n\tz-index: 100;\n\tbox-shadow: 0 1px 5px rgba(0,0,0,.3);\n\twidth: 350px;\n\ttransform: translateX(380px);\n}\n\n/* .mgfe-aside-sm {{{ */\n.mgfe-aside.aside-right.aside-sm {\n\twidth: 40px;\n\ttransform: translateX(50px);\n\ttop: calc(50% - 30px); /* Approx middle of the screen */\n\tbottom: inherit;\n\tborder-radius: 50px;\n}\n.mgfe-aside.aside-right.aside-sm .form-group {\n\tmargin: 0;\n}\n\n/* Remove BS padding from sub-elements */\n.mgfe-aside.aside-right.aside-sm .form-group [class*=\"col-\"] {\n\tpadding: 0;\n}\n/* }}} */\n\n/* Headers {{{ */\n.mgfe-aside .aside-header {\n\tdisplay: flex;\n\talign-items: center;\n\tjustify-content: flex-end;\n\tborder-bottom: 1px solid #e9ecef;\n\tmargin: 0;\n}\n.mgfe-aside .aside-header h4 {\n\tflex-grow: 1;\n}\n.mgfe-aside .aside-header legend.form-control-static {\n\tborder-bottom: none;\n\tfont-size: 17pt;\n}\n.mgfe-aside .aside-header .close {\n\tcolor: #5e5e5e;\n}\n.mgfe-aside .aside-header .close:hover {\n\tcolor: #000;\n}\n.mgfe-aside .aside-header .close::after {\n\tdisplay: inline-block;\n\tfont-family: 'Font Awesome 5 Pro';\n\tfont-weight: 900;\n\tcontent: \"\\f00d\";\n}\n/* }}} */\n\n/* Actions {{{ */\n.mgfe-aside .aside-actions {\n\tjustify-self: flex-end;\n\tmargin-right: 10px;\n}\n.mgfe-aside .aside-actions .btn-group {\n\tborder: none;\n\tbox-shadow: none;\n}\n.mgfe-aside .aside-actions a {\n\tpadding: 8px;\n\tfont-size: 125%;\n}\n/* }}} */\n\n/* Body {{{ */\n.mgfe-aside .aside-body {\n\tmargin-left: 0;\n\tmargin: 10px 0 0;\n\n\t/* Body scrolling */\n\toverflow: auto;\n\theight: calc(100vh - 80px);\n}\n/* }}} */\n/* }}} */\n\n/* Component highlighting {{{\n\n/* Highlight applied to active elements inside an mgContainer */\n.mg-form-editor-target {\n\tborder: 2px solid var(--blue);\n\tborder-radius: 5px;\n\tposition: relative;\n\ttop: -4px;\n\tleft: -4px;\n\tpadding: 2px;\n}\n.mg-form-editor-drop-target {\n}\n.mg-form-editor-drop-target-before {\n\tborder-top: 4px dashed var(--blue);\n}\n.mg-form-editor-drop-target-after {\n\tborder-bottom: 4px dashed var(--blue);\n}\n/* }}} */\n\n/* Drag + Drop {{{ */\nbody.mg-form-editor-dragging * {\n\tcursor: grabbing;\n}\n#mg-form-editor-drag {\n\tdisplay: block;\n\tz-index: 1000;\n\tposition: absolute;\n\ttop: -10000px;\n\tleft: -10000px;\n\tmin-width: 160px;\n\theight: 40px;\n\tborder-radius: 5px;\n\tbackground: #2196F3;\n\tbox-shadow: 1px 1px 4px rgba(0,0,0,.3);\n\tpadding: 10px;\n\tcolor: #FFF;\n}\n#mg-form-editor-drag > i {\n\tmargin-right: 5px;\n}\n/* }}} */\n\n/* Misc fixes {{{ */\n/* Buttons that are also fixed with look weird */\n.mg-form-editor .btn.fa-fw {\n\twidth: 2.30em;\n\tpadding: 4px 2px !important;\n}\n/* }}} */\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgFormEditor.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAggBA,kBAAA;AACA;CACA,qCAAA;CACA,kCAAA;CACA,4CAAA;CACA,yCAAA;CACA,kCAAA;CACA,+BAAA;AACA;AACA,QAAA;;AAEA,mCAAA;AACA;CACA,mCAAA;AACA;AAEA;CACA,SAAA;AACA;AAEA,oCAAA,kFAAA;CACA,0BAAA;AACA;AAEA;CACA,eAAA;CACA,QAAA;CACA,UAAA;CACA,WAAA;CACA,gBAAA;CACA,YAAA;CACA,oCAAA;CACA,YAAA;CACA,4BAAA;AACA;;AAEA,uBAAA;AACA;CACA,WAAA;CACA,2BAAA;CACA,qBAAA,EAAA,gCAAA;CACA,eAAA;CACA,mBAAA;AACA;AAEA;CACA,SAAA;AACA;;AAEA,wCAAA;AACA;CACA,UAAA;AACA;AACA,QAAA;;AAEA,gBAAA;AACA;CACA,aAAA;CACA,mBAAA;CACA,yBAAA;CACA,gCAAA;CACA,SAAA;AACA;AAEA;CACA,YAAA;AACA;AAEA;CACA,mBAAA;CACA,eAAA;AACA;AAEA;CACA,cAAA;AACA;AAEA;CACA,WAAA;AACA;AAEA;CACA,qBAAA;CACA,iCAAA;CACA,gBAAA;CACA,gBAAA;AACA;AACA,QAAA;;AAEA,gBAAA;AACA;CACA,sBAAA;CACA,kBAAA;AACA;AAEA;CACA,YAAA;CACA,gBAAA;AACA;AAEA;CACA,YAAA;CACA,eAAA;AACA;AACA,QAAA;;AAEA,aAAA;AACA;CACA,cAAA;CACA,gBAAA;;CAEA,mBAAA;CACA,cAAA;CACA,0BAAA;AACA;AACA,QAAA;AACA,QAAA;;AAEA;;+DAEA;AACA;CACA,6BAAA;CACA,kBAAA;CACA,kBAAA;CACA,SAAA;CACA,UAAA;CACA,YAAA;AACA;AAEA;AACA;AAEA;CACA,kCAAA;AACA;AAEA;CACA,qCAAA;AACA;AACA,QAAA;;AAEA,oBAAA;AACA;CACA,gBAAA;AACA;AAEA;CACA,cAAA;CACA,aAAA;CACA,kBAAA;CACA,aAAA;CACA,cAAA;CACA,gBAAA;CACA,YAAA;CACA,kBAAA;CACA,mBAAA;CACA,sCAAA;CACA,aAAA;CACA,WAAA;AACA;AAEA;CACA,iBAAA;AACA;AACA,QAAA;;AAEA,mBAAA;AACA,gDAAA;AACA;CACA,aAAA;CACA,2BAAA;AACA;AACA,QAAA","file":"mgFormEditor.vue","sourcesContent":["<script>\nimport mgFormEditorControls from './mgFormEditorControls';\n/**\n* mg-form-editor - Drag-and-drop form designer for MacGyver\n*\n* @param {Object} config mgForm compatible spec to edit\n* @param {Object} [data] Optional data bindings for the form\n* @param {array<Object>} [verbs] Verb edit mgForm to show in the small edit sidebar, defaults to selecting widgets / adding widgets buttons\n* @param {string} [asideClassActive=\"mgfe-aside aside-right open\"] Class to set all editing sidebars to when inactive\n* @param {string} [asideClassInactive=\"mgfe-aside aside-right\"] Class to set all editing sidebar to when inactive\n* @param {string} [asideClassModeNormal=\"aside-sm\"] Class to associate with the smaller toolkit display when editing\n* @param {string} [asideClassModeAdding=\"\"] Class to associate with the editing sidebar when adding\n* @param {string} [asideClassModeEditing=\"\"] Class to associate with the editing sidebar when editing\n*\n* @emits change Emitted as `(config)` on any item configuration change. WARNING, subscribing to this involves an entire deep copy of the config structure, subscribe to changeItem if possible\n* @emits changeItem Emitted as `({path, value})` when a single config item changes, inexpensive compared to `change`\n*/\nexport default Vue.component('mgFormEditor', {\n\tprovide() { return {\n\t\t$mgFormEditor: this,\n\t}},\n\tcomponents: {\n\t\tmgFormEditorControls,\n\t},\n\tdata() { return {\n\t\tmode: 'normal', // ENUM: normal, editing, adding\n\t\tid: this.$macgyver.nextId(), // ID of the editing form item\n\t\tediting: undefined, // The active item we are editing\n\t\twidgetListMode: 'grid',\n\n\t\t// Asides\n\t\teditConfig: [],\n\t\teditData: {},\n\n\t\taddTarget: undefined, // Spec path to add after, if any\n\t\taddOrientation: 'after',\n\t\t// Add widget UI {{{\n\t\taddConfig: [\n\t\t\t{ // Header area\n\t\t\t\ttype: 'mgContainer',\n\t\t\t\tlayout: 'columns',\n\t\t\t\tborder: false,\n\t\t\t\trowClass: 'aside-header',\n\t\t\t\tshowTitle: false,\n\t\t\t\titems: [\n\t\t\t\t\t{type: 'mgHeading', text: 'Add widget'},\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\trowClass: 'aside-actions',\n\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t{type: 'mgButton', action: 'setMode', text: '', icon: '', class: 'btn btn-link btn-xs far fa-times'},\n\t\t\t\t\t\t],\n\t\t\t\t\t},\n\t\t\t\t],\n\t\t\t},\n\t\t\t{ // Body area\n\t\t\t\ttype: 'mgContainer',\n\t\t\t\tlayout: 'form',\n\t\t\t\trowClass: 'aside-body',\n\t\t\t\tshowTitles: false,\n\t\t\t\titems: [\n\t\t\t\t\t{\n\t\t\t\t\t\tid: 'addType',\n\t\t\t\t\t\ttype: 'mgChoiceList',\n\t\t\t\t\t\ttitle: 'Widget type to add',\n\t\t\t\t\t\tenum: _(this.$macgyver.widgets)\n\t\t\t\t\t\t\t.map((w, k) => ({\n\t\t\t\t\t\t\t\tid: k,\n\t\t\t\t\t\t\t\ttitle: w.title,\n\t\t\t\t\t\t\t\ticon: `${w.icon} fa-fw`,\n\t\t\t\t\t\t\t}))\n\t\t\t\t\t\t\t.sortBy('title')\n\t\t\t\t\t\t\t.value(),\n\t\t\t\t\t\tonChange: type => {\n\t\t\t\t\t\t\tvar inserted = this.insertWidget({type}, {\n\t\t\t\t\t\t\t\tspecPath: this.addTarget,\n\t\t\t\t\t\t\t\torientation: this.addOrientation,\n\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\tconsole.log('INSERTED AS', inserted);\n\t\t\t\t\t\t\t// this.editWidget(inserted.id);\n\t\t\t\t\t\t},\n\t\t\t\t\t},\n\t\t\t\t],\n\t\t\t},\n\t\t],\n\t\taddData: {},\n\t\t// }}}\n\t}},\n\tprops: {\n\t\tdata: Object,\n\t\tconfig: Object,\n\t\tasideClassActive: {type: String, default: 'mgfe-aside aside-right open'},\n\t\tasideClassInactive: {type: String, default: 'mgfe-aside aside-right'},\n\t\tasideClassModeNormal: {type: String, default: 'aside-sm'},\n\t\tasideClassModeAdding: {type: String, default: ''},\n\t\tasideClassModeEditing: {type: String, default: ''},\n\t\tgeneralVerbs: {\n\t\t\ttype: Array,\n\t\t\tdefault() {\n\t\t\t\treturn [\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"setMode()\",\n\t\t\t\t\t\tclass: 'btn btn-primary',\n\t\t\t\t\t\ticon: 'fa fa-mouse-pointer fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\ttooltip: {content: 'Select widgets to edit', placement: 'left'},\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"setMode('adding')\",\n\t\t\t\t\t\tclass: 'btn btn-light',\n\t\t\t\t\t\ticon: 'far fa-plus fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\ttooltip: {content: 'Add a new widget', placement: 'left'},\n\t\t\t\t\t},\n\t\t\t\t];\n\t\t\t},\n\t\t},\n\t},\n\tmounted() {\n\t\tthis.$refs.form.$on('mgContainer.click', (container, specPath, componentIndex, e) => {\n\t\t\te.stopPropagation();\n\t\t\te.preventDefault();\n\t\t\tthis.editWidget(specPath);\n\t\t});\n\n\t\tthis.$refs.form.$on('mgContainer.mouseEnter', (container, specPath, componentIndex, e) => {\n\t\t\tvar component = this.$refs.form.getComponentBySpecPath(specPath);\n\t\t\tvar componentIndex = container.findChildIndex(component);\n\n\t\t\tcontainer.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).concat(['editHover']));\n\t\t});\n\n\t\tthis.$refs.form.$on('mgContainer.mouseLeave', (container, specPath, componentIndex, e) => {\n\t\t\tvar component = this.$refs.form.getComponentBySpecPath(specPath);\n\t\t\tvar componentIndex = container.findChildIndex(component);\n\n\t\t\tcontainer.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).filter(c => c != 'editHover'));\n\t\t});\n\t},\n\tmethods: {\n\t\t/**\n\t\t* Stop editing / adding and return to regular mode\n\t\t* @param {string} [mode=\"normal\"] Mode to switch to\n\t\t* @param {boolean} [clearHighlight=true] Also attempt to clear out any highlight and reset the aside panes\n\t\t*/\n\t\tsetMode(mode = 'normal', clearHighlight = true) {\n\t\t\t// Deselect the existing item (if we have one)\n\t\t\tif (this.editing && clearHighlight) {\n\t\t\t\tthis.setComponentHighlight(this.editing, []);\n\t\t\t\tthis.editing = undefined;\n\t\t\t}\n\n\t\t\tthis.$set(this, 'mode', mode);\n\t\t\treturn true; // Signal to mgForm that we have handled this action\n\t\t},\n\n\n\t\t/**\n\t\t* Delete the active widget\n\t\t*/\n\t\tdeleteWidget() {\n\t\t\tif (!this.editing) {\n\t\t\t\tthis.$macgyver.notify.warn('No widget selected to delete'); // Not editing anyway\n\t\t\t} else {\n\t\t\t\tthis.removeWidget(this.editing.$props.config.$specPath);\n\t\t\t}\n\n\t\t\treturn true; // Signal to mgForm that we have handled this action\n\t\t},\n\n\n\t\t/**\n\t\t* Set the component.highlight[index] to the given list of CSS classes\n\t\t* @param {VueController} component The VueController to set the highlight of within its mgContainer\n\t\t* @param {array<string>} classes Array of string classes to set\n\t\t*/\n\t\tsetComponentHighlight(component, classes) {\n\t\t\tif (!_.isArray(classes)) throw new Error('setComponentHighlight must be passed an array');\n\n\t\t\tvar container = false;\n\t\t\tcomponent.$emit.up('mgIdentify', component => {\n\t\t\t\tif (!container && component.$props.config.type == 'mgContainer') container = component;\n\t\t\t});\n\t\t\tif (!container) return console.warn('[mgFormEditor] setComponentHighlight component failed to find enclosing container', {component});\n\n\t\t\tvar childOffset = container.findChildIndex(component);\n\t\t\tif (childOffset === false) return console.warn('[mgFormEditor]', 'Cannot locate component within container', {container, component});\n\n\t\t\tconsole.log('Set highlight', childOffset, classes);\n\t\t\tcontainer.$set(container.highlights, childOffset, classes);\n\t\t},\n\n\n\t\t/**\n\t\t* Edit a widget by its specPath or component\n\t\t* @param {VueComponent|string} component Either the VueComponent to edit or the specPath of the widget to edit\n\t\t*/\n\t\teditWidget(component) {\n\t\t\tvar component; // The Vue component from the widget path\n\t\t\tif (!_.isObject(component) && !_.isString(component)) throw new Error('editWidget requires either a specPath or VueComponent');\n\t\t\tif (_.isObject(component) && !component._uid) throw new Error('editWidget() requires a valid VueComponent object (or specPath string)');\n\n\t\t\tif (_.isString(component) || _.isArray(component)) component = this.$refs.form.getComponentBySpecPath(component); // Resolve specPath into actual component if eneded\n\n\t\t\tthis.setMode();\n\n\t\t\tthis.$set(this, 'editing', component);\n\t\t\tthis.$set(this, 'mode', 'editing');\n\n\t\t\tthis.setComponentHighlight(component, ['editEditing']);\n\n\t\t\tvar widget = this.$macgyver.widgets[component.$props.config.type];\n\t\t\tif (widget) {\n\t\t\t\tthis.$set(this, 'editConfig', [\n\t\t\t\t\t{ // Header area\n\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\trowClass: 'aside-header',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t{id: 'metaIcon', type: 'mgIcon'},\n\t\t\t\t\t\t\t{id: 'id', type: 'mgText', placeholder: 'No ID'},\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t\t\trowClass: 'aside-actions',\n\t\t\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'deleteWidget', class: 'btn btn-link btn-link-danger btn-xs', icon: 'far fa-trash', tooltip: 'Delete this widget'},\n\t\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'setMode', text: '', icon: '', class: 'btn btn-link btn-xs far fa-times'},\n\t\t\t\t\t\t\t\t],\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t],\n\t\t\t\t\t},\n\t\t\t\t\t{ // Body area\n\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\tlayout: 'form',\n\t\t\t\t\t\tformClass: 'titles-above',\n\t\t\t\t\t\trowClass: 'aside-body',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\titems: _.map(widget.config, (v, k) => _.set(v, 'id', k)),\n\t\t\t\t\t},\n\t\t\t\t]);\n\t\t\t\tthis.$set(this, 'editData',\n\t\t\t\t\t_(widget.config)\n\t\t\t\t\t\t.pickBy((v, k) => _.has(widget.config, k))\n\t\t\t\t\t\t.mapValues((v, k) => _.get(component.$props.config, k) || _.get(widget.config, 'default'))\n\t\t\t\t\t\t.set('id', _.get(component.$props, 'config.id', ''))\n\t\t\t\t\t\t.set('metaIcon', widget.icon)\n\t\t\t\t\t\t.value()\n\t\t\t\t);\n\t\t\t} else {\n\t\t\t\tthis.$macgyver.notify.warn(`Cannot edit unknown widget \"${component.$props.config.type}\"`);\n\t\t\t\tthis.setMode();\n\t\t\t}\n\t\t},\n\n\n\t\t/**\n\t\t* Change the value of a nested config path\n\t\t* @param {string} path The dotted / array notation path to mutate\n\t\t* @param {*} value The value to set, if undefined the key is removed\n\t\t*/\n\t\tmutatePath(path, value) {\n\t\t\t// Only bother cloning the entire object if something is listening to 'change'\n\t\t\tif (this.$emit.hasListeners('change')) {\n\t\t\t\tvar configCopy = _.cloneDeep(this.config);\n\t\t\t\tthis.$setPath(configCopy, path, value);\n\t\t\t\tthis.$emit('change', configCopy);\n\t\t\t}\n\n\t\t\tthis.$emit('changeItem', path, value);\n\t\t},\n\n\n\t\t/**\n\t\t* Insert a widget at a given path\n\t\t* @param {Object} widget The widget to insert, this must contain at least a `type` key\n\t\t* @param {Object} [options] Additional options\n\t\t* @param {string|array} [options.specPath] The lodash notation specPath to target instead of the last element on the form\n\t\t* @param {string} [options.orientation='after'] Where to insert. ENUM: 'before', 'after'\n\t\t* @param {boolean} [options.useContainer=true] If no spec path, try and fit the new widget within the last container if one exists\n\t\t* @param {boolean} [options.allocateTitle=true] Try to allocate a title if not supplied\n\t\t* @param {boolean} [options.allocateId=true] Try to allocate an ID if not supplied and the widget has `preferId`\n\t\t* @returns {Object} The inserted widget object (complete with ID if allocateId is specified)\n\t\t*/\n\t\tinsertWidget(widget, options) {\n\t\t\tvar settings = {\n\t\t\t\tspecPath: undefined,\n\t\t\t\torientation: 'after',\n\t\t\t\tuseContainer: true,\n\t\t\t\tallocateTitle: true,\n\t\t\t\tallocateId: true,\n\t\t\t\t...options,\n\t\t\t};\n\n\t\t\tif (!widget.type) throw new Error('Widget.type must be specified as a minimum for insertWidget()');\n\n\t\t\t// options.allocateTitle / settings.alloacteId {{{\n\t\t\tif (\n\t\t\t\twidget.type // Know the type\n\t\t\t\t&& ( // A field we want is missing\n\t\t\t\t\t(settings.allocateTitle && !widget.title)\n\t\t\t\t\t|| (settings.allocateId && !widget.id)\n\t\t\t\t)\n\t\t\t) {\n\t\t\t\tvar widgetOffset = // Compute how many of this widget are on the form\n\t\t\t\t\tthis.$macgyver.flatten(this.$props.config, {want: 'array'}).reduce((offset, widget) =>\n\t\t\t\t\t\twidget.type == this.addData.addType ? offset + 1 : offset\n\t\t\t\t\t, 0);\n\n\t\t\t\tif (settings.allocateTitle && !widget.title) widget.title =\n\t\t\t\t\tthis.$macgyver.widgets[this.addData.addType].title\n\t\t\t\t\t+ String(widgetOffset == 0 ? '' : widgetOffset);\n\n\t\t\t\tif (settings.allocateId && !widget.id) widget.id =\n\t\t\t\t\tthis.addData.addType\n\t\t\t\t\t+ String(widgetOffset == 0 ? '' : widgetOffset);\n\t\t\t}\n\t\t\t// }}}\n\n\t\t\tif (settings.specPath) { // Insert relative to another widget\n\t\t\t\tvar parentItems = _.isArray(settings.specPath) ? settings.specPath : settings.specPath.split('.');\n\t\t\t\tvar targetWidget = parentItems.pop();\n\n\t\t\t\tthis.mutatePath(parentItems,\n\t\t\t\t\t_.chain(_.get(this.$props.config, parentItems))\n\t\t\t\t\t\t.thru(v => {\n\t\t\t\t\t\t\tif (settings.orientation == 'after') {\n\t\t\t\t\t\t\t\tv.splice(+targetWidget + 1, 0, widget);\n\t\t\t\t\t\t\t} else if (settings.orientation == 'before') {\n\t\t\t\t\t\t\t\tv.splice(targetWidget, 0, widget);\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\tthrow new Error(`Unsupported insert orientation \"${settings.orientation}\"`);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\treturn v;\n\t\t\t\t\t\t})\n\t\t\t\t\t\t.value()\n\t\t\t\t);\n\t\t\t} else if ( // Insert within container?\n\t\t\t\tsettings.useContainer\n\t\t\t) {\n\t\t\t\tconsole.warn('FIXME: Unsupported inserting within container');\n\t\t\t} else { // Blind insert as last item\n\t\t\t\tconsole.log('FIXME: Unsupported - insert last', widget);\n\t\t\t}\n\n\t\t\tthis.$emit.down('mgForm.rebuild'); // Tell the mgForm under us to rebuild itself\n\n\t\t\treturn widget;\n\t\t},\n\n\n\t\t/**\n\t\t* Remove a widget by its specPath\n\t\t* @param {string|array} specPath The lodash notation specPath to remove\n\t\t*/\n\t\tremoveWidget(specPath) {\n\t\t\tthis.setMode(); // Reset mode to close edit panel\n\n\t\t\tvar parentItems = _.isArray(specPath) ? specPath : specPath.split('.');\n\t\t\tvar targetIndex = parentItems.pop();\n\n\t\t\tthis.mutatePath(\n\t\t\t\tparentItems,\n\t\t\t\t_.get(this.config, parentItems).filter((v, i) => i != targetIndex),\n\t\t\t);\n\t\t},\n\n\n\t\t/**\n\t\t* Duplicate a widget by its specPath\n\t\t* @param {string|array} specPath The lodash notation specPath to remove\n\t\t*/\n\t\tduplicateWidget(specPath) {\n\t\t\tvar parentItems = _.isArray(specPath) ? specPath : specPath.split('.');\n\t\t\tvar targetIndex = parentItems.pop();\n\n\t\t\tthis.setMode(); // Reset mode to close edit panel\n\t\t\tthis.mutatePath(\n\t\t\t\tparentItems,\n\t\t\t\t_(_.get(this.config, parentItems))\n\t\t\t\t\t.map((v, i) => i == targetIndex // Duplicate this item when we find its index\n\t\t\t\t\t\t? [\n\t\t\t\t\t\t\tv, // Original object\n\t\t\t\t\t\t\t_.chain(v)\n\t\t\t\t\t\t\t\t.cloneDeep()\n\t\t\t\t\t\t\t\t.pickBy((v, k) => !k.startsWith('$'))\n\t\t\t\t\t\t\t\t.set('id', this.$macgyver.utils.incrementId(v.id)) // Also increment its ID\n\t\t\t\t\t\t\t\t.value(),\n\t\t\t\t\t\t]\n\t\t\t\t\t\t: v\n\t\t\t\t\t)\n\t\t\t\t\t.flatten()\n\t\t\t\t\t.value()\n\t\t\t);\n\t\t},\n\n\n\t\t/**\n\t\t* Move a widget in a given direction\n\t\t* @param {string|array} specPath The lodash notation SpecPath to move\n\t\t* @param {string} direction The direction to move. ENUM: 'up', 'down'\n\t\t*/\n\t\tmoveWidget(specPath, direction) {\n\t\t\tif (!['up', 'down'].includes(direction)) throw new Error('Unsupported direction');\n\n\t\t\tvar parentItems = _.isArray(specPath) ? specPath : specPath.split('.');\n\t\t\tvar targetIndex = parentItems.pop();\n\n\t\t\tthis.setMode(); // Reset mode to close edit panel\n\t\t\tthis.mutatePath(\n\t\t\t\tparentItems,\n\t\t\t\t_.chain(_.get(this.config, parentItems))\n\t\t\t\t\t.clone()\n\t\t\t\t\t.thru(v => {\n\t\t\t\t\t\ttargetIndex = +targetIndex; // Splat into number\n\t\t\t\t\t\tif (direction == 'up' && targetIndex > 0) {\n\t\t\t\t\t\t\t[v[targetIndex], v[targetIndex-1]]\n\t\t\t\t\t\t\t=\n\t\t\t\t\t\t\t[v[targetIndex-1], v[targetIndex]]\n\t\t\t\t\t\t} else if (direction == 'down' && targetIndex < v.length) {\n\t\t\t\t\t\t\tconsole.log('SWAP', targetIndex, targetIndex + 1);\n\t\t\t\t\t\t\t[v[targetIndex], v[targetIndex+1]]\n\t\t\t\t\t\t\t=\n\t\t\t\t\t\t\t[v[targetIndex+1], v[targetIndex]]\n\t\t\t\t\t\t}\n\t\t\t\t\t\treturn v;\n\t\t\t\t\t})\n\t\t\t\t\t.value()\n\t\t\t);\n\t\t},\n\n\n\t\t/**\n\t\t* Begin drag sequence for a widget\n\t\t* @param {string|array} specPath The lodash notation SpecPath to drag\n\t\t*/\n\t\tdragWidget(specPath) {\n\t\t\tconsole.warn('FIXME: dragWidget() not yet supported');\n\t\t},\n\n\n\t\trawEdit() {\n\t\t\tthis.$prompt.macgyver({\n\t\t\t\ttitle: 'Template JSON',\n\t\t\t\tform: {\n\t\t\t\t\tid: 'code',\n\t\t\t\t\ttype: 'mgCode',\n\t\t\t\t\tsyntax: 'json',\n\t\t\t\t\tvalue: this.value,\n\t\t\t\t},\n\t\t\t})\n\t\t\t\t.then(form => this.$set(this, 'config', JSON.parse(form.code)))\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-form-editor\">\n\t\t<!-- Aside normal mode {{{ -->\n\t\t<aside :class=\"[mode == 'normal' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeNormal]\">\n\t\t\t<mg-form\n\t\t\t\t:form=\"`${id}-normal`\"\n\t\t\t\t:config=\"$props.generalVerbs\"\n\t\t\t\t:actions=\"{setMode, setMode}\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\t\t<!-- Aside widget library (add widget) {{{ -->\n\t\t<aside :class=\"[mode == 'adding' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeAdding]\">\n\t\t\t<mg-form\n\t\t\t\tref=\"formAdd\"\n\t\t\t\t:config=\"addConfig\"\n\t\t\t\t:data=\"addData\"\n\t\t\t\t:actions=\"{setMode}\"\n\t\t\t\t@change=\"addData = $event\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\t\t<!-- Aside item editor (edit widget) {{{ -->\n\t\t<aside :class=\"[mode == 'editing' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeEditing]\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"editing\"\n\t\t\t\t:form=\"`${id}-edit`\"\n\t\t\t\t:config=\"editConfig\"\n\t\t\t\t:data=\"editData\"\n\t\t\t\t:actions=\"{setMode, deleteWidget}\"\n\t\t\t\t@changeItem=\"mutatePath(`${editing.config.$specPath}.${$event.path}`, $event.value)\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\n\t\t<!-- Display form {{{ -->\n\t\t<mg-form\n\t\t\tref=\"form\"\n\t\t\t:config=\"$props.config\"\n\t\t\t:data=\"$props.data\"\n\t\t/>\n\t\t<!-- }}} -->\n\t</div>\n</template>\n\n<style>\n/* Variables {{{ */\n:root {\n\t--mg-form-editor-selected-bg: #007bff;\n\t--mg-form-editor-selected-fg: #fff;;\n\t--mg-form-editor-selected-highlight: #5dabff;\n\t--mg-form-editor-selected-danger: #dc3545;\n\t--mg-form-editor-hover-bg: #77b9ff;\n\t--mg-form-editor-hover-fg: #fff;\n}\n/* }}} */\n\n/* Aside styles - .mgfe-aside {{{ */\n.mgfe-aside {\n\ttransition: transform 0.2s ease-out;\n}\n\n.mgfe-aside .mg-form {\n\tmargin: 0;\n}\n\n.mgfe-aside.aside-right.open.open { /* Silly hack to force the transform when open (overrides .asign-sm in priority) */\n\ttransform: translateX(0px);\n}\n\n.mgfe-aside.aside-right {\n\tposition: fixed;\n\ttop: 0px;\n\tright: 0px;\n\tbottom: 0px;\n\tbackground: #FFF;\n\tz-index: 100;\n\tbox-shadow: 0 1px 5px rgba(0,0,0,.3);\n\twidth: 350px;\n\ttransform: translateX(380px);\n}\n\n/* .mgfe-aside-sm {{{ */\n.mgfe-aside.aside-right.aside-sm {\n\twidth: 40px;\n\ttransform: translateX(50px);\n\ttop: calc(50% - 30px); /* Approx middle of the screen */\n\tbottom: inherit;\n\tborder-radius: 50px;\n}\n\n.mgfe-aside.aside-right.aside-sm .form-group {\n\tmargin: 0;\n}\n\n/* Remove BS padding from sub-elements */\n.mgfe-aside.aside-right.aside-sm .form-group [class*=\"col-\"] {\n\tpadding: 0;\n}\n/* }}} */\n\n/* Headers {{{ */\n.mgfe-aside .aside-header {\n\tdisplay: flex;\n\talign-items: center;\n\tjustify-content: flex-end;\n\tborder-bottom: 1px solid #e9ecef;\n\tmargin: 0;\n}\n\n.mgfe-aside .aside-header h4 {\n\tflex-grow: 1;\n}\n\n.mgfe-aside .aside-header legend.form-control-static {\n\tborder-bottom: none;\n\tfont-size: 17pt;\n}\n\n.mgfe-aside .aside-header .close {\n\tcolor: #5e5e5e;\n}\n\n.mgfe-aside .aside-header .close:hover {\n\tcolor: #000;\n}\n\n.mgfe-aside .aside-header .close::after {\n\tdisplay: inline-block;\n\tfont-family: 'Font Awesome 5 Pro';\n\tfont-weight: 900;\n\tcontent: \"\\f00d\";\n}\n/* }}} */\n\n/* Actions {{{ */\n.mgfe-aside .aside-actions {\n\tjustify-self: flex-end;\n\tmargin-right: 10px;\n}\n\n.mgfe-aside .aside-actions .btn-group {\n\tborder: none;\n\tbox-shadow: none;\n}\n\n.mgfe-aside .aside-actions a {\n\tpadding: 8px;\n\tfont-size: 125%;\n}\n/* }}} */\n\n/* Body {{{ */\n.mgfe-aside .aside-body {\n\tmargin-left: 0;\n\tmargin: 10px 0 0;\n\n\t/* Body scrolling */\n\toverflow: auto;\n\theight: calc(100vh - 80px);\n}\n/* }}} */\n/* }}} */\n\n/* Component highlighting {{{\n\n/* Highlight applied to active elements inside an mgContainer */\n.mg-form-editor-target {\n\tborder: 2px solid var(--blue);\n\tborder-radius: 5px;\n\tposition: relative;\n\ttop: -4px;\n\tleft: -4px;\n\tpadding: 2px;\n}\n\n.mg-form-editor-drop-target {\n}\n\n.mg-form-editor-drop-target-before {\n\tborder-top: 4px dashed var(--blue);\n}\n\n.mg-form-editor-drop-target-after {\n\tborder-bottom: 4px dashed var(--blue);\n}\n/* }}} */\n\n/* Drag + Drop {{{ */\nbody.mg-form-editor-dragging * {\n\tcursor: grabbing;\n}\n\n#mg-form-editor-drag {\n\tdisplay: block;\n\tz-index: 1000;\n\tposition: absolute;\n\ttop: -10000px;\n\tleft: -10000px;\n\tmin-width: 160px;\n\theight: 40px;\n\tborder-radius: 5px;\n\tbackground: #2196F3;\n\tbox-shadow: 1px 1px 4px rgba(0,0,0,.3);\n\tpadding: 10px;\n\tcolor: #FFF;\n}\n\n#mg-form-editor-drag > i {\n\tmargin-right: 5px;\n}\n/* }}} */\n\n/* Misc fixes {{{ */\n/* Buttons that are also fixed with look weird */\n.mg-form-editor .btn.fa-fw {\n\twidth: 2.30em;\n\tpadding: 4px 2px !important;\n}\n/* }}} */\n</style>\n"]}, media: undefined });
+                inject("data-v-bd7ec0f8_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Variables {{{ */\n:root {\n\t--mg-form-editor-selected-bg: #007bff;\n\t--mg-form-editor-selected-fg: #fff;;\n\t--mg-form-editor-selected-highlight: #5dabff;\n\t--mg-form-editor-selected-danger: #dc3545;\n\t--mg-form-editor-hover-bg: #77b9ff;\n\t--mg-form-editor-hover-fg: #fff;\n}\n/* }}} */\n\n/* Aside styles - .mgfe-aside {{{ */\n.mgfe-aside {\n\ttransition: transform 0.2s ease-out;\n}\n.mgfe-aside .mg-form {\n\tmargin: 0;\n}\n.mgfe-aside.aside-right.open.open { /* Silly hack to force the transform when open (overrides .asign-sm in priority) */\n\ttransform: translateX(0px);\n}\n.mgfe-aside.aside-right {\n\tposition: fixed;\n\ttop: 0px;\n\tright: 0px;\n\tbottom: 0px;\n\tbackground: #FFF;\n\tz-index: 100;\n\tbox-shadow: 0 1px 5px rgba(0,0,0,.3);\n\twidth: 350px;\n\ttransform: translateX(380px);\n}\n\n/* .mgfe-aside-sm {{{ */\n.mgfe-aside.aside-right.aside-sm {\n\twidth: 40px;\n\ttransform: translateX(50px);\n\ttop: calc(50% - 30px); /* Approx middle of the screen */\n\tbottom: inherit;\n\tborder-radius: 5px;\n}\n.mgfe-aside.aside-right.aside-sm .form-group {\n\tmargin: 0;\n}\n\n/* Remove BS padding from sub-elements */\n.mgfe-aside.aside-right.aside-sm .form-group [class*=\"col-\"] {\n\tpadding: 0;\n}\n/* }}} */\n\n/* Headers {{{ */\n.mgfe-aside .aside-header {\n\tdisplay: flex;\n\talign-items: center;\n\tjustify-content: flex-end;\n\tborder-bottom: 1px solid #e9ecef;\n\tmargin: 0;\n}\n.mgfe-aside .aside-header h4 {\n\tflex-grow: 1;\n}\n.mgfe-aside .aside-header legend.form-control-static {\n\tborder-bottom: none;\n\tfont-size: 17pt;\n}\n.mgfe-aside .aside-header .close {\n\tcolor: #5e5e5e;\n}\n.mgfe-aside .aside-header .close:hover {\n\tcolor: #000;\n}\n.mgfe-aside .aside-header .close::after {\n\tdisplay: inline-block;\n\tfont-family: 'Font Awesome 5 Pro';\n\tfont-weight: 900;\n\tcontent: \"\\f00d\";\n}\n/* }}} */\n\n/* Actions {{{ */\n.mgfe-aside .aside-actions {\n\tjustify-self: flex-end;\n\tmargin-right: 10px;\n}\n.mgfe-aside .aside-actions .btn-group {\n\tborder: none;\n\tbox-shadow: none;\n}\n.mgfe-aside .aside-actions a {\n\tpadding: 8px;\n\tfont-size: 125%;\n}\n/* }}} */\n\n/* Body {{{ */\n.mgfe-aside .aside-body {\n\tmargin-left: 0;\n\tmargin: 10px 0 0;\n\n\t/* Body scrolling */\n\toverflow: auto;\n\theight: calc(100vh - 80px);\n}\n/* }}} */\n/* }}} */\n\n/* Component highlighting {{{\n\n/* Highlight applied to active elements inside an mgContainer */\n.mg-form-editor-target {\n\tborder: 2px solid var(--blue);\n\tborder-radius: 5px;\n\tposition: relative;\n\ttop: -4px;\n\tleft: -4px;\n\tpadding: 2px;\n}\n.mg-form-editor-drop-target {\n}\n.mg-form-editor-drop-target-before {\n\tborder-top: 4px dashed var(--blue);\n}\n.mg-form-editor-drop-target-after {\n\tborder-bottom: 4px dashed var(--blue);\n}\n/* }}} */\n\n/* Drag + Drop {{{ */\nbody.mg-form-editor-dragging * {\n\tcursor: grabbing;\n}\n#mg-form-editor-drag {\n\tdisplay: block;\n\tz-index: 1000;\n\tposition: absolute;\n\ttop: -10000px;\n\tleft: -10000px;\n\tmin-width: 160px;\n\theight: 40px;\n\tborder-radius: 5px;\n\tbackground: #2196F3;\n\tbox-shadow: 1px 1px 4px rgba(0,0,0,.3);\n\tpadding: 10px;\n\tcolor: #FFF;\n}\n#mg-form-editor-drag > i {\n\tmargin-right: 5px;\n}\n/* }}} */\n\n/* Misc fixes {{{ */\n/* Buttons that are also fixed with look weird */\n.mg-form-editor .btn.fa-fw {\n\twidth: 2.30em;\n\tpadding: 4px 2px !important;\n}\n/* }}} */\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgFormEditor.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AA6lBA,kBAAA;AACA;CACA,qCAAA;CACA,kCAAA;CACA,4CAAA;CACA,yCAAA;CACA,kCAAA;CACA,+BAAA;AACA;AACA,QAAA;;AAEA,mCAAA;AACA;CACA,mCAAA;AACA;AAEA;CACA,SAAA;AACA;AAEA,oCAAA,kFAAA;CACA,0BAAA;AACA;AAEA;CACA,eAAA;CACA,QAAA;CACA,UAAA;CACA,WAAA;CACA,gBAAA;CACA,YAAA;CACA,oCAAA;CACA,YAAA;CACA,4BAAA;AACA;;AAEA,uBAAA;AACA;CACA,WAAA;CACA,2BAAA;CACA,qBAAA,EAAA,gCAAA;CACA,eAAA;CACA,kBAAA;AACA;AAEA;CACA,SAAA;AACA;;AAEA,wCAAA;AACA;CACA,UAAA;AACA;AACA,QAAA;;AAEA,gBAAA;AACA;CACA,aAAA;CACA,mBAAA;CACA,yBAAA;CACA,gCAAA;CACA,SAAA;AACA;AAEA;CACA,YAAA;AACA;AAEA;CACA,mBAAA;CACA,eAAA;AACA;AAEA;CACA,cAAA;AACA;AAEA;CACA,WAAA;AACA;AAEA;CACA,qBAAA;CACA,iCAAA;CACA,gBAAA;CACA,gBAAA;AACA;AACA,QAAA;;AAEA,gBAAA;AACA;CACA,sBAAA;CACA,kBAAA;AACA;AAEA;CACA,YAAA;CACA,gBAAA;AACA;AAEA;CACA,YAAA;CACA,eAAA;AACA;AACA,QAAA;;AAEA,aAAA;AACA;CACA,cAAA;CACA,gBAAA;;CAEA,mBAAA;CACA,cAAA;CACA,0BAAA;AACA;AACA,QAAA;AACA,QAAA;;AAEA;;+DAEA;AACA;CACA,6BAAA;CACA,kBAAA;CACA,kBAAA;CACA,SAAA;CACA,UAAA;CACA,YAAA;AACA;AAEA;AACA;AAEA;CACA,kCAAA;AACA;AAEA;CACA,qCAAA;AACA;AACA,QAAA;;AAEA,oBAAA;AACA;CACA,gBAAA;AACA;AAEA;CACA,cAAA;CACA,aAAA;CACA,kBAAA;CACA,aAAA;CACA,cAAA;CACA,gBAAA;CACA,YAAA;CACA,kBAAA;CACA,mBAAA;CACA,sCAAA;CACA,aAAA;CACA,WAAA;AACA;AAEA;CACA,iBAAA;AACA;AACA,QAAA;;AAEA,mBAAA;AACA,gDAAA;AACA;CACA,aAAA;CACA,2BAAA;AACA;AACA,QAAA","file":"mgFormEditor.vue","sourcesContent":["<script>\nimport mgFormEditorControls from './mgFormEditorControls';\n/**\n* mg-form-editor - Drag-and-drop form designer for MacGyver\n*\n* @param {Object} config mgForm compatible spec to edit\n* @param {Object} [data] Optional data bindings for the form\n* @param {array<Object>} [verbs] Verb edit mgForm to show in the small edit sidebar, defaults to selecting widgets / adding widgets buttons\n* @param {string} [asideClassActive=\"mgfe-aside aside-right open\"] Class to set all editing sidebars to when inactive\n* @param {string} [asideClassInactive=\"mgfe-aside aside-right\"] Class to set all editing sidebar to when inactive\n* @param {string} [asideClassModeCollapsed=\"aside-sm\"] Class to associate with the smaller toolkit display when editing\n* @param {string} [asideClassModeToc=\"aside-sm\"] Class to associate with the Table-Of-Contents sidebar\n* @param {string} [asideClassModeAdding=\"\"] Class to associate with the editing sidebar when adding\n* @param {string} [asideClassModeEditing=\"\"] Class to associate with the editing sidebar when editing\n*\n* @emits change Emitted as `(config)` on any item configuration change. WARNING, subscribing to this involves an entire deep copy of the config structure, subscribe to changeItem if possible\n* @emits changeItem Emitted as `({path, value})` when a single config item changes, inexpensive compared to `change`\n*/\nexport default Vue.component('mgFormEditor', {\n\tprovide() { return {\n\t\t$mgFormEditor: this,\n\t}},\n\tcomponents: {\n\t\tmgFormEditorControls,\n\t},\n\tdata() { return {\n\t\tmode: 'toc', // ENUM: collapsed, toc, editing, adding\n\t\tid: this.$macgyver.nextId(), // ID of the editing form item\n\t\tediting: undefined, // The active item we are editing\n\t\twidgetListMode: 'grid',\n\n\t\t// Asides\n\t\teditConfig: [],\n\t\teditData: {},\n\n\t\taddTarget: undefined, // Spec path to add after, if any\n\t\taddOrientation: 'after',\n\n\t\t// Holding data for various form states\n\t\taddData: {},\n\t}},\n\tprops: {\n\t\tdata: Object,\n\t\tconfig: Object,\n\t\tasideClassActive: {type: String, default: 'mgfe-aside aside-right open'},\n\t\tasideClassInactive: {type: String, default: 'mgfe-aside aside-right'},\n\t\tasideClassModeCollapsed: {type: String, default: 'aside-sm'},\n\t\tasideClassModeToc: {type: String, default: ''},\n\t\tasideClassModeAdding: {type: String, default: ''},\n\t\tasideClassModeEditing: {type: String, default: ''},\n\t\tgeneralVerbs: {\n\t\t\ttype: Array,\n\t\t\tdefault() {\n\t\t\t\treturn [\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"setMode()\",\n\t\t\t\t\t\tclass: 'btn btn-primary text-white px-2',\n\t\t\t\t\t\ticon: 'fa fa-mouse-pointer fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\ttooltip: {content: 'Select widgets to edit', placement: 'left'},\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"setMode('toc')\",\n\t\t\t\t\t\tclass: 'btn btn-outline-light border-0 px-2',\n\t\t\t\t\t\ticon: 'fa fa-stream fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\ttooltip: {content: 'Select widgets to edit', placement: 'left'},\n\t\t\t\t\t},\n\t\t\t\t\t...(this.$prompt?.macgyver ? [{ // Include JSON editing if $prompt.macgyver() is available\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"rawEdit()\",\n\t\t\t\t\t\tclass: 'btn btn-outline-light border-0 px-2',\n\t\t\t\t\t\ticon: 'fa fa-code fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\ttooltip: {content: 'Edit the form contents as JSON', placement: 'left'},\n\t\t\t\t\t}] : []),\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"setMode('adding')\",\n\t\t\t\t\t\tclass: 'btn btn-outline-light border-0 px-2',\n\t\t\t\t\t\ticon: 'far fa-plus fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\ttooltip: {content: 'Add a new widget', placement: 'left'},\n\t\t\t\t\t},\n\t\t\t\t];\n\t\t\t},\n\t\t},\n\t},\n\tmounted() {\n\t\tthis.$refs.form.$on('mgContainer.click', (container, specPath, componentIndex, e) => {\n\t\t\te.stopPropagation();\n\t\t\te.preventDefault();\n\t\t\tthis.editWidget(specPath);\n\t\t});\n\n\t\tthis.$refs.form.$on('mgContainer.mouseEnter', (container, specPath, componentIndex, e) => {\n\t\t\tvar component = this.$refs.form.getComponentBySpecPath(specPath);\n\t\t\tvar componentIndex = container.findChildIndex(component);\n\n\t\t\tcontainer.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).concat(['editHover']));\n\t\t});\n\n\t\tthis.$refs.form.$on('mgContainer.mouseLeave', (container, specPath, componentIndex, e) => {\n\t\t\tvar component = this.$refs.form.getComponentBySpecPath(specPath);\n\t\t\tvar componentIndex = container.findChildIndex(component);\n\n\t\t\tcontainer.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).filter(c => c != 'editHover'));\n\t\t});\n\t},\n\tmethods: {\n\t\t/**\n\t\t* Stop editing / adding and return to regular mode\n\t\t* @param {string} [mode=\"collapsed\"] Mode to switch to\n\t\t* @param {boolean} [clearHighlight=true] Also attempt to clear out any highlight and reset the aside panes\n\t\t*/\n\t\tsetMode(mode = 'collapsed', clearHighlight = true) {\n\t\t\t// Deselect the existing item (if we have one)\n\t\t\tif (this.editing && clearHighlight) {\n\t\t\t\tthis.setComponentHighlight(this.editing, []);\n\t\t\t\tthis.editing = undefined;\n\t\t\t}\n\n\t\t\tthis.$set(this, 'mode', mode || 'collapsed');\n\t\t\treturn true; // Signal to mgForm that we have handled this action\n\t\t},\n\n\n\t\t/**\n\t\t* Delete the active widget\n\t\t*/\n\t\tdeleteWidget() {\n\t\t\tif (!this.editing) {\n\t\t\t\tthis.$macgyver.notify.warn('No widget selected to delete'); // Not editing anyway\n\t\t\t} else {\n\t\t\t\tthis.removeWidget(this.editing.$props.config.$specPath);\n\t\t\t}\n\n\t\t\treturn true; // Signal to mgForm that we have handled this action\n\t\t},\n\n\n\t\t/**\n\t\t* Set the component.highlight[index] to the given list of CSS classes\n\t\t* @param {VueController} component The VueController to set the highlight of within its mgContainer\n\t\t* @param {array<string>} classes Array of string classes to set\n\t\t*/\n\t\tsetComponentHighlight(component, classes) {\n\t\t\tif (!_.isArray(classes)) throw new Error('setComponentHighlight must be passed an array');\n\n\t\t\tvar container = false;\n\t\t\tcomponent.$emit.up('mgIdentify', component => {\n\t\t\t\tif (!container && component.$props.config.type == 'mgContainer') container = component;\n\t\t\t});\n\t\t\tif (!container) return console.warn('[mgFormEditor] setComponentHighlight component failed to find enclosing container', {component});\n\n\t\t\tvar childOffset = container.findChildIndex(component);\n\t\t\tif (childOffset === false) return console.warn('[mgFormEditor]', 'Cannot locate component within container', {container, component});\n\n\t\t\tconsole.log('Set highlight', childOffset, classes);\n\t\t\tcontainer.$set(container.highlights, childOffset, classes);\n\t\t},\n\n\n\t\t/**\n\t\t* Edit a widget by its specPath or component\n\t\t* @param {VueComponent|string} component Either the VueComponent to edit or the specPath of the widget to edit\n\t\t*/\n\t\teditWidget(component) {\n\t\t\tvar component; // The Vue component from the widget path\n\t\t\tif (!_.isObject(component) && !_.isString(component)) throw new Error('editWidget requires either a specPath or VueComponent');\n\t\t\tif (_.isObject(component) && !component._uid) throw new Error('editWidget() requires a valid VueComponent object (or specPath string)');\n\n\t\t\tif (_.isString(component) || _.isArray(component)) component = this.$refs.form.getComponentBySpecPath(component); // Resolve specPath into actual component if eneded\n\n\t\t\tthis.setMode();\n\n\t\t\tthis.$set(this, 'editing', component);\n\t\t\tthis.$set(this, 'mode', 'editing');\n\n\t\t\tthis.setComponentHighlight(component, ['editEditing']);\n\n\t\t\tvar widget = this.$macgyver.widgets[component.$props.config.type];\n\t\t\tif (widget) {\n\t\t\t\tthis.$set(this, 'editConfig', [\n\t\t\t\t\t{ // Header area\n\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\trowClass: 'aside-header',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t{id: 'metaIcon', type: 'mgIcon'},\n\t\t\t\t\t\t\t{id: 'id', type: 'mgText', placeholder: 'No ID'},\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t\t\trowClass: 'aside-actions',\n\t\t\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'deleteWidget', class: 'btn btn-link btn-link-danger btn-xs', icon: 'far fa-trash', tooltip: 'Delete this widget'},\n\t\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'setMode', text: '', icon: '', class: 'btn btn-link btn-xs far fa-times'},\n\t\t\t\t\t\t\t\t],\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t],\n\t\t\t\t\t},\n\t\t\t\t\t{ // Body area\n\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\tlayout: 'form',\n\t\t\t\t\t\tformClass: 'titles-above',\n\t\t\t\t\t\trowClass: 'aside-body',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\titems: _.map(widget.config, (v, k) => _.set(v, 'id', k)),\n\t\t\t\t\t},\n\t\t\t\t]);\n\t\t\t\tthis.$set(this, 'editData',\n\t\t\t\t\t_(widget.config)\n\t\t\t\t\t\t.pickBy((v, k) => _.has(widget.config, k))\n\t\t\t\t\t\t.mapValues((v, k) => _.get(component.$props.config, k) || _.get(widget.config, 'default'))\n\t\t\t\t\t\t.set('id', _.get(component.$props, 'config.id', ''))\n\t\t\t\t\t\t.set('metaIcon', widget.icon)\n\t\t\t\t\t\t.value()\n\t\t\t\t);\n\t\t\t} else {\n\t\t\t\tthis.$macgyver.notify.warn(`Cannot edit unknown widget \"${component.$props.config.type}\"`);\n\t\t\t\tthis.setMode();\n\t\t\t}\n\t\t},\n\n\n\t\t/**\n\t\t* Change the value of a nested config path\n\t\t* @param {string} path The dotted / array notation path to mutate\n\t\t* @param {*} value The value to set, if undefined the key is removed\n\t\t*/\n\t\tmutatePath(path, value) {\n\t\t\t// Only bother cloning the entire object if something is listening to 'change'\n\t\t\tif (this.$emit.hasListeners('change')) {\n\t\t\t\tvar configCopy = _.cloneDeep(this.config);\n\t\t\t\tthis.$setPath(configCopy, path, value);\n\t\t\t\tthis.$emit('change', configCopy);\n\t\t\t}\n\n\t\t\tthis.$emit('changeItem', path, value);\n\t\t},\n\n\n\t\t/**\n\t\t* Insert a widget at a given path\n\t\t* @param {Object} widget The widget to insert, this must contain at least a `type` key\n\t\t* @param {Object} [options] Additional options\n\t\t* @param {string|array} [options.specPath] The lodash notation specPath to target instead of the last element on the form\n\t\t* @param {string} [options.orientation='after'] Where to insert. ENUM: 'before', 'after'\n\t\t* @param {boolean} [options.useContainer=true] If no spec path, try and fit the new widget within the last container if one exists\n\t\t* @param {boolean} [options.allocateTitle=true] Try to allocate a title if not supplied\n\t\t* @param {boolean} [options.allocateId=true] Try to allocate an ID if not supplied and the widget has `preferId`\n\t\t* @returns {Object} The inserted widget object (complete with ID if allocateId is specified)\n\t\t*/\n\t\tinsertWidget(widget, options) {\n\t\t\tvar settings = {\n\t\t\t\tspecPath: undefined,\n\t\t\t\torientation: 'after',\n\t\t\t\tuseContainer: true,\n\t\t\t\tallocateTitle: true,\n\t\t\t\tallocateId: true,\n\t\t\t\t...options,\n\t\t\t};\n\n\t\t\tif (!widget.type) throw new Error('Widget.type must be specified as a minimum for insertWidget()');\n\n\t\t\t// options.allocateTitle / settings.alloacteId {{{\n\t\t\tif (\n\t\t\t\twidget.type // Know the type\n\t\t\t\t&& ( // A field we want is missing\n\t\t\t\t\t(settings.allocateTitle && !widget.title)\n\t\t\t\t\t|| (settings.allocateId && !widget.id)\n\t\t\t\t)\n\t\t\t) {\n\t\t\t\tvar widgetOffset = // Compute how many of this widget are on the form\n\t\t\t\t\tthis.$macgyver.flatten(this.$props.config, {want: 'array'}).reduce((offset, widget) =>\n\t\t\t\t\t\twidget.type == this.addData.addType ? offset + 1 : offset\n\t\t\t\t\t, 0);\n\n\t\t\t\tif (settings.allocateTitle && !widget.title) widget.title =\n\t\t\t\t\tthis.$macgyver.widgets[this.addData.addType].title\n\t\t\t\t\t+ String(widgetOffset == 0 ? '' : widgetOffset);\n\n\t\t\t\tif (settings.allocateId && !widget.id) widget.id =\n\t\t\t\t\tthis.addData.addType\n\t\t\t\t\t+ String(widgetOffset == 0 ? '' : widgetOffset);\n\t\t\t}\n\t\t\t// }}}\n\n\t\t\tif (settings.specPath) { // Insert relative to another widget\n\t\t\t\tvar parentItems = _.isArray(settings.specPath) ? settings.specPath : settings.specPath.split('.');\n\t\t\t\tvar targetWidget = parentItems.pop();\n\n\t\t\t\tthis.mutatePath(parentItems,\n\t\t\t\t\t_.chain(_.get(this.$props.config, parentItems))\n\t\t\t\t\t\t.thru(v => {\n\t\t\t\t\t\t\tif (settings.orientation == 'after') {\n\t\t\t\t\t\t\t\tv.splice(+targetWidget + 1, 0, widget);\n\t\t\t\t\t\t\t} else if (settings.orientation == 'before') {\n\t\t\t\t\t\t\t\tv.splice(targetWidget, 0, widget);\n\t\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\t\tthrow new Error(`Unsupported insert orientation \"${settings.orientation}\"`);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\treturn v;\n\t\t\t\t\t\t})\n\t\t\t\t\t\t.value()\n\t\t\t\t);\n\t\t\t} else if ( // Insert within container?\n\t\t\t\tsettings.useContainer\n\t\t\t) {\n\t\t\t\tconsole.warn('FIXME: Unsupported inserting within container');\n\t\t\t} else { // Blind insert as last item\n\t\t\t\tconsole.log('FIXME: Unsupported - insert last', widget);\n\t\t\t}\n\n\t\t\tthis.$emit.down('mgForm.rebuild'); // Tell the mgForm under us to rebuild itself\n\n\t\t\treturn widget;\n\t\t},\n\n\n\t\t/**\n\t\t* Remove a widget by its specPath\n\t\t* @param {string|array} specPath The lodash notation specPath to remove\n\t\t*/\n\t\tremoveWidget(specPath) {\n\t\t\tthis.setMode(); // Reset mode to close edit panel\n\n\t\t\tvar parentItems = _.isArray(specPath) ? specPath : specPath.split('.');\n\t\t\tvar targetIndex = parentItems.pop();\n\n\t\t\tthis.mutatePath(\n\t\t\t\tparentItems,\n\t\t\t\t_.get(this.config, parentItems).filter((v, i) => i != targetIndex),\n\t\t\t);\n\t\t},\n\n\n\t\t/**\n\t\t* Duplicate a widget by its specPath\n\t\t* @param {string|array} specPath The lodash notation specPath to remove\n\t\t*/\n\t\tduplicateWidget(specPath) {\n\t\t\tvar parentItems = _.isArray(specPath) ? specPath : specPath.split('.');\n\t\t\tvar targetIndex = parentItems.pop();\n\n\t\t\tthis.setMode(); // Reset mode to close edit panel\n\t\t\tthis.mutatePath(\n\t\t\t\tparentItems,\n\t\t\t\t_(_.get(this.config, parentItems))\n\t\t\t\t\t.map((v, i) => i == targetIndex // Duplicate this item when we find its index\n\t\t\t\t\t\t? [\n\t\t\t\t\t\t\tv, // Original object\n\t\t\t\t\t\t\t_.chain(v)\n\t\t\t\t\t\t\t\t.cloneDeep()\n\t\t\t\t\t\t\t\t.pickBy((v, k) => !k.startsWith('$'))\n\t\t\t\t\t\t\t\t.set('id', this.$macgyver.utils.incrementId(v.id)) // Also increment its ID\n\t\t\t\t\t\t\t\t.value(),\n\t\t\t\t\t\t]\n\t\t\t\t\t\t: v\n\t\t\t\t\t)\n\t\t\t\t\t.flatten()\n\t\t\t\t\t.value()\n\t\t\t);\n\t\t},\n\n\n\t\t/**\n\t\t* Move a widget in a given direction\n\t\t* @param {string|array} specPath The lodash notation SpecPath to move\n\t\t* @param {string} direction The direction to move. ENUM: 'up', 'down'\n\t\t*/\n\t\tmoveWidget(specPath, direction) {\n\t\t\tif (!['up', 'down'].includes(direction)) throw new Error('Unsupported direction');\n\n\t\t\tvar parentItems = _.isArray(specPath) ? specPath : specPath.split('.');\n\t\t\tvar targetIndex = parentItems.pop();\n\n\t\t\tthis.setMode(); // Reset mode to close edit panel\n\t\t\tthis.mutatePath(\n\t\t\t\tparentItems,\n\t\t\t\t_.chain(_.get(this.config, parentItems))\n\t\t\t\t\t.clone()\n\t\t\t\t\t.thru(v => {\n\t\t\t\t\t\ttargetIndex = +targetIndex; // Splat into number\n\t\t\t\t\t\tif (direction == 'up' && targetIndex > 0) {\n\t\t\t\t\t\t\t[v[targetIndex], v[targetIndex-1]]\n\t\t\t\t\t\t\t=\n\t\t\t\t\t\t\t[v[targetIndex-1], v[targetIndex]]\n\t\t\t\t\t\t} else if (direction == 'down' && targetIndex < v.length) {\n\t\t\t\t\t\t\tconsole.log('SWAP', targetIndex, targetIndex + 1);\n\t\t\t\t\t\t\t[v[targetIndex], v[targetIndex+1]]\n\t\t\t\t\t\t\t=\n\t\t\t\t\t\t\t[v[targetIndex+1], v[targetIndex]]\n\t\t\t\t\t\t}\n\t\t\t\t\t\treturn v;\n\t\t\t\t\t})\n\t\t\t\t\t.value()\n\t\t\t);\n\t\t},\n\n\n\t\t/**\n\t\t* Begin drag sequence for a widget\n\t\t* @param {string|array} specPath The lodash notation SpecPath to drag\n\t\t*/\n\t\tdragWidget(specPath) {\n\t\t\tconsole.warn('FIXME: dragWidget() not yet supported');\n\t\t},\n\n\n\t\trawEdit() {\n\t\t\tthis.$prompt.macgyver({\n\t\t\t\ttitle: 'Template JSON',\n\t\t\t\tmacgyver: {\n\t\t\t\t\tid: 'code',\n\t\t\t\t\ttype: 'mgCode',\n\t\t\t\t\tsyntax: 'json',\n\t\t\t\t\tconvert: true,\n\t\t\t\t\tdefault: this.$props.config,\n\t\t\t\t},\n\t\t\t}).then(form => this.$set(this, 'config', form.code))\n\t\t},\n\n\n\t\t// Form layouts {{{\n\t\t/**\n\t\t* Generate the config layout for the Table-Of-Contents sidebar\n\t\t*/\n\t\tgenerateConfigToc() {\n\t\t\tvar genTreeBranch = root =>\n\t\t\t\troot.map(widget => ({\n\t\t\t\t\ttitle: `${widget.type} #${widget.id}`,\n\t\t\t\t\ticon: this.$macgyver.widgets[widget.type].icon,\n\t\t\t\t\tenum: widget.items ? genTreeBranch(widget.items) : undefined,\n\t\t\t\t}));\n\n\t\t\treturn [\n\t\t\t\t{ // Header area\n\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\tborder: false,\n\t\t\t\t\trowClass: 'aside-header',\n\t\t\t\t\tshowTitle: false,\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{type: 'mgHeading', text: 'Form layout'},\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t\trowClass: 'aside-actions',\n\t\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'setMode', text: '', icon: '', class: 'btn btn-link btn-xs far fa-times'},\n\t\t\t\t\t\t\t],\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t\t{ // Body area\n\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\tlayout: 'form',\n\t\t\t\t\trowClass: 'aside-body',\n\t\t\t\t\tshowTitles: false,\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\ttype: 'mgChoiceTree',\n\t\t\t\t\t\t\ttitle: 'Layout tree',\n\t\t\t\t\t\t\tonChange: item => {\n\t\t\t\t\t\t\t\tconsole.log('TREE CLICK', item);\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tenum: genTreeBranch(\n\t\t\t\t\t\t\t\t[ this.$macgyver.compileSpec(this.$props.config, {clone: false}).spec ]\n\t\t\t\t\t\t\t),\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t];\n\t\t},\n\n\n\t\t/**\n\t\t* Generate the config layout for the \"add widget\" sidebar\n\t\t*/\n\t\tgenerateConfigAdding() {\n\t\t\treturn [\n\t\t\t\t{ // Header area\n\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\tborder: false,\n\t\t\t\t\trowClass: 'aside-header',\n\t\t\t\t\tshowTitle: false,\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{type: 'mgHeading', text: 'Add widget'},\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t\trowClass: 'aside-actions',\n\t\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'setMode', text: '', icon: '', class: 'btn btn-link btn-xs far fa-times'},\n\t\t\t\t\t\t\t],\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t\t{ // Body area\n\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\tlayout: 'form',\n\t\t\t\t\trowClass: 'aside-body',\n\t\t\t\t\tshowTitles: false,\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tid: 'addType',\n\t\t\t\t\t\t\ttype: 'mgChoiceList',\n\t\t\t\t\t\t\ttitle: 'Widget type to add',\n\t\t\t\t\t\t\tenum: _(this.$macgyver.widgets)\n\t\t\t\t\t\t\t\t.map((w, k) => ({\n\t\t\t\t\t\t\t\t\tid: k,\n\t\t\t\t\t\t\t\t\ttitle: w.title,\n\t\t\t\t\t\t\t\t\ticon: `${w.icon} fa-fw`,\n\t\t\t\t\t\t\t\t}))\n\t\t\t\t\t\t\t\t.sortBy('title')\n\t\t\t\t\t\t\t\t.value(),\n\t\t\t\t\t\t\tonChange: type => {\n\t\t\t\t\t\t\t\tvar inserted = this.insertWidget({type}, {\n\t\t\t\t\t\t\t\t\tspecPath: this.addTarget,\n\t\t\t\t\t\t\t\t\torientation: this.addOrientation,\n\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t\tconsole.log('INSERTED AS', inserted);\n\t\t\t\t\t\t\t\t// this.editWidget(inserted.id);\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t];\n\t\t},\n\t\t// }}}\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-form-editor\">\n\t\t<!-- Aside collapsed mode {{{ -->\n\t\t<aside :class=\"[mode == 'collapsed' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeCollapsed]\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"mode == 'collapsed'\"\n\t\t\t\t:form=\"`${id}-collapsed`\"\n\t\t\t\t:config=\"$props.generalVerbs\"\n\t\t\t\t:actions=\"{setMode, rawEdit}\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\t\t<!-- Aside toc (table-of-contents) mode {{{ -->\n\t\t<aside :class=\"[mode == 'toc' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeToc]\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"mode == 'toc'\"\n\t\t\t\t:form=\"`${id}-toc`\"\n\t\t\t\t:config=\"generateConfigToc()\"\n\t\t\t\t:actions=\"{setMode}\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\t\t<!-- Aside widget library (add widget) {{{ -->\n\t\t<aside :class=\"[mode == 'adding' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeAdding]\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"mode == 'adding'\"\n\t\t\t\tref=\"formAdd\"\n\t\t\t\t:config=\"generateConfigAdding()\"\n\t\t\t\t:data=\"addData\"\n\t\t\t\t:actions=\"{setMode}\"\n\t\t\t\t@change=\"addData = $event\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\t\t<!-- Aside item editor (edit widget) {{{ -->\n\t\t<aside :class=\"[mode == 'editing' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeEditing]\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"mode == 'editing'\"\n\t\t\t\t:form=\"`${id}-edit`\"\n\t\t\t\t:config=\"editConfig\"\n\t\t\t\t:data=\"editData\"\n\t\t\t\t:actions=\"{setMode, deleteWidget}\"\n\t\t\t\t@changeItem=\"mutatePath(`${editing.config.$specPath}.${$event.path}`, $event.value)\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\n\t\t<!-- Display form {{{ -->\n\t\t<mg-form\n\t\t\tref=\"form\"\n\t\t\t:config=\"$props.config\"\n\t\t\t:data=\"$props.data\"\n\t\t/>\n\t\t<!-- }}} -->\n\t</div>\n</template>\n\n<style>\n/* Variables {{{ */\n:root {\n\t--mg-form-editor-selected-bg: #007bff;\n\t--mg-form-editor-selected-fg: #fff;;\n\t--mg-form-editor-selected-highlight: #5dabff;\n\t--mg-form-editor-selected-danger: #dc3545;\n\t--mg-form-editor-hover-bg: #77b9ff;\n\t--mg-form-editor-hover-fg: #fff;\n}\n/* }}} */\n\n/* Aside styles - .mgfe-aside {{{ */\n.mgfe-aside {\n\ttransition: transform 0.2s ease-out;\n}\n\n.mgfe-aside .mg-form {\n\tmargin: 0;\n}\n\n.mgfe-aside.aside-right.open.open { /* Silly hack to force the transform when open (overrides .asign-sm in priority) */\n\ttransform: translateX(0px);\n}\n\n.mgfe-aside.aside-right {\n\tposition: fixed;\n\ttop: 0px;\n\tright: 0px;\n\tbottom: 0px;\n\tbackground: #FFF;\n\tz-index: 100;\n\tbox-shadow: 0 1px 5px rgba(0,0,0,.3);\n\twidth: 350px;\n\ttransform: translateX(380px);\n}\n\n/* .mgfe-aside-sm {{{ */\n.mgfe-aside.aside-right.aside-sm {\n\twidth: 40px;\n\ttransform: translateX(50px);\n\ttop: calc(50% - 30px); /* Approx middle of the screen */\n\tbottom: inherit;\n\tborder-radius: 5px;\n}\n\n.mgfe-aside.aside-right.aside-sm .form-group {\n\tmargin: 0;\n}\n\n/* Remove BS padding from sub-elements */\n.mgfe-aside.aside-right.aside-sm .form-group [class*=\"col-\"] {\n\tpadding: 0;\n}\n/* }}} */\n\n/* Headers {{{ */\n.mgfe-aside .aside-header {\n\tdisplay: flex;\n\talign-items: center;\n\tjustify-content: flex-end;\n\tborder-bottom: 1px solid #e9ecef;\n\tmargin: 0;\n}\n\n.mgfe-aside .aside-header h4 {\n\tflex-grow: 1;\n}\n\n.mgfe-aside .aside-header legend.form-control-static {\n\tborder-bottom: none;\n\tfont-size: 17pt;\n}\n\n.mgfe-aside .aside-header .close {\n\tcolor: #5e5e5e;\n}\n\n.mgfe-aside .aside-header .close:hover {\n\tcolor: #000;\n}\n\n.mgfe-aside .aside-header .close::after {\n\tdisplay: inline-block;\n\tfont-family: 'Font Awesome 5 Pro';\n\tfont-weight: 900;\n\tcontent: \"\\f00d\";\n}\n/* }}} */\n\n/* Actions {{{ */\n.mgfe-aside .aside-actions {\n\tjustify-self: flex-end;\n\tmargin-right: 10px;\n}\n\n.mgfe-aside .aside-actions .btn-group {\n\tborder: none;\n\tbox-shadow: none;\n}\n\n.mgfe-aside .aside-actions a {\n\tpadding: 8px;\n\tfont-size: 125%;\n}\n/* }}} */\n\n/* Body {{{ */\n.mgfe-aside .aside-body {\n\tmargin-left: 0;\n\tmargin: 10px 0 0;\n\n\t/* Body scrolling */\n\toverflow: auto;\n\theight: calc(100vh - 80px);\n}\n/* }}} */\n/* }}} */\n\n/* Component highlighting {{{\n\n/* Highlight applied to active elements inside an mgContainer */\n.mg-form-editor-target {\n\tborder: 2px solid var(--blue);\n\tborder-radius: 5px;\n\tposition: relative;\n\ttop: -4px;\n\tleft: -4px;\n\tpadding: 2px;\n}\n\n.mg-form-editor-drop-target {\n}\n\n.mg-form-editor-drop-target-before {\n\tborder-top: 4px dashed var(--blue);\n}\n\n.mg-form-editor-drop-target-after {\n\tborder-bottom: 4px dashed var(--blue);\n}\n/* }}} */\n\n/* Drag + Drop {{{ */\nbody.mg-form-editor-dragging * {\n\tcursor: grabbing;\n}\n\n#mg-form-editor-drag {\n\tdisplay: block;\n\tz-index: 1000;\n\tposition: absolute;\n\ttop: -10000px;\n\tleft: -10000px;\n\tmin-width: 160px;\n\theight: 40px;\n\tborder-radius: 5px;\n\tbackground: #2196F3;\n\tbox-shadow: 1px 1px 4px rgba(0,0,0,.3);\n\tpadding: 10px;\n\tcolor: #FFF;\n}\n\n#mg-form-editor-drag > i {\n\tmargin-right: 5px;\n}\n/* }}} */\n\n/* Misc fixes {{{ */\n/* Buttons that are also fixed with look weird */\n.mg-form-editor .btn.fa-fw {\n\twidth: 2.30em;\n\tpadding: 4px 2px !important;\n}\n/* }}} */\n</style>\n"]}, media: undefined });
 
               };
               /* scoped */
-              const __vue_scope_id__$m = undefined;
+              const __vue_scope_id__$n = undefined;
               /* module identifier */
-              const __vue_module_identifier__$m = undefined;
+              const __vue_module_identifier__$n = undefined;
               /* functional template */
-              const __vue_is_functional_template__$m = false;
+              const __vue_is_functional_template__$n = false;
               /* style inject SSR */
               
               /* style inject shadow dom */
               
 
               
-              const __vue_component__$m = normalizeComponent(
+              const __vue_component__$n = normalizeComponent(
                 { render: __vue_render__$g, staticRenderFns: __vue_staticRenderFns__$g },
-                __vue_inject_styles__$m,
-                __vue_script__$m,
-                __vue_scope_id__$m,
-                __vue_is_functional_template__$m,
-                __vue_module_identifier__$m,
+                __vue_inject_styles__$n,
+                __vue_script__$n,
+                __vue_scope_id__$n,
+                __vue_is_functional_template__$n,
+                __vue_module_identifier__$n,
                 false,
                 createInjector,
                 undefined,
@@ -11297,7 +11671,7 @@
 
             var mgFormEditor = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$m
+                        'default': __vue_component__$n
             });
 
             /**
@@ -11324,7 +11698,7 @@
             * @emits mgContainer.mouseEnter Emitted as `(container, specPath, event)` on the native mouseEnter event of a component within a container
             * @emits mgContainer.mouseLeave Emitted as `(container, specPath, event)` on the native mouseLeave event of a component within a container
             */
-            var script$m = Vue.component('mgForm', {
+            var script$n = Vue.component('mgForm', {
               provide: function provide() {
                 return {
                   $mgForm: this
@@ -11526,7 +11900,7 @@
                     .split(',').map(function (i) {
                       return i && JSON.parse(i.replace(/'/g, '"'));
                     });
-                    if (func.apply(context !== null && context !== void 0 ? context : this, [actionArgs].concat(params))) return;
+                    if (func.call.apply(func, [context !== null && context !== void 0 ? context : this].concat(_toConsumableArray(actionArgs), params))) return;
                   } // }}}
                   // 4. If all else failed and FORM.$props.actionsFallback is true - handle it via vm.$eval {{{
 
@@ -11589,7 +11963,7 @@
             });
 
             /* script */
-            const __vue_script__$n = script$m;
+            const __vue_script__$o = script$n;
 
             /* template */
             var __vue_render__$h = function() {
@@ -11631,13 +12005,13 @@
             __vue_render__$h._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$n = undefined;
+              const __vue_inject_styles__$o = undefined;
               /* scoped */
-              const __vue_scope_id__$n = undefined;
+              const __vue_scope_id__$o = undefined;
               /* module identifier */
-              const __vue_module_identifier__$n = undefined;
+              const __vue_module_identifier__$o = undefined;
               /* functional template */
-              const __vue_is_functional_template__$n = false;
+              const __vue_is_functional_template__$o = false;
               /* style inject */
               
               /* style inject SSR */
@@ -11646,13 +12020,13 @@
               
 
               
-              const __vue_component__$n = normalizeComponent(
+              const __vue_component__$o = normalizeComponent(
                 { render: __vue_render__$h, staticRenderFns: __vue_staticRenderFns__$h },
-                __vue_inject_styles__$n,
-                __vue_script__$n,
-                __vue_scope_id__$n,
-                __vue_is_functional_template__$n,
-                __vue_module_identifier__$n,
+                __vue_inject_styles__$o,
+                __vue_script__$o,
+                __vue_scope_id__$o,
+                __vue_is_functional_template__$o,
+                __vue_module_identifier__$o,
                 false,
                 undefined,
                 undefined,
@@ -11661,7 +12035,7 @@
 
             var mgForm = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$n
+                        'default': __vue_component__$o
             });
 
             /**
@@ -11682,7 +12056,7 @@
               },
               format: true
             });
-            var script$n = Vue.component('mgGrid', {
+            var script$o = Vue.component('mgGrid', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -11698,7 +12072,7 @@
             });
 
             /* script */
-            const __vue_script__$o = script$n;
+            const __vue_script__$p = script$o;
 
             /* template */
             var __vue_render__$i = function() {
@@ -11732,81 +12106,6 @@
             __vue_render__$i._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$o = undefined;
-              /* scoped */
-              const __vue_scope_id__$o = undefined;
-              /* module identifier */
-              const __vue_module_identifier__$o = undefined;
-              /* functional template */
-              const __vue_is_functional_template__$o = false;
-              /* style inject */
-              
-              /* style inject SSR */
-              
-              /* style inject shadow dom */
-              
-
-              
-              const __vue_component__$o = normalizeComponent(
-                { render: __vue_render__$i, staticRenderFns: __vue_staticRenderFns__$i },
-                __vue_inject_styles__$o,
-                __vue_script__$o,
-                __vue_scope_id__$o,
-                __vue_is_functional_template__$o,
-                __vue_module_identifier__$o,
-                false,
-                undefined,
-                undefined,
-                undefined
-              );
-
-            var mgGrid = /*#__PURE__*/Object.freeze({
-                        __proto__: null,
-                        'default': __vue_component__$o
-            });
-
-            macgyver.register('mgHeading', {
-              title: 'Heading',
-              icon: 'far fa-heading',
-              category: 'General Decoration',
-              preferId: false,
-              config: {
-                text: {
-                  type: 'mgText'
-                }
-              }
-            });
-            var script$o = Vue.component('mgHeading', {
-              inject: ['$mgForm'],
-              data: function data() {
-                return {
-                  data: undefined
-                };
-              },
-              props: {
-                config: Object
-              },
-              created: function created() {
-                this.$mgForm.inject(this);
-              }
-            });
-
-            /* script */
-            const __vue_script__$p = script$o;
-
-            /* template */
-            var __vue_render__$j = function() {
-              var _vm = this;
-              var _h = _vm.$createElement;
-              var _c = _vm._self._c || _h;
-              return _c("legend", { staticClass: "form-control-static" }, [
-                _vm._v("\n\t" + _vm._s(_vm.data || _vm.$props.config.text) + "\n")
-              ])
-            };
-            var __vue_staticRenderFns__$j = [];
-            __vue_render__$j._withStripped = true;
-
-              /* style */
               const __vue_inject_styles__$p = undefined;
               /* scoped */
               const __vue_scope_id__$p = undefined;
@@ -11823,7 +12122,7 @@
 
               
               const __vue_component__$p = normalizeComponent(
-                { render: __vue_render__$j, staticRenderFns: __vue_staticRenderFns__$j },
+                { render: __vue_render__$i, staticRenderFns: __vue_staticRenderFns__$i },
                 __vue_inject_styles__$p,
                 __vue_script__$p,
                 __vue_scope_id__$p,
@@ -11835,25 +12134,24 @@
                 undefined
               );
 
-            var mgHeading = /*#__PURE__*/Object.freeze({
+            var mgGrid = /*#__PURE__*/Object.freeze({
                         __proto__: null,
                         'default': __vue_component__$p
             });
 
-            macgyver.register('mgHtml', {
-              title: 'Static HTML',
-              icon: 'fab fa-html5',
+            macgyver.register('mgHeading', {
+              title: 'Heading',
+              icon: 'far fa-heading',
               category: 'General Decoration',
               preferId: false,
               config: {
                 text: {
-                  type: 'mgCodeEditor',
-                  syntax: 'html'
+                  type: 'mgText'
                 }
               }
             });
-            var script$p = Vue.component('mgHtml', {
-              inject: ['$mgForm', '$mgFormEditor'],
+            var script$p = Vue.component('mgHeading', {
+              inject: ['$mgForm'],
               data: function data() {
                 return {
                   data: undefined
@@ -11869,6 +12167,90 @@
 
             /* script */
             const __vue_script__$q = script$p;
+
+            /* template */
+            var __vue_render__$j = function() {
+              var _vm = this;
+              var _h = _vm.$createElement;
+              var _c = _vm._self._c || _h;
+              return _c("legend", { staticClass: "form-control-static" }, [
+                _vm._v("\n\t" + _vm._s(_vm.data || _vm.$props.config.text) + "\n")
+              ])
+            };
+            var __vue_staticRenderFns__$j = [];
+            __vue_render__$j._withStripped = true;
+
+              /* style */
+              const __vue_inject_styles__$q = undefined;
+              /* scoped */
+              const __vue_scope_id__$q = undefined;
+              /* module identifier */
+              const __vue_module_identifier__$q = undefined;
+              /* functional template */
+              const __vue_is_functional_template__$q = false;
+              /* style inject */
+              
+              /* style inject SSR */
+              
+              /* style inject shadow dom */
+              
+
+              
+              const __vue_component__$q = normalizeComponent(
+                { render: __vue_render__$j, staticRenderFns: __vue_staticRenderFns__$j },
+                __vue_inject_styles__$q,
+                __vue_script__$q,
+                __vue_scope_id__$q,
+                __vue_is_functional_template__$q,
+                __vue_module_identifier__$q,
+                false,
+                undefined,
+                undefined,
+                undefined
+              );
+
+            var mgHeading = /*#__PURE__*/Object.freeze({
+                        __proto__: null,
+                        'default': __vue_component__$q
+            });
+
+            macgyver.register('mgHtml', {
+              title: 'Static HTML',
+              icon: 'fab fa-html5',
+              category: 'General Decoration',
+              preferId: false,
+              config: {
+                text: {
+                  type: 'mgCodeEditor',
+                  syntax: 'html'
+                }
+              }
+            });
+            var script$q = Vue.component('mgHtml', {
+              inject: {
+                $mgForm: {
+                  from: '$mgForm'
+                },
+                $mgFormEditor: {
+                  from: '$mgFormEditor',
+                  "default": false
+                }
+              },
+              data: function data() {
+                return {
+                  data: undefined
+                };
+              },
+              props: {
+                config: Object
+              },
+              created: function created() {
+                this.$mgForm.inject(this);
+              }
+            });
+
+            /* script */
+            const __vue_script__$r = script$q;
 
             /* template */
             var __vue_render__$k = function() {
@@ -11908,13 +12290,13 @@
             __vue_render__$k._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$q = undefined;
+              const __vue_inject_styles__$r = undefined;
               /* scoped */
-              const __vue_scope_id__$q = undefined;
+              const __vue_scope_id__$r = undefined;
               /* module identifier */
-              const __vue_module_identifier__$q = undefined;
+              const __vue_module_identifier__$r = undefined;
               /* functional template */
-              const __vue_is_functional_template__$q = false;
+              const __vue_is_functional_template__$r = false;
               /* style inject */
               
               /* style inject SSR */
@@ -11923,13 +12305,13 @@
               
 
               
-              const __vue_component__$q = normalizeComponent(
+              const __vue_component__$r = normalizeComponent(
                 { render: __vue_render__$k, staticRenderFns: __vue_staticRenderFns__$k },
-                __vue_inject_styles__$q,
-                __vue_script__$q,
-                __vue_scope_id__$q,
-                __vue_is_functional_template__$q,
-                __vue_module_identifier__$q,
+                __vue_inject_styles__$r,
+                __vue_script__$r,
+                __vue_scope_id__$r,
+                __vue_is_functional_template__$r,
+                __vue_module_identifier__$r,
                 false,
                 undefined,
                 undefined,
@@ -11938,7 +12320,7 @@
 
             var mgHtml = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$q
+                        'default': __vue_component__$r
             });
 
             macgyver.register('mgIcon', {
@@ -11984,7 +12366,7 @@
               },
               format: true
             });
-            var script$q = Vue.component('mgIcon', {
+            var script$r = Vue.component('mgIcon', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -12050,7 +12432,7 @@
             });
 
             /* script */
-            const __vue_script__$r = script$q;
+            const __vue_script__$s = script$r;
 
             /* template */
             var __vue_render__$l = function() {
@@ -12112,30 +12494,30 @@
             __vue_render__$l._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$r = function (inject) {
+              const __vue_inject_styles__$s = function (inject) {
                 if (!inject) return
                 inject("data-v-66cd0bcc_0", { source: "\n.btn.btn-icon-fixed {\n\tbox-shadow: none;\n\twidth: 32px;\n\theight: 32px;\n\tpadding: 7px 0;\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgIcon.vue"],"names":[],"mappings":";AAuGA;CACA,gBAAA;CACA,WAAA;CACA,YAAA;CACA,cAAA;CACA,aAAA;CACA,uBAAA;CACA,mBAAA;AACA","file":"mgIcon.vue","sourcesContent":["<script>\nmacgyver.register('mgIcon', {\n\ttitle: 'Icon',\n\ticon: 'far fa-flag',\n\tcategory: 'Simple Inputs',\n\tpreferId: true,\n\tconfig: {\n\t\ticonFallback: {type: 'mgIcon', default: 'far fa-info', help: 'The icon to use if non is selected'},\n\t\trequired: {type: 'mgToggle', default: false},\n\t\tinterface: {type: 'mgChoiceButtons', default: 'modal', enum: ['modal', 'dropdown']},\n\t\ticonFeed: {type: 'mgText', default: '/api/webfonts/fa.json', advanced: true, help: 'The data source to import icon information', relative: true},\n\t\tclass: {type: 'mgText', default: 'btn btn-light btn-circle', advanced: true},\n\t\tclassActive: {type: 'mgText', advanced: true},\n\t\tclassInactive: {type: 'mgText', advanced: true},\n\t},\n\tformat: true,\n});\n\nexport default Vue.component('mgIcon', {\n\tinject: ['$mgForm'],\n\tdata() { return {\n\t\tdata: undefined,\n\t}},\n\tprops: {\n\t\tconfig: Object,\n\t},\n\tcreated() {\n\t\tthis.$mgForm.inject(this);\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);\n\t\t});\n\t},\n\tmethods: {\n\t\tselectIcon() {\n\t\t\tPromise.resolve()\n\t\t\t\t.then(()=> this.$macgyver.notify.loading(this._uid, true))\n\t\t\t\t.then(()=> this.$http.get(this.$props.config.iconFeed))\n\t\t\t\t.then(res => { this.$macgyver.notify.loading(this._uid, false); return res })\n\t\t\t\t.then(res => this.$macgyver.$prompt.macgyver({\n\t\t\t\t\ttitle: 'Select icon',\n\t\t\t\t\tbuttons: [], // We're capturing the first click so we don't need confirm buttons\n\t\t\t\t\tmacgyver: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tid: 'class',\n\t\t\t\t\t\t\ttype: 'mgChoiceButtons',\n\t\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t\tclassWrapper: '',\n\t\t\t\t\t\t\tenum: res.data.map(icon => ({\n\t\t\t\t\t\t\t\tid: icon.class,\n\t\t\t\t\t\t\t\tclass: `btn btn-icon-fixed ${icon.class} fa-fw`,\n\t\t\t\t\t\t\t\tclassActive: `btn btn-primary btn-icon-fixed ${icon.class} fa-fw`,\n\t\t\t\t\t\t\t})),\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t\tonShow: ()=> {\n\t\t\t\t\t\t// Bind to the mg-form element, detect the first change and close the dialog\n\t\t\t\t\t\tthis.$macgyver.$prompt.settings.macgyverForm.$on('mgChange', ()=> setTimeout(()=> { // Timeout not really needed but it lets the button highlight before we close\n\t\t\t\t\t\t\tthis.$macgyver.$prompt.close(true, this.$macgyver.$prompt.settings.value);\n\t\t\t\t\t\t}, 100));\n\t\t\t\t\t},\n\t\t\t\t}))\n\t\t\t\t.then(form => this.data = form.class)\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-icon\">\n\t\t<a\n\t\t\tv-if=\"$props.config.interface == 'modal'\"\n\t\t\t@click=\"selectIcon()\"\n\t\t\tclass=\"btn btn-light btn-icon-fixed\"\n\t\t\t:class=\"data ? [data, $props.config.classActive || $props.config.class] : [$props.config.iconFallback, $props.config.classInactive || $props.config.class]\"\n\t\t/>\n\t\t<mg-choice-dropdown\n\t\t\tv-else-if=\"$props.config.interface == 'dropdown'\"\n\t\t\t:form=\"$props.form\"\n\t\t\t:data=\"data\"\n\t\t\t:config=\"{\n\t\t\t\t$dataPath: $props.config.$dataPath,\n\t\t\t\tenumSource: 'url',\n\t\t\t\tenumUrl: {\n\t\t\t\t\turl: $props.config.iconFeed,\n\t\t\t\t\ttype: 'array',\n\t\t\t\t\tmappings: {\n\t\t\t\t\t\tid: {required: true, from: 'class'},\n\t\t\t\t\t\ttitle: {required: true, from: 'id'},\n\t\t\t\t\t\ticon: {required: true, from: 'class'},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\tdefault: $props.config.default,\n\t\t\t\trequired: $props.config.required,\n\t\t\t}\"\n\t\t/>\n\t\t<mg-error\n\t\t\tv-else\n\t\t\t:config=\"{errorText: 'Unknown mgIcon interface'}\"\n\t\t/>\n\t</div>\n</template>\n\n<style>\n.btn.btn-icon-fixed {\n\tbox-shadow: none;\n\twidth: 32px;\n\theight: 32px;\n\tpadding: 7px 0;\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n}\n</style>\n"]}, media: undefined });
 
               };
               /* scoped */
-              const __vue_scope_id__$r = undefined;
+              const __vue_scope_id__$s = undefined;
               /* module identifier */
-              const __vue_module_identifier__$r = undefined;
+              const __vue_module_identifier__$s = undefined;
               /* functional template */
-              const __vue_is_functional_template__$r = false;
+              const __vue_is_functional_template__$s = false;
               /* style inject SSR */
               
               /* style inject shadow dom */
               
 
               
-              const __vue_component__$r = normalizeComponent(
+              const __vue_component__$s = normalizeComponent(
                 { render: __vue_render__$l, staticRenderFns: __vue_staticRenderFns__$l },
-                __vue_inject_styles__$r,
-                __vue_script__$r,
-                __vue_scope_id__$r,
-                __vue_is_functional_template__$r,
-                __vue_module_identifier__$r,
+                __vue_inject_styles__$s,
+                __vue_script__$s,
+                __vue_scope_id__$s,
+                __vue_is_functional_template__$s,
+                __vue_module_identifier__$s,
                 false,
                 createInjector,
                 undefined,
@@ -12144,7 +12526,7 @@
 
             var mgIcon = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$r
+                        'default': __vue_component__$s
             });
 
             macgyver.register('mgInfoBlock', {
@@ -12236,7 +12618,7 @@
               },
               format: false
             });
-            var script$r = Vue.component('mgInfoBlock', {
+            var script$s = Vue.component('mgInfoBlock', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -12279,7 +12661,7 @@
             });
 
             /* script */
-            const __vue_script__$s = script$r;
+            const __vue_script__$t = script$s;
 
             /* template */
             var __vue_render__$m = function() {
@@ -12319,30 +12701,30 @@
             __vue_render__$m._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$s = function (inject) {
+              const __vue_inject_styles__$t = function (inject) {
                 if (!inject) return
                 inject("data-v-ddfcced6_0", { source: "\n.mg-info-block {\n\tbackground: transparent;\n\tborder-radius: 5px;\n}\n.mg-info-block .mg-info-block-text {\n\tfont-size: 200%;\n\tfont-weight: bold;\n}\n.mg-info-block .mg-info-block-title {\n\tfont-size: 90%;\n\topacity: 0.8;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgInfoBlock.vue"],"names":[],"mappings":";AAuFA;CACA,uBAAA;CACA,kBAAA;AACA;AAEA;CACA,eAAA;CACA,iBAAA;AACA;AAEA;CACA,cAAA;CACA,YAAA;AACA","file":"mgInfoBlock.vue","sourcesContent":["<script>\nmacgyver.register('mgInfoBlock', {\n\ttitle: 'Info Block',\n\ticon: 'far fa-info-square',\n\tcategory: 'Data display',\n\tconfig: {\n\t\ttext: {type: 'mgText', help: 'Text to display, if a URL is also specified this is overridden when the result loads', default: ''},\n\t\turl: {type: 'mgUrl', relative: true, default: '/api/datafeeds/random/number?$extract=number'},\n\t\tcoloring: {\n\t\t\ttype: 'mgChoiceDropdown',\n\t\t\tdefault: 'bg-primary',\n\t\t\tenum: [\n\t\t\t\t{id: 'bg-primary text-white', text: 'Primary'},\n\t\t\t\t{id: 'bg-secondary', text: 'Secondary'},\n\t\t\t\t{id: 'bg-success text-white', text: 'Success'},\n\t\t\t\t{id: 'bg-danger text-white', text: 'Danger'},\n\t\t\t\t{id: 'bg-warning text-white', text: 'Warning'},\n\t\t\t\t{id: 'bg-info text-white', text: 'Info'},\n\t\t\t\t{id: 'bg-light', text: 'Light'},\n\t\t\t\t{id: 'bg-dark text-white', text: 'Dark'},\n\t\t\t\t{id: 'bg-muted', text: 'Muted'},\n\t\t\t],\n\t\t},\n\t\ticon: {type: 'mgIcon', default: 'far fa-info-circle'},\n\t\ticonLoading: {type: 'mgIcon', default: 'far fa-spinner fa-spin', advanced: true},\n\t\ticonSize: {\n\t\t\ttype: 'mgChoiceButtons',\n\t\t\tdefault: 'fa-4x',\n\t\t\tadvanced: true,\n\t\t\tenum: [\n\t\t\t\t{id: '', text: 'Normal'},\n\t\t\t\t{id: 'fa-2x', text: '2x'},\n\t\t\t\t{id: 'fa-3x', text: '3x'},\n\t\t\t\t{id: 'fa-4x', text: '4x'},\n\t\t\t\t{id: 'fa-5x', text: '5x'},\n\t\t\t\t{id: 'fa-6x', text: '6x'},\n\t\t\t\t{id: 'fa-7x', text: '7x'},\n\t\t\t\t{id: 'fa-8x', text: '8x'},\n\t\t\t],\n\t\t},\n\t},\n\tformat: false,\n});\n\nexport default Vue.component('mgInfoBlock', {\n\tinject: ['$mgForm'],\n\tdata() { return {\n\t\tdata: undefined,\n\t\tisLoading: false,\n\t}},\n\tprops: {\n\t\tconfig: Object,\n\t},\n\tcreated() {\n\t\tthis.$mgForm.inject(this);\n\n\t\tthis.$watch('$props.config.url', ()=> {\n\t\t\tif (!this.$props.config.url) return;\n\t\t\tPromise.resolve()\n\t\t\t\t.then(()=> this.isLoading = true)\n\t\t\t\t.then(()=> this.$macgyver.utils.fetch(this.$props.config.url, {\n\t\t\t\t\ttype: 'object',\n\t\t\t\t\tmappings: {extract: {required: true}},\n\t\t\t\t\tformat: d => d.extract,\n\t\t\t\t}))\n\t\t\t\t.then(data => this.$set(this, 'data', data))\n\t\t\t\t.then(()=> this.isLoading = false)\n\t\t}, {immediate: true});\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"card mg-info-block\" :class=\"$props.config.coloring\">\n\t\t<div class=\"card-body media\">\n\t\t\t<div class=\"mr-3\">\n\t\t\t\t<i :class=\"[isLoading ? $props.config.iconLoading : $props.config.icon, $props.config.iconSize]\"/>\n\t\t\t</div>\n\t\t\t<div class=\"media-body\">\n\t\t\t\t<div class=\"mg-info-block-text\">{{data || $props.config.text}}</div>\n\t\t\t\t<div class=\"mg-info-block-title\">{{$props.config.title}}</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n\n<style>\n.mg-info-block {\n\tbackground: transparent;\n\tborder-radius: 5px;\n}\n\n.mg-info-block .mg-info-block-text {\n\tfont-size: 200%;\n\tfont-weight: bold;\n}\n\n.mg-info-block .mg-info-block-title {\n\tfont-size: 90%;\n\topacity: 0.8;\n}\n</style>\n"]}, media: undefined });
 
               };
               /* scoped */
-              const __vue_scope_id__$s = undefined;
+              const __vue_scope_id__$t = undefined;
               /* module identifier */
-              const __vue_module_identifier__$s = undefined;
+              const __vue_module_identifier__$t = undefined;
               /* functional template */
-              const __vue_is_functional_template__$s = false;
+              const __vue_is_functional_template__$t = false;
               /* style inject SSR */
               
               /* style inject shadow dom */
               
 
               
-              const __vue_component__$s = normalizeComponent(
+              const __vue_component__$t = normalizeComponent(
                 { render: __vue_render__$m, staticRenderFns: __vue_staticRenderFns__$m },
-                __vue_inject_styles__$s,
-                __vue_script__$s,
-                __vue_scope_id__$s,
-                __vue_is_functional_template__$s,
-                __vue_module_identifier__$s,
+                __vue_inject_styles__$t,
+                __vue_script__$t,
+                __vue_scope_id__$t,
+                __vue_is_functional_template__$t,
+                __vue_module_identifier__$t,
                 false,
                 createInjector,
                 undefined,
@@ -12351,7 +12733,7 @@
 
             var mgInfoBlock = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$s
+                        'default': __vue_component__$t
             });
 
             macgyver.register('mgLabel', {
@@ -12370,7 +12752,7 @@
                 }
               }
             });
-            var script$s = Vue.component('mgLabel', {
+            var script$t = Vue.component('mgLabel', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -12386,7 +12768,7 @@
             });
 
             /* script */
-            const __vue_script__$t = script$s;
+            const __vue_script__$u = script$t;
 
             /* template */
             var __vue_render__$n = function() {
@@ -12401,13 +12783,13 @@
             __vue_render__$n._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$t = undefined;
+              const __vue_inject_styles__$u = undefined;
               /* scoped */
-              const __vue_scope_id__$t = undefined;
+              const __vue_scope_id__$u = undefined;
               /* module identifier */
-              const __vue_module_identifier__$t = undefined;
+              const __vue_module_identifier__$u = undefined;
               /* functional template */
-              const __vue_is_functional_template__$t = false;
+              const __vue_is_functional_template__$u = false;
               /* style inject */
               
               /* style inject SSR */
@@ -12416,13 +12798,13 @@
               
 
               
-              const __vue_component__$t = normalizeComponent(
+              const __vue_component__$u = normalizeComponent(
                 { render: __vue_render__$n, staticRenderFns: __vue_staticRenderFns__$n },
-                __vue_inject_styles__$t,
-                __vue_script__$t,
-                __vue_scope_id__$t,
-                __vue_is_functional_template__$t,
-                __vue_module_identifier__$t,
+                __vue_inject_styles__$u,
+                __vue_script__$u,
+                __vue_scope_id__$u,
+                __vue_is_functional_template__$u,
+                __vue_module_identifier__$u,
                 false,
                 undefined,
                 undefined,
@@ -12431,7 +12813,7 @@
 
             var mgLabel = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$t
+                        'default': __vue_component__$u
             });
 
             macgyver.register('mgList', {
@@ -12475,7 +12857,7 @@
                 return (v || []).join(', ');
               }
             });
-            var script$t = Vue.component('mgList', {
+            var script$u = Vue.component('mgList', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -12514,7 +12896,7 @@
             });
 
             /* script */
-            const __vue_script__$u = script$t;
+            const __vue_script__$v = script$u;
 
             /* template */
             var __vue_render__$o = function() {
@@ -12645,30 +13027,30 @@
             __vue_render__$o._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$u = function (inject) {
+              const __vue_inject_styles__$v = function (inject) {
                 if (!inject) return
                 inject("data-v-e380d608_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Cell padding */\n.mg-list td {\n\tpadding: 0px !important;\n}\n.mg-list td input[type=\"text\"] {\n\tborder: none;\n}\n\n/* Row number cell */\n.mg-list td.row-number-cell {\n\ttext-align: center;\n\twidth: 30px;\n\tvertical-align: middle;\n}\n\n/* Verb cell */\n.mg-list .verb-cell {\n\twidth: 30px;\n\ttext-align: center;\n\tvertical-align: middle;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgList.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAkFA,iBAAA;AACA;CACA,uBAAA;AACA;AAEA;CACA,YAAA;AACA;;AAEA,oBAAA;AACA;CACA,kBAAA;CACA,WAAA;CACA,sBAAA;AACA;;AAEA,cAAA;AACA;CACA,WAAA;CACA,kBAAA;CACA,sBAAA;AACA","file":"mgList.vue","sourcesContent":["<script>\nmacgyver.register('mgList', {\n\ttitle: 'List',\n\ticon: 'far fa-list-ul',\n\tcategory: 'Simple Inputs',\n\tpreferId: true,\n\tconfig: {\n\t\tallowDelete: {type: 'mgToggle', default: true},\n\t\tmin: {type: 'mgNumber', title: 'Minimum number of items'},\n\t\tmax: {type: 'mgNumber', title: 'Maximum number of items'},\n\t\trequired: {type: 'mgToggle', default: false},\n\t\tnumbered: {type: 'mgToggle', default: true},\n\t\taddButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},\n\t\taddButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},\n\t},\n\tformat: v => (v || []).join(', '),\n});\n\nexport default Vue.component('mgList', {\n\tinject: ['$mgForm'],\n\tdata() { return {\n\t\tdata: undefined,\n\t\tnewItem: '',\n\t}},\n\tprops: {\n\t\tconfig: Object,\n\t},\n\tcreated() {\n\t\tthis.$mgForm.inject(this);\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.config.required && (!this.data || !this.data.length)) return reply(`${this.$props.config.title} is required`);\n\t\t\tif (this.$props.config.min && _.isString(this.data) && this.data.length < this.$props.config.min) return reply(`${this.$props.config.title} must have at least ${this.$props.config.min} items`);\n\t\t\tif (this.$props.config.max && _.isString(this.data) && this.data.length > this.$props.config.max) return reply(`${this.$props.config.title} must have at most ${this.$props.config.max} items`);\n\t\t});\n\t},\n\tmethods: {\n\t\taddItem() {\n\t\t\tif (!_.isArray(this.data)) this.data = [];\n\t\t\tthis.data.push(this.newItem);\n\t\t\tthis.newItem = '';\n\t\t},\n\t\tchangeItem(index, value) {\n\t\t\tthis.$set(this.data, index, value);\n\t\t},\n\t\tremoveItem(index) {\n\t\t\tthis.data = this.data.filter((x, i) => i != index);\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<table class=\"table table-bordered mg-list\">\n\t\t<tbody>\n\t\t\t<tr v-for=\"(row, rowIndex) in data\">\n\t\t\t\t<td v-if=\"$props.config.numbered\" class=\"row-number-cell\">{{rowIndex + 1 | number}}</td>\n\t\t\t\t<td>\n\t\t\t\t\t<input :value=\"row\" @change=\"changeItem(rowIndex, $event.srcElement.value)\" type=\"text\" class=\"form-control\"/>\n\t\t\t\t</td>\n\t\t\t\t<td v-if=\"$props.config.allowDelete\" class=\"verb-cell\">\n\t\t\t\t\t<a @click=\"removeItem(rowIndex)\" class=\"btn btn-link btn-link-danger btn-xs text-muted\"><i class=\"fa fa-trash\"></i></a>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody>\n\t\t<tfoot class=\"hidden-print\">\n\t\t\t<tr>\n\t\t\t\t<td v-if=\"$props.config.numbered\" class=\"row-number-cell\">\n\t\t\t\t\t<a v-if=\"!$props.config.allowDelete\" @click=\"addItem()\" :class=\"newItem ? $props.config.addButtonActiveClass : $props.config.addButtonInactiveClass\"/>\n\t\t\t\t\t<i v-else class=\"far fa-asterisk\"></i>\n\t\t\t\t</td>\n\t\t\t\t<td :colspan=\"$props.config.allowDelete ? 1 : 2\">\n\t\t\t\t\t<input @keyup.enter=\"addItem()\" v-model=\"newItem\" type=\"text\" class=\"form-control\"/>\n\t\t\t\t</td>\n\t\t\t\t<td v-if=\"$props.config.allowDelete\" class=\"verb-cell\">\n\t\t\t\t\t<a @click=\"addItem()\" :class=\"newItem ? $props.config.addButtonActiveClass : $props.config.addButtonInactiveClass\"/>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tfoot>\n\t</table>\n</template>\n\n<style>\n/* Cell padding */\n.mg-list td {\n\tpadding: 0px !important;\n}\n\n.mg-list td input[type=\"text\"] {\n\tborder: none;\n}\n\n/* Row number cell */\n.mg-list td.row-number-cell {\n\ttext-align: center;\n\twidth: 30px;\n\tvertical-align: middle;\n}\n\n/* Verb cell */\n.mg-list .verb-cell {\n\twidth: 30px;\n\ttext-align: center;\n\tvertical-align: middle;\n}\n</style>\n"]}, media: undefined });
 
               };
               /* scoped */
-              const __vue_scope_id__$u = undefined;
+              const __vue_scope_id__$v = undefined;
               /* module identifier */
-              const __vue_module_identifier__$u = undefined;
+              const __vue_module_identifier__$v = undefined;
               /* functional template */
-              const __vue_is_functional_template__$u = false;
+              const __vue_is_functional_template__$v = false;
               /* style inject SSR */
               
               /* style inject shadow dom */
               
 
               
-              const __vue_component__$u = normalizeComponent(
+              const __vue_component__$v = normalizeComponent(
                 { render: __vue_render__$o, staticRenderFns: __vue_staticRenderFns__$o },
-                __vue_inject_styles__$u,
-                __vue_script__$u,
-                __vue_scope_id__$u,
-                __vue_is_functional_template__$u,
-                __vue_module_identifier__$u,
+                __vue_inject_styles__$v,
+                __vue_script__$v,
+                __vue_scope_id__$v,
+                __vue_is_functional_template__$v,
+                __vue_module_identifier__$v,
                 false,
                 createInjector,
                 undefined,
@@ -12677,7 +13059,7 @@
 
             var mgList = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$u
+                        'default': __vue_component__$v
             });
 
             macgyver.register('mgNumber', {
@@ -12766,7 +13148,7 @@
               formatAlign: 'right',
               shorthand: ['integer', 'int', 'float']
             });
-            var script$u = Vue.component('mgNumber', {
+            var script$v = Vue.component('mgNumber', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -12798,7 +13180,7 @@
             });
 
             /* script */
-            const __vue_script__$v = script$u;
+            const __vue_script__$w = script$v;
 
             /* template */
             var __vue_render__$p = function() {
@@ -12938,30 +13320,30 @@
             __vue_render__$p._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$v = function (inject) {
+              const __vue_inject_styles__$w = function (inject) {
                 if (!inject) return
                 inject("data-v-0b27630c_0", { source: "\n.mg-number input[type=number] {\n\tpadding: 0 10px;\n}\n.mg-number .btn {\n\tbox-shadow: none;\n\tborder: 1px solid #f0f0f0;\n\tdisplay: flex;\n\talign-items: center;\n}\n\n/* Hide the spin button in mgNumber controls */\n.mg-number input[type=number]::-webkit-outer-spin-button,\n.mg-number input[type=number]::-webkit-inner-spin-button {\n\t/* display: none; <- Crashes Chrome on hover */\n\t-webkit-appearance: none;\n\tmargin: 0; /* <-- Apparently some margin is still there even though it's hidden */\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgNumber.vue"],"names":[],"mappings":";AAkFA;CACA,eAAA;AACA;AAEA;CACA,gBAAA;CACA,yBAAA;CACA,aAAA;CACA,mBAAA;AACA;;AAEA,8CAAA;AACA;;CAEA,8CAAA;CACA,wBAAA;CACA,SAAA,EAAA,sEAAA;AACA","file":"mgNumber.vue","sourcesContent":["<script>\nmacgyver.register('mgNumber', {\n\ttitle: 'Number',\n\ticon: 'far fa-sort-numeric-down',\n\tcategory: 'Simple Inputs',\n\tpreferId: true,\n\tconfig: {\n\t\tmin: {type: 'mgNumber', title: 'Minimum value'},\n\t\tmax: {type: 'mgNumber', title: 'Maximum value'},\n\t\tstep: {type: 'mgNumber', title: 'Value to increment / decrement by'},\n\t\tplaceholder: {type: 'mgNumber', help: 'Ghost text to display when there is no value'},\n\t\trequired: {type: 'mgToggle', default: false},\n\t\tinterface: {type: 'mgChoiceDropdown', title: 'Interface', help: 'How to allow number input', default: 'bumpers', enum: [\n\t\t\t{id: 'bumpers', title: 'Number input with buttons'},\n\t\t\t{id: 'slider', title: 'Slider bar'},\n\t\t\t{id: 'input', title: 'Number input box only'},\n\t\t]},\n\t\tbumperDownClass: {type: 'mgText', default: 'btn btn-light fa fa-arrow-down input-group-prepend', advanced: true, showIf: 'interface == \"bumpers\"'},\n\t\tbumperUpClass: {type: 'mgText', default: 'btn btn-light fa fa-arrow-up input-group-append', advanced: true, showIf: 'interface == \"bumpers\"'},\n\t\tprefix: {type: 'mgText', title: 'Prefix', help: 'Prefix to show before the input', showIf: 'interface == \"input\"'},\n\t\tprefixClass: {type: 'mgText', default: 'input-group-prepend input-group-text', advanced: true, showIf: 'interface == \"input\"'},\n\t\tsuffix: {type: 'mgText', title: 'Suffix', help: 'Suffix to show after the input', showIf: 'interface == \"input\"'},\n\t\tsuffixClass: {type: 'mgText', default: 'input-group-append input-group-text', advanced: true, showIf: 'interface == \"input\"'},\n\t},\n\tformat: v => {\n\t\tif (!v) return '';\n\t\treturn (_.isNumber(v) ? v : parseInt(v)).toLocaleString();\n\t},\n\tformatAlign: 'right',\n\tshorthand: ['integer', 'int', 'float'],\n});\n\nexport default Vue.component('mgNumber', {\n\tinject: ['$mgForm'],\n\tdata() { return {\n\t\tdata: undefined,\n\t}},\n\tprops: {\n\t\tconfig: Object,\n\t},\n\tcreated() {\n\t\tthis.$mgForm.inject(this);\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);\n\t\t\tif (this.$props.config.min && this.data < this.$props.config.min) return reply(`${this.$props.config.title} is too small (minimum value is ${this.$props.config.min})`);\n\t\t\tif (this.$props.config.max && this.data > this.$props.config.max) return reply(`${this.$props.config.title} is too large (maximum value is ${this.$props.config.max})`);\n\t\t});\n\t},\n\tmethods: {\n\t\tadd(steps) {\n\t\t\tif (!_.isNumber(this.data)) return this.data = this.$props.config.min || 0; // Not already a number default to the min or zero\n\n\t\t\tthis.data += steps * (this.$props.config.step || 1);\n\t\t\tif (this.$props.config.max && this.data > this.$props.config.max) this.data = this.$props.config.max;\n\t\t\tif (this.$props.config.min && this.data < this.$props.config.min) this.data = this.$props.config.min;\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-number\">\n\t\t<div v-if=\"$props.config.interface == 'slider'\">\n\t\t\t<input v-model=\"data\" type=\"range\" class=\"form-control\" :placeholder=\"$props.config.placeholder\" :min=\"$props.config.min\" :max=\"$props.config.max\" :step=\"$props.config.step\"/>\n\t\t</div>\n\t\t<div v-else-if=\"$props.config.interface == 'bumpers'\" class=\"input-group\">\n\t\t\t<a @click=\"add(-1)\" class=\"hidden-print\" :class=\"$props.config.bumperDownClass\"></a>\n\t\t\t<input v-model=\"data\" type=\"number\" class=\"form-control\" :placeholder=\"$props.config.placeholder\" :min=\"$props.config.min\" :max=\"$props.config.max\" :step=\"$props.config.step\"/>\n\t\t\t<a @click=\"add(1)\" class=\"hidden-print\" :class=\"$props.config.bumperUpClass\"></a>\n\t\t</div>\n\t\t<div v-else-if=\"$props.config.interface == 'input'\" class=\"input-group\">\n\t\t\t<div v-if=\"$props.config.prefix\" :class=\"$props.config.prefixClass\">{{$props.config.prefix}}</div>\n\t\t\t<input v-model=\"data\" type=\"number\" class=\"form-control\" :placeholder=\"$props.config.placeholder\" :min=\"$props.config.min\" :max=\"$props.config.max\" :step=\"$props.config.step\"/>\n\t\t\t<div v-if=\"$props.config.suffix\" :class=\"$props.config.suffixClass\">{{$props.config.suffix}}</div>\n\t\t</div>\n\t\t<div v-else class=\"alert alert-warning\">\n\t\t\tUnknown mgNumber interface '{{$props.config.interface}}'\n\t\t</div>\n\t</div>\n</template>\n\n<style>\n.mg-number input[type=number] {\n\tpadding: 0 10px;\n}\n\n.mg-number .btn {\n\tbox-shadow: none;\n\tborder: 1px solid #f0f0f0;\n\tdisplay: flex;\n\talign-items: center;\n}\n\n/* Hide the spin button in mgNumber controls */\n.mg-number input[type=number]::-webkit-outer-spin-button,\n.mg-number input[type=number]::-webkit-inner-spin-button {\n\t/* display: none; <- Crashes Chrome on hover */\n\t-webkit-appearance: none;\n\tmargin: 0; /* <-- Apparently some margin is still there even though it's hidden */\n}\n</style>\n"]}, media: undefined });
 
               };
               /* scoped */
-              const __vue_scope_id__$v = undefined;
+              const __vue_scope_id__$w = undefined;
               /* module identifier */
-              const __vue_module_identifier__$v = undefined;
+              const __vue_module_identifier__$w = undefined;
               /* functional template */
-              const __vue_is_functional_template__$v = false;
+              const __vue_is_functional_template__$w = false;
               /* style inject SSR */
               
               /* style inject shadow dom */
               
 
               
-              const __vue_component__$v = normalizeComponent(
+              const __vue_component__$w = normalizeComponent(
                 { render: __vue_render__$p, staticRenderFns: __vue_staticRenderFns__$p },
-                __vue_inject_styles__$v,
-                __vue_script__$v,
-                __vue_scope_id__$v,
-                __vue_is_functional_template__$v,
-                __vue_module_identifier__$v,
+                __vue_inject_styles__$w,
+                __vue_script__$w,
+                __vue_scope_id__$w,
+                __vue_is_functional_template__$w,
+                __vue_module_identifier__$w,
                 false,
                 createInjector,
                 undefined,
@@ -12970,7 +13352,7 @@
 
             var mgNumber = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$v
+                        'default': __vue_component__$w
             });
 
             macgyver.register('mgPermissions', {
@@ -12994,7 +13376,7 @@
               },
               format: true
             });
-            var script$v = Vue.component('mgPermissions', {
+            var script$w = Vue.component('mgPermissions', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -13057,7 +13439,7 @@
             });
 
             /* script */
-            const __vue_script__$w = script$v;
+            const __vue_script__$x = script$w;
 
             /* template */
             var __vue_render__$q = function() {
@@ -13100,13 +13482,13 @@
             __vue_render__$q._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$w = undefined;
+              const __vue_inject_styles__$x = undefined;
               /* scoped */
-              const __vue_scope_id__$w = undefined;
+              const __vue_scope_id__$x = undefined;
               /* module identifier */
-              const __vue_module_identifier__$w = undefined;
+              const __vue_module_identifier__$x = undefined;
               /* functional template */
-              const __vue_is_functional_template__$w = false;
+              const __vue_is_functional_template__$x = false;
               /* style inject */
               
               /* style inject SSR */
@@ -13115,13 +13497,13 @@
               
 
               
-              const __vue_component__$w = normalizeComponent(
+              const __vue_component__$x = normalizeComponent(
                 { render: __vue_render__$q, staticRenderFns: __vue_staticRenderFns__$q },
-                __vue_inject_styles__$w,
-                __vue_script__$w,
-                __vue_scope_id__$w,
-                __vue_is_functional_template__$w,
-                __vue_module_identifier__$w,
+                __vue_inject_styles__$x,
+                __vue_script__$x,
+                __vue_scope_id__$x,
+                __vue_is_functional_template__$x,
+                __vue_module_identifier__$x,
                 false,
                 undefined,
                 undefined,
@@ -13130,7 +13512,7 @@
 
             var mgPermissions = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$w
+                        'default': __vue_component__$x
             });
 
             macgyver.register('mgPlaceholder', {
@@ -13161,7 +13543,7 @@
                 }
               }
             });
-            var script$w = Vue.component('mgPlaceholder', {
+            var script$x = Vue.component('mgPlaceholder', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -13177,7 +13559,7 @@
             });
 
             /* script */
-            const __vue_script__$x = script$w;
+            const __vue_script__$y = script$x;
 
             /* template */
             var __vue_render__$r = function() {
@@ -13204,30 +13586,30 @@
             __vue_render__$r._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$x = function (inject) {
+              const __vue_inject_styles__$y = function (inject) {
                 if (!inject) return
                 inject("data-v-1404bcff_0", { source: "\n.mg-placeholder {\n\tmin-height: 100px;\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n\tborder-radius: 5px;\n}\n\n/* Style: placeholder-box {{{ */\n.mg-placeholder.mg-placeholder-box {\n\tborder: 1px solid #000;\n\tbackground:\n\t\tlinear-gradient(to top left,\n\t\t\trgba(0,0,0,0) 0%,\n\t\t\trgba(0,0,0,0) calc(50% - 0.8px),\n\t\t\trgba(0,0,0,1) 50%,\n\t\t\trgba(0,0,0,0) calc(50% + 0.8px),\n\t\t\trgba(0,0,0,0) 100%),\n\t\tlinear-gradient(to top right,\n\t\t\trgba(0,0,0,0) 0%,\n\t\t\trgba(0,0,0,0) calc(50% - 0.8px),\n\t\t\trgba(0,0,0,1) 50%,\n\t\t\trgba(0,0,0,0) calc(50% + 0.8px),\n\t\t\trgba(0,0,0,0) 100%);\n}\n.mg-placeholder.mg-placeholder-box > .mg-placeholder-text {\n\tbackground: #FFF;\n\tborder-radius: 10px;\n\tpadding: 10px 15px;\n}\n/* }}} */\n\n/* Style: placeholder-construction {{{ */\n.mg-placeholder.mg-placeholder-construction {\n\tbackground: repeating-linear-gradient(45deg, #dfc458, #dfc458 10px, #666 10px, #666 20px);\n}\n.mg-placeholder.mg-placeholder-construction > .mg-placeholder-text {\n\tfont-size: 20pt;\n\tcolor: #FFF;\n\ttext-shadow: -2px -2px 1px #000, 2px -2px 1px #000, -2px 2px 1px #000, 2px 2px 1px #000;\n}\n/* }}} */\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgPlaceholder.vue"],"names":[],"mappings":";AA6CA;CACA,iBAAA;CACA,aAAA;CACA,uBAAA;CACA,mBAAA;CACA,kBAAA;AACA;;AAEA,+BAAA;AACA;CACA,sBAAA;CACA;;;;;;;;;;;;sBAYA;AACA;AAEA;CACA,gBAAA;CACA,mBAAA;CACA,kBAAA;AACA;AACA,QAAA;;AAEA,wCAAA;AACA;CACA,yFAAA;AACA;AAEA;CACA,eAAA;CACA,WAAA;CACA,uFAAA;AACA;AACA,QAAA","file":"mgPlaceholder.vue","sourcesContent":["<script>\nmacgyver.register('mgPlaceholder', {\n\ttitle: 'Placeholder',\n\ticon: 'far fa-construction',\n\tcategory: 'General Decoration',\n\tpreferId: true,\n\tconfig: {\n\t\ttext: {type: 'mgText'},\n\t\theight: {type: 'mgNumber', default: '100%'},\n\t\tstyle: {\n\t\t\ttype: 'mgChoiceButtons',\n\t\t\tdefault: 'mg-placeholder-box',\n\t\t\ticonSelected: 'far fa-fw fa-check',\n\t\t\ticonDefault: 'far fa-fw',\n\t\t\tenum: [\n\t\t\t\t{id: 'mg-placeholder-box', title: 'Lined box'},\n\t\t\t\t{id: 'mg-placeholder-construction', title: 'Construction area'},\n\t\t\t],\n\t\t},\n\t},\n});\n\nexport default Vue.component('mgPlaceholder', {\n\tinject: ['$mgForm'],\n\tdata() { return {\n\t\tdata: undefined,\n\t}},\n\tprops: {\n\t\tconfig: Object,\n\t},\n\tcreated() {\n\t\tthis.$mgForm.inject(this);\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-placeholder\" :class=\"$props.config.style\" :style=\"`height: ${$props.config.height || 'auto'}`\">\n\t\t<div v-if=\"$props.config.text\" class=\"mg-placeholder-text\">\n\t\t\t{{$props.config.text}}\n\t\t</div>\n\t</div>\n</template>\n\n<style>\n.mg-placeholder {\n\tmin-height: 100px;\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n\tborder-radius: 5px;\n}\n\n/* Style: placeholder-box {{{ */\n.mg-placeholder.mg-placeholder-box {\n\tborder: 1px solid #000;\n\tbackground:\n\t\tlinear-gradient(to top left,\n\t\t\trgba(0,0,0,0) 0%,\n\t\t\trgba(0,0,0,0) calc(50% - 0.8px),\n\t\t\trgba(0,0,0,1) 50%,\n\t\t\trgba(0,0,0,0) calc(50% + 0.8px),\n\t\t\trgba(0,0,0,0) 100%),\n\t\tlinear-gradient(to top right,\n\t\t\trgba(0,0,0,0) 0%,\n\t\t\trgba(0,0,0,0) calc(50% - 0.8px),\n\t\t\trgba(0,0,0,1) 50%,\n\t\t\trgba(0,0,0,0) calc(50% + 0.8px),\n\t\t\trgba(0,0,0,0) 100%);\n}\n\n.mg-placeholder.mg-placeholder-box > .mg-placeholder-text {\n\tbackground: #FFF;\n\tborder-radius: 10px;\n\tpadding: 10px 15px;\n}\n/* }}} */\n\n/* Style: placeholder-construction {{{ */\n.mg-placeholder.mg-placeholder-construction {\n\tbackground: repeating-linear-gradient(45deg, #dfc458, #dfc458 10px, #666 10px, #666 20px);\n}\n\n.mg-placeholder.mg-placeholder-construction > .mg-placeholder-text {\n\tfont-size: 20pt;\n\tcolor: #FFF;\n\ttext-shadow: -2px -2px 1px #000, 2px -2px 1px #000, -2px 2px 1px #000, 2px 2px 1px #000;\n}\n/* }}} */\n</style>\n"]}, media: undefined });
 
               };
               /* scoped */
-              const __vue_scope_id__$x = undefined;
+              const __vue_scope_id__$y = undefined;
               /* module identifier */
-              const __vue_module_identifier__$x = undefined;
+              const __vue_module_identifier__$y = undefined;
               /* functional template */
-              const __vue_is_functional_template__$x = false;
+              const __vue_is_functional_template__$y = false;
               /* style inject SSR */
               
               /* style inject shadow dom */
               
 
               
-              const __vue_component__$x = normalizeComponent(
+              const __vue_component__$y = normalizeComponent(
                 { render: __vue_render__$r, staticRenderFns: __vue_staticRenderFns__$r },
-                __vue_inject_styles__$x,
-                __vue_script__$x,
-                __vue_scope_id__$x,
-                __vue_is_functional_template__$x,
-                __vue_module_identifier__$x,
+                __vue_inject_styles__$y,
+                __vue_script__$y,
+                __vue_scope_id__$y,
+                __vue_is_functional_template__$y,
+                __vue_module_identifier__$y,
                 false,
                 createInjector,
                 undefined,
@@ -13236,7 +13618,7 @@
 
             var mgPlaceholder = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$x
+                        'default': __vue_component__$y
             });
 
             macgyver.register('mgQuery', {
@@ -13257,7 +13639,7 @@
                 }
               }
             });
-            var script$x = Vue.component('mgQuery', {
+            var script$y = Vue.component('mgQuery', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -13532,7 +13914,7 @@
             });
 
             /* script */
-            const __vue_script__$y = script$x;
+            const __vue_script__$z = script$y;
 
             /* template */
             var __vue_render__$s = function() {
@@ -13558,13 +13940,13 @@
             __vue_render__$s._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$y = undefined;
+              const __vue_inject_styles__$z = undefined;
               /* scoped */
-              const __vue_scope_id__$y = undefined;
+              const __vue_scope_id__$z = undefined;
               /* module identifier */
-              const __vue_module_identifier__$y = undefined;
+              const __vue_module_identifier__$z = undefined;
               /* functional template */
-              const __vue_is_functional_template__$y = false;
+              const __vue_is_functional_template__$z = false;
               /* style inject */
               
               /* style inject SSR */
@@ -13573,13 +13955,13 @@
               
 
               
-              const __vue_component__$y = normalizeComponent(
+              const __vue_component__$z = normalizeComponent(
                 { render: __vue_render__$s, staticRenderFns: __vue_staticRenderFns__$s },
-                __vue_inject_styles__$y,
-                __vue_script__$y,
-                __vue_scope_id__$y,
-                __vue_is_functional_template__$y,
-                __vue_module_identifier__$y,
+                __vue_inject_styles__$z,
+                __vue_script__$z,
+                __vue_scope_id__$z,
+                __vue_is_functional_template__$z,
+                __vue_module_identifier__$z,
                 false,
                 undefined,
                 undefined,
@@ -13588,7 +13970,7 @@
 
             var mgQuery = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$y
+                        'default': __vue_component__$z
             });
 
             macgyver.register('mgRestQuery', {
@@ -13634,7 +14016,7 @@
               },
               format: true
             });
-            var script$y = Vue.component('mgRestQuery', {
+            var script$z = Vue.component('mgRestQuery', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -13683,7 +14065,7 @@
             });
 
             /* script */
-            const __vue_script__$z = script$y;
+            const __vue_script__$A = script$z;
 
             /* template */
             var __vue_render__$t = function() {
@@ -13733,13 +14115,13 @@
             __vue_render__$t._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$z = undefined;
+              const __vue_inject_styles__$A = undefined;
               /* scoped */
-              const __vue_scope_id__$z = undefined;
+              const __vue_scope_id__$A = undefined;
               /* module identifier */
-              const __vue_module_identifier__$z = undefined;
+              const __vue_module_identifier__$A = undefined;
               /* functional template */
-              const __vue_is_functional_template__$z = false;
+              const __vue_is_functional_template__$A = false;
               /* style inject */
               
               /* style inject SSR */
@@ -13748,13 +14130,13 @@
               
 
               
-              const __vue_component__$z = normalizeComponent(
+              const __vue_component__$A = normalizeComponent(
                 { render: __vue_render__$t, staticRenderFns: __vue_staticRenderFns__$t },
-                __vue_inject_styles__$z,
-                __vue_script__$z,
-                __vue_scope_id__$z,
-                __vue_is_functional_template__$z,
-                __vue_module_identifier__$z,
+                __vue_inject_styles__$A,
+                __vue_script__$A,
+                __vue_scope_id__$A,
+                __vue_is_functional_template__$A,
+                __vue_module_identifier__$A,
                 false,
                 undefined,
                 undefined,
@@ -13763,7 +14145,7 @@
 
             var mgRestQuery = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$z
+                        'default': __vue_component__$A
             });
 
             macgyver.register('mgSeperator', {
@@ -13771,7 +14153,7 @@
               icon: 'far fa-minus',
               category: 'General Decoration'
             });
-            var script$z = Vue.component('mgSeperator', {
+            var script$A = Vue.component('mgSeperator', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -13787,7 +14169,7 @@
             });
 
             /* script */
-            const __vue_script__$A = script$z;
+            const __vue_script__$B = script$A;
 
             /* template */
             var __vue_render__$u = function() {
@@ -13800,30 +14182,30 @@
             __vue_render__$u._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$A = function (inject) {
+              const __vue_inject_styles__$B = function (inject) {
                 if (!inject) return
                 inject("data-v-14ba3820_0", { source: "\n.mg-seperator {\n\tmargin-top: 0px;\n\tmargin-bottom: 10px;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgSeperator.vue"],"names":[],"mappings":";AA0BA;CACA,eAAA;CACA,mBAAA;AACA","file":"mgSeperator.vue","sourcesContent":["<script>\nmacgyver.register('mgSeperator', {\n\ttitle: 'Seperator',\n\ticon: 'far fa-minus',\n\tcategory: 'General Decoration',\n});\n\nexport default Vue.component('mgSeperator', {\n\tinject: ['$mgForm'],\n\tdata() { return {\n\t\tdata: undefined,\n\t}},\n\tprops: {\n\t\tconfig: Object,\n\t},\n\tcreated() {\n\t\tthis.$mgForm.inject(this);\n\t},\n});\n</script>\n\n<template>\n\t<hr class=\"mg-seperator\"/>\n</template>\n\n<style>\n.mg-seperator {\n\tmargin-top: 0px;\n\tmargin-bottom: 10px;\n}\n</style>\n"]}, media: undefined });
 
               };
               /* scoped */
-              const __vue_scope_id__$A = undefined;
+              const __vue_scope_id__$B = undefined;
               /* module identifier */
-              const __vue_module_identifier__$A = undefined;
+              const __vue_module_identifier__$B = undefined;
               /* functional template */
-              const __vue_is_functional_template__$A = false;
+              const __vue_is_functional_template__$B = false;
               /* style inject SSR */
               
               /* style inject shadow dom */
               
 
               
-              const __vue_component__$A = normalizeComponent(
+              const __vue_component__$B = normalizeComponent(
                 { render: __vue_render__$u, staticRenderFns: __vue_staticRenderFns__$u },
-                __vue_inject_styles__$A,
-                __vue_script__$A,
-                __vue_scope_id__$A,
-                __vue_is_functional_template__$A,
-                __vue_module_identifier__$A,
+                __vue_inject_styles__$B,
+                __vue_script__$B,
+                __vue_scope_id__$B,
+                __vue_is_functional_template__$B,
+                __vue_module_identifier__$B,
                 false,
                 createInjector,
                 undefined,
@@ -13832,7 +14214,7 @@
 
             var mgSeperator = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$A
+                        'default': __vue_component__$B
             });
 
             macgyver.register('mgTable', {
@@ -13898,7 +14280,7 @@
                 }
               }
             });
-            var script$A = Vue.component('mgTable', {
+            var script$B = Vue.component('mgTable', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -13949,7 +14331,7 @@
             });
 
             /* script */
-            const __vue_script__$B = script$A;
+            const __vue_script__$C = script$B;
 
             /* template */
             var __vue_render__$v = function() {
@@ -14172,30 +14554,30 @@
             __vue_render__$v._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$B = function (inject) {
+              const __vue_inject_styles__$C = function (inject) {
                 if (!inject) return
                 inject("data-v-e2e6434c_0", { source: "\n.mg-table .row-number {\n\tfont-size: 16px;\n\ttext-align: middle;\n}\n.mg-table td.row-number {\n\tmargin-top: 14px;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgTable.vue"],"names":[],"mappings":";AA6HA;CACA,eAAA;CACA,kBAAA;AACA;AAEA;CACA,gBAAA;AACA","file":"mgTable.vue","sourcesContent":["<script>\nmacgyver.register('mgTable', {\n\ttitle: 'Table layout',\n\ticon: 'far fa-table',\n\tcategory: 'Layout',\n\tisContainer: true,\n\tisContainerArray: true,\n\tpreferId: false,\n\tconfig: {\n\t\turl: {type: 'mgUrl', relative: true, help: 'Data feed to populate the table'},\n\t\tallowAdd: {type: 'mgToggle', title: 'Allow Row Addition', default: true},\n\t\tallowDelete: {type: 'mgToggle', title: 'Allow Row Deletion', default: true},\n\t\ttextEmpty: {type: 'mgText', title: 'No data message', default: 'No data'},\n\t\titems: {\n\t\t\ttype: 'mgTableEditor',\n\t\t\ttitle: 'Column setup',\n\t\t\tdefault: [\n\t\t\t\t/* e.g.\n\t\t\t\t{id: 'col1', type: 'mgText'},\n\t\t\t\t{id: 'col2', title: 'mgText'},\n\t\t\t\t{id: 'col3', title: 'mgText'},\n\t\t\t\t*/\n\t\t\t],\n\t\t},\n\t\taddButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},\n\t\taddButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},\n\t\trowNumbers: {type: 'mgToggle', help: 'Show the row number at the beginning of each row', default: true},\n\t},\n\tconfigChildren: {\n\t\tshowTitle: {type: 'mgToggle', default: false, title: 'Show Title'},\n\t},\n});\n\nexport default Vue.component('mgTable', {\n\tinject: ['$mgForm'],\n\tdata() { return {\n\t\tdata: [],\n\t\tnewRow: [],\n\t\tisAdding: false,\n\t}},\n\tprops: {\n\t\tconfig: Object,\n\t},\n\tcreated() {\n\t\tthis.$mgForm.inject(this);\n\t},\n\tmounted() {\n\t\tthis.$watch('$props.config.url', ()=> {\n\t\t\tif (!this.$props.config.url) return;\n\t\t\tthis.$macgyver.utils.fetch(this.$props.config.url, {type: 'array'})\n\t\t\t\t.then(data => this.$set(this.$props.config, 'data', data))\n\t\t}, {immediate: true});\n\t},\n\twatch: {\n\t\tdata: {\n\t\t\timmediate: true,\n\t\t\thandler() {\n\t\t\t\t// Ensure that data is always an array\n\t\t\t\tif (!_.isArray(this.data)) this.data = [];\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\tcreateRow(offset) { // Offset is the row to create after - i.e. array position splice\n\t\t\tconsole.log(`FIXME: createRow(${offset})`);\n\t\t},\n\t\tdeleteRow(offset) {\n\t\t\tconsole.log(`FIXME: deleteRow(${offset})`);\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<table class=\"table table-bordered table-striped table-hover\">\n\t\t<thead>\n\t\t\t<tr>\n\t\t\t\t<th v-if=\"$props.config.rowNumbers\" class=\"row-number\">#</th>\n\t\t\t\t<th v-for=\"col in $props.config.items\" :key=\"col.id\" :style=\"(col.width ? 'width: ' + col.width + '; ' : '') + col.class\">\n\t\t\t\t\t{{col.title}}\n\t\t\t\t</th>\n\t\t\t\t<th class=\"btn-context\"></th>\n\t\t\t</tr>\n\t\t</thead>\n\t\t<tbody>\n\t\t\t<tr v-if=\"!data || !data.length\">\n\t\t\t\t<td :colspan=\"$props.config.items.length + ($props.config.rowNumbers ? 2 : 1)\">\n\t\t\t\t\t<div class=\"alert alert-warning m-10\">{{$props.config.textEmpty || 'No data'}}</div>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t\t<tr v-for=\"(row, rowNumber) in data\">\n\t\t\t\t<td v-if=\"$props.config.rowNumbers\" class=\"row-number\">\n\t\t\t\t\t{{rowNumber + 1 | number}}\n\t\t\t\t</td>\n\t\t\t\t<td v-for=\"col in $props.config.items\" :key=\"col.id\" :class=\"col.class\">\n\t\t\t\t\t<mg-component :form=\"$props.form\" :config=\"col\"/>\n\t\t\t\t</td>\n\t\t\t\t<td class=\"btn-context\">\n\t\t\t\t\t<div class=\"btn-group\">\n\t\t\t\t\t\t<a class=\"btn btn-context\" data-toggle=\"dropdown\"><i class=\"far fa-ellipsis-v\"></i></a>\n\t\t\t\t\t\t<ul class=\"dropdown-menu pull-right\">\n\t\t\t\t\t\t\t<li><a @click=\"createRow(rowNumber)\"><i class=\"far fa-arrow-circle-up\"></i> Add row above</a></li>\n\t\t\t\t\t\t\t<li><a @click=\"createRow(rowNumber)\"><i class=\"far fa-arrow-circle-down\"></i> Add row below</a></li>\n\t\t\t\t\t\t\t<li v-if=\"$props.config.allowDelete\" class=\"dropdown-divider\"></li>\n\t\t\t\t\t\t\t<li v-if=\"$props.config.allowDelete\" class=\"dropdown-item-danger\"><a @click=\"deleteRow(rowNumber)\"><i class=\"far fa-trash\"></i> Delete</a></li>\n\t\t\t\t\t\t</ul>\n\t\t\t\t\t</div>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t\t<tr class=\"mgTable-append\" v-if=\"$props.config.allowAdd\">\n\t\t\t\t<td v-if=\"$props.config.rowNumbers\" class=\"row-number\">\n\t\t\t\t\t<i class=\"far fa-asterisk\"></i>\n\t\t\t\t</td>\n\t\t\t\t<td v-for=\"(col, colNumber) in $props.config.items\" :key=\"col.id\">\n\t\t\t\t\t<mg-component :form=\"$props.form\" :config=\"col\" :data=\"newRow[colNumber]\"/>\n\t\t\t\t</td>\n\t\t\t\t<td>\n\t\t\t\t\t<a @click=\"createRow()\" :class=\"isAdding ? $props.config.addButtonActiveClass : $props.config.addButtonInactiveClass\"></a>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody>\n\t</table>\n</template>\n\n<style>\n.mg-table .row-number {\n\tfont-size: 16px;\n\ttext-align: middle;\n}\n\n.mg-table td.row-number {\n\tmargin-top: 14px;\n}\n</style>\n"]}, media: undefined });
 
               };
               /* scoped */
-              const __vue_scope_id__$B = undefined;
+              const __vue_scope_id__$C = undefined;
               /* module identifier */
-              const __vue_module_identifier__$B = undefined;
+              const __vue_module_identifier__$C = undefined;
               /* functional template */
-              const __vue_is_functional_template__$B = false;
+              const __vue_is_functional_template__$C = false;
               /* style inject SSR */
               
               /* style inject shadow dom */
               
 
               
-              const __vue_component__$B = normalizeComponent(
+              const __vue_component__$C = normalizeComponent(
                 { render: __vue_render__$v, staticRenderFns: __vue_staticRenderFns__$v },
-                __vue_inject_styles__$B,
-                __vue_script__$B,
-                __vue_scope_id__$B,
-                __vue_is_functional_template__$B,
-                __vue_module_identifier__$B,
+                __vue_inject_styles__$C,
+                __vue_script__$C,
+                __vue_scope_id__$C,
+                __vue_is_functional_template__$C,
+                __vue_module_identifier__$C,
                 false,
                 createInjector,
                 undefined,
@@ -14204,7 +14586,7 @@
 
             var mgTable = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$B
+                        'default': __vue_component__$C
             });
 
             macgyver.register('mgTextArea', {
@@ -14238,7 +14620,7 @@
               },
               format: true
             });
-            var script$B = Vue.component('mgTextArea', {
+            var script$C = Vue.component('mgTextArea', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -14261,7 +14643,7 @@
             });
 
             /* script */
-            const __vue_script__$C = script$B;
+            const __vue_script__$D = script$C;
 
             /* template */
             var __vue_render__$w = function() {
@@ -14295,13 +14677,13 @@
             __vue_render__$w._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$C = undefined;
+              const __vue_inject_styles__$D = undefined;
               /* scoped */
-              const __vue_scope_id__$C = undefined;
+              const __vue_scope_id__$D = undefined;
               /* module identifier */
-              const __vue_module_identifier__$C = undefined;
+              const __vue_module_identifier__$D = undefined;
               /* functional template */
-              const __vue_is_functional_template__$C = false;
+              const __vue_is_functional_template__$D = false;
               /* style inject */
               
               /* style inject SSR */
@@ -14310,13 +14692,13 @@
               
 
               
-              const __vue_component__$C = normalizeComponent(
+              const __vue_component__$D = normalizeComponent(
                 { render: __vue_render__$w, staticRenderFns: __vue_staticRenderFns__$w },
-                __vue_inject_styles__$C,
-                __vue_script__$C,
-                __vue_scope_id__$C,
-                __vue_is_functional_template__$C,
-                __vue_module_identifier__$C,
+                __vue_inject_styles__$D,
+                __vue_script__$D,
+                __vue_scope_id__$D,
+                __vue_is_functional_template__$D,
+                __vue_module_identifier__$D,
                 false,
                 undefined,
                 undefined,
@@ -14325,7 +14707,7 @@
 
             var mgTextArea = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$C
+                        'default': __vue_component__$D
             });
 
             macgyver.register('mgText', {
@@ -14412,7 +14794,7 @@
               format: true,
               shorthand: ['string', 'str']
             });
-            var script$C = Vue.component('mgText', {
+            var script$D = Vue.component('mgText', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -14450,7 +14832,7 @@
             });
 
             /* script */
-            const __vue_script__$D = script$C;
+            const __vue_script__$E = script$D;
 
             /* template */
             var __vue_render__$x = function() {
@@ -14482,13 +14864,13 @@
             __vue_render__$x._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$D = undefined;
+              const __vue_inject_styles__$E = undefined;
               /* scoped */
-              const __vue_scope_id__$D = undefined;
+              const __vue_scope_id__$E = undefined;
               /* module identifier */
-              const __vue_module_identifier__$D = undefined;
+              const __vue_module_identifier__$E = undefined;
               /* functional template */
-              const __vue_is_functional_template__$D = false;
+              const __vue_is_functional_template__$E = false;
               /* style inject */
               
               /* style inject SSR */
@@ -14497,13 +14879,13 @@
               
 
               
-              const __vue_component__$D = normalizeComponent(
+              const __vue_component__$E = normalizeComponent(
                 { render: __vue_render__$x, staticRenderFns: __vue_staticRenderFns__$x },
-                __vue_inject_styles__$D,
-                __vue_script__$D,
-                __vue_scope_id__$D,
-                __vue_is_functional_template__$D,
-                __vue_module_identifier__$D,
+                __vue_inject_styles__$E,
+                __vue_script__$E,
+                __vue_scope_id__$E,
+                __vue_is_functional_template__$E,
+                __vue_module_identifier__$E,
                 false,
                 undefined,
                 undefined,
@@ -14512,7 +14894,7 @@
 
             var mgText = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$D
+                        'default': __vue_component__$E
             });
 
             macgyver.register('mgTime', {
@@ -14541,7 +14923,7 @@
               },
               formatAlign: 'center'
             });
-            var script$D = Vue.component('mgTime', {
+            var script$E = Vue.component('mgTime', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -14564,7 +14946,7 @@
             });
 
             /* script */
-            const __vue_script__$E = script$D;
+            const __vue_script__$F = script$E;
 
             /* template */
             var __vue_render__$y = function() {
@@ -14592,13 +14974,13 @@
             __vue_render__$y._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$E = undefined;
+              const __vue_inject_styles__$F = undefined;
               /* scoped */
-              const __vue_scope_id__$E = undefined;
+              const __vue_scope_id__$F = undefined;
               /* module identifier */
-              const __vue_module_identifier__$E = undefined;
+              const __vue_module_identifier__$F = undefined;
               /* functional template */
-              const __vue_is_functional_template__$E = false;
+              const __vue_is_functional_template__$F = false;
               /* style inject */
               
               /* style inject SSR */
@@ -14607,13 +14989,13 @@
               
 
               
-              const __vue_component__$E = normalizeComponent(
+              const __vue_component__$F = normalizeComponent(
                 { render: __vue_render__$y, staticRenderFns: __vue_staticRenderFns__$y },
-                __vue_inject_styles__$E,
-                __vue_script__$E,
-                __vue_scope_id__$E,
-                __vue_is_functional_template__$E,
-                __vue_module_identifier__$E,
+                __vue_inject_styles__$F,
+                __vue_script__$F,
+                __vue_scope_id__$F,
+                __vue_is_functional_template__$F,
+                __vue_module_identifier__$F,
                 false,
                 undefined,
                 undefined,
@@ -14622,7 +15004,7 @@
 
             var mgTime = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$E
+                        'default': __vue_component__$F
             });
 
             var dist = createCommonjsModule(function (module, exports) {
@@ -15510,7 +15892,7 @@
               formatAlign: 'center',
               shorthand: ['boolean', 'switch', 'toggle']
             });
-            var script$E = Vue.component('mgToggle', {
+            var script$F = Vue.component('mgToggle', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -15531,7 +15913,7 @@
             });
 
             /* script */
-            const __vue_script__$F = script$E;
+            const __vue_script__$G = script$F;
 
             /* template */
             var __vue_render__$z = function() {
@@ -15560,30 +15942,30 @@
             __vue_render__$z._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$F = function (inject) {
+              const __vue_inject_styles__$G = function (inject) {
                 if (!inject) return
                 inject("data-v-696d6508_0", { source: "\n.mg-toggle {\n\tmargin-top: 7px;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgToggle.vue"],"names":[],"mappings":";AAsDA;CACA,eAAA;AACA","file":"mgToggle.vue","sourcesContent":["<script>\nimport ToggleButton from 'vue-js-toggle-button';\nVue.use(ToggleButton);\n\nmacgyver.register('mgToggle', {\n\trequires: 'node_modules/vue-js-toggle-button/dist/index.js',\n\ttitle: 'Toggle Switch',\n\ticon: 'far fa-toggle-on',\n\tcategory: 'Simple Inputs',\n\tpreferId: true,\n\tconfig: {\n\t\tonText: {type: 'mgText', default: 'on'},\n\t\tonColor: {type: 'mgColor', default: '#75c791', advanced: true},\n\t\toffText: {type: 'mgText', default: 'off'},\n\t\toffColor: {type: 'mgColor', default: '#bfcbd9', advanced: true},\n\t\tswitchColor: {type: 'mgColor', default: '#fff', advanced: true},\n\t\tdisabledColor: {type: 'mgColor', default: '#cccccc', advanced: true},\n\t},\n\tformat: (v, config) => v ? config.onText : config.offText,\n\tformatAlign: 'center',\n\tshorthand: ['boolean', 'switch', 'toggle'],\n});\n\nexport default Vue.component('mgToggle', {\n\tinject: ['$mgForm'],\n\tdata() { return {\n\t\tdata: undefined,\n\t}},\n\tprops: {\n\t\tconfig: Object,\n\t},\n\tcreated() {\n\t\tthis.$mgForm.inject(this);\n\t},\n\tmethods: {\n\t\tchange(e) {\n\t\t\tthis.$mgForm.$emit('mgChange', this.config.id, e.value);\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<toggle-button\n\t\tclass=\"mg-toggle\"\n\t\t:value=\"data\"\n\t\t:color=\"{checked: $props.config.onColor, unchecked: $props.config.offColor, disabled: $props.config.disabledColor}\"\n\t\t:labels=\"{checked: $props.config.onText, unchecked: $props.config.offText}\"\n\t\t:switchColor=\"$props.config.switchColor\"\n\t\t@change=\"change\"\n\t/>\n</template>\n\n<style>\n.mg-toggle {\n\tmargin-top: 7px;\n}\n</style>\n"]}, media: undefined });
 
               };
               /* scoped */
-              const __vue_scope_id__$F = undefined;
+              const __vue_scope_id__$G = undefined;
               /* module identifier */
-              const __vue_module_identifier__$F = undefined;
+              const __vue_module_identifier__$G = undefined;
               /* functional template */
-              const __vue_is_functional_template__$F = false;
+              const __vue_is_functional_template__$G = false;
               /* style inject SSR */
               
               /* style inject shadow dom */
               
 
               
-              const __vue_component__$F = normalizeComponent(
+              const __vue_component__$G = normalizeComponent(
                 { render: __vue_render__$z, staticRenderFns: __vue_staticRenderFns__$z },
-                __vue_inject_styles__$F,
-                __vue_script__$F,
-                __vue_scope_id__$F,
-                __vue_is_functional_template__$F,
-                __vue_module_identifier__$F,
+                __vue_inject_styles__$G,
+                __vue_script__$G,
+                __vue_scope_id__$G,
+                __vue_is_functional_template__$G,
+                __vue_module_identifier__$G,
                 false,
                 createInjector,
                 undefined,
@@ -15592,7 +15974,7 @@
 
             var mgToggle = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$F
+                        'default': __vue_component__$G
             });
 
             macgyver.register('mgUrl', {
@@ -15621,7 +16003,7 @@
               },
               shorthand: ['uri']
             });
-            var script$F = Vue.component('mgUrl', {
+            var script$G = Vue.component('mgUrl', {
               inject: ['$mgForm'],
               data: function data() {
                 return {
@@ -15642,7 +16024,7 @@
             });
 
             /* script */
-            const __vue_script__$G = script$F;
+            const __vue_script__$H = script$G;
 
             /* template */
             var __vue_render__$A = function() {
@@ -15670,13 +16052,13 @@
             __vue_render__$A._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$G = undefined;
+              const __vue_inject_styles__$H = undefined;
               /* scoped */
-              const __vue_scope_id__$G = undefined;
+              const __vue_scope_id__$H = undefined;
               /* module identifier */
-              const __vue_module_identifier__$G = undefined;
+              const __vue_module_identifier__$H = undefined;
               /* functional template */
-              const __vue_is_functional_template__$G = false;
+              const __vue_is_functional_template__$H = false;
               /* style inject */
               
               /* style inject SSR */
@@ -15685,13 +16067,13 @@
               
 
               
-              const __vue_component__$G = normalizeComponent(
+              const __vue_component__$H = normalizeComponent(
                 { render: __vue_render__$A, staticRenderFns: __vue_staticRenderFns__$A },
-                __vue_inject_styles__$G,
-                __vue_script__$G,
-                __vue_scope_id__$G,
-                __vue_is_functional_template__$G,
-                __vue_module_identifier__$G,
+                __vue_inject_styles__$H,
+                __vue_script__$H,
+                __vue_scope_id__$H,
+                __vue_is_functional_template__$H,
+                __vue_module_identifier__$H,
                 false,
                 undefined,
                 undefined,
@@ -15700,7 +16082,7 @@
 
             var mgUrl = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$G
+                        'default': __vue_component__$H
             });
 
             var quill = createCommonjsModule(function (module, exports) {
@@ -27650,7 +28032,7 @@
             }(); // module.exports = MarkdownShortcuts;
 
             //
-            var script$G = {
+            var script$H = {
               name: "VueEditor",
               mixins: [oldApi],
               props: {
@@ -27976,36 +28358,36 @@
             var browser = createInjector$1;
 
             /* script */
-            const __vue_script__$H = script$G;
+            const __vue_script__$I = script$H;
 
             /* template */
             var __vue_render__$B = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"quillWrapper"},[_vm._t("toolbar"),_vm._v(" "),_c('div',{ref:"quillContainer",attrs:{"id":_vm.id}}),_vm._v(" "),(_vm.useCustomImageHandler)?_c('input',{ref:"fileInput",staticStyle:{"display":"none"},attrs:{"id":"file-upload","type":"file","accept":"image/*"},on:{"change":function($event){return _vm.emitImageInfo($event)}}}):_vm._e()],2)};
             var __vue_staticRenderFns__$B = [];
 
               /* style */
-              const __vue_inject_styles__$H = function (inject) {
+              const __vue_inject_styles__$I = function (inject) {
                 if (!inject) return
                 inject("data-v-59392418_0", { source: "/*!\n * Quill Editor v1.3.6\n * https://quilljs.com/\n * Copyright (c) 2014, Jason Chen\n * Copyright (c) 2013, salesforce.com\n */.ql-container{box-sizing:border-box;font-family:Helvetica,Arial,sans-serif;font-size:13px;height:100%;margin:0;position:relative}.ql-container.ql-disabled .ql-tooltip{visibility:hidden}.ql-container.ql-disabled .ql-editor ul[data-checked]>li::before{pointer-events:none}.ql-clipboard{left:-100000px;height:1px;overflow-y:hidden;position:absolute;top:50%}.ql-clipboard p{margin:0;padding:0}.ql-editor{box-sizing:border-box;line-height:1.42;height:100%;outline:0;overflow-y:auto;padding:12px 15px;tab-size:4;-moz-tab-size:4;text-align:left;white-space:pre-wrap;word-wrap:break-word}.ql-editor>*{cursor:text}.ql-editor blockquote,.ql-editor h1,.ql-editor h2,.ql-editor h3,.ql-editor h4,.ql-editor h5,.ql-editor h6,.ql-editor ol,.ql-editor p,.ql-editor pre,.ql-editor ul{margin:0;padding:0;counter-reset:list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9}.ql-editor ol,.ql-editor ul{padding-left:1.5em}.ql-editor ol>li,.ql-editor ul>li{list-style-type:none}.ql-editor ul>li::before{content:'\\2022'}.ql-editor ul[data-checked=false],.ql-editor ul[data-checked=true]{pointer-events:none}.ql-editor ul[data-checked=false]>li *,.ql-editor ul[data-checked=true]>li *{pointer-events:all}.ql-editor ul[data-checked=false]>li::before,.ql-editor ul[data-checked=true]>li::before{color:#777;cursor:pointer;pointer-events:all}.ql-editor ul[data-checked=true]>li::before{content:'\\2611'}.ql-editor ul[data-checked=false]>li::before{content:'\\2610'}.ql-editor li::before{display:inline-block;white-space:nowrap;width:1.2em}.ql-editor li:not(.ql-direction-rtl)::before{margin-left:-1.5em;margin-right:.3em;text-align:right}.ql-editor li.ql-direction-rtl::before{margin-left:.3em;margin-right:-1.5em}.ql-editor ol li:not(.ql-direction-rtl),.ql-editor ul li:not(.ql-direction-rtl){padding-left:1.5em}.ql-editor ol li.ql-direction-rtl,.ql-editor ul li.ql-direction-rtl{padding-right:1.5em}.ql-editor ol li{counter-reset:list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;counter-increment:list-0}.ql-editor ol li:before{content:counter(list-0,decimal) '. '}.ql-editor ol li.ql-indent-1{counter-increment:list-1}.ql-editor ol li.ql-indent-1:before{content:counter(list-1,lower-alpha) '. '}.ql-editor ol li.ql-indent-1{counter-reset:list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9}.ql-editor ol li.ql-indent-2{counter-increment:list-2}.ql-editor ol li.ql-indent-2:before{content:counter(list-2,lower-roman) '. '}.ql-editor ol li.ql-indent-2{counter-reset:list-3 list-4 list-5 list-6 list-7 list-8 list-9}.ql-editor ol li.ql-indent-3{counter-increment:list-3}.ql-editor ol li.ql-indent-3:before{content:counter(list-3,decimal) '. '}.ql-editor ol li.ql-indent-3{counter-reset:list-4 list-5 list-6 list-7 list-8 list-9}.ql-editor ol li.ql-indent-4{counter-increment:list-4}.ql-editor ol li.ql-indent-4:before{content:counter(list-4,lower-alpha) '. '}.ql-editor ol li.ql-indent-4{counter-reset:list-5 list-6 list-7 list-8 list-9}.ql-editor ol li.ql-indent-5{counter-increment:list-5}.ql-editor ol li.ql-indent-5:before{content:counter(list-5,lower-roman) '. '}.ql-editor ol li.ql-indent-5{counter-reset:list-6 list-7 list-8 list-9}.ql-editor ol li.ql-indent-6{counter-increment:list-6}.ql-editor ol li.ql-indent-6:before{content:counter(list-6,decimal) '. '}.ql-editor ol li.ql-indent-6{counter-reset:list-7 list-8 list-9}.ql-editor ol li.ql-indent-7{counter-increment:list-7}.ql-editor ol li.ql-indent-7:before{content:counter(list-7,lower-alpha) '. '}.ql-editor ol li.ql-indent-7{counter-reset:list-8 list-9}.ql-editor ol li.ql-indent-8{counter-increment:list-8}.ql-editor ol li.ql-indent-8:before{content:counter(list-8,lower-roman) '. '}.ql-editor ol li.ql-indent-8{counter-reset:list-9}.ql-editor ol li.ql-indent-9{counter-increment:list-9}.ql-editor ol li.ql-indent-9:before{content:counter(list-9,decimal) '. '}.ql-editor .ql-indent-1:not(.ql-direction-rtl){padding-left:3em}.ql-editor li.ql-indent-1:not(.ql-direction-rtl){padding-left:4.5em}.ql-editor .ql-indent-1.ql-direction-rtl.ql-align-right{padding-right:3em}.ql-editor li.ql-indent-1.ql-direction-rtl.ql-align-right{padding-right:4.5em}.ql-editor .ql-indent-2:not(.ql-direction-rtl){padding-left:6em}.ql-editor li.ql-indent-2:not(.ql-direction-rtl){padding-left:7.5em}.ql-editor .ql-indent-2.ql-direction-rtl.ql-align-right{padding-right:6em}.ql-editor li.ql-indent-2.ql-direction-rtl.ql-align-right{padding-right:7.5em}.ql-editor .ql-indent-3:not(.ql-direction-rtl){padding-left:9em}.ql-editor li.ql-indent-3:not(.ql-direction-rtl){padding-left:10.5em}.ql-editor .ql-indent-3.ql-direction-rtl.ql-align-right{padding-right:9em}.ql-editor li.ql-indent-3.ql-direction-rtl.ql-align-right{padding-right:10.5em}.ql-editor .ql-indent-4:not(.ql-direction-rtl){padding-left:12em}.ql-editor li.ql-indent-4:not(.ql-direction-rtl){padding-left:13.5em}.ql-editor .ql-indent-4.ql-direction-rtl.ql-align-right{padding-right:12em}.ql-editor li.ql-indent-4.ql-direction-rtl.ql-align-right{padding-right:13.5em}.ql-editor .ql-indent-5:not(.ql-direction-rtl){padding-left:15em}.ql-editor li.ql-indent-5:not(.ql-direction-rtl){padding-left:16.5em}.ql-editor .ql-indent-5.ql-direction-rtl.ql-align-right{padding-right:15em}.ql-editor li.ql-indent-5.ql-direction-rtl.ql-align-right{padding-right:16.5em}.ql-editor .ql-indent-6:not(.ql-direction-rtl){padding-left:18em}.ql-editor li.ql-indent-6:not(.ql-direction-rtl){padding-left:19.5em}.ql-editor .ql-indent-6.ql-direction-rtl.ql-align-right{padding-right:18em}.ql-editor li.ql-indent-6.ql-direction-rtl.ql-align-right{padding-right:19.5em}.ql-editor .ql-indent-7:not(.ql-direction-rtl){padding-left:21em}.ql-editor li.ql-indent-7:not(.ql-direction-rtl){padding-left:22.5em}.ql-editor .ql-indent-7.ql-direction-rtl.ql-align-right{padding-right:21em}.ql-editor li.ql-indent-7.ql-direction-rtl.ql-align-right{padding-right:22.5em}.ql-editor .ql-indent-8:not(.ql-direction-rtl){padding-left:24em}.ql-editor li.ql-indent-8:not(.ql-direction-rtl){padding-left:25.5em}.ql-editor .ql-indent-8.ql-direction-rtl.ql-align-right{padding-right:24em}.ql-editor li.ql-indent-8.ql-direction-rtl.ql-align-right{padding-right:25.5em}.ql-editor .ql-indent-9:not(.ql-direction-rtl){padding-left:27em}.ql-editor li.ql-indent-9:not(.ql-direction-rtl){padding-left:28.5em}.ql-editor .ql-indent-9.ql-direction-rtl.ql-align-right{padding-right:27em}.ql-editor li.ql-indent-9.ql-direction-rtl.ql-align-right{padding-right:28.5em}.ql-editor .ql-video{display:block;max-width:100%}.ql-editor .ql-video.ql-align-center{margin:0 auto}.ql-editor .ql-video.ql-align-right{margin:0 0 0 auto}.ql-editor .ql-bg-black{background-color:#000}.ql-editor .ql-bg-red{background-color:#e60000}.ql-editor .ql-bg-orange{background-color:#f90}.ql-editor .ql-bg-yellow{background-color:#ff0}.ql-editor .ql-bg-green{background-color:#008a00}.ql-editor .ql-bg-blue{background-color:#06c}.ql-editor .ql-bg-purple{background-color:#93f}.ql-editor .ql-color-white{color:#fff}.ql-editor .ql-color-red{color:#e60000}.ql-editor .ql-color-orange{color:#f90}.ql-editor .ql-color-yellow{color:#ff0}.ql-editor .ql-color-green{color:#008a00}.ql-editor .ql-color-blue{color:#06c}.ql-editor .ql-color-purple{color:#93f}.ql-editor .ql-font-serif{font-family:Georgia,Times New Roman,serif}.ql-editor .ql-font-monospace{font-family:Monaco,Courier New,monospace}.ql-editor .ql-size-small{font-size:.75em}.ql-editor .ql-size-large{font-size:1.5em}.ql-editor .ql-size-huge{font-size:2.5em}.ql-editor .ql-direction-rtl{direction:rtl;text-align:inherit}.ql-editor .ql-align-center{text-align:center}.ql-editor .ql-align-justify{text-align:justify}.ql-editor .ql-align-right{text-align:right}.ql-editor.ql-blank::before{color:rgba(0,0,0,.6);content:attr(data-placeholder);font-style:italic;left:15px;pointer-events:none;position:absolute;right:15px}.ql-snow .ql-toolbar:after,.ql-snow.ql-toolbar:after{clear:both;content:'';display:table}.ql-snow .ql-toolbar button,.ql-snow.ql-toolbar button{background:0 0;border:none;cursor:pointer;display:inline-block;float:left;height:24px;padding:3px 5px;width:28px}.ql-snow .ql-toolbar button svg,.ql-snow.ql-toolbar button svg{float:left;height:100%}.ql-snow .ql-toolbar button:active:hover,.ql-snow.ql-toolbar button:active:hover{outline:0}.ql-snow .ql-toolbar input.ql-image[type=file],.ql-snow.ql-toolbar input.ql-image[type=file]{display:none}.ql-snow .ql-toolbar .ql-picker-item.ql-selected,.ql-snow .ql-toolbar .ql-picker-item:hover,.ql-snow .ql-toolbar .ql-picker-label.ql-active,.ql-snow .ql-toolbar .ql-picker-label:hover,.ql-snow .ql-toolbar button.ql-active,.ql-snow .ql-toolbar button:focus,.ql-snow .ql-toolbar button:hover,.ql-snow.ql-toolbar .ql-picker-item.ql-selected,.ql-snow.ql-toolbar .ql-picker-item:hover,.ql-snow.ql-toolbar .ql-picker-label.ql-active,.ql-snow.ql-toolbar .ql-picker-label:hover,.ql-snow.ql-toolbar button.ql-active,.ql-snow.ql-toolbar button:focus,.ql-snow.ql-toolbar button:hover{color:#06c}.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-fill,.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill,.ql-snow .ql-toolbar .ql-picker-item:hover .ql-fill,.ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke.ql-fill,.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-fill,.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke.ql-fill,.ql-snow .ql-toolbar .ql-picker-label:hover .ql-fill,.ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke.ql-fill,.ql-snow .ql-toolbar button.ql-active .ql-fill,.ql-snow .ql-toolbar button.ql-active .ql-stroke.ql-fill,.ql-snow .ql-toolbar button:focus .ql-fill,.ql-snow .ql-toolbar button:focus .ql-stroke.ql-fill,.ql-snow .ql-toolbar button:hover .ql-fill,.ql-snow .ql-toolbar button:hover .ql-stroke.ql-fill,.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-fill,.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill,.ql-snow.ql-toolbar .ql-picker-item:hover .ql-fill,.ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke.ql-fill,.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-fill,.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke.ql-fill,.ql-snow.ql-toolbar .ql-picker-label:hover .ql-fill,.ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke.ql-fill,.ql-snow.ql-toolbar button.ql-active .ql-fill,.ql-snow.ql-toolbar button.ql-active .ql-stroke.ql-fill,.ql-snow.ql-toolbar button:focus .ql-fill,.ql-snow.ql-toolbar button:focus .ql-stroke.ql-fill,.ql-snow.ql-toolbar button:hover .ql-fill,.ql-snow.ql-toolbar button:hover .ql-stroke.ql-fill{fill:#06c}.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke,.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter,.ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke,.ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke-miter,.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke,.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter,.ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke,.ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke-miter,.ql-snow .ql-toolbar button.ql-active .ql-stroke,.ql-snow .ql-toolbar button.ql-active .ql-stroke-miter,.ql-snow .ql-toolbar button:focus .ql-stroke,.ql-snow .ql-toolbar button:focus .ql-stroke-miter,.ql-snow .ql-toolbar button:hover .ql-stroke,.ql-snow .ql-toolbar button:hover .ql-stroke-miter,.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke,.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter,.ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke,.ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke-miter,.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke,.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter,.ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke,.ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke-miter,.ql-snow.ql-toolbar button.ql-active .ql-stroke,.ql-snow.ql-toolbar button.ql-active .ql-stroke-miter,.ql-snow.ql-toolbar button:focus .ql-stroke,.ql-snow.ql-toolbar button:focus .ql-stroke-miter,.ql-snow.ql-toolbar button:hover .ql-stroke,.ql-snow.ql-toolbar button:hover .ql-stroke-miter{stroke:#06c}@media (pointer:coarse){.ql-snow .ql-toolbar button:hover:not(.ql-active),.ql-snow.ql-toolbar button:hover:not(.ql-active){color:#444}.ql-snow .ql-toolbar button:hover:not(.ql-active) .ql-fill,.ql-snow .ql-toolbar button:hover:not(.ql-active) .ql-stroke.ql-fill,.ql-snow.ql-toolbar button:hover:not(.ql-active) .ql-fill,.ql-snow.ql-toolbar button:hover:not(.ql-active) .ql-stroke.ql-fill{fill:#444}.ql-snow .ql-toolbar button:hover:not(.ql-active) .ql-stroke,.ql-snow .ql-toolbar button:hover:not(.ql-active) .ql-stroke-miter,.ql-snow.ql-toolbar button:hover:not(.ql-active) .ql-stroke,.ql-snow.ql-toolbar button:hover:not(.ql-active) .ql-stroke-miter{stroke:#444}}.ql-snow{box-sizing:border-box}.ql-snow *{box-sizing:border-box}.ql-snow .ql-hidden{display:none}.ql-snow .ql-out-bottom,.ql-snow .ql-out-top{visibility:hidden}.ql-snow .ql-tooltip{position:absolute;transform:translateY(10px)}.ql-snow .ql-tooltip a{cursor:pointer;text-decoration:none}.ql-snow .ql-tooltip.ql-flip{transform:translateY(-10px)}.ql-snow .ql-formats{display:inline-block;vertical-align:middle}.ql-snow .ql-formats:after{clear:both;content:'';display:table}.ql-snow .ql-stroke{fill:none;stroke:#444;stroke-linecap:round;stroke-linejoin:round;stroke-width:2}.ql-snow .ql-stroke-miter{fill:none;stroke:#444;stroke-miterlimit:10;stroke-width:2}.ql-snow .ql-fill,.ql-snow .ql-stroke.ql-fill{fill:#444}.ql-snow .ql-empty{fill:none}.ql-snow .ql-even{fill-rule:evenodd}.ql-snow .ql-stroke.ql-thin,.ql-snow .ql-thin{stroke-width:1}.ql-snow .ql-transparent{opacity:.4}.ql-snow .ql-direction svg:last-child{display:none}.ql-snow .ql-direction.ql-active svg:last-child{display:inline}.ql-snow .ql-direction.ql-active svg:first-child{display:none}.ql-snow .ql-editor h1{font-size:2em}.ql-snow .ql-editor h2{font-size:1.5em}.ql-snow .ql-editor h3{font-size:1.17em}.ql-snow .ql-editor h4{font-size:1em}.ql-snow .ql-editor h5{font-size:.83em}.ql-snow .ql-editor h6{font-size:.67em}.ql-snow .ql-editor a{text-decoration:underline}.ql-snow .ql-editor blockquote{border-left:4px solid #ccc;margin-bottom:5px;margin-top:5px;padding-left:16px}.ql-snow .ql-editor code,.ql-snow .ql-editor pre{background-color:#f0f0f0;border-radius:3px}.ql-snow .ql-editor pre{white-space:pre-wrap;margin-bottom:5px;margin-top:5px;padding:5px 10px}.ql-snow .ql-editor code{font-size:85%;padding:2px 4px}.ql-snow .ql-editor pre.ql-syntax{background-color:#23241f;color:#f8f8f2;overflow:visible}.ql-snow .ql-editor img{max-width:100%}.ql-snow .ql-picker{color:#444;display:inline-block;float:left;font-size:14px;font-weight:500;height:24px;position:relative;vertical-align:middle}.ql-snow .ql-picker-label{cursor:pointer;display:inline-block;height:100%;padding-left:8px;padding-right:2px;position:relative;width:100%}.ql-snow .ql-picker-label::before{display:inline-block;line-height:22px}.ql-snow .ql-picker-options{background-color:#fff;display:none;min-width:100%;padding:4px 8px;position:absolute;white-space:nowrap}.ql-snow .ql-picker-options .ql-picker-item{cursor:pointer;display:block;padding-bottom:5px;padding-top:5px}.ql-snow .ql-picker.ql-expanded .ql-picker-label{color:#ccc;z-index:2}.ql-snow .ql-picker.ql-expanded .ql-picker-label .ql-fill{fill:#ccc}.ql-snow .ql-picker.ql-expanded .ql-picker-label .ql-stroke{stroke:#ccc}.ql-snow .ql-picker.ql-expanded .ql-picker-options{display:block;margin-top:-1px;top:100%;z-index:1}.ql-snow .ql-color-picker,.ql-snow .ql-icon-picker{width:28px}.ql-snow .ql-color-picker .ql-picker-label,.ql-snow .ql-icon-picker .ql-picker-label{padding:2px 4px}.ql-snow .ql-color-picker .ql-picker-label svg,.ql-snow .ql-icon-picker .ql-picker-label svg{right:4px}.ql-snow .ql-icon-picker .ql-picker-options{padding:4px 0}.ql-snow .ql-icon-picker .ql-picker-item{height:24px;width:24px;padding:2px 4px}.ql-snow .ql-color-picker .ql-picker-options{padding:3px 5px;width:152px}.ql-snow .ql-color-picker .ql-picker-item{border:1px solid transparent;float:left;height:16px;margin:2px;padding:0;width:16px}.ql-snow .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg{position:absolute;margin-top:-9px;right:0;top:50%;width:18px}.ql-snow .ql-picker.ql-font .ql-picker-item[data-label]:not([data-label=''])::before,.ql-snow .ql-picker.ql-font .ql-picker-label[data-label]:not([data-label=''])::before,.ql-snow .ql-picker.ql-header .ql-picker-item[data-label]:not([data-label=''])::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-label]:not([data-label=''])::before,.ql-snow .ql-picker.ql-size .ql-picker-item[data-label]:not([data-label=''])::before,.ql-snow .ql-picker.ql-size .ql-picker-label[data-label]:not([data-label=''])::before{content:attr(data-label)}.ql-snow .ql-picker.ql-header{width:98px}.ql-snow .ql-picker.ql-header .ql-picker-item::before,.ql-snow .ql-picker.ql-header .ql-picker-label::before{content:'Normal'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"1\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"1\"]::before{content:'Heading 1'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"2\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"2\"]::before{content:'Heading 2'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"3\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"3\"]::before{content:'Heading 3'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"4\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"4\"]::before{content:'Heading 4'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"5\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"5\"]::before{content:'Heading 5'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"6\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"6\"]::before{content:'Heading 6'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"1\"]::before{font-size:2em}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"2\"]::before{font-size:1.5em}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"3\"]::before{font-size:1.17em}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"4\"]::before{font-size:1em}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"5\"]::before{font-size:.83em}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"6\"]::before{font-size:.67em}.ql-snow .ql-picker.ql-font{width:108px}.ql-snow .ql-picker.ql-font .ql-picker-item::before,.ql-snow .ql-picker.ql-font .ql-picker-label::before{content:'Sans Serif'}.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=serif]::before,.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=serif]::before{content:'Serif'}.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=monospace]::before,.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=monospace]::before{content:'Monospace'}.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=serif]::before{font-family:Georgia,Times New Roman,serif}.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=monospace]::before{font-family:Monaco,Courier New,monospace}.ql-snow .ql-picker.ql-size{width:98px}.ql-snow .ql-picker.ql-size .ql-picker-item::before,.ql-snow .ql-picker.ql-size .ql-picker-label::before{content:'Normal'}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=small]::before,.ql-snow .ql-picker.ql-size .ql-picker-label[data-value=small]::before{content:'Small'}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=large]::before,.ql-snow .ql-picker.ql-size .ql-picker-label[data-value=large]::before{content:'Large'}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=huge]::before,.ql-snow .ql-picker.ql-size .ql-picker-label[data-value=huge]::before{content:'Huge'}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=small]::before{font-size:10px}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=large]::before{font-size:18px}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=huge]::before{font-size:32px}.ql-snow .ql-color-picker.ql-background .ql-picker-item{background-color:#fff}.ql-snow .ql-color-picker.ql-color .ql-picker-item{background-color:#000}.ql-toolbar.ql-snow{border:1px solid #ccc;box-sizing:border-box;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;padding:8px}.ql-toolbar.ql-snow .ql-formats{margin-right:15px}.ql-toolbar.ql-snow .ql-picker-label{border:1px solid transparent}.ql-toolbar.ql-snow .ql-picker-options{border:1px solid transparent;box-shadow:rgba(0,0,0,.2) 0 2px 8px}.ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-label{border-color:#ccc}.ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options{border-color:#ccc}.ql-toolbar.ql-snow .ql-color-picker .ql-picker-item.ql-selected,.ql-toolbar.ql-snow .ql-color-picker .ql-picker-item:hover{border-color:#000}.ql-toolbar.ql-snow+.ql-container.ql-snow{border-top:0}.ql-snow .ql-tooltip{background-color:#fff;border:1px solid #ccc;box-shadow:0 0 5px #ddd;color:#444;padding:5px 12px;white-space:nowrap}.ql-snow .ql-tooltip::before{content:\"Visit URL:\";line-height:26px;margin-right:8px}.ql-snow .ql-tooltip input[type=text]{display:none;border:1px solid #ccc;font-size:13px;height:26px;margin:0;padding:3px 5px;width:170px}.ql-snow .ql-tooltip a.ql-preview{display:inline-block;max-width:200px;overflow-x:hidden;text-overflow:ellipsis;vertical-align:top}.ql-snow .ql-tooltip a.ql-action::after{border-right:1px solid #ccc;content:'Edit';margin-left:16px;padding-right:8px}.ql-snow .ql-tooltip a.ql-remove::before{content:'Remove';margin-left:8px}.ql-snow .ql-tooltip a{line-height:26px}.ql-snow .ql-tooltip.ql-editing a.ql-preview,.ql-snow .ql-tooltip.ql-editing a.ql-remove{display:none}.ql-snow .ql-tooltip.ql-editing input[type=text]{display:inline-block}.ql-snow .ql-tooltip.ql-editing a.ql-action::after{border-right:0;content:'Save';padding-right:0}.ql-snow .ql-tooltip[data-mode=link]::before{content:\"Enter link:\"}.ql-snow .ql-tooltip[data-mode=formula]::before{content:\"Enter formula:\"}.ql-snow .ql-tooltip[data-mode=video]::before{content:\"Enter video:\"}.ql-snow a{color:#06c}.ql-container.ql-snow{border:1px solid #ccc}", map: undefined, media: undefined })
             ,inject("data-v-59392418_1", { source: ".ql-editor{min-height:200px;font-size:16px}.ql-snow .ql-stroke.ql-thin,.ql-snow .ql-thin{stroke-width:1px!important}.quillWrapper .ql-snow.ql-toolbar{padding-top:8px;padding-bottom:4px}.quillWrapper .ql-snow.ql-toolbar .ql-formats{margin-bottom:10px}.ql-snow .ql-toolbar button svg,.quillWrapper .ql-snow.ql-toolbar button svg{width:22px;height:22px}.quillWrapper .ql-editor ul[data-checked=false]>li::before,.quillWrapper .ql-editor ul[data-checked=true]>li::before{font-size:1.35em;vertical-align:baseline;bottom:-.065em;font-weight:900;color:#222}.quillWrapper .ql-snow .ql-stroke{stroke:rgba(63,63,63,.95);stroke-linecap:square;stroke-linejoin:initial;stroke-width:1.7px}.quillWrapper .ql-picker-label{font-size:15px}.quillWrapper .ql-snow .ql-active .ql-stroke{stroke-width:2.25px}.quillWrapper .ql-toolbar.ql-snow .ql-formats{vertical-align:top}.ql-picker:not(.ql-background){position:relative;top:2px}.ql-picker.ql-color-picker svg{width:22px!important;height:22px!important}.quillWrapper .imageResizeActive img{display:block;cursor:pointer}.quillWrapper .imageResizeActive~div svg{cursor:pointer}", map: undefined, media: undefined });
 
               };
               /* scoped */
-              const __vue_scope_id__$H = undefined;
+              const __vue_scope_id__$I = undefined;
               /* module identifier */
-              const __vue_module_identifier__$H = undefined;
+              const __vue_module_identifier__$I = undefined;
               /* functional template */
-              const __vue_is_functional_template__$H = false;
+              const __vue_is_functional_template__$I = false;
               /* style inject SSR */
               
 
               
               var VueEditor = normalizeComponent_1(
                 { render: __vue_render__$B, staticRenderFns: __vue_staticRenderFns__$B },
-                __vue_inject_styles__$H,
-                __vue_script__$H,
-                __vue_scope_id__$H,
-                __vue_is_functional_template__$H,
-                __vue_module_identifier__$H,
+                __vue_inject_styles__$I,
+                __vue_script__$I,
+                __vue_scope_id__$I,
+                __vue_is_functional_template__$I,
+                __vue_module_identifier__$I,
                 browser,
                 undefined
               );
@@ -28054,7 +28436,7 @@
               format: true,
               shorthand: ['content']
             });
-            var script$H = Vue.component('mgWysiwyg', {
+            var script$I = Vue.component('mgWysiwyg', {
               inject: ['$mgForm'],
               components: {
                 VueEditor: VueEditor
@@ -28078,7 +28460,7 @@
             });
 
             /* script */
-            const __vue_script__$I = script$H;
+            const __vue_script__$J = script$I;
 
             /* template */
             var __vue_render__$C = function() {
@@ -28101,13 +28483,13 @@
             __vue_render__$C._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$I = undefined;
+              const __vue_inject_styles__$J = undefined;
               /* scoped */
-              const __vue_scope_id__$I = undefined;
+              const __vue_scope_id__$J = undefined;
               /* module identifier */
-              const __vue_module_identifier__$I = undefined;
+              const __vue_module_identifier__$J = undefined;
               /* functional template */
-              const __vue_is_functional_template__$I = false;
+              const __vue_is_functional_template__$J = false;
               /* style inject */
               
               /* style inject SSR */
@@ -28116,13 +28498,13 @@
               
 
               
-              const __vue_component__$H = normalizeComponent(
+              const __vue_component__$I = normalizeComponent(
                 { render: __vue_render__$C, staticRenderFns: __vue_staticRenderFns__$C },
-                __vue_inject_styles__$I,
-                __vue_script__$I,
-                __vue_scope_id__$I,
-                __vue_is_functional_template__$I,
-                __vue_module_identifier__$I,
+                __vue_inject_styles__$J,
+                __vue_script__$J,
+                __vue_scope_id__$J,
+                __vue_is_functional_template__$J,
+                __vue_module_identifier__$J,
                 false,
                 undefined,
                 undefined,
@@ -28131,7 +28513,7 @@
 
             var mgWysiwyg = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$H
+                        'default': __vue_component__$I
             });
 
 }(Vue, $));

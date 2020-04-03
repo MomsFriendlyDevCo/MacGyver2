@@ -195,6 +195,38 @@
 					"title": "Mulitiple tag choice",
 					"enum": ["Foo", "Bar", "Baz"],
 					"default": "Foo"
+				},
+				{
+					"id": "exampleTree",
+					"type": "mgChoiceTree",
+					"enum": [
+						{
+							"id": "australia",
+							"title": "Australia",
+							"enum": [
+								{
+									"id": "queensland",
+									"title": "Queensland",
+									"enum": ["Brisbane", "Gold Coast"]
+								},
+								{
+									"id": "newSouthWales",
+									"title": "New South Wales",
+									"enum": ["Newcastle", "Sydney"]
+								},
+								{
+									"id": "victoria",
+									"title": "Victoria",
+									"enum": ["Melbourne"]
+								}
+							]
+						},
+						{
+							"id": "uk",
+							"title": "United Kingdom",
+							"enum": ["London", "Not london"]
+						}
+					]
 				}
 			]
 		},
@@ -355,6 +387,30 @@
 					]
 				},
 				{
+					"id": "containerLayoutFormAbove",
+					"type": "mgContainer",
+					"layout": "form",
+					"formClass": "titles-above",
+					"title": "Form (with titles above)",
+					"items": [
+						{
+							"id": "containerLayoutFormFormAboveFoo",
+							"type": "mgText",
+							"title": "Foo"
+						},
+						{
+							"id": "containerLayoutFormFormAboveBar",
+							"type": "mgText",
+							"title": "Bar"
+						},
+						{
+							"id": "containerLayoutFormFormAboveBaz",
+							"type": "mgText",
+							"title": "Baz"
+						}
+					]
+				},
+				{
 					"id": "containerLayoutCardFloating",
 					"type": "mgContainer",
 					"layout": "formFloating",
@@ -367,13 +423,17 @@
 						},
 						{
 							"id": "containerLayoutCardFloatingBar",
-							"type": "mgText",
+							"type": "mgNumber",
 							"title": "Bar"
 						},
 						{
 							"id": "containerLayoutCardFloatingBaz",
-							"type": "mgText",
-							"title": "Baz"
+							"type": "mgToggle"
+						},
+						{
+							"id": "containerLayoutCardFloatingQuz",
+							"type": "mgTextArea",
+							"rows": 5
 						}
 					]
 				},
