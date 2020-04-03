@@ -4,7 +4,7 @@ Dynamic form widgets for Vue.
 
 MacGyver is a form designer for Vue that works by being given a form definition and a data set.
 
-[LIVE DEMO](https://momsfriendlydevco.github.io/macgyver2)
+[LIVE DEMO](https://momsfriendlydevco.github.io/MacGyver2)
 
 
 Example
