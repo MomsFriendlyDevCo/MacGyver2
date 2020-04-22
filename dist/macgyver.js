@@ -11780,15 +11780,13 @@
                 var _this2 = this;
 
                 this.$watch('$props.config', function () {
-                  console.log('mgForm config clobber', _this2.id, JSON.parse(JSON.stringify(_this2.$props.config)));
-
+                  // console.log('mgForm config clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
                   _this2.rebuild();
                 }, {
                   immediate: true
                 });
                 this.$watch('$props.data', function () {
-                  console.log('mgForm data clobber', _this2.id, JSON.parse(JSON.stringify(_this2.$props.config)));
-
+                  // console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
                   _this2.rebuildData();
                 }, {
                   immediate: true,
@@ -11800,8 +11798,8 @@
                 * Force the form to rebuild its config
                 */
                 rebuild: function rebuild() {
-                  this.id = this.id || this.$props.form || this.$macgyver.nextId();
-                  console.log("Rebuild form config for form \"".concat(this.id, "\""));
+                  this.id = this.id || this.$props.form || this.$macgyver.nextId(); // console.log(`Rebuild form config for form "${this.id}"`);
+
                   this.spec = this.$macgyver.compileSpec(this.$props.config);
                   if (!this.spec || !this.spec.spec) throw new Error('Invalid Macgyver form spec');
                 },
@@ -11812,7 +11810,7 @@
                 rebuildData: function rebuildData() {
                   var _this3 = this;
 
-                  if (this.inRefresh) return console.log('Skip refresh');
+                  if (this.inRefresh) return;
                   this.inRefresh = true;
                   this.formData = _.cloneDeep(this.$props.data);
                   if (this.$props.populateDefaults) this.assignDefaults();
@@ -14805,6 +14803,15 @@
                     id: 'postal-code',
                     title: 'Postcode'
                   }]
+                },
+                "enum": {
+                  type: 'mgTable',
+                  title: 'Suggested items',
+                  items: [{
+                    id: 'title',
+                    type: 'mgText',
+                    required: true
+                  }]
                 }
               },
               format: true,
@@ -14819,6 +14826,19 @@
               },
               props: {
                 config: Object
+              },
+              computed: {
+                datalist: function datalist() {
+                  // Map $props.enum into a collection of the form {id, title}
+                  if (!this.$props.config["enum"] || !this.$props.config["enum"].length) return;
+                  return this.$props.config["enum"].map(function (i) {
+                    if (_.isString(i)) return {
+                      id: i,
+                      title: i
+                    };
+                    return i;
+                  });
+                }
               },
               created: function created() {
                 var _this = this;
@@ -14855,26 +14875,47 @@
               var _vm = this;
               var _h = _vm.$createElement;
               var _c = _vm._self._c || _h;
-              return _c("input", {
-                directives: [
-                  { name: "model", rawName: "v-model", value: _vm.data, expression: "data" }
-                ],
-                staticClass: "form-control",
-                attrs: {
-                  type: "text",
-                  autocomplete: _vm.$props.config.autoComplete,
-                  placeholder: _vm.$props.config.placeholder
-                },
-                domProps: { value: _vm.data },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
+              return _c("div", { staticClass: "mg-text" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.data,
+                      expression: "data"
                     }
-                    _vm.data = $event.target.value;
+                  ],
+                  staticClass: "form-control",
+                  attrs: {
+                    type: "text",
+                    autocomplete: _vm.$props.config.autoComplete,
+                    placeholder: _vm.$props.config.placeholder,
+                    list: _vm.datalist ? "mg-text-datalist-" + _vm._uid : undefined
+                  },
+                  domProps: { value: _vm.data },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.data = $event.target.value;
+                    }
                   }
-                }
-              })
+                }),
+                _vm._v(" "),
+                _vm.datalist
+                  ? _c(
+                      "datalist",
+                      { attrs: { id: "mg-text-datalist-" + _vm._uid } },
+                      _vm._l(_vm.datalist, function(item) {
+                        return _c("option", { domProps: { value: item.title } }, [
+                          _vm._v("\n\t\t\t" + _vm._s(item.title) + "\n\t\t")
+                        ])
+                      }),
+                      0
+                    )
+                  : _vm._e()
+              ])
             };
             var __vue_staticRenderFns__$x = [];
             __vue_render__$x._withStripped = true;

@@ -14805,6 +14805,15 @@
                     id: 'postal-code',
                     title: 'Postcode'
                   }]
+                },
+                "enum": {
+                  type: 'mgTable',
+                  title: 'Suggested items',
+                  items: [{
+                    id: 'title',
+                    type: 'mgText',
+                    required: true
+                  }]
                 }
               },
               format: true,
@@ -14819,6 +14828,19 @@
               },
               props: {
                 config: Object
+              },
+              computed: {
+                datalist: function datalist() {
+                  // Map $props.enum into a collection of the form {id, title}
+                  if (!this.$props.config["enum"] || !this.$props.config["enum"].length) return;
+                  return this.$props.config["enum"].map(function (i) {
+                    if (_.isString(i)) return {
+                      id: i,
+                      title: i
+                    };
+                    return i;
+                  });
+                }
               },
               created: function created() {
                 var _this = this;
@@ -14855,26 +14877,47 @@
               var _vm = this;
               var _h = _vm.$createElement;
               var _c = _vm._self._c || _h;
-              return _c("input", {
-                directives: [
-                  { name: "model", rawName: "v-model", value: _vm.data, expression: "data" }
-                ],
-                staticClass: "form-control",
-                attrs: {
-                  type: "text",
-                  autocomplete: _vm.$props.config.autoComplete,
-                  placeholder: _vm.$props.config.placeholder
-                },
-                domProps: { value: _vm.data },
-                on: {
-                  input: function($event) {
-                    if ($event.target.composing) {
-                      return
+              return _c("div", { staticClass: "mg-text" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.data,
+                      expression: "data"
                     }
-                    _vm.data = $event.target.value;
+                  ],
+                  staticClass: "form-control",
+                  attrs: {
+                    type: "text",
+                    autocomplete: _vm.$props.config.autoComplete,
+                    placeholder: _vm.$props.config.placeholder,
+                    list: _vm.datalist ? "mg-text-datalist-" + _vm._uid : undefined
+                  },
+                  domProps: { value: _vm.data },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.data = $event.target.value;
+                    }
                   }
-                }
-              })
+                }),
+                _vm._v(" "),
+                _vm.datalist
+                  ? _c(
+                      "datalist",
+                      { attrs: { id: "mg-text-datalist-" + _vm._uid } },
+                      _vm._l(_vm.datalist, function(item) {
+                        return _c("option", { domProps: { value: item.title } }, [
+                          _vm._v("\n\t\t\t" + _vm._s(item.title) + "\n\t\t")
+                        ])
+                      }),
+                      0
+                    )
+                  : _vm._e()
+              ])
             };
             var __vue_staticRenderFns__$x = [];
             __vue_render__$x._withStripped = true;

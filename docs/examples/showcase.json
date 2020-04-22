@@ -17,6 +17,12 @@
 					"default": "Hello World"
 				},
 				{
+					"id": "demoTextSuggestions",
+					"type": "mgText",
+					"title": "Text (with non-enforced suggestions)",
+					"enum": ["Foo", "Bar", "Baz", "Quz", "Quz"]
+				},
+				{
 					"id": "demoTextArea",
 					"type": "mgTextArea",
 					"title": "Text area",
