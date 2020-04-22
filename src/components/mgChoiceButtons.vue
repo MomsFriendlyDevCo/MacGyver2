@@ -12,6 +12,7 @@ macgyver.register('mgChoiceButtons', {
 				{id: 'id', title: 'ID'},
 				{id: 'title', title: 'Title'},
 				{id: 'tooltip', title: 'Tooltip'},
+				{id: 'icon', title: 'Icon', type: 'mgIcon'},
 				{id: 'class', title: 'Classes'},
 				{id: 'classActive', title: 'Active Class'},
 				{id: 'classInactive', title: 'Inactive Class'},
@@ -69,6 +70,7 @@ export default Vue.component('mgChoiceButtons', {
 			v-tooltip="item.tooltip"
 			@click="select(item.id)"
 		>
+			<i v-if="item.icon" :class="item.icon"/>
 			{{item.title}}
 		</a>
 	</div>
