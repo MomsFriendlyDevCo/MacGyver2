@@ -5,7 +5,7 @@
 * @param {Object|Array} config The MacGyver form object either in long form nested array structure or short form object (which is converted)
 * @param {boolean} [populateDefaults=true] Apply initial defaults to the data when the config is ready, if false you can call vm.assignDefaults() manually if needed
 * @param {boolean} [actionsFallback=true] Use vm.$eval as a runner when no action listener is found
-* @param {Object} [actions] Actions subscribers, a lookup list of action definition string keys and their firable function. Functions are called with the context as `(...params)`
+* @param {Object|function} [actions] Actions subscribers as an object as a lookup list of action definition string keys and their firable function. Subscriber functions are called with the context as `(...params)`. If the value is a function it is called as the raw contents of the action.
 * @param {Object} [data] The data binding
 *
 * @emits change Emitted as `(data)` whenever any data changes
@@ -44,8 +44,8 @@ export default Vue.component('mgForm', {
 		onAction: Function,
 		actionsFallback: {type: Boolean, default: true},
 		actions: { // Object of functions e.g. `{customFunc: ()=> {}}`
-			type: Object,
-			validator: v => _.every(v => _.isFunction(v)),
+			type: [Function, Object],
+			validator: v => _.isFunction(v) || _.every(v => _.isFunction(v)),
 		},
 	},
 	created() {
@@ -164,7 +164,14 @@ export default Vue.component('mgForm', {
 			if (this.$props.onAction && this.$props.onAction.call(context ?? this, action, ...params)) return;
 			// }}}
 
-			// 3. See if FORM.$props.actions[action] exists and if so whether it returns truthy {{{
+			// 3a. Does FORM.$props.actions exist and is a function which will handle everything? {{{
+			if (this.$props.actions && _.isFunction(this.$props.actions)) {
+				this.$props.actions.call(context ?? this, action);
+				return;
+			}
+			// }}}
+
+			// 3b. Does FORM.$props.actions[action] exist and if so whether it returns truthy {{{
 			var [junk, actionReadable, actionArgs] = /^([a-z0-9\_]*?)(\(.*\))?$/i.exec(action) || [];
 			if (actionReadable && this.$props.actions && this.$props.actions[actionReadable]) {
 				// Collapse strings to functions
