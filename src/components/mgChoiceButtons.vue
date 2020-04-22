@@ -16,6 +16,7 @@ macgyver.register('mgChoiceButtons', {
 				{id: 'class', title: 'Classes'},
 				{id: 'classActive', title: 'Active Class'},
 				{id: 'classInactive', title: 'Inactive Class'},
+				// Implied: {id: 'action', title: 'Action on select', type: 'function'},
 			],
 		},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
@@ -42,8 +43,9 @@ export default Vue.component('mgChoiceButtons', {
 		});
 	},
 	methods: {
-		select(id) {
-			this.data = id;
+		select(item) {
+			this.data = item.id;
+			if (item.action) this.$mgForm.run(item.action);
 		},
 	},
 	watch: {
@@ -66,9 +68,12 @@ export default Vue.component('mgChoiceButtons', {
 		<a
 			v-for="item in enumIter"
 			:key="item.id"
-			:class="data == item.id ? item.classActive || item.class || $props.config.itemClassActive : item.classInactive || item.class || $props.config.itemClassInactive"
+			:class="data == item.id
+				? item.classActive || item.class || $props.config.itemClassActive
+				: item.classInactive || item.class || $props.config.itemClassInactive
+			"
 			v-tooltip="item.tooltip"
-			@click="select(item.id)"
+			@click="select(item)"
 		>
 			<i v-if="item.icon" :class="item.icon"/>
 			{{item.title}}
