@@ -33,6 +33,13 @@ macgyver.register('mgText', {
 				{id: 'postal-code', title: 'Postcode'},
 			],
 		},
+		enum: {
+			type: 'mgTable',
+			title: 'Suggested items',
+			items: [
+				{id: 'title', type: 'mgText', required: true},
+			],
+		},
 	},
 	format: true,
 	shorthand: ['string', 'str'],
@@ -45,6 +52,15 @@ export default Vue.component('mgText', {
 	}},
 	props: {
 		config: Object,
+	},
+	computed: {
+		datalist() { // Map $props.enum into a collection of the form {id, title}
+			if (!this.$props.config.enum || !this.$props.config.enum.length) return;
+			return this.$props.config.enum.map(i => {
+				if (_.isString(i)) return {id: i, title: i};
+				return i;
+			});
+		},
 	},
 	created() {
 		this.$mgForm.inject(this);
@@ -71,11 +87,19 @@ export default Vue.component('mgText', {
 </script>
 
 <template>
-	<input
-		v-model="data"
-		type="text"
-		class="form-control"
-		:autocomplete="$props.config.autoComplete"
-		:placeholder="$props.config.placeholder"
-	/>
+	<div class="mg-text">
+		<input
+			v-model="data"
+			type="text"
+			class="form-control"
+			:autocomplete="$props.config.autoComplete"
+			:placeholder="$props.config.placeholder"
+			:list="datalist ? `mg-text-datalist-${_uid}` : undefined"
+		/>
+		<datalist v-if="datalist" :id="`mg-text-datalist-${_uid}`">
+			<option v-for="item in datalist" :value="item.title">
+				{{item.title}}
+			</option>
+		</datalist>
+	</div>
 </template>
