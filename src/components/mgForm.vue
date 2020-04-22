@@ -65,12 +65,12 @@ export default Vue.component('mgForm', {
 	},
 	mounted() {
 		this.$watch('$props.config', ()=> {
-			console.log('mgForm config clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
+			// console.log('mgForm config clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
 			this.rebuild();
 		}, {immediate: true});
 
 		this.$watch('$props.data', ()=> {
-			console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
+			// console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
 			this.rebuildData();
 		}, {immediate: true, deep: true});
 	},
@@ -80,7 +80,7 @@ export default Vue.component('mgForm', {
 		*/
 		rebuild() {
 			this.id = this.id || this.$props.form || this.$macgyver.nextId();
-			console.log(`Rebuild form config for form "${this.id}"`);
+			// console.log(`Rebuild form config for form "${this.id}"`);
 
 			this.spec = this.$macgyver.compileSpec(this.$props.config);
 			if (!this.spec || !this.spec.spec) throw new Error('Invalid Macgyver form spec');
@@ -91,7 +91,7 @@ export default Vue.component('mgForm', {
 		* Force the form to rebuild its data set
 		*/
 		rebuildData() {
-			if (this.inRefresh) return console.log('Skip refresh');
+			if (this.inRefresh) return;
 			this.inRefresh = true;
 
 			this.formData = _.cloneDeep(this.$props.data);
