@@ -7658,6 +7658,10 @@
                     id: 'tooltip',
                     title: 'Tooltip'
                   }, {
+                    id: 'icon',
+                    title: 'Icon',
+                    type: 'mgIcon'
+                  }, {
                     id: 'class',
                     title: 'Classes'
                   }, {
@@ -7666,7 +7670,8 @@
                   }, {
                     id: 'classInactive',
                     title: 'Inactive Class'
-                  }]
+                  } // Implied: {id: 'action', title: 'Action on select', type: 'function'},
+                  ]
                 },
                 required: {
                   type: 'mgToggle',
@@ -7713,8 +7718,9 @@
                 });
               },
               methods: {
-                select: function select(id) {
-                  this.data = id;
+                select: function select(item) {
+                  this.data = item.id;
+                  if (item.action) this.$mgForm.run(item.action);
                 }
               },
               watch: {
@@ -7816,7 +7822,7 @@
                       ],
                       key: item.id,
                       class:
-                        _vm.data == item.id
+                        item.id && _vm.data == item.id
                           ? item.classActive ||
                             item.class ||
                             _vm.$props.config.itemClassActive
@@ -7825,11 +7831,14 @@
                             _vm.$props.config.itemClassInactive,
                       on: {
                         click: function($event) {
-                          return _vm.select(item.id)
+                          return _vm.select(item)
                         }
                       }
                     },
-                    [_vm._v("\n\t\t" + _vm._s(item.title) + "\n\t")]
+                    [
+                      item.icon ? _c("i", { class: item.icon }) : _vm._e(),
+                      _vm._v("\n\t\t" + _vm._s(item.title) + "\n\t")
+                    ]
                   )
                 }),
                 0
@@ -7841,7 +7850,7 @@
               /* style */
               const __vue_inject_styles__$7 = function (inject) {
                 if (!inject) return
-                inject("data-v-5fea2c9b_0", { source: "\n.fa-invisible:before {\n\tcontent: \"\\f111\";\n\tvisibility: hidden;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgChoiceButtons.vue"],"names":[],"mappings":";AA6EA;CACA,gBAAA;CACA,kBAAA;AACA","file":"mgChoiceButtons.vue","sourcesContent":["<script>\nmacgyver.register('mgChoiceButtons', {\n\ttitle: 'Choice Buttons',\n\ticon: 'fas fa-ellipsis-h',\n\tcategory: 'Choice Selectors',\n\tpreferId: true,\n\tconfig: {\n\t\tenum: {\n\t\t\ttype: 'mgTable',\n\t\t\ttitle: 'List items',\n\t\t\titems: [\n\t\t\t\t{id: 'id', title: 'ID'},\n\t\t\t\t{id: 'title', title: 'Title'},\n\t\t\t\t{id: 'tooltip', title: 'Tooltip'},\n\t\t\t\t{id: 'class', title: 'Classes'},\n\t\t\t\t{id: 'classActive', title: 'Active Class'},\n\t\t\t\t{id: 'classInactive', title: 'Inactive Class'},\n\t\t\t],\n\t\t},\n\t\trequired: {type: 'mgToggle', default: false, help: 'One choice must be selected'},\n\t\tclassWrapper: {type: 'mgText', default: 'btn-group', title: 'Group CSS class', advanced: true},\n\t\titemClassActive: {type: 'mgText', default: 'btn btn-primary', advanced: true},\n\t\titemClassInactive: {type: 'mgText', default: 'btn btn-light', advanced: true},\n\t},\n\tformat: true, // FIXME: Not sure about this, what if we need to lookup the value by the enum ID?\n});\n\nexport default Vue.component('mgChoiceButtons', {\n\tinject: ['$mgForm'],\n\tdata() { return {\n\t\tdata: undefined,\n\t\tenumIter: [],\n\t}},\n\tprops: {\n\t\tconfig: Object,\n\t},\n\tcreated() {\n\t\tthis.$mgForm.inject(this);\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);\n\t\t});\n\t},\n\tmethods: {\n\t\tselect(id) {\n\t\t\tthis.data = id;\n\t\t},\n\t},\n\twatch: {\n\t\t'$props.config.enum': {\n\t\t\timmediate: true,\n\t\t\thandler() {\n\t\t\t\tif (_.isArray(this.$props.config.enum) && _.isString(this.$props.config.enum[0])) { // Array of strings\n\t\t\t\t\tthis.enumIter = this.$props.config.enum.map(i => ({id: _.camelCase(i), title: i}));\n\t\t\t\t} else if (_.isArray(this.$props.config.enum) && _.isObject(this.$props.config.enum[0])) { // Collection\n\t\t\t\t\tthis.enumIter = this.$props.config.enum;\n\t\t\t\t}\n\t\t\t},\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-choice-buttons\" :class=\"$props.config.classWrapper\">\n\t\t<a\n\t\t\tv-for=\"item in enumIter\"\n\t\t\t:key=\"item.id\"\n\t\t\t:class=\"data == item.id ? item.classActive || item.class || $props.config.itemClassActive : item.classInactive || item.class || $props.config.itemClassInactive\"\n\t\t\tv-tooltip=\"item.tooltip\"\n\t\t\t@click=\"select(item.id)\"\n\t\t>\n\t\t\t{{item.title}}\n\t\t</a>\n\t</div>\n</template>\n\n<style>\n.fa-invisible:before {\n\tcontent: \"\\f111\";\n\tvisibility: hidden;\n}\n</style>\n"]}, media: undefined });
+                inject("data-v-2ecae545_0", { source: "\n.fa-invisible:before {\n\tcontent: \"\\f111\";\n\tvisibility: hidden;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgChoiceButtons.vue"],"names":[],"mappings":";AAoFA;CACA,gBAAA;CACA,kBAAA;AACA","file":"mgChoiceButtons.vue","sourcesContent":["<script>\nmacgyver.register('mgChoiceButtons', {\n\ttitle: 'Choice Buttons',\n\ticon: 'fas fa-ellipsis-h',\n\tcategory: 'Choice Selectors',\n\tpreferId: true,\n\tconfig: {\n\t\tenum: {\n\t\t\ttype: 'mgTable',\n\t\t\ttitle: 'List items',\n\t\t\titems: [\n\t\t\t\t{id: 'id', title: 'ID'},\n\t\t\t\t{id: 'title', title: 'Title'},\n\t\t\t\t{id: 'tooltip', title: 'Tooltip'},\n\t\t\t\t{id: 'icon', title: 'Icon', type: 'mgIcon'},\n\t\t\t\t{id: 'class', title: 'Classes'},\n\t\t\t\t{id: 'classActive', title: 'Active Class'},\n\t\t\t\t{id: 'classInactive', title: 'Inactive Class'},\n\t\t\t\t// Implied: {id: 'action', title: 'Action on select', type: 'function'},\n\t\t\t],\n\t\t},\n\t\trequired: {type: 'mgToggle', default: false, help: 'One choice must be selected'},\n\t\tclassWrapper: {type: 'mgText', default: 'btn-group', title: 'Group CSS class', advanced: true},\n\t\titemClassActive: {type: 'mgText', default: 'btn btn-primary', advanced: true},\n\t\titemClassInactive: {type: 'mgText', default: 'btn btn-light', advanced: true},\n\t},\n\tformat: true, // FIXME: Not sure about this, what if we need to lookup the value by the enum ID?\n});\n\nexport default Vue.component('mgChoiceButtons', {\n\tinject: ['$mgForm'],\n\tdata() { return {\n\t\tdata: undefined,\n\t\tenumIter: [],\n\t}},\n\tprops: {\n\t\tconfig: Object,\n\t},\n\tcreated() {\n\t\tthis.$mgForm.inject(this);\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);\n\t\t});\n\t},\n\tmethods: {\n\t\tselect(item) {\n\t\t\tthis.data = item.id;\n\t\t\tif (item.action) this.$mgForm.run(item.action);\n\t\t},\n\t},\n\twatch: {\n\t\t'$props.config.enum': {\n\t\t\timmediate: true,\n\t\t\thandler() {\n\t\t\t\tif (_.isArray(this.$props.config.enum) && _.isString(this.$props.config.enum[0])) { // Array of strings\n\t\t\t\t\tthis.enumIter = this.$props.config.enum.map(i => ({id: _.camelCase(i), title: i}));\n\t\t\t\t} else if (_.isArray(this.$props.config.enum) && _.isObject(this.$props.config.enum[0])) { // Collection\n\t\t\t\t\tthis.enumIter = this.$props.config.enum;\n\t\t\t\t}\n\t\t\t},\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-choice-buttons\" :class=\"$props.config.classWrapper\">\n\t\t<a\n\t\t\tv-for=\"item in enumIter\"\n\t\t\t:key=\"item.id\"\n\t\t\t:class=\"item.id && data == item.id\n\t\t\t\t? item.classActive || item.class || $props.config.itemClassActive\n\t\t\t\t: item.classInactive || item.class || $props.config.itemClassInactive\n\t\t\t\"\n\t\t\tv-tooltip=\"item.tooltip\"\n\t\t\t@click=\"select(item)\"\n\t\t>\n\t\t\t<i v-if=\"item.icon\" :class=\"item.icon\"/>\n\t\t\t{{item.title}}\n\t\t</a>\n\t</div>\n</template>\n\n<style>\n.fa-invisible:before {\n\tcontent: \"\\f111\";\n\tvisibility: hidden;\n}\n</style>\n"]}, media: undefined });
 
               };
               /* scoped */
@@ -11680,7 +11689,7 @@
             * @param {Object|Array} config The MacGyver form object either in long form nested array structure or short form object (which is converted)
             * @param {boolean} [populateDefaults=true] Apply initial defaults to the data when the config is ready, if false you can call vm.assignDefaults() manually if needed
             * @param {boolean} [actionsFallback=true] Use vm.$eval as a runner when no action listener is found
-            * @param {Object} [actions] Actions subscribers, a lookup list of action definition string keys and their firable function. Functions are called with the context as `(...params)`
+            * @param {Object|function} [actions] Actions subscribers as an object as a lookup list of action definition string keys and their firable function. Subscriber functions are called with the context as `(...params)`. If the value is a function it is called as the raw contents of the action.
             * @param {Object} [data] The data binding
             *
             * @emits change Emitted as `(data)` whenever any data changes
@@ -11737,9 +11746,9 @@
                 },
                 actions: {
                   // Object of functions e.g. `{customFunc: ()=> {}}`
-                  type: Object,
+                  type: [Function, Object],
                   validator: function validator(v) {
-                    return _.every(function (v) {
+                    return _.isFunction(v) || _.every(function (v) {
                       return _.isFunction(v);
                     });
                   }
@@ -11883,7 +11892,14 @@
                   // 2. Use FORM.$props.onAction(action) and see if returns truthy {{{
 
                   if (this.$props.onAction && (_this$$props$onAction = this.$props.onAction).call.apply(_this$$props$onAction, [context !== null && context !== void 0 ? context : this, action].concat(params))) return; // }}}
-                  // 3. See if FORM.$props.actions[action] exists and if so whether it returns truthy {{{
+                  // 3a. Does FORM.$props.actions exist and is a function which will handle everything? {{{
+
+                  if (this.$props.actions && _.isFunction(this.$props.actions)) {
+                    this.$props.actions.call(context !== null && context !== void 0 ? context : this, action);
+                    return;
+                  } // }}}
+                  // 3b. Does FORM.$props.actions[action] exist and if so whether it returns truthy {{{
+
 
                   var _ref = /^([a-z0-9\_]*?)(\(.*\))?$/i.exec(action) || [],
                       _ref2 = _slicedToArray(_ref, 3),
