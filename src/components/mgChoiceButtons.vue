@@ -68,7 +68,7 @@ export default Vue.component('mgChoiceButtons', {
 		<a
 			v-for="item in enumIter"
 			:key="item.id"
-			:class="data == item.id
+			:class="item.id && data == item.id
 				? item.classActive || item.class || $props.config.itemClassActive
 				: item.classInactive || item.class || $props.config.itemClassInactive
 			"
