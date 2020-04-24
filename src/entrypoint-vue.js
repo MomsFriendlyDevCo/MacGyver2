@@ -52,4 +52,5 @@ import('./components/mgText');
 import('./components/mgTime');
 import('./components/mgToggle');
 import('./components/mgUrl');
+import('./components/mgVideo');
 import('./components/mgWysiwyg');

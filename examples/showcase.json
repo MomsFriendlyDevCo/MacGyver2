@@ -549,6 +549,11 @@
 					"type": "mgWysiwyg",
 					"title": "WYSIWYG",
 					"default": "<h1>Hello</h1><p>Hello <strong>world</strong></p>"
+				},
+				{
+					"id": "demoVideo",
+					"type": "mgVideo",
+					"url": "https://www.youtube.com/embed/3s-MnvKIqb8"
 				}
 			]
 		},
