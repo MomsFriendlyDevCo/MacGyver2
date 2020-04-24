@@ -23,6 +23,12 @@
 					"enum": ["Foo", "Bar", "Baz", "Quz", "Quz"]
 				},
 				{
+					"id": "demoTextMask",
+					"type": "mgText",
+					"title": "Text (with mask)",
+					"mask": "#-#-#-#"
+				},
+				{
 					"id": "demoTextArea",
 					"type": "mgTextArea",
 					"title": "Text area",
@@ -429,13 +435,17 @@
 						},
 						{
 							"id": "containerLayoutCardFloatingBar",
-							"type": "mgText",
+							"type": "mgNumber",
 							"title": "Bar"
 						},
 						{
 							"id": "containerLayoutCardFloatingBaz",
-							"type": "mgText",
-							"title": "Baz"
+							"type": "mgToggle"
+						},
+						{
+							"id": "containerLayoutCardFloatingQuz",
+							"type": "mgTextArea",
+							"rows": 5
 						}
 					]
 				},

@@ -6948,6 +6948,7 @@
             Promise.resolve().then(function () { return mgTime; });
             Promise.resolve().then(function () { return mgToggle; });
             Promise.resolve().then(function () { return mgUrl; });
+            Promise.resolve().then(function () { return mgVideo; });
             Promise.resolve().then(function () { return mgWysiwyg; });
 
             var methods = {}; // Method's to glue onto vm.$emit
@@ -14724,6 +14725,13 @@
                         'default': __vue_component__$D
             });
 
+            var vueInputFacade_umd_min = createCommonjsModule(function (module, exports) {
+            (function(e,t){module.exports=t();})("undefined"!==typeof self?self:commonjsGlobal,(function(){return function(e){var t={};function n(r){if(t[r])return t[r].exports;var o=t[r]={i:r,l:!1,exports:{}};return e[r].call(o.exports,o,o.exports,n),o.l=!0,o.exports}return n.m=e,n.c=t,n.d=function(e,t,r){n.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:r});},n.r=function(e){"undefined"!==typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0});},n.t=function(e,t){if(1&t&&(e=n(e)),8&t)return e;if(4&t&&"object"===typeof e&&e&&e.__esModule)return e;var r=Object.create(null);if(n.r(r),Object.defineProperty(r,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var o in e)n.d(r,o,function(t){return e[t]}.bind(null,o));return r},n.n=function(e){var t=e&&e.__esModule?function(){return e["default"]}:function(){return e};return n.d(t,"a",t),t},n.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},n.p="",n(n.s="fb15")}({"0cfb":function(e,t,n){var r=n("83ab"),o=n("d039"),i=n("cc12");e.exports=!r&&!o((function(){return 7!=Object.defineProperty(i("div"),"a",{get:function(){return 7}}).a}));},"25f0":function(e,t,n){var r=n("6eeb"),o=n("825a"),i=n("d039"),a=n("ad6d"),u="toString",c=RegExp.prototype,s=c[u],f=i((function(){return "/a/b"!=s.call({source:"a",flags:"b"})})),l=s.name!=u;(f||l)&&r(RegExp.prototype,u,(function(){var e=o(this),t=String(e.source),n=e.flags,r=String(void 0===n&&e instanceof RegExp&&!("flags"in c)?a.call(e):n);return "/"+t+"/"+r}),{unsafe:!0});},5135:function(e,t){var n={}.hasOwnProperty;e.exports=function(e,t){return n.call(e,t)};},5692:function(e,t,n){var r=n("c430"),o=n("c6cd");(e.exports=function(e,t){return o[e]||(o[e]=void 0!==t?t:{})})("versions",[]).push({version:"3.4.2",mode:r?"pure":"global",copyright:"© 2019 Denis Pushkarev (zloirock.ru)"});},"5c6c":function(e,t){e.exports=function(e,t){return {enumerable:!(1&e),configurable:!(2&e),writable:!(4&e),value:t}};},"69f3":function(e,t,n){var r,o,i,a=n("7f9a"),u=n("da84"),c=n("861d"),s=n("9112"),f=n("5135"),l=n("f772"),d=n("d012"),p=u.WeakMap,m=function(e){return i(e)?o(e):r(e,{})},v=function(e){return function(t){var n;if(!c(t)||(n=o(t)).type!==e)throw TypeError("Incompatible receiver, "+e+" required");return n}};if(a){var h=new p,g=h.get,b=h.has,y=h.set;r=function(e,t){return y.call(h,e,t),t},o=function(e){return g.call(h,e)||{}},i=function(e){return b.call(h,e)};}else{var k=l("state");d[k]=!0,r=function(e,t){return s(e,k,t),t},o=function(e){return f(e,k)?e[k]:{}},i=function(e){return f(e,k)};}e.exports={set:r,get:o,has:i,enforce:m,getterFor:v};},"6eeb":function(e,t,n){var r=n("da84"),o=n("5692"),i=n("9112"),a=n("5135"),u=n("ce4e"),c=n("9e81"),s=n("69f3"),f=s.get,l=s.enforce,d=String(c).split("toString");o("inspectSource",(function(e){return c.call(e)})),(e.exports=function(e,t,n,o){var c=!!o&&!!o.unsafe,s=!!o&&!!o.enumerable,f=!!o&&!!o.noTargetGet;"function"==typeof n&&("string"!=typeof t||a(n,"name")||i(n,"name",t),l(n).source=d.join("string"==typeof t?t:"")),e!==r?(c?!f&&e[t]&&(s=!0):delete e[t],s?e[t]=n:i(e,t,n)):s?e[t]=n:u(t,n);})(Function.prototype,"toString",(function(){return "function"==typeof this&&f(this).source||c.call(this)}));},"7f9a":function(e,t,n){var r=n("da84"),o=n("9e81"),i=r.WeakMap;e.exports="function"===typeof i&&/native code/.test(o.call(i));},"825a":function(e,t,n){var r=n("861d");e.exports=function(e){if(!r(e))throw TypeError(String(e)+" is not an object");return e};},"83ab":function(e,t,n){var r=n("d039");e.exports=!r((function(){return 7!=Object.defineProperty({},"a",{get:function(){return 7}}).a}));},"861d":function(e,t){e.exports=function(e){return "object"===typeof e?null!==e:"function"===typeof e};},"90e3":function(e,t){var n=0,r=Math.random();e.exports=function(e){return "Symbol("+String(void 0===e?"":e)+")_"+(++n+r).toString(36)};},9112:function(e,t,n){var r=n("83ab"),o=n("9bf2"),i=n("5c6c");e.exports=r?function(e,t,n){return o.f(e,t,i(1,n))}:function(e,t,n){return e[t]=n,e};},"9bf2":function(e,t,n){var r=n("83ab"),o=n("0cfb"),i=n("825a"),a=n("c04e"),u=Object.defineProperty;t.f=r?u:function(e,t,n){if(i(e),t=a(t,!0),i(n),o)try{return u(e,t,n)}catch(r){}if("get"in n||"set"in n)throw TypeError("Accessors not supported");return "value"in n&&(e[t]=n.value),e};},"9e81":function(e,t,n){var r=n("5692");e.exports=r("native-function-to-string",Function.toString);},ad6d:function(e,t,n){var r=n("825a");e.exports=function(){var e=r(this),t="";return e.global&&(t+="g"),e.ignoreCase&&(t+="i"),e.multiline&&(t+="m"),e.dotAll&&(t+="s"),e.unicode&&(t+="u"),e.sticky&&(t+="y"),t};},c04e:function(e,t,n){var r=n("861d");e.exports=function(e,t){if(!r(e))return e;var n,o;if(t&&"function"==typeof(n=e.toString)&&!r(o=n.call(e)))return o;if("function"==typeof(n=e.valueOf)&&!r(o=n.call(e)))return o;if(!t&&"function"==typeof(n=e.toString)&&!r(o=n.call(e)))return o;throw TypeError("Can't convert object to primitive value")};},c430:function(e,t){e.exports=!1;},c6cd:function(e,t,n){var r=n("da84"),o=n("ce4e"),i="__core-js_shared__",a=r[i]||o(i,{});e.exports=a;},c8ba:function(e,t){var n;n=function(){return this}();try{n=n||new Function("return this")();}catch(r){"object"===typeof window&&(n=window);}e.exports=n;},cc12:function(e,t,n){var r=n("da84"),o=n("861d"),i=r.document,a=o(i)&&o(i.createElement);e.exports=function(e){return a?i.createElement(e):{}};},ce4e:function(e,t,n){var r=n("da84"),o=n("9112");e.exports=function(e,t){try{o(r,e,t);}catch(n){r[e]=t;}return t};},d012:function(e,t){e.exports={};},d039:function(e,t){e.exports=function(e){try{return !!e()}catch(t){return !0}};},da84:function(e,t,n){(function(t){var n=function(e){return e&&e.Math==Math&&e};e.exports=n("object"==typeof globalThis&&globalThis)||n("object"==typeof window&&window)||n("object"==typeof self&&self)||n("object"==typeof t&&t)||Function("return this")();}).call(this,n("c8ba"));},f772:function(e,t,n){var r=n("5692"),o=n("90e3"),i=r("keys");e.exports=function(e){return i[e]||(i[e]=o(e))};},fb15:function(e,t,n){var r;(n.r(t),"undefined"!==typeof window)&&((r=window.document.currentScript)&&(r=r.src.match(/(.+\/)[^/]+\.js(\?.*)?$/))&&(n.p=r[1]));var o={"#":{pattern:/\d/},X:{pattern:/[0-9a-z]/i},S:{pattern:/[a-z]/i},A:{pattern:/[a-z]/i,transform:e=>e.toLocaleUpperCase()},a:{pattern:/[a-z]/i,transform:e=>e.toLocaleLowerCase()},"\\":{escape:!0}};n("25f0");const i="__input-facade__";function a(e=""){this.masked=this.raw=e;}function u(){return new CustomEvent("input",{bubbles:!0,cancelable:!0,detail:{facade:!0}})}function c(e={}){return (Array.isArray(e)||"string"===typeof e)&&(e={mask:e}),e}function s(e){const t=e instanceof HTMLInputElement?e:e.querySelector("input");if(!t)throw new Error("facade directive requires an input element");return t}function f(e){const{target:t,detail:n}=e;if(n&&n.facade)return !1;e.stopPropagation();const r=t.value,o=t.selectionEnd;d(t,{emit:!1}),l(e,r,o),t.dispatchEvent(u());}function l(e,t,n){const{target:r}=e,o=["text","tel","search",null].includes(r.getAttribute("type")),a=r[i]&&r[i].config;if(r!==document.activeElement||!o||!a.mask)return;const u="insertFromPaste"===e.inputType,c=(e.data||u)&&n==t.length;let s=t[n-1];const f=r.value.toLocaleLowerCase();let l=n;if(c)l=f.length;else if(s){s=s.toLocaleLowerCase();let e=l;while(e<=f.length&&f.charAt(e-1)!==s)e++;l=e<=f.length?e:l-1;}r.setSelectionRange(l,l),setTimeout((function(){r.setSelectionRange(l,l);}),0);}function d(e,{emit:t=!0,force:n=!1}={}){const{config:r,oldValue:o}=e[i];if(n||o!==e.value){const n=g(e.value,r);e[i].oldValue=n.masked,e.value!==n.masked&&(e.value=n.masked),e.unmaskedValue=n.raw,t&&e.dispatchEvent(u());}}let p=o;function m(e){p=e;}function v(e,t={}){const n=t.masks.slice().sort((e,t)=>e.length-t.length),r=e=>Object.assign({},t,e),o=(t,n)=>{const o=h(e,r({mask:n,short:!0}));return o.masked.length>t.length};for(let i=0;i<n.length;i++){const t=n[i],a=n[i+1];if(!a||!o(t,a))return h(e,r({mask:t}))}return new a}function h(e="",t={}){let{mask:n="",tokens:r,short:o=!1}=t;r=r?Object.assign({},p,r):p,e=e.toString();let i=new a,u=!1,c=0,s=0,f="";while(s<n.length){const t=n[s],a=r[t];let l=e[c];if(!l&&(o||a))break;if(a&&!u){if(a.escape){u=!0,s++;continue}a.pattern.test(l)&&(l=a.transform?a.transform(l):l,i.raw+=l,i.masked+=f+l,f="",s++),c++;}else f+=t,l===t&&c++,u=!1,s++;}return i.raw&&!o&&(i.masked+=f),i}function g(e,t){return t=c(t),t.mask?Array.isArray(t.mask)?v(e,Object.assign({},t,{masks:t.mask})):h(e,t):new a(e)}const b=i;var y={bind:function(e,t){e=s(e),e.addEventListener("input",f,!0),e[b]={config:c(t.value)},d(e);},update:(e,{value:t,oldValue:n})=>{e=s(e),t!==n?(e[b].config=c(t),d(e,{force:!0})):d(e);},unbind:e=>e.removeEventListener("input",f,!0)},k=function(){var e=this,t=e.$createElement,n=e._self._c||t;return n("input",{directives:[{name:"facade",rawName:"v-facade",value:e.config,expression:"config"}],attrs:{type:"text"},domProps:{value:e.maskedValue},on:{input:e.input,blur:function(t){return e.$emit("blur")},focus:function(t){return e.$emit("focus")}}})},w=[],x={name:"InputFacade",props:{mask:[String,Array],masked:{type:Boolean,default:!1},tokens:Object,value:[String,Number]},directives:{facade:y},data(){return {emittedValue:this.value,maskedValue:this.value,unmaskedValue:null}},watch:{value(e){e!==this.emittedValue&&(this.maskedValue=e);},mask(e){e||(this.maskedValue=this.unmaskedValue);},masked(){this.refresh();}},computed:{config(){return {mask:this.mask,tokens:this.tokens}}},methods:{input({target:e}){this.maskedValue=e.value,this.unmaskedValue=e.unmaskedValue,this.refresh();},refresh(){let e=this.mask&&this.masked?this.maskedValue:this.unmaskedValue;this.emittedValue!==e&&(this.emittedValue=e,this.$emit("input",e));}}},_=x;function S(e,t,n,r,o,i,a,u){var c,s="function"===typeof e?e.options:e;if(t&&(s.render=t,s.staticRenderFns=n,s._compiled=!0),r&&(s.functional=!0),i&&(s._scopeId="data-v-"+i),a?(c=function(e){e=e||this.$vnode&&this.$vnode.ssrContext||this.parent&&this.parent.$vnode&&this.parent.$vnode.ssrContext,e||"undefined"===typeof __VUE_SSR_CONTEXT__||(e=__VUE_SSR_CONTEXT__),o&&o.call(this,e),e&&e._registeredComponents&&e._registeredComponents.add(a);},s._ssrRegister=c):o&&(c=u?function(){o.call(this,this.$root.$options.shadowRoot);}:o),c)if(s.functional){s._injectStyles=c;var f=s.render;s.render=function(e,t){return c.call(t),f(e,t)};}else{var l=s.beforeCreate;s.beforeCreate=l?[].concat(l,c):[c];}return {exports:e,options:s}}var j=S(_,k,w,!1,null,null,null),E=j.exports;function V(e,t={}){t.tokens&&m(t.tokens),e.component(E.name,E),e.directive(t.name||"facade",y),e.filter(t.name||"facade",O);}function O(e,t){return g(e,t).masked}var T=V;"undefined"!==typeof window&&window.Vue&&window.Vue.use(V),n.d(t,"InputFacade",(function(){return E})),n.d(t,"facade",(function(){return y})),n.d(t,"tokens",(function(){return o})),n.d(t,"masker",(function(){return g})),n.d(t,"filter",(function(){return O}));t["default"]=T;}})}));
+            });
+
+            var InputFacade = unwrapExports(vueInputFacade_umd_min);
+
+            Vue.use(InputFacade);
             macgyver.register('mgText', {
               title: 'Text',
               icon: 'far fa-edit',
@@ -14746,6 +14754,10 @@
                 required: {
                   type: 'mgToggle',
                   "default": false
+                },
+                mask: {
+                  type: 'mgText',
+                  help: 'Text input mask to restrict to, #=Number, S=Letter, X=Alpha-numeric, A=Alpha Uppercase, a=Alpha lowercase, \=Escape'
                 },
                 focus: {
                   type: 'mgToggle',
@@ -14883,6 +14895,12 @@
                       rawName: "v-model",
                       value: _vm.data,
                       expression: "data"
+                    },
+                    {
+                      name: "facade",
+                      rawName: "v-facade",
+                      value: _vm.$props.config.mask,
+                      expression: "$props.config.mask"
                     }
                   ],
                   staticClass: "form-control",
@@ -16140,6 +16158,147 @@
             var mgUrl = /*#__PURE__*/Object.freeze({
                         __proto__: null,
                         'default': __vue_component__$H
+            });
+
+            macgyver.register('mgVideo', {
+              title: 'Video',
+              icon: 'far fa-film',
+              category: 'Media',
+              preferId: true,
+              config: {
+                url: {
+                  type: 'mgUrl',
+                  required: true
+                },
+                width: {
+                  type: 'mgText',
+                  "default": '100%'
+                },
+                height: {
+                  type: 'mgText',
+                  "default": '315px'
+                },
+                autoPlay: {
+                  type: 'mgToggle',
+                  "default": false
+                },
+                showControls: {
+                  type: 'mgToggle',
+                  "default": true
+                },
+                loop: {
+                  type: 'mgToggle',
+                  "default": false
+                }
+              }
+            });
+            var script$H = Vue.component('mgVideo', {
+              inject: ['$mgForm'],
+              data: function data() {
+                return {
+                  data: undefined
+                };
+              },
+              props: {
+                config: Object
+              },
+              computed: {
+                videoResource: function videoResource() {
+                  if (!this.$props.config.url) {
+                    return {
+                      type: 'none'
+                    };
+                  } else if (/^https?:\/\/(www\.)?youtube\.com/.test(this.$props.config.url)) {
+                    return {
+                      type: 'youTube',
+                      url: this.$props.config.url + "?autoplay=".concat(this.$props.config.autoPlay ? '1' : '0') + "&controls=".concat(this.$props.config.showControls ? '1' : '0') + "&loop=".concat(this.$props.config.loop ? '1' : '0')
+                    };
+                  } else {
+                    return {
+                      type: 'unknown'
+                    };
+                  }
+                }
+              }
+            });
+
+            /* script */
+            const __vue_script__$I = script$H;
+
+            /* template */
+            var __vue_render__$B = function() {
+              var _vm = this;
+              var _h = _vm.$createElement;
+              var _c = _vm._self._c || _h;
+              return _c(
+                "div",
+                {
+                  staticClass: "mg-video",
+                  style: {
+                    width: _vm.$props.config.width,
+                    height: _vm.$props.config.height
+                  }
+                },
+                [
+                  _vm.videoResource.type == "none"
+                    ? _c("div", { staticClass: "alert alert-warning" }, [
+                        _vm._v("\n\t\tNo video URL provided\n\t")
+                      ])
+                    : _vm.videoResource.type == "youTube"
+                    ? _c("iframe", {
+                        attrs: {
+                          width: "100%",
+                          height: "100%",
+                          src: _vm.videoResource.url,
+                          frameborder: "0",
+                          allow:
+                            "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture",
+                          allowfullscreen: ""
+                        }
+                      })
+                    : _c("div", { staticClass: "alert alert-warning" }, [
+                        _vm._v("\n\t\tUnsupported video URL\n\t")
+                      ])
+                ]
+              )
+            };
+            var __vue_staticRenderFns__$B = [];
+            __vue_render__$B._withStripped = true;
+
+              /* style */
+              const __vue_inject_styles__$I = function (inject) {
+                if (!inject) return
+                inject("data-v-40ca3e10_0", { source: "\n.mg-video .alert {\n\tdisplay: flex;\n\theight: 100%;\n\twidth: 100%;\n\tjustify-content: center;\n\talign-items: center;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgVideo.vue"],"names":[],"mappings":";AAuEA;CACA,aAAA;CACA,YAAA;CACA,WAAA;CACA,uBAAA;CACA,mBAAA;AACA","file":"mgVideo.vue","sourcesContent":["<script>\nmacgyver.register('mgVideo', {\n\ttitle: 'Video',\n\ticon: 'far fa-film',\n\tcategory: 'Media',\n\tpreferId: true,\n\tconfig: {\n\t\turl: {type: 'mgUrl', required: true},\n\t\twidth: {type: 'mgText', default: '100%'},\n\t\theight: {type: 'mgText', default: '315px'},\n\t\tautoPlay: {type: 'mgToggle', default: false},\n\t\tshowControls: {type: 'mgToggle', default: true},\n\t\tloop: {type: 'mgToggle', default: false},\n\t},\n});\n\nexport default Vue.component('mgVideo', {\n\tinject: ['$mgForm'],\n\tdata() {return {\n\t\tdata: undefined,\n\t}},\n\tprops: {\n\t\tconfig: Object,\n\t},\n\tcomputed: {\n\t\tvideoResource() {\n\t\t\tif (!this.$props.config.url) {\n\t\t\t\treturn {type: 'none'};\n\t\t\t} else if (/^https?:\\/\\/(www\\.)?youtube\\.com/.test(this.$props.config.url)) {\n\t\t\t\treturn {\n\t\t\t\t\ttype: 'youTube',\n\t\t\t\t\turl: this.$props.config.url\n\t\t\t\t\t\t+ `?autoplay=${this.$props.config.autoPlay ? '1' : '0'}`\n\t\t\t\t\t\t+ `&controls=${this.$props.config.showControls ? '1' : '0'}`\n\t\t\t\t\t\t+ `&loop=${this.$props.config.loop ? '1' : '0'}`\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\treturn {type: 'unknown'};\n\t\t\t}\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-video\" :style=\"{width: $props.config.width, height: $props.config.height}\">\n\t\t<div\n\t\t\tv-if=\"videoResource.type == 'none'\"\n\t\t\tclass=\"alert alert-warning\"\n\t\t>\n\t\t\tNo video URL provided\n\t\t</div>\n\t\t<iframe\n\t\t\tv-else-if=\"videoResource.type == 'youTube'\"\n\t\t\twidth=\"100%\"\n\t\t\theight=\"100%\"\n\t\t\t:src=\"videoResource.url\"\n\t\t\tframeborder=\"0\"\n\t\t\tallow=\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\"\n\t\t\tallowfullscreen\n\t\t/>\n\t\t<div\n\t\t\tv-else\n\t\t\tclass=\"alert alert-warning\" \n\t\t>\n\t\t\tUnsupported video URL\n\t\t</div>\n\t</div>\n</template>\n\n<style>\n.mg-video .alert {\n\tdisplay: flex;\n\theight: 100%;\n\twidth: 100%;\n\tjustify-content: center;\n\talign-items: center;\n}\n</style>\n"]}, media: undefined });
+
+              };
+              /* scoped */
+              const __vue_scope_id__$I = undefined;
+              /* module identifier */
+              const __vue_module_identifier__$I = undefined;
+              /* functional template */
+              const __vue_is_functional_template__$I = false;
+              /* style inject SSR */
+              
+              /* style inject shadow dom */
+              
+
+              
+              const __vue_component__$I = normalizeComponent(
+                { render: __vue_render__$B, staticRenderFns: __vue_staticRenderFns__$B },
+                __vue_inject_styles__$I,
+                __vue_script__$I,
+                __vue_scope_id__$I,
+                __vue_is_functional_template__$I,
+                __vue_module_identifier__$I,
+                false,
+                createInjector,
+                undefined,
+                undefined
+              );
+
+            var mgVideo = /*#__PURE__*/Object.freeze({
+                        __proto__: null,
+                        'default': __vue_component__$I
             });
 
             var quill = createCommonjsModule(function (module, exports) {
@@ -28089,7 +28248,7 @@
             }(); // module.exports = MarkdownShortcuts;
 
             //
-            var script$H = {
+            var script$I = {
               name: "VueEditor",
               mixins: [oldApi],
               props: {
@@ -28415,36 +28574,36 @@
             var browser = createInjector$1;
 
             /* script */
-            const __vue_script__$I = script$H;
+            const __vue_script__$J = script$I;
 
             /* template */
-            var __vue_render__$B = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"quillWrapper"},[_vm._t("toolbar"),_vm._v(" "),_c('div',{ref:"quillContainer",attrs:{"id":_vm.id}}),_vm._v(" "),(_vm.useCustomImageHandler)?_c('input',{ref:"fileInput",staticStyle:{"display":"none"},attrs:{"id":"file-upload","type":"file","accept":"image/*"},on:{"change":function($event){return _vm.emitImageInfo($event)}}}):_vm._e()],2)};
-            var __vue_staticRenderFns__$B = [];
+            var __vue_render__$C = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"quillWrapper"},[_vm._t("toolbar"),_vm._v(" "),_c('div',{ref:"quillContainer",attrs:{"id":_vm.id}}),_vm._v(" "),(_vm.useCustomImageHandler)?_c('input',{ref:"fileInput",staticStyle:{"display":"none"},attrs:{"id":"file-upload","type":"file","accept":"image/*"},on:{"change":function($event){return _vm.emitImageInfo($event)}}}):_vm._e()],2)};
+            var __vue_staticRenderFns__$C = [];
 
               /* style */
-              const __vue_inject_styles__$I = function (inject) {
+              const __vue_inject_styles__$J = function (inject) {
                 if (!inject) return
                 inject("data-v-59392418_0", { source: "/*!\n * Quill Editor v1.3.6\n * https://quilljs.com/\n * Copyright (c) 2014, Jason Chen\n * Copyright (c) 2013, salesforce.com\n */.ql-container{box-sizing:border-box;font-family:Helvetica,Arial,sans-serif;font-size:13px;height:100%;margin:0;position:relative}.ql-container.ql-disabled .ql-tooltip{visibility:hidden}.ql-container.ql-disabled .ql-editor ul[data-checked]>li::before{pointer-events:none}.ql-clipboard{left:-100000px;height:1px;overflow-y:hidden;position:absolute;top:50%}.ql-clipboard p{margin:0;padding:0}.ql-editor{box-sizing:border-box;line-height:1.42;height:100%;outline:0;overflow-y:auto;padding:12px 15px;tab-size:4;-moz-tab-size:4;text-align:left;white-space:pre-wrap;word-wrap:break-word}.ql-editor>*{cursor:text}.ql-editor blockquote,.ql-editor h1,.ql-editor h2,.ql-editor h3,.ql-editor h4,.ql-editor h5,.ql-editor h6,.ql-editor ol,.ql-editor p,.ql-editor pre,.ql-editor ul{margin:0;padding:0;counter-reset:list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9}.ql-editor ol,.ql-editor ul{padding-left:1.5em}.ql-editor ol>li,.ql-editor ul>li{list-style-type:none}.ql-editor ul>li::before{content:'\\2022'}.ql-editor ul[data-checked=false],.ql-editor ul[data-checked=true]{pointer-events:none}.ql-editor ul[data-checked=false]>li *,.ql-editor ul[data-checked=true]>li *{pointer-events:all}.ql-editor ul[data-checked=false]>li::before,.ql-editor ul[data-checked=true]>li::before{color:#777;cursor:pointer;pointer-events:all}.ql-editor ul[data-checked=true]>li::before{content:'\\2611'}.ql-editor ul[data-checked=false]>li::before{content:'\\2610'}.ql-editor li::before{display:inline-block;white-space:nowrap;width:1.2em}.ql-editor li:not(.ql-direction-rtl)::before{margin-left:-1.5em;margin-right:.3em;text-align:right}.ql-editor li.ql-direction-rtl::before{margin-left:.3em;margin-right:-1.5em}.ql-editor ol li:not(.ql-direction-rtl),.ql-editor ul li:not(.ql-direction-rtl){padding-left:1.5em}.ql-editor ol li.ql-direction-rtl,.ql-editor ul li.ql-direction-rtl{padding-right:1.5em}.ql-editor ol li{counter-reset:list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;counter-increment:list-0}.ql-editor ol li:before{content:counter(list-0,decimal) '. '}.ql-editor ol li.ql-indent-1{counter-increment:list-1}.ql-editor ol li.ql-indent-1:before{content:counter(list-1,lower-alpha) '. '}.ql-editor ol li.ql-indent-1{counter-reset:list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9}.ql-editor ol li.ql-indent-2{counter-increment:list-2}.ql-editor ol li.ql-indent-2:before{content:counter(list-2,lower-roman) '. '}.ql-editor ol li.ql-indent-2{counter-reset:list-3 list-4 list-5 list-6 list-7 list-8 list-9}.ql-editor ol li.ql-indent-3{counter-increment:list-3}.ql-editor ol li.ql-indent-3:before{content:counter(list-3,decimal) '. '}.ql-editor ol li.ql-indent-3{counter-reset:list-4 list-5 list-6 list-7 list-8 list-9}.ql-editor ol li.ql-indent-4{counter-increment:list-4}.ql-editor ol li.ql-indent-4:before{content:counter(list-4,lower-alpha) '. '}.ql-editor ol li.ql-indent-4{counter-reset:list-5 list-6 list-7 list-8 list-9}.ql-editor ol li.ql-indent-5{counter-increment:list-5}.ql-editor ol li.ql-indent-5:before{content:counter(list-5,lower-roman) '. '}.ql-editor ol li.ql-indent-5{counter-reset:list-6 list-7 list-8 list-9}.ql-editor ol li.ql-indent-6{counter-increment:list-6}.ql-editor ol li.ql-indent-6:before{content:counter(list-6,decimal) '. '}.ql-editor ol li.ql-indent-6{counter-reset:list-7 list-8 list-9}.ql-editor ol li.ql-indent-7{counter-increment:list-7}.ql-editor ol li.ql-indent-7:before{content:counter(list-7,lower-alpha) '. '}.ql-editor ol li.ql-indent-7{counter-reset:list-8 list-9}.ql-editor ol li.ql-indent-8{counter-increment:list-8}.ql-editor ol li.ql-indent-8:before{content:counter(list-8,lower-roman) '. '}.ql-editor ol li.ql-indent-8{counter-reset:list-9}.ql-editor ol li.ql-indent-9{counter-increment:list-9}.ql-editor ol li.ql-indent-9:before{content:counter(list-9,decimal) '. '}.ql-editor .ql-indent-1:not(.ql-direction-rtl){padding-left:3em}.ql-editor li.ql-indent-1:not(.ql-direction-rtl){padding-left:4.5em}.ql-editor .ql-indent-1.ql-direction-rtl.ql-align-right{padding-right:3em}.ql-editor li.ql-indent-1.ql-direction-rtl.ql-align-right{padding-right:4.5em}.ql-editor .ql-indent-2:not(.ql-direction-rtl){padding-left:6em}.ql-editor li.ql-indent-2:not(.ql-direction-rtl){padding-left:7.5em}.ql-editor .ql-indent-2.ql-direction-rtl.ql-align-right{padding-right:6em}.ql-editor li.ql-indent-2.ql-direction-rtl.ql-align-right{padding-right:7.5em}.ql-editor .ql-indent-3:not(.ql-direction-rtl){padding-left:9em}.ql-editor li.ql-indent-3:not(.ql-direction-rtl){padding-left:10.5em}.ql-editor .ql-indent-3.ql-direction-rtl.ql-align-right{padding-right:9em}.ql-editor li.ql-indent-3.ql-direction-rtl.ql-align-right{padding-right:10.5em}.ql-editor .ql-indent-4:not(.ql-direction-rtl){padding-left:12em}.ql-editor li.ql-indent-4:not(.ql-direction-rtl){padding-left:13.5em}.ql-editor .ql-indent-4.ql-direction-rtl.ql-align-right{padding-right:12em}.ql-editor li.ql-indent-4.ql-direction-rtl.ql-align-right{padding-right:13.5em}.ql-editor .ql-indent-5:not(.ql-direction-rtl){padding-left:15em}.ql-editor li.ql-indent-5:not(.ql-direction-rtl){padding-left:16.5em}.ql-editor .ql-indent-5.ql-direction-rtl.ql-align-right{padding-right:15em}.ql-editor li.ql-indent-5.ql-direction-rtl.ql-align-right{padding-right:16.5em}.ql-editor .ql-indent-6:not(.ql-direction-rtl){padding-left:18em}.ql-editor li.ql-indent-6:not(.ql-direction-rtl){padding-left:19.5em}.ql-editor .ql-indent-6.ql-direction-rtl.ql-align-right{padding-right:18em}.ql-editor li.ql-indent-6.ql-direction-rtl.ql-align-right{padding-right:19.5em}.ql-editor .ql-indent-7:not(.ql-direction-rtl){padding-left:21em}.ql-editor li.ql-indent-7:not(.ql-direction-rtl){padding-left:22.5em}.ql-editor .ql-indent-7.ql-direction-rtl.ql-align-right{padding-right:21em}.ql-editor li.ql-indent-7.ql-direction-rtl.ql-align-right{padding-right:22.5em}.ql-editor .ql-indent-8:not(.ql-direction-rtl){padding-left:24em}.ql-editor li.ql-indent-8:not(.ql-direction-rtl){padding-left:25.5em}.ql-editor .ql-indent-8.ql-direction-rtl.ql-align-right{padding-right:24em}.ql-editor li.ql-indent-8.ql-direction-rtl.ql-align-right{padding-right:25.5em}.ql-editor .ql-indent-9:not(.ql-direction-rtl){padding-left:27em}.ql-editor li.ql-indent-9:not(.ql-direction-rtl){padding-left:28.5em}.ql-editor .ql-indent-9.ql-direction-rtl.ql-align-right{padding-right:27em}.ql-editor li.ql-indent-9.ql-direction-rtl.ql-align-right{padding-right:28.5em}.ql-editor .ql-video{display:block;max-width:100%}.ql-editor .ql-video.ql-align-center{margin:0 auto}.ql-editor .ql-video.ql-align-right{margin:0 0 0 auto}.ql-editor .ql-bg-black{background-color:#000}.ql-editor .ql-bg-red{background-color:#e60000}.ql-editor .ql-bg-orange{background-color:#f90}.ql-editor .ql-bg-yellow{background-color:#ff0}.ql-editor .ql-bg-green{background-color:#008a00}.ql-editor .ql-bg-blue{background-color:#06c}.ql-editor .ql-bg-purple{background-color:#93f}.ql-editor .ql-color-white{color:#fff}.ql-editor .ql-color-red{color:#e60000}.ql-editor .ql-color-orange{color:#f90}.ql-editor .ql-color-yellow{color:#ff0}.ql-editor .ql-color-green{color:#008a00}.ql-editor .ql-color-blue{color:#06c}.ql-editor .ql-color-purple{color:#93f}.ql-editor .ql-font-serif{font-family:Georgia,Times New Roman,serif}.ql-editor .ql-font-monospace{font-family:Monaco,Courier New,monospace}.ql-editor .ql-size-small{font-size:.75em}.ql-editor .ql-size-large{font-size:1.5em}.ql-editor .ql-size-huge{font-size:2.5em}.ql-editor .ql-direction-rtl{direction:rtl;text-align:inherit}.ql-editor .ql-align-center{text-align:center}.ql-editor .ql-align-justify{text-align:justify}.ql-editor .ql-align-right{text-align:right}.ql-editor.ql-blank::before{color:rgba(0,0,0,.6);content:attr(data-placeholder);font-style:italic;left:15px;pointer-events:none;position:absolute;right:15px}.ql-snow .ql-toolbar:after,.ql-snow.ql-toolbar:after{clear:both;content:'';display:table}.ql-snow .ql-toolbar button,.ql-snow.ql-toolbar button{background:0 0;border:none;cursor:pointer;display:inline-block;float:left;height:24px;padding:3px 5px;width:28px}.ql-snow .ql-toolbar button svg,.ql-snow.ql-toolbar button svg{float:left;height:100%}.ql-snow .ql-toolbar button:active:hover,.ql-snow.ql-toolbar button:active:hover{outline:0}.ql-snow .ql-toolbar input.ql-image[type=file],.ql-snow.ql-toolbar input.ql-image[type=file]{display:none}.ql-snow .ql-toolbar .ql-picker-item.ql-selected,.ql-snow .ql-toolbar .ql-picker-item:hover,.ql-snow .ql-toolbar .ql-picker-label.ql-active,.ql-snow .ql-toolbar .ql-picker-label:hover,.ql-snow .ql-toolbar button.ql-active,.ql-snow .ql-toolbar button:focus,.ql-snow .ql-toolbar button:hover,.ql-snow.ql-toolbar .ql-picker-item.ql-selected,.ql-snow.ql-toolbar .ql-picker-item:hover,.ql-snow.ql-toolbar .ql-picker-label.ql-active,.ql-snow.ql-toolbar .ql-picker-label:hover,.ql-snow.ql-toolbar button.ql-active,.ql-snow.ql-toolbar button:focus,.ql-snow.ql-toolbar button:hover{color:#06c}.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-fill,.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill,.ql-snow .ql-toolbar .ql-picker-item:hover .ql-fill,.ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke.ql-fill,.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-fill,.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke.ql-fill,.ql-snow .ql-toolbar .ql-picker-label:hover .ql-fill,.ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke.ql-fill,.ql-snow .ql-toolbar button.ql-active .ql-fill,.ql-snow .ql-toolbar button.ql-active .ql-stroke.ql-fill,.ql-snow .ql-toolbar button:focus .ql-fill,.ql-snow .ql-toolbar button:focus .ql-stroke.ql-fill,.ql-snow .ql-toolbar button:hover .ql-fill,.ql-snow .ql-toolbar button:hover .ql-stroke.ql-fill,.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-fill,.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill,.ql-snow.ql-toolbar .ql-picker-item:hover .ql-fill,.ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke.ql-fill,.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-fill,.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke.ql-fill,.ql-snow.ql-toolbar .ql-picker-label:hover .ql-fill,.ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke.ql-fill,.ql-snow.ql-toolbar button.ql-active .ql-fill,.ql-snow.ql-toolbar button.ql-active .ql-stroke.ql-fill,.ql-snow.ql-toolbar button:focus .ql-fill,.ql-snow.ql-toolbar button:focus .ql-stroke.ql-fill,.ql-snow.ql-toolbar button:hover .ql-fill,.ql-snow.ql-toolbar button:hover .ql-stroke.ql-fill{fill:#06c}.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke,.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter,.ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke,.ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke-miter,.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke,.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter,.ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke,.ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke-miter,.ql-snow .ql-toolbar button.ql-active .ql-stroke,.ql-snow .ql-toolbar button.ql-active .ql-stroke-miter,.ql-snow .ql-toolbar button:focus .ql-stroke,.ql-snow .ql-toolbar button:focus .ql-stroke-miter,.ql-snow .ql-toolbar button:hover .ql-stroke,.ql-snow .ql-toolbar button:hover .ql-stroke-miter,.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke,.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter,.ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke,.ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke-miter,.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke,.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter,.ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke,.ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke-miter,.ql-snow.ql-toolbar button.ql-active .ql-stroke,.ql-snow.ql-toolbar button.ql-active .ql-stroke-miter,.ql-snow.ql-toolbar button:focus .ql-stroke,.ql-snow.ql-toolbar button:focus .ql-stroke-miter,.ql-snow.ql-toolbar button:hover .ql-stroke,.ql-snow.ql-toolbar button:hover .ql-stroke-miter{stroke:#06c}@media (pointer:coarse){.ql-snow .ql-toolbar button:hover:not(.ql-active),.ql-snow.ql-toolbar button:hover:not(.ql-active){color:#444}.ql-snow .ql-toolbar button:hover:not(.ql-active) .ql-fill,.ql-snow .ql-toolbar button:hover:not(.ql-active) .ql-stroke.ql-fill,.ql-snow.ql-toolbar button:hover:not(.ql-active) .ql-fill,.ql-snow.ql-toolbar button:hover:not(.ql-active) .ql-stroke.ql-fill{fill:#444}.ql-snow .ql-toolbar button:hover:not(.ql-active) .ql-stroke,.ql-snow .ql-toolbar button:hover:not(.ql-active) .ql-stroke-miter,.ql-snow.ql-toolbar button:hover:not(.ql-active) .ql-stroke,.ql-snow.ql-toolbar button:hover:not(.ql-active) .ql-stroke-miter{stroke:#444}}.ql-snow{box-sizing:border-box}.ql-snow *{box-sizing:border-box}.ql-snow .ql-hidden{display:none}.ql-snow .ql-out-bottom,.ql-snow .ql-out-top{visibility:hidden}.ql-snow .ql-tooltip{position:absolute;transform:translateY(10px)}.ql-snow .ql-tooltip a{cursor:pointer;text-decoration:none}.ql-snow .ql-tooltip.ql-flip{transform:translateY(-10px)}.ql-snow .ql-formats{display:inline-block;vertical-align:middle}.ql-snow .ql-formats:after{clear:both;content:'';display:table}.ql-snow .ql-stroke{fill:none;stroke:#444;stroke-linecap:round;stroke-linejoin:round;stroke-width:2}.ql-snow .ql-stroke-miter{fill:none;stroke:#444;stroke-miterlimit:10;stroke-width:2}.ql-snow .ql-fill,.ql-snow .ql-stroke.ql-fill{fill:#444}.ql-snow .ql-empty{fill:none}.ql-snow .ql-even{fill-rule:evenodd}.ql-snow .ql-stroke.ql-thin,.ql-snow .ql-thin{stroke-width:1}.ql-snow .ql-transparent{opacity:.4}.ql-snow .ql-direction svg:last-child{display:none}.ql-snow .ql-direction.ql-active svg:last-child{display:inline}.ql-snow .ql-direction.ql-active svg:first-child{display:none}.ql-snow .ql-editor h1{font-size:2em}.ql-snow .ql-editor h2{font-size:1.5em}.ql-snow .ql-editor h3{font-size:1.17em}.ql-snow .ql-editor h4{font-size:1em}.ql-snow .ql-editor h5{font-size:.83em}.ql-snow .ql-editor h6{font-size:.67em}.ql-snow .ql-editor a{text-decoration:underline}.ql-snow .ql-editor blockquote{border-left:4px solid #ccc;margin-bottom:5px;margin-top:5px;padding-left:16px}.ql-snow .ql-editor code,.ql-snow .ql-editor pre{background-color:#f0f0f0;border-radius:3px}.ql-snow .ql-editor pre{white-space:pre-wrap;margin-bottom:5px;margin-top:5px;padding:5px 10px}.ql-snow .ql-editor code{font-size:85%;padding:2px 4px}.ql-snow .ql-editor pre.ql-syntax{background-color:#23241f;color:#f8f8f2;overflow:visible}.ql-snow .ql-editor img{max-width:100%}.ql-snow .ql-picker{color:#444;display:inline-block;float:left;font-size:14px;font-weight:500;height:24px;position:relative;vertical-align:middle}.ql-snow .ql-picker-label{cursor:pointer;display:inline-block;height:100%;padding-left:8px;padding-right:2px;position:relative;width:100%}.ql-snow .ql-picker-label::before{display:inline-block;line-height:22px}.ql-snow .ql-picker-options{background-color:#fff;display:none;min-width:100%;padding:4px 8px;position:absolute;white-space:nowrap}.ql-snow .ql-picker-options .ql-picker-item{cursor:pointer;display:block;padding-bottom:5px;padding-top:5px}.ql-snow .ql-picker.ql-expanded .ql-picker-label{color:#ccc;z-index:2}.ql-snow .ql-picker.ql-expanded .ql-picker-label .ql-fill{fill:#ccc}.ql-snow .ql-picker.ql-expanded .ql-picker-label .ql-stroke{stroke:#ccc}.ql-snow .ql-picker.ql-expanded .ql-picker-options{display:block;margin-top:-1px;top:100%;z-index:1}.ql-snow .ql-color-picker,.ql-snow .ql-icon-picker{width:28px}.ql-snow .ql-color-picker .ql-picker-label,.ql-snow .ql-icon-picker .ql-picker-label{padding:2px 4px}.ql-snow .ql-color-picker .ql-picker-label svg,.ql-snow .ql-icon-picker .ql-picker-label svg{right:4px}.ql-snow .ql-icon-picker .ql-picker-options{padding:4px 0}.ql-snow .ql-icon-picker .ql-picker-item{height:24px;width:24px;padding:2px 4px}.ql-snow .ql-color-picker .ql-picker-options{padding:3px 5px;width:152px}.ql-snow .ql-color-picker .ql-picker-item{border:1px solid transparent;float:left;height:16px;margin:2px;padding:0;width:16px}.ql-snow .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg{position:absolute;margin-top:-9px;right:0;top:50%;width:18px}.ql-snow .ql-picker.ql-font .ql-picker-item[data-label]:not([data-label=''])::before,.ql-snow .ql-picker.ql-font .ql-picker-label[data-label]:not([data-label=''])::before,.ql-snow .ql-picker.ql-header .ql-picker-item[data-label]:not([data-label=''])::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-label]:not([data-label=''])::before,.ql-snow .ql-picker.ql-size .ql-picker-item[data-label]:not([data-label=''])::before,.ql-snow .ql-picker.ql-size .ql-picker-label[data-label]:not([data-label=''])::before{content:attr(data-label)}.ql-snow .ql-picker.ql-header{width:98px}.ql-snow .ql-picker.ql-header .ql-picker-item::before,.ql-snow .ql-picker.ql-header .ql-picker-label::before{content:'Normal'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"1\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"1\"]::before{content:'Heading 1'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"2\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"2\"]::before{content:'Heading 2'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"3\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"3\"]::before{content:'Heading 3'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"4\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"4\"]::before{content:'Heading 4'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"5\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"5\"]::before{content:'Heading 5'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"6\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"6\"]::before{content:'Heading 6'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"1\"]::before{font-size:2em}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"2\"]::before{font-size:1.5em}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"3\"]::before{font-size:1.17em}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"4\"]::before{font-size:1em}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"5\"]::before{font-size:.83em}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"6\"]::before{font-size:.67em}.ql-snow .ql-picker.ql-font{width:108px}.ql-snow .ql-picker.ql-font .ql-picker-item::before,.ql-snow .ql-picker.ql-font .ql-picker-label::before{content:'Sans Serif'}.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=serif]::before,.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=serif]::before{content:'Serif'}.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=monospace]::before,.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=monospace]::before{content:'Monospace'}.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=serif]::before{font-family:Georgia,Times New Roman,serif}.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=monospace]::before{font-family:Monaco,Courier New,monospace}.ql-snow .ql-picker.ql-size{width:98px}.ql-snow .ql-picker.ql-size .ql-picker-item::before,.ql-snow .ql-picker.ql-size .ql-picker-label::before{content:'Normal'}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=small]::before,.ql-snow .ql-picker.ql-size .ql-picker-label[data-value=small]::before{content:'Small'}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=large]::before,.ql-snow .ql-picker.ql-size .ql-picker-label[data-value=large]::before{content:'Large'}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=huge]::before,.ql-snow .ql-picker.ql-size .ql-picker-label[data-value=huge]::before{content:'Huge'}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=small]::before{font-size:10px}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=large]::before{font-size:18px}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=huge]::before{font-size:32px}.ql-snow .ql-color-picker.ql-background .ql-picker-item{background-color:#fff}.ql-snow .ql-color-picker.ql-color .ql-picker-item{background-color:#000}.ql-toolbar.ql-snow{border:1px solid #ccc;box-sizing:border-box;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;padding:8px}.ql-toolbar.ql-snow .ql-formats{margin-right:15px}.ql-toolbar.ql-snow .ql-picker-label{border:1px solid transparent}.ql-toolbar.ql-snow .ql-picker-options{border:1px solid transparent;box-shadow:rgba(0,0,0,.2) 0 2px 8px}.ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-label{border-color:#ccc}.ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options{border-color:#ccc}.ql-toolbar.ql-snow .ql-color-picker .ql-picker-item.ql-selected,.ql-toolbar.ql-snow .ql-color-picker .ql-picker-item:hover{border-color:#000}.ql-toolbar.ql-snow+.ql-container.ql-snow{border-top:0}.ql-snow .ql-tooltip{background-color:#fff;border:1px solid #ccc;box-shadow:0 0 5px #ddd;color:#444;padding:5px 12px;white-space:nowrap}.ql-snow .ql-tooltip::before{content:\"Visit URL:\";line-height:26px;margin-right:8px}.ql-snow .ql-tooltip input[type=text]{display:none;border:1px solid #ccc;font-size:13px;height:26px;margin:0;padding:3px 5px;width:170px}.ql-snow .ql-tooltip a.ql-preview{display:inline-block;max-width:200px;overflow-x:hidden;text-overflow:ellipsis;vertical-align:top}.ql-snow .ql-tooltip a.ql-action::after{border-right:1px solid #ccc;content:'Edit';margin-left:16px;padding-right:8px}.ql-snow .ql-tooltip a.ql-remove::before{content:'Remove';margin-left:8px}.ql-snow .ql-tooltip a{line-height:26px}.ql-snow .ql-tooltip.ql-editing a.ql-preview,.ql-snow .ql-tooltip.ql-editing a.ql-remove{display:none}.ql-snow .ql-tooltip.ql-editing input[type=text]{display:inline-block}.ql-snow .ql-tooltip.ql-editing a.ql-action::after{border-right:0;content:'Save';padding-right:0}.ql-snow .ql-tooltip[data-mode=link]::before{content:\"Enter link:\"}.ql-snow .ql-tooltip[data-mode=formula]::before{content:\"Enter formula:\"}.ql-snow .ql-tooltip[data-mode=video]::before{content:\"Enter video:\"}.ql-snow a{color:#06c}.ql-container.ql-snow{border:1px solid #ccc}", map: undefined, media: undefined })
             ,inject("data-v-59392418_1", { source: ".ql-editor{min-height:200px;font-size:16px}.ql-snow .ql-stroke.ql-thin,.ql-snow .ql-thin{stroke-width:1px!important}.quillWrapper .ql-snow.ql-toolbar{padding-top:8px;padding-bottom:4px}.quillWrapper .ql-snow.ql-toolbar .ql-formats{margin-bottom:10px}.ql-snow .ql-toolbar button svg,.quillWrapper .ql-snow.ql-toolbar button svg{width:22px;height:22px}.quillWrapper .ql-editor ul[data-checked=false]>li::before,.quillWrapper .ql-editor ul[data-checked=true]>li::before{font-size:1.35em;vertical-align:baseline;bottom:-.065em;font-weight:900;color:#222}.quillWrapper .ql-snow .ql-stroke{stroke:rgba(63,63,63,.95);stroke-linecap:square;stroke-linejoin:initial;stroke-width:1.7px}.quillWrapper .ql-picker-label{font-size:15px}.quillWrapper .ql-snow .ql-active .ql-stroke{stroke-width:2.25px}.quillWrapper .ql-toolbar.ql-snow .ql-formats{vertical-align:top}.ql-picker:not(.ql-background){position:relative;top:2px}.ql-picker.ql-color-picker svg{width:22px!important;height:22px!important}.quillWrapper .imageResizeActive img{display:block;cursor:pointer}.quillWrapper .imageResizeActive~div svg{cursor:pointer}", map: undefined, media: undefined });
 
               };
               /* scoped */
-              const __vue_scope_id__$I = undefined;
+              const __vue_scope_id__$J = undefined;
               /* module identifier */
-              const __vue_module_identifier__$I = undefined;
+              const __vue_module_identifier__$J = undefined;
               /* functional template */
-              const __vue_is_functional_template__$I = false;
+              const __vue_is_functional_template__$J = false;
               /* style inject SSR */
               
 
               
               var VueEditor = normalizeComponent_1(
-                { render: __vue_render__$B, staticRenderFns: __vue_staticRenderFns__$B },
-                __vue_inject_styles__$I,
-                __vue_script__$I,
-                __vue_scope_id__$I,
-                __vue_is_functional_template__$I,
-                __vue_module_identifier__$I,
+                { render: __vue_render__$C, staticRenderFns: __vue_staticRenderFns__$C },
+                __vue_inject_styles__$J,
+                __vue_script__$J,
+                __vue_scope_id__$J,
+                __vue_is_functional_template__$J,
+                __vue_module_identifier__$J,
                 browser,
                 undefined
               );
@@ -28493,7 +28652,7 @@
               format: true,
               shorthand: ['content']
             });
-            var script$I = Vue.component('mgWysiwyg', {
+            var script$J = Vue.component('mgWysiwyg', {
               inject: ['$mgForm'],
               components: {
                 VueEditor: VueEditor
@@ -28517,10 +28676,10 @@
             });
 
             /* script */
-            const __vue_script__$J = script$I;
+            const __vue_script__$K = script$J;
 
             /* template */
-            var __vue_render__$C = function() {
+            var __vue_render__$D = function() {
               var _vm = this;
               var _h = _vm.$createElement;
               var _c = _vm._self._c || _h;
@@ -28536,17 +28695,17 @@
                 }
               })
             };
-            var __vue_staticRenderFns__$C = [];
-            __vue_render__$C._withStripped = true;
+            var __vue_staticRenderFns__$D = [];
+            __vue_render__$D._withStripped = true;
 
               /* style */
-              const __vue_inject_styles__$J = undefined;
+              const __vue_inject_styles__$K = undefined;
               /* scoped */
-              const __vue_scope_id__$J = undefined;
+              const __vue_scope_id__$K = undefined;
               /* module identifier */
-              const __vue_module_identifier__$J = undefined;
+              const __vue_module_identifier__$K = undefined;
               /* functional template */
-              const __vue_is_functional_template__$J = false;
+              const __vue_is_functional_template__$K = false;
               /* style inject */
               
               /* style inject SSR */
@@ -28555,13 +28714,13 @@
               
 
               
-              const __vue_component__$I = normalizeComponent(
-                { render: __vue_render__$C, staticRenderFns: __vue_staticRenderFns__$C },
-                __vue_inject_styles__$J,
-                __vue_script__$J,
-                __vue_scope_id__$J,
-                __vue_is_functional_template__$J,
-                __vue_module_identifier__$J,
+              const __vue_component__$J = normalizeComponent(
+                { render: __vue_render__$D, staticRenderFns: __vue_staticRenderFns__$D },
+                __vue_inject_styles__$K,
+                __vue_script__$K,
+                __vue_scope_id__$K,
+                __vue_is_functional_template__$K,
+                __vue_module_identifier__$K,
                 false,
                 undefined,
                 undefined,
@@ -28570,7 +28729,7 @@
 
             var mgWysiwyg = /*#__PURE__*/Object.freeze({
                         __proto__: null,
-                        'default': __vue_component__$I
+                        'default': __vue_component__$J
             });
 
 }(Vue, $));

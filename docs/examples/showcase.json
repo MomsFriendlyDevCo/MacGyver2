@@ -23,6 +23,12 @@
 					"enum": ["Foo", "Bar", "Baz", "Quz", "Quz"]
 				},
 				{
+					"id": "demoTextMask",
+					"type": "mgText",
+					"title": "Text (with mask)",
+					"mask": "#-#-#-#",
+				},
+				{
 					"id": "demoTextArea",
 					"type": "mgTextArea",
 					"title": "Text area",
@@ -553,6 +559,11 @@
 					"type": "mgWysiwyg",
 					"title": "WYSIWYG",
 					"default": "<h1>Hello</h1><p>Hello <strong>world</strong></p>"
+				},
+				{
+					"id": "demoVideo",
+					"type": "mgVideo",
+					"url": "https://www.youtube.com/embed/3s-MnvKIqb8"
 				}
 			]
 		},
