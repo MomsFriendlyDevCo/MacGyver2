@@ -24,6 +24,7 @@
     "bootstrap": "^4.4.1",
     "jquery": "^3.4.1",
     "lodash": "^4.17.15",
+    "vue-input-facade": "^1.1.5",
     "vue-select": "^3.4.0",
     "vue2-editor": "^2.10.2"
   },

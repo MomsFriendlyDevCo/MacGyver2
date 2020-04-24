@@ -1,4 +1,7 @@
 <script>
+import InputFacade from 'vue-input-facade';
+Vue.use(InputFacade);
+
 macgyver.register('mgText', {
 	title: 'Text',
 	icon: 'far fa-edit',
@@ -9,6 +12,7 @@ macgyver.register('mgText', {
 		lengthMax: {type: 'mgNumber', title: 'Maximum Length'},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
 		required: {type: 'mgToggle', default: false},
+		mask: {type: 'mgText', help: 'Text input mask to restrict to, #=Number, S=Letter, X=Alpha-numeric, A=Alpha Uppercase, a=Alpha lowercase, \=Escape'},
 		focus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},
 		autoComplete: {
 			type: 'mgChoiceDropdown',
@@ -95,6 +99,7 @@ export default Vue.component('mgText', {
 			:autocomplete="$props.config.autoComplete"
 			:placeholder="$props.config.placeholder"
 			:list="datalist ? `mg-text-datalist-${_uid}` : undefined"
+			v-facade="$props.config.mask"
 		/>
 		<datalist v-if="datalist" :id="`mg-text-datalist-${_uid}`">
 			<option v-for="item in datalist" :value="item.title">
