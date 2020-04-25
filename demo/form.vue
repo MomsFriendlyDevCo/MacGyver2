@@ -91,7 +91,7 @@ export default {
 							<h4 class="card-title">Form data</h4>
 						</div>
 						<div class="card-body" style="height: 200px; overflow-y: scroll">
-							<pre>{{data | json}}</pre>
+							<pre>{{data}}</pre>
 						</div>
 					</div>
 				</div>
