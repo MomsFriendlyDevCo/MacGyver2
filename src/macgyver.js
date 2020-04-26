@@ -579,6 +579,12 @@ $macgyver.utils.evalCompile = (expression, asFunc = true) => {
 			match.groups.right = match.groups.right.substr(1, match.groups.right.length - 2);
 		}
 
+		// Convert string to boolean
+		if (typeof match.groups.right === 'string' && match.groups.right.toLowerCase() === 'true')
+			match.groups.right = true;
+		if (typeof match.groups.right === 'string' && match.groups.right.toLowerCase() === 'false')
+			match.groups.right = false;
+
 		var obj;
 		if (['=', '==', '$eq'].includes(match.groups.operand)) { // Direct equality
 			obj = {[match.groups.left]: match.groups.right};
