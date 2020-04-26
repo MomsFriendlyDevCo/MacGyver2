@@ -596,7 +596,7 @@ $macgyver.utils.evalCompile = (expression, asFunc = true) => {
 
 		return (asFunc ? sift(obj) : obj);
 	} else {
-		throw new Error(`Error parsinng expression "${expression}", $macgyver.utils.evelParse() can only process simple expressions for now, use Sift object syntax for more complex tests`);
+		throw new Error(`Error parsinng expression "${expression}", $macgyver.utils.evalCompile() can only process simple expressions for now, use Sift object syntax for more complex tests`);
 	}
 };
 
