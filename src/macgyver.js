@@ -580,9 +580,9 @@ $macgyver.utils.evalCompile = (expression, asFunc = true) => {
 		}
 
 		// Convert string to boolean
-		if (typeof match.groups.right === 'string' && match.groups.right.toLowerCase() === 'true')
+		if (_.isString(match.groups.right) && match.groups.right.toLowerCase() === 'true')
 			match.groups.right = true;
-		if (typeof match.groups.right === 'string' && match.groups.right.toLowerCase() === 'false')
+		if (_.isString(match.groups.right) && match.groups.right.toLowerCase() === 'false')
 			match.groups.right = false;
 
 		var obj;
