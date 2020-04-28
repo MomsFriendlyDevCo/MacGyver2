@@ -43,16 +43,16 @@ export default Vue.component('mgCode', {
 		});
 
 		this.editor.on('change', ()=> {
-			var val = this.editor.getValue();
+			var value = this.editor.getvalueue();
 			if (this.$props.config.convert && this.$props.config.syntax == 'json') {
 				try {
-					val = JSON.parse(val);
-					this.$mgForm.$emit('mgChange', this.$props.config.id, val)
+					value = JSON.parse(value);
+					this.$mgForm.$emit('mgChange', {path: this.$props.config.id, value})
 				} catch (e) {
-					// Silently fail as the JSON is invalid
+					// Silently fail as the JSON is invalueid
 				}
 			} else {
-				this.$mgForm.$emit('mgChange', this.$props.config.id, val)
+				this.$mgForm.$emit('mgChange', {path: this.$props.config.id, value})
 			}
 			return true;
 		});

@@ -13,54 +13,6 @@ var $macgyver = {};
 */
 $macgyver.widgets = {};
 
-/**
-* Add a known widget to the widgets lookup object
-* @param {string} [id] The unique ID of the widget to add (this is optional if id is specified in properties)
-* @param {Object} [properties] Optional properties of the widget to add
-* @param {boolean} [options.isContainer] Indicates that the widget can contain other widgets (under the `items` array)
-* @param {boolean} [options.isContainerArray] Addition to `isContainer` that indicates the widget will contain an array of rows (like a table)
-* @param {string} [options.title=id] Optional human readable title of the widget
-* @param {string} [options.icon="far fa-square"] Optional icon to display in the form editor
-* @param {Object} [options.config] Optional list of configuration the widget takes, this is in the form of a MacGyver form
-* @param {boolean} [options.userPlaceable=true] Whether this component should be listed as placeable by the user (if false, its hidden in the mgFormEditor UI)
-* @param {string} [options.category="Misc"] Which category this widget fits into when displaying the 'Add widget' dialog in mgFormEditor
-* @param {boolean|function} [options.format=false] Whether the value of the widget can be exposed as a string. If this is === true the exact value is used, if === false (default) it will be ignored when making a digest of the form, if a function it will be called as (value) and expected to return a string value. NOTE: In the spec file, which is a flat JSON file any function argument will be overridden to `true`
-* @param {string} [options.formatAlign='left'] The prefered column alignment when showing the result of `options.format`
-* @param {boolean} [options.preferId=true] Whether the widget recommends needing an ID when its created, if false, no default ID is allocated via mgFormEditor
-* @param {array <string>} [options.shorthand] Other aliases the widget answers to in shorthand mode (e.g. `{shorthand: ['boolean']}` will map that widget to the boolean type
-*
-* @returns {$macgyver} This chainable object
-*/
-$macgyver.register = (id, options) => {
-	// Argument mangling {{{
-	if (id && options) { // both id + options
-		options.id = id;
-	} else if (_.isPlainObject(id)) { // Just options
-		[id, options] = [id.id, id]; // Optional ID arg
-	} else {
-		throw new Error('$macgyver.register(id, options) requires either an ID + options or an options object');
-	}
-	// }}}
-
-	if (!_.isString(options.id) || !options.id.startsWith('mg')) throw new Error('Widget IDs must be simple strings beginning with "mg*"');
-
-	$macgyver.widgets[options.id] = {
-		title: _.startCase(options.id),
-		userPlaceable: true,
-		category: 'Misc',
-		icon: 'far far-square',
-		format: false,
-		formatAlign: 'left',
-		isContainer: false,
-		isContainerArray: false,
-		preferId: true,
-		...options,
-	};
-
-	return $macgyver;
-};
-
-
 $macgyver.$nextId = 0;
 $macgyver.nextId = ()=> `mgForm${$macgyver.$nextId++}`;
 
@@ -311,7 +263,7 @@ $macgyver.compileSpec = (spec, options) => {
 		convertShorthandDetect: spec =>
 			_.isPlainObject(spec) // Simple object
 			&& !_.has(spec, 'type') // It doesn't have a type key (i.e. there is only one item in this object
-			&& _.every(spec, (v, k) => !_.has(v, 'id') && (!_.has(v, 'type') || v.type != 'mgContainer')), // Each item lacks and ID and either doesn't have a type or that type is not a container
+			&& _.every(spec, (v, k) => !_.has(v, 'id') && (!_.has(v, 'type') || v.type != 'mgContainer')), // Each item lacks an ID and either doesn't have a type or that type is not a container
 		convertShorthandTranslate: spec => ({
 			type: 'mgContainer',
 			items: _.map(spec, (v, k) => ({

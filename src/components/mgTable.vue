@@ -3,8 +3,6 @@ macgyver.register('mgTable', {
 	title: 'Table layout',
 	icon: 'far fa-table',
 	category: 'Layout',
-	isContainer: true,
-	isContainerArray: true,
 	preferId: false,
 	config: {
 		url: {type: 'mgUrl', relative: true, help: 'Data feed to populate the table'},

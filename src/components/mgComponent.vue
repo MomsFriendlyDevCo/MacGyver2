@@ -1,7 +1,9 @@
 <script>
 /**
 * Instance of a MacGyver widget
-* This is the parent of all other mg* components except mgContainer
+* This is the parent of all other mg* components
+*
+* @param {Object} config The MacGyver component config - this is a simple object containing all prototype $props mappings
 */
 export default Vue.component('mgComponent', {
 	inject: ['$mgForm'],
@@ -9,16 +11,13 @@ export default Vue.component('mgComponent', {
 		data: undefined,
 	}},
 	props: {
-		config: Object,
+		config: {type: Object, required: true},
 	},
 	render(h) {
 		if (!this.$macgyver.widgets[this.$props.config.type]) return h('mg-error', {props: {config: {errorText: `Unknown type: ${this.$props.config.type}`}}});
 
 		return h(this.$props.config.type, {
-			props: {
-				config: this.$props.config,
-				data: this.data,
-			},
+			props: this.$props.config,
 			nativeOn: {
 				click: e => this.$mgForm.$emit('mgComponent.click', this, e),
 				mousedown: e => this.$mgForm.$emit('mgComponent.mouseDown', this, e),

@@ -14,7 +14,6 @@ module.exports = {
 	title: 'Grid layout',
 	icon: 'far fa-chess-board',
 	category: 'Layout',
-	isContainer: true,
 	preferId: false,
 	config: {
 		items: {type: 'mgUnknown', default: []}, // Each item also needs X, Y, W, H (W/H are block sizes not absolutes)

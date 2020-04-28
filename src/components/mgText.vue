@@ -2,12 +2,16 @@
 import InputFacade from 'vue-input-facade';
 Vue.use(InputFacade);
 
-macgyver.register('mgText', {
-	title: 'Text',
-	icon: 'far fa-edit',
-	category: 'Simple Inputs',
-	preferId: true,
-	config: {
+export default Vue.mgComponent('mgText', {
+	meta: {
+		title: 'Text',
+		icon: 'far fa-edit',
+		category: 'Simple Inputs',
+		preferId: true,
+		format: true,
+		shorthand: ['string', 'str'],
+	},
+	props: {
 		lengthMin: {type: 'mgNumber', title: 'Minimum Length', min: 0},
 		lengthMax: {type: 'mgNumber', title: 'Maximum Length'},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
@@ -45,37 +49,24 @@ macgyver.register('mgText', {
 			],
 		},
 	},
-	format: true,
-	shorthand: ['string', 'str'],
-});
-
-export default Vue.component('mgText', {
-	inject: ['$mgForm'],
-	data() {return {
-		data: undefined,
-	}},
-	props: {
-		config: Object,
-	},
 	computed: {
 		datalist() { // Map $props.enum into a collection of the form {id, title}
-			if (!this.$props.config.enum || !this.$props.config.enum.length) return;
-			return this.$props.config.enum.map(i => {
+			if (!this.$props.enum || !this.$props.enum.length) return;
+			return this.$props.enum.map(i => {
 				if (_.isString(i)) return {id: i, title: i};
 				return i;
 			});
 		},
 	},
 	created() {
-		this.$mgForm.inject(this);
 		this.$on('mgValidate', reply => {
-			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
-			if (this.$props.config.lengthMin && _.isString(this.data) && this.data.length < this.$props.config.lengthMin) return reply(`${this.$props.config.title} is too small (minimum length is ${this.$props.config.lengthMin})`);
-			if (this.$props.config.lengthMax && _.isString(this.data) && this.data.length > this.$props.config.lengthMax) return reply(`${this.$props.config.title} is too long (maximum length is ${this.$props.config.lengthMax})`);
+			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
+			if (this.$props.lengthMin && _.isString(this.data) && this.data.length < this.$props.lengthMin) return reply(`${this.$props.title} is too small (minimum length is ${this.$props.lengthMin})`);
+			if (this.$props.lengthMax && _.isString(this.data) && this.data.length > this.$props.lengthMax) return reply(`${this.$props.title} is too long (maximum length is ${this.$props.lengthMax})`);
 		});
 	},
 	mounted() {
-		if (this.$props.config.focus) {
+		if (this.$props.focus) {
 			var $el = $(this.$el);
 			var focusVisible = ()=> {
 				if ($el.is(':visible')) {
@@ -96,10 +87,10 @@ export default Vue.component('mgText', {
 			v-model="data"
 			type="text"
 			class="form-control"
-			:autocomplete="$props.config.autoComplete"
-			:placeholder="$props.config.placeholder"
+			:autocomplete="$props.autoComplete"
+			:placeholder="$props.placeholder"
 			:list="datalist ? `mg-text-datalist-${_uid}` : undefined"
-			v-facade="$props.config.mask"
+			v-facade="$props.mask"
 		/>
 		<datalist v-if="datalist" :id="`mg-text-datalist-${_uid}`">
 			<option v-for="item in datalist" :value="item.title">

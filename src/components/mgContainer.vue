@@ -2,29 +2,19 @@
 /**
 * MacGyver component loader
 * This is a meta component that loads other dynamic components as an array
-* @param {Object} config The config specification
-* @param {array<Object>} config.items A collection of sub-item objects to display
-* @param {string} [config.title] The title of the container to display
-* @param {string} [config.layout="form"] The layout profile to use. ENUM: form = A standard horizontal form layout, card = a Bootstrap 4 card with header and footer, columns = vertically sorted column display, query = an inline query constructor
-*
-* @param {boolean} [config.items[].help] Optional help text to show under the element
-* @param {boolean} [config.items[].showTitle=true] Whether to show the left-hand-side form title for the item
-* @param {string} [config.items[].title] Optional title to display for the widget
-* @param {string} config.items[].type The type of the object to render. This corresponds to a `mg*` component
-*
-* @param {array<Object>} [config.verbs] Optional verbs to display for cards
-* @param {string} [config.verbs[].tooltip] Tooltip to display per verb
-* @param {string} [config.verbs[].icon] Icon to display per verb
-* @param {string} [config.verbs[].class=""] Class to apply per verb
 */
-
-macgyver.register('mgContainer', {
-	title: 'Container layout',
-	icon: 'far fa-th-large',
-	category: 'Layout',
-	isContainer: true,
-	preferId: false,
-	config: {
+export default Vue.mgComponent('mgContainer', {
+	inject: {
+		$mgForm: {from: '$mgForm'},
+		$mgFormEditor: {from: '$mgFormEditor', default: false},
+	},
+	meta: {
+		title: 'Container layout',
+		icon: 'far fa-th-large',
+		category: 'Layout',
+		preferId: false,
+	},
+	props: {
 		layout: {
 			type: 'mgChoiceRadio',
 			title: 'Layout profile',
@@ -64,8 +54,10 @@ macgyver.register('mgContainer', {
 				{id: 'action', type: 'mgText'},
 			],
 		},
+
+		items: {type: 'mgAlert', vueType: 'array', text: 'Use the editor to define child widgets'}, // Child items
 	},
-	configChildren: {
+	childProps: {
 		help: {type: 'mgText', title: 'Help text', help: 'Optional help text for the item - just like what you are reading now'},
 		showTitle: {type: 'mgToggle', default: true, title: 'Show Title', help: 'Whether to show the side title for this element'},
 		title: {type: 'mgText', title: 'Title'},
@@ -77,25 +69,12 @@ macgyver.register('mgContainer', {
 		show: {type: 'mgToggle', default: true, advanced: true, help: 'Whether the item is visible by default'},
 		showIf: {type: 'mgCodeEditor', syntax: 'text', advanced: true, help: 'A simple equality expression or Sift object to deteremine visibility'},
 	},
-});
-
-export default Vue.component('mgContainer', {
-	inject: {
-		$mgForm: {from: '$mgForm'},
-		$mgFormEditor: {from: '$mgFormEditor', default: false},
-	},
 	data() { return {
 		highlights: {}, // Lookup of extra classes to add to widgets, each key is the array offset of the widget within this container, the value is an array of classes to add
-		localData: {}, // Lookup of immediate child data values, used when `$props.config.layout == 'formFloating'`
+		localData: {}, // Lookup of immediate child data values, used when `$props.layout == 'formFloating'`
 	}},
-	props: {
-		config: Object,
-	},
-	created() {
-		this.$mgForm.inject(this);
-	},
 	mounted() {
-		if (this.$props.config.collapsable) {
+		if (this.$props.collapsable) {
 			var $card = $(this.$el).find('.card').first();
 
 			$card.find('.card-header').first().on('click', ()=> {
@@ -108,10 +87,10 @@ export default Vue.component('mgContainer', {
 			});
 		}
 
-		if (this.$props.config.layout == 'formFloating') {
+		if (this.$props.layout == 'formFloating') {
 			// When in floating mode we need to keep track of child data so we copy its value into our `localData` object lookup
 			this.$mgForm.$on('changeItem', v => { // Bind to parent form handler
-				if (this.$props.config.items.some(item => item.$dataPath == v.path)) { // Is this widget one of our immediate children?
+				if (this.$props.items.some(item => item.$dataPath == v.path)) { // Is this widget one of our immediate children?
 					this.$set(this.localData, v.path, v.value); // Copy its data against our local copy
 				}
 			});
@@ -161,41 +140,41 @@ export default Vue.component('mgContainer', {
 
 <template>
 	<div
-		v-if="$props.config.layout == 'form' || $props.config.layout === undefined"
+		v-if="$props.layout == 'form' || $props.layout === undefined"
 		class="mg-container"
-		:class="$props.config.formClass"
+		:class="$props.formClass"
 	>
 		<div
-			v-for="(widget, widgetIndex) in $props.config.items"
+			v-for="(widget, widgetIndex) in $props.items"
 			:key="widget.id"
 			v-if="widget.show"
 			class="form-group row mg-component"
 			:class="[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])"
 		>
-			<label v-if="widget.showTitle || $props.config.showTitles" class="col-form-label text-left col-sm-3">
+			<label v-if="widget.showTitle || $props.showTitles" class="col-form-label text-left col-sm-3">
 				{{widget.title}}
 			</label>
-			<div class="col-form-value" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'">
+			<div class="col-form-value" :class="widget.showTitle || $props.showTitles ? 'col-sm-9' : 'col-sm-12'">
 				<mg-component
 					:ref="widgetIndex"
 					:config="widget"
 				/>
 			</div>
-			<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
+			<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
 		</div>
 	</div>
 	<!-- Layout: card {{{ -->
 	<div
-		v-else-if="$props.config.layout == 'card'"
+		v-else-if="$props.layout == 'card'"
 		class="mg-container"
-		:class="$props.config.formClass"
+		:class="$props.formClass"
 	>
-		<div class="card mg-container" :class="{'card-collapsable': $props.config.collapsable, 'card-collapsed': $props.config.collapsed}">
-			<div v-if="$props.config.title || ($props.config.verbs && $props.config.verbs.length)" class="card-header">
-				{{$props.config.title}}
-				<div v-if="$props.config.verbs && $props.config.verbs.length" class="card-verbs">
+		<div class="card mg-container" :class="{'card-collapsable': $props.collapsable, 'card-collapsed': $props.collapsed}">
+			<div v-if="$props.title || ($props.verbs && $props.verbs.length)" class="card-header">
+				{{$props.title}}
+				<div v-if="$props.verbs && $props.verbs.length" class="card-verbs">
 					<a
-						v-for="(verb, verbIndex) in $props.config.verbs"
+						v-for="(verb, verbIndex) in $props.verbs"
 						:key="verbIndex"
 						:class="[verb.class, verb.icon]"
 						v-tooltip="verb.tooltip"
@@ -205,7 +184,7 @@ export default Vue.component('mgContainer', {
 			</div>
 			<div class="card-body">
 				<div
-					v-for="(widget, widgetIndex) in $props.config.items"
+					v-for="(widget, widgetIndex) in $props.items"
 					:key="widget.id"
 					v-if="widget.show"
 					class="form-group row mg-component"
@@ -219,25 +198,25 @@ export default Vue.component('mgContainer', {
 						v-show="highlights[widgetIndex] && highlights[widgetIndex].some(c => c == 'editHover' || c == 'editEditing')"
 						:config="widget"
 					/>
-					<label v-if="widget.showTitle || $props.config.showTitles" class="col-form-label text-left col-sm-3">
+					<label v-if="widget.showTitle || $props.showTitles" class="col-form-label text-left col-sm-3">
 						{{widget.title}}
 					</label>
-					<div class="col-form-value" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9' : 'col-sm-12'">
+					<div class="col-form-value" :class="widget.showTitle || $props.showTitles ? 'col-sm-9' : 'col-sm-12'">
 						<mg-component
 							:ref="widgetIndex"
 							:config="widget"
 						/>
 					</div>
-					<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
+					<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
 				</div>
 			</div>
 		</div>
 	</div>
 	<!-- }}} -->
 	<!-- Layout: formFloating {{{ -->
-	<div v-else-if="$props.config.layout == 'formFloating'">
+	<div v-else-if="$props.layout == 'formFloating'">
 		<div
-			v-for="(widget, widgetIndex) in $props.config.items"
+			v-for="(widget, widgetIndex) in $props.items"
 			:key="widget.id"
 			v-if="widget.show"
 			class="form-group mgContainer-formFloating row mg-component"
@@ -249,18 +228,18 @@ export default Vue.component('mgContainer', {
 					class="control-input"
 					:class="!localData[widget.$dataPath] && 'blank'"
 				/>
-				<label v-if="$props.config.showTitles" class="col-form-label text-left col-sm-3">
+				<label v-if="$props.showTitles" class="col-form-label text-left col-sm-3">
 					{{widget.title}}
 				</label>
 			</div>
-			<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.config.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
+			<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
 		</div>
 	</div>
 	<!-- }}} -->
 	<!-- Layout: columns {{{ -->
-	<div v-else-if="$props.config.layout == 'columns'">
-		<table class="mg-container" :class="$props.config.border ? 'table table-bordered' : 'mg-container-columns-no-border'" style="width: 100%">
-			<thead v-if="$props.config.columnHeaders">
+	<div v-else-if="$props.layout == 'columns'">
+		<table class="mg-container" :class="$props.border ? 'table table-bordered' : 'mg-container-columns-no-border'" style="width: 100%">
+			<thead v-if="$props.columnHeaders">
 				<tr>
 					<th
 						v-for="widget in config.items"
@@ -272,7 +251,7 @@ export default Vue.component('mgContainer', {
 			<tbody>
 				<tr>
 					<td
-						v-for="(widget, widgetIndex) in $props.config.items"
+						v-for="(widget, widgetIndex) in $props.items"
 						:key="widget.id"
 						v-if="widget.show"
 						:class="[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])"
@@ -289,9 +268,9 @@ export default Vue.component('mgContainer', {
 	</div>
 	<!-- }}} -->
 	<!-- Layout: query {{{ -->
-	<div v-else-if="$props.config.layout == 'query'">
+	<div v-else-if="$props.layout == 'query'">
 		<div class="mg-container mg-container-query">
-			<div v-for="rowWidget in $props.config.items" :key="rowWidget.id">
+			<div v-for="rowWidget in $props.items" :key="rowWidget.id">
 				<div v-if="rowWidget.type == 'mgContainer' && rowWidget.layout == 'query-row'" class="row">
 					<div v-for="colWidget in rowWidget.items" :key="colWidget.id" class="col mg-component">
 						<mg-component
@@ -311,8 +290,8 @@ export default Vue.component('mgContainer', {
 	<!-- Layout: unknown {{{ -->
 	<div v-else class="mg-container">
 		<div class="alert alert-danger">
-			Unsupported mgContainer layout "{{$props.config.layout || 'Unspecified'}}"
-			<pre>{{$props.config}}</pre>
+			Unsupported mgContainer layout "{{$props.layout || 'Unspecified'}}"
+			<pre>{{$props}}</pre>
 		</div>
 	</div>
 	<!-- }}} -->

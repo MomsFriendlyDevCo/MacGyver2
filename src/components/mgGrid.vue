@@ -7,7 +7,6 @@ macgyver.register('mgGrid', {
 	title: 'Grid layout',
 	icon: 'far fa-grip-horizontal',
 	category: 'Layout',
-	isContainer: true,
 	preferId: false,
 	config: {
 		items: {type: 'mgUnknown', default: []},

@@ -51,10 +51,10 @@ export default Vue.component('mgForm', {
 	created() {
 		this.id = this.id || this.$props.form || this.$macgyver.nextId();
 
-		this.$on('mgChange', (path, value) => {
+		this.$on('mgChange', data => {
 			if (this.inRefresh) return;
-			this.$macgyver.utils.setPath(this, `formData.${path}`, value);
-			this.$emit('changeItem', {path, value});
+			this.$macgyver.utils.setPath(this, `formData.${data.path}`, data.value);
+			this.$emit('changeItem', data);
 
 			this.$emit('change', this.formData);
 			this.refreshShowIfs();
@@ -200,29 +200,30 @@ export default Vue.component('mgForm', {
 		* @param {VueComponent} component The Vue component we should inject
 		*/
 		inject(component) {
+			console.warn('@DEPRECIATED', 'Call to inject()');
 			component.$on('mgIdentify', reply => reply(component));
 
 			// Read in initial data value
-			if (component.$props.config.$dataPath) {
+			if (component.$props.$dataPath) {
 				var refresher = ()=> {
-					component.data = _.get(component.$mgForm.formData, component.$props.config.$dataPath);
+					component.data = _.get(component.$mgForm.formData, component.$props.$dataPath);
 				};
 
 				component.$on('mgRefresh', refresher);
 				this.$on('mgRefreshForm', refresher);
 
 				refresher();
-			} else if (component.$props.config.default) { // No data path but there IS a default - link to that instead
-				component.data = _.clone(component.$props.config.default);
+			} else if (component.$props.default) { // No data path but there IS a default - link to that instead
+				component.data = _.clone(component.$props.default);
 			}
 
 			// Inject data watcher which transforms change operations into emitters to the nearest parent form {{{
 			component.$watch('data', val => {
 				// Emit `mgChange` to form element
-				this.$emit('mgChange', component.$props.config.$dataPath, val);
+				this.$emit('mgChange', component.$props.$dataPath, val);
 
 				// If the component also has a .onChange binding fire that
-				if (component.$props.config.onChange) component.$props.config.onChange.call(component, val);
+				if (component.$props.onChange) component.$props.onChange.call(component, val);
 			});
 			// }}}
 		},
@@ -237,7 +238,7 @@ export default Vue.component('mgForm', {
 		getComponentBySpecPath(specPath, throws = true) {
 			var found = false;
 			this.$emit.down('mgIdentify', widget => {
-				if (!found && widget.$props.config.$specPath == specPath)
+				if (!found && widget.$props.$specPath == specPath)
 					found = widget;
 			});
 			if (!found && throws) throw new Error(`Cannot edit component by non-existant specPath "${specPath}"`);
@@ -257,7 +258,6 @@ export default Vue.component('mgForm', {
 
 		<mg-component
 			v-if="spec"
-			:form="id"
 			:config="spec.spec"
 		/>
 	</form>

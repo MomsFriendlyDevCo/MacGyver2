@@ -34,7 +34,7 @@ export default Vue.component('mgToggle', {
 	},
 	methods: {
 		change(e) {
-			this.$mgForm.$emit('mgChange', this.config.id, e.value);
+			this.$mgForm.$emit('mgChange', {path: this.config.id, value: e.value});
 		},
 	},
 });
