@@ -1,10 +1,15 @@
 <script>
-macgyver.register('mgChoiceTree', {
-	title: 'Choice Tree',
-	icon: 'fas fa-stream',
-	category: 'Choice Selectors',
-	preferId: true,
-	config: {
+export default Vue.mgComponent('mgChoiceTree', {
+	meta: {
+		title: 'Choice Tree',
+		icon: 'fas fa-stream',
+		category: 'Choice Selectors',
+		preferId: true,
+	},
+	data() { return {
+		enumIter: undefined,
+	}},
+	props: {
 		enum: {
 			type: 'mgTable',
 			title: 'List items',
@@ -26,31 +31,18 @@ macgyver.register('mgChoiceTree', {
 		iconClassBranchOpen: {type: 'mgIcon', title: 'Branch icon open (overrides base)', default: '', advanced: true},
 		iconClassBranchClosed: {type: 'mgIcon', title: 'Branch icon closed (overrides base)', default: '', advanced: true},
 	},
-	format: true, // FIXME: Not sure about this, what if we need to lookup the value by the enum ID?
-});
-
-export default Vue.component('mgChoiceTree', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-		enumIter: undefined,
-	}},
-	props: {
-		config: Object,
-	},
 	created() {
-		this.$mgForm.inject(this);
 		this.$on('mgValidate', reply => {
-			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
+			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
 		});
 	},
 	methods: {
 		select(item) {
-			if (this.$props.config.collapsable && !item.isLeaf && !item.open) { // Item is closed - user probably wants it open
+			if (this.$props.collapsable && !item.isLeaf && !item.open) { // Item is closed - user probably wants it open
 				console.log('Toggle open (node is closed)');
 				item.isOpen = !item.isOpen;
-			} else if ((item.isLeaf || this.$props.config.selectBranches) && item.active != item.id) { // Item is selectable but not selected - user probably wants it selected
-				if (!this.$props.config.required && this.data == item.id) {
+			} else if ((item.isLeaf || this.$props.selectBranches) && item.active != item.id) { // Item is selectable but not selected - user probably wants it selected
+				if (!this.$props.required && this.data == item.id) {
 					console.log('Deselect');
 					this.data = undefined;
 				} else {
@@ -58,7 +50,7 @@ export default Vue.component('mgChoiceTree', {
 					this.data = item.id;
 					console.log('DATA', this.data);
 				}
-			} else if (this.$props.config.collapsable && !item.isLeaf) { // No idea, but item is not a leaf, maybe the user wants to toggle it?
+			} else if (this.$props.collapsable && !item.isLeaf) { // No idea, but item is not a leaf, maybe the user wants to toggle it?
 				console.log('Toggle open');
 				item.open = !item.isOpen;
 			} else { // Give up
@@ -78,10 +70,10 @@ export default Vue.component('mgChoiceTree', {
 		* Remap the incomming `enum` into an iterable array-of-arrays
 		* Each child will be of the form {id, title, enum?, isOpen, isLeaf}
 		*/
-		'$props.config.enum': {
+		'$props.enum': {
 			immediate: true,
 			handler() {
-				if (!this.$props.config.enum) return; // Nothing to render yet
+				if (!this.$props.enum) return; // Nothing to render yet
 
 				var walkBranch = items => {
 					return items.map(item => {
@@ -95,7 +87,7 @@ export default Vue.component('mgChoiceTree', {
 					});
 				}
 
-				this.enumIter = walkBranch(this.$props.config.enum);
+				this.enumIter = walkBranch(this.$props.enum);
 			},
 		},
 	},
@@ -103,14 +95,14 @@ export default Vue.component('mgChoiceTree', {
 		var renderBranch = (items, isOpen) => h(
 			'div',
 			{class: [
-				this.$props.config.branchClass,
+				this.$props.branchClass,
 				isOpen && 'open',
 			]},
 			items.map(item => [
 				h(
 					'div',
 					{
-						class: this.data == item.id ? this.$props.config.itemClassActive : this.$props.config.itemClassInactive,
+						class: this.data == item.id ? this.$props.itemClassActive : this.$props.itemClassInactive,
 						on: {
 							click: e => {
 								this.select(item);
@@ -123,11 +115,11 @@ export default Vue.component('mgChoiceTree', {
 							class:
 								item.isOpen && item.iconOpen ? item.iconOpen
 								: item.isOpen && item.icon ? item.icon
-								: item.isOpen && this.$props.config.iconClassBranchOpen ? this.$props.config.iconClassBranchOpen
+								: item.isOpen && this.$props.iconClassBranchOpen ? this.$props.iconClassBranchOpen
 								: !item.isOpen && item.iconClosed ? item.iconClosed
 								: !item.isOpen && item.icon ? item.icon
-								: !item.isOpen && this.$props.config.iconClassBranchClosed ? this.$props.config.iconClassBranchClosed
-								: this.$props.config.iconClassBranch,
+								: !item.isOpen && this.$props.iconClassBranchClosed ? this.$props.iconClassBranchClosed
+								: this.$props.iconClassBranch,
 							on: {
 								click: e => {
 									this.toggleOpen(item);
@@ -142,7 +134,7 @@ export default Vue.component('mgChoiceTree', {
 			])
 		);
 
-		return h('div', {class: this.$props.config.classWrapper}, [renderBranch(this.enumIter, true)]);
+		return h('div', {class: this.$props.classWrapper}, [renderBranch(this.enumIter, true)]);
 	},
 });
 </script>

@@ -1,36 +1,27 @@
 <script>
-macgyver.register('mgEmail', {
-	title: 'Email address',
-	icon: 'far fa-at',
-	category: 'Simple Inputs',
-	preferId: true,
-	config: {
+export default Vue.mgComponent('mgEmail', {
+	meta: {
+		title: 'Email address',
+		icon: 'far fa-at',
+		category: 'Simple Inputs',
+		preferId: true,
+		format: v => {
+			if (!v) return '';
+			return `<a href="mailto:${v}">${v}</a>`;
+		},
+	},
+	props: {
 		placeholder: {type: 'mgText', help: 'Ghost text to display when the text box has no value'},
 		required: {type: 'mgToggle', default: false},
 	},
-	format: v => {
-		if (!v) return '';
-		return `<a href="mailto:${v}">${v}</a>`;
-	},
-});
-
-export default Vue.component('mgEmail', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-	}},
-	props: {
-		config: Object,
-	},
 	created() {
-		this.$mgForm.inject(this);
 		this.$on('mgValidate', reply => {
-			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
+			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
 		});
 	},
 });
 </script>
 
 <template>
-	<input v-model="data" type="email" class="form-control" :placeholder="$props.config.placeholder"/>
+	<input v-model="data" type="email" class="form-control" :placeholder="$props.placeholder"/>
 </template>

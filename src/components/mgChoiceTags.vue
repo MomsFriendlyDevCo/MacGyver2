@@ -11,12 +11,18 @@ import 'vue-select/dist/vue-select.css';
 
 Vue.component('v-select', VueSelect);
 
-macgyver.register('mgChoiceTags', {
-	title: 'Dropdown multiple-choice',
-	icon: 'far fa-tags',
-	category: 'Choice Selectors',
-	preferId: true,
-	config: {
+export default Vue.mgComponent('mgChoiceTags', {
+	meta: {
+		title: 'Dropdown multiple-choice',
+		icon: 'far fa-tags',
+		category: 'Choice Selectors',
+		preferId: true,
+	},
+	data() { return {
+		value: [],
+		enumIter: [],
+	}},
+	props: {
 		enum: {
 			type: 'mgTable',
 			title: 'List items',
@@ -31,36 +37,22 @@ macgyver.register('mgChoiceTags', {
 		showDropdown: {type: 'mgToggle', default: true, help: 'When clicking, show a dropdown box. Disabling will only allow the user to use existing tags'},
 		maxVisible: {type: 'number', default: 0, help: 'Maximum number of tags to display before showing helper text, set to zero to disable'},
 	},
-	format: true, // FIXME: Not sure about this, what if we need to lookup the value by the enum ID?
-});
-
-export default Vue.component('mgChoiceTags', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-		value: [],
-		enumIter: [],
-	}},
-	props: {
-		config: Object,
-	},
 	created() {
-		this.$mgForm.inject(this);
 		this.$on('mgValidate', reply => {
-			if (this.$props.config.required && !this.data || !this.data.length) return reply(`${this.$props.config.title} is required`);
+			if (this.$props.required && !this.data || !this.data.length) return reply(`${this.$props.title} is required`);
 		});
 
-		this.$watch('$props.config.enum', ()=> {
-			if (_.isArray(this.$props.config.enum) && _.isString(this.$props.config.enum[0])) { // Array of strings
-				this.enumIter = this.$props.config.enum.map(i => ({id: _.camelCase(i), title: i}));
-			} else if (_.isArray(this.$props.config.enum) && _.isObject(this.$props.config.enum[0])) { // Collection
-				this.enumIter = this.$props.config.enum;
+		this.$watch('$props.enum', ()=> {
+			if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
+				this.enumIter = this.$props.enum.map(i => ({id: _.camelCase(i), title: i}));
+			} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection
+				this.enumIter = this.$props.enum;
 			}
 
 			if (this.data) {
 				this.value = this.enumIter.filter(e => e.id == this.data) || this.data;
-			} else if (this.$props.config.default) {
-				this.value = this.enumIter.filter(e => e.id == this.$props.config.default) || this.$props.config.default;
+			} else if (this.$props.default) {
+				this.value = this.enumIter.filter(e => e.id == this.$props.default) || this.$props.default;
 			}
 		}, {immediate: true});
 	},
@@ -79,9 +71,9 @@ export default Vue.component('mgChoiceTags', {
 		:value="value"
 		label="title"
 		:options="enumIter"
-		:placeholder="$props.config.placeholder"
-		:taggable="$props.config.allowCreate"
-		:no-drop="!$props.config.showDropdown"
+		:placeholder="$props.placeholder"
+		:taggable="$props.allowCreate"
+		:no-drop="!$props.showDropdown"
 		:close-on-select="false"
 		:multiple="true"
 		@input="change"
@@ -95,7 +87,7 @@ export default Vue.component('mgChoiceTags', {
 			{{option.title}}
 		</template>
 		<template #selected-option-container="props">
-			<span v-if="!$props.config.maxVisible || value.length - 1 < $props.config.maxVisible" class="vs__selected">
+			<span v-if="!$props.maxVisible || value.length - 1 < $props.maxVisible" class="vs__selected">
 				{{props.option.title}}
 				<i @click="props.deselect(props.option)" class="far fa-times ml-1 clickable"/>
 			</span>

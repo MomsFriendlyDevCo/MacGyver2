@@ -1,20 +1,9 @@
 <script>
-macgyver.register('mgSeperator', {
-	title: 'Seperator',
-	icon: 'far fa-minus',
-	category: 'General Decoration',
-});
-
-export default Vue.component('mgSeperator', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-	}},
-	props: {
-		config: Object,
-	},
-	created() {
-		this.$mgForm.inject(this);
+export default Vue.mgComponent('mgSeperator', {
+	meta: {
+		title: 'Seperator',
+		icon: 'far fa-minus',
+		category: 'General Decoration',
 	},
 });
 </script>

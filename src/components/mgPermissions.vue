@@ -1,27 +1,16 @@
 <script>
-macgyver.register('mgPermissions', {
-	title: 'Permissions',
-	icon: 'far fa-key',
-	category: 'System Administration',
-	preferId: true,
-	config: {
+export default Vue.mgComponent('mgPermissions', {
+	meta: {
+		title: 'Permissions',
+		icon: 'far fa-key',
+		category: 'System Administration',
+		preferId: true,
+	},
+	props: {
 		textEmpty: {type: 'mgText', help: 'Text to display when no permissions are set', default: 'No permissions selected'},
 		permissionsFeed: {type: 'mgUrl', relative: true, default: '/api/users/meta', advanced: true, help: 'The data source to import user permissions', relative: true},
 	},
-	format: true,
-});
-
-export default Vue.component('mgPermissions', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-	}},
-	props: {
-		config: Object,
-	},
 	created() {
-		this.$mgForm.inject(this);
-
 		this.$watch('data', ()=> {
 			if (_.isString(this.data)) this.$set(this, 'data',
 				/\|\|/.test(this.data) ? this.data.split(/\s*\|\|\s*/) // `foo || bar` -> ['foo', 'bar']
@@ -33,7 +22,7 @@ export default Vue.component('mgPermissions', {
 		edit() {
 			Promise.resolve()
 				.then(()=> this.$macgyver.notify.loading(this._uid, true))
-				.then(()=> this.$http.get(this.$props.config.permissionsFeed).catch(this.$toast.catch))
+				.then(()=> this.$http.get(this.$props.permissionsFeed).catch(this.$toast.catch))
 				.tap(()=> this.$macgyver.notify.loading(this._uid, false))
 				.then(res => this.$prompt.macgyver({
 					title: 'Select permissions',
@@ -69,7 +58,7 @@ export default Vue.component('mgPermissions', {
 			{{permission | permissionCase}}
 		</span>
 		<span v-if="!data || !data.length" class="font-italic text-muted">
-			{{$props.config.textEmpty}}
+			{{$props.textEmpty}}
 		</span>
 	</a>
 </template>

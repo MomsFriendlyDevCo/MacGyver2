@@ -1,10 +1,18 @@
 <script>
-macgyver.register('mgNumber', {
-	title: 'Number',
-	icon: 'far fa-sort-numeric-down',
-	category: 'Simple Inputs',
-	preferId: true,
-	config: {
+export default Vue.mgComponent('mgNumber', {
+	meta: {
+		title: 'Number',
+		icon: 'far fa-sort-numeric-down',
+		category: 'Simple Inputs',
+		preferId: true,
+		shorthand: ['integer', 'int', 'float', 'num'],
+		format: v => {
+			if (!v) return '';
+			return (_.isNumber(v) ? v : parseInt(v)).toLocaleString();
+		},
+		formatClass: 'text-right',
+	},
+	props: {
 		min: {type: 'mgNumber', title: 'Minimum value'},
 		max: {type: 'mgNumber', title: 'Maximum value'},
 		step: {type: 'mgNumber', title: 'Value to increment / decrement by'},
@@ -22,37 +30,20 @@ macgyver.register('mgNumber', {
 		suffix: {type: 'mgText', title: 'Suffix', help: 'Suffix to show after the input', showIf: 'interface == "input"'},
 		suffixClass: {type: 'mgText', default: 'input-group-append input-group-text', advanced: true, showIf: 'interface == "input"'},
 	},
-	format: v => {
-		if (!v) return '';
-		return (_.isNumber(v) ? v : parseInt(v)).toLocaleString();
-	},
-	formatAlign: 'right',
-	shorthand: ['integer', 'int', 'float'],
-});
-
-export default Vue.component('mgNumber', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-	}},
-	props: {
-		config: Object,
-	},
 	created() {
-		this.$mgForm.inject(this);
 		this.$on('mgValidate', reply => {
-			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
-			if (this.$props.config.min && this.data < this.$props.config.min) return reply(`${this.$props.config.title} is too small (minimum value is ${this.$props.config.min})`);
-			if (this.$props.config.max && this.data > this.$props.config.max) return reply(`${this.$props.config.title} is too large (maximum value is ${this.$props.config.max})`);
+			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
+			if (this.$props.min && this.data < this.$props.min) return reply(`${this.$props.title} is too small (minimum value is ${this.$props.min})`);
+			if (this.$props.max && this.data > this.$props.max) return reply(`${this.$props.title} is too large (maximum value is ${this.$props.max})`);
 		});
 	},
 	methods: {
 		add(steps) {
-			if (!_.isNumber(this.data)) return this.data = this.$props.config.min || 0; // Not already a number default to the min or zero
+			if (!_.isNumber(this.data)) return this.data = this.$props.min || 0; // Not already a number default to the min or zero
 
-			this.data += steps * (this.$props.config.step || 1);
-			if (this.$props.config.max && this.data > this.$props.config.max) this.data = this.$props.config.max;
-			if (this.$props.config.min && this.data < this.$props.config.min) this.data = this.$props.config.min;
+			this.data += steps * (this.$props.step || 1);
+			if (this.$props.max && this.data > this.$props.max) this.data = this.$props.max;
+			if (this.$props.min && this.data < this.$props.min) this.data = this.$props.min;
 		},
 	},
 });
@@ -60,21 +51,21 @@ export default Vue.component('mgNumber', {
 
 <template>
 	<div class="mg-number">
-		<div v-if="$props.config.interface == 'slider'">
-			<input v-model="data" type="range" class="form-control" :placeholder="$props.config.placeholder" :min="$props.config.min" :max="$props.config.max" :step="$props.config.step"/>
+		<div v-if="$props.interface == 'slider'">
+			<input v-model="data" type="range" class="form-control" :placeholder="$props.placeholder" :min="$props.min" :max="$props.max" :step="$props.step"/>
 		</div>
-		<div v-else-if="$props.config.interface == 'bumpers'" class="input-group">
-			<a @click="add(-1)" class="hidden-print" :class="$props.config.bumperDownClass"></a>
-			<input v-model="data" type="number" class="form-control" :placeholder="$props.config.placeholder" :min="$props.config.min" :max="$props.config.max" :step="$props.config.step"/>
-			<a @click="add(1)" class="hidden-print" :class="$props.config.bumperUpClass"></a>
+		<div v-else-if="$props.interface == 'bumpers'" class="input-group">
+			<a @click="add(-1)" class="hidden-print" :class="$props.bumperDownClass"></a>
+			<input v-model="data" type="number" class="form-control" :placeholder="$props.placeholder" :min="$props.min" :max="$props.max" :step="$props.step"/>
+			<a @click="add(1)" class="hidden-print" :class="$props.bumperUpClass"></a>
 		</div>
-		<div v-else-if="$props.config.interface == 'input'" class="input-group">
-			<div v-if="$props.config.prefix" :class="$props.config.prefixClass">{{$props.config.prefix}}</div>
-			<input v-model="data" type="number" class="form-control" :placeholder="$props.config.placeholder" :min="$props.config.min" :max="$props.config.max" :step="$props.config.step"/>
-			<div v-if="$props.config.suffix" :class="$props.config.suffixClass">{{$props.config.suffix}}</div>
+		<div v-else-if="$props.interface == 'input'" class="input-group">
+			<div v-if="$props.prefix" :class="$props.prefixClass">{{$props.prefix}}</div>
+			<input v-model="data" type="number" class="form-control" :placeholder="$props.placeholder" :min="$props.min" :max="$props.max" :step="$props.step"/>
+			<div v-if="$props.suffix" :class="$props.suffixClass">{{$props.suffix}}</div>
 		</div>
 		<div v-else class="alert alert-warning">
-			Unknown mgNumber interface '{{$props.config.interface}}'
+			Unknown mgNumber interface '{{$props.interface}}'
 		</div>
 	</div>
 </template>

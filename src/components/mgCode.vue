@@ -1,28 +1,16 @@
 <script>
-macgyver.register('mgCode', {
-	requires: 'node_modules/ace-builds/src-noconflict/ace.js',
-	title: 'Code Editor',
-	icon: 'fal fa-code',
-	category: 'Complex Inputs',
-	preferId: true,
-	config: {
-		syntax: {type: 'mgChoiceDropdown', enum: ['text', 'json', 'javascript', 'html'], default: 'json'},
+export default Vue.mgComponent('mgCode', {
+	meta: {
+		title: 'Code Editor',
+		icon: 'fal fa-code',
+		category: 'Complex Inputs',
+		preferId: true,
+	},
+	props: {
+		syntax: {type: 'mgChoiceDropdown', enum: ['text', 'json', 'javascript', 'html', 'css'], default: 'json'},
 		convert: {type: 'mgToggle', default: true, showIf: 'syntax == "json"', help: 'Convert data back to a native JS object'},
 		theme: {type: 'mgChoiceDropdown', enum: ['chrome'], advanced: true, default: 'chrome', help: 'The syntax color scheme to use'},
 		height: {type: 'mgText', default: '400px', help: 'The size of the editing window as a valid CSS measurement', advanced: true},
-	},
-});
-
-export default Vue.component('mgCode', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-	}},
-	props: {
-		config: Object,
-	},
-	created() {
-		this.$mgForm.inject(this);
 	},
 	beforeDestroy() {
 		this.editor.destroy();
@@ -44,15 +32,15 @@ export default Vue.component('mgCode', {
 
 		this.editor.on('change', ()=> {
 			var value = this.editor.getvalueue();
-			if (this.$props.config.convert && this.$props.config.syntax == 'json') {
+			if (this.$props.convert && this.$props.syntax == 'json') {
 				try {
 					value = JSON.parse(value);
-					this.$mgForm.$emit('mgChange', {path: this.$props.config.id, value})
+					this.$mgForm.$emit('mgChange', {path: this.$props.id, value})
 				} catch (e) {
 					// Silently fail as the JSON is invalueid
 				}
 			} else {
-				this.$mgForm.$emit('mgChange', {path: this.$props.config.id, value})
+				this.$mgForm.$emit('mgChange', {path: this.$props.id, value})
 			}
 			return true;
 		});
@@ -60,15 +48,15 @@ export default Vue.component('mgCode', {
 		this.$nextTick(()=> this.editor.resize());
 
 		this.$watch('config', ()=> {
-			if (this.$props.config.syntax) this.editor.getSession().setMode(`ace/mode/${this.$props.config.syntax}`);
-			if (this.$props.config.theme) this.editor.setTheme(`ace/theme/${this.$props.config.theme}`);
+			if (this.$props.syntax) this.editor.getSession().setMode(`ace/mode/${this.$props.syntax}`);
+			if (this.$props.theme) this.editor.setTheme(`ace/theme/${this.$props.theme}`);
 		}, {immediate: true});
 	},
 	render(h) {
 		return h('div', {
 			attrs: {
 				class: 'mg-code',
-				style: `height: ${this.$props.config.height}; width: 100%`,
+				style: `height: ${this.$props.height}; width: 100%`,
 			},
 		});
 	},

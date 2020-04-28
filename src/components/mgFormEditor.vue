@@ -24,7 +24,7 @@ export default Vue.component('mgFormEditor', {
 		mgFormEditorControls,
 	},
 	data() { return {
-		mode: 'collapsed', // ENUM: collapsed, toc, editing, adding
+		mode: 'toc', // ENUM: collapsed, toc, editing, adding
 		id: this.$macgyver.nextId(), // ID of the editing form item
 		editing: undefined, // The active item we are editing
 		widgetListMode: 'grid',
@@ -434,6 +434,13 @@ export default Vue.component('mgFormEditor', {
 		* Generate the config layout for the Table-Of-Contents sidebar
 		*/
 		generateConfigToc() {
+			var genTreeBranch = root =>
+				root.map(widget => ({
+					title: `${widget.type} #${widget.id}`,
+					icon: this.$macgyver.widgets[widget.type].icon,
+					enum: widget.items ? genTreeBranch(widget.items) : undefined,
+				}));
+
 			return [
 				{ // Header area
 					type: 'mgContainer',
@@ -464,10 +471,12 @@ export default Vue.component('mgFormEditor', {
 						{
 							type: 'mgChoiceTree',
 							title: 'Layout tree',
-							default: {foo: 1, bar: 2},
 							onChange: item => {
 								console.log('TREE CLICK', item);
 							},
+							enum: genTreeBranch(
+								[ this.$macgyver.compileSpec(this.$props.config, {clone: false}).spec ]
+							),
 						},
 					],
 				},

@@ -4,12 +4,19 @@ import 'vue-select/dist/vue-select.css';
 
 Vue.component('v-select', VueSelect);
 
-macgyver.register('mgChoiceDropdown', {
-	title: 'Dropdown multiple-choice',
-	icon: 'far fa-chevron-circle-down',
-	category: 'Choice Selectors',
-	preferId: true,
-	config: {
+export default Vue.mgComponent('mgChoiceDropdown', {
+	meta: {
+		title: 'Dropdown multiple-choice',
+		icon: 'far fa-chevron-circle-down',
+		category: 'Choice Selectors',
+		preferId: true,
+		shorthand: ['choice', 'choose', 'dropdown', 'pick'],
+	},
+	data() { return {
+		value: [],
+		enumIter: [],
+	}},
+	props: {
 		enumSource: {type: 'mgChoiceButtons', default: 'list', enum: ['list', 'url'], default: 'list', help: 'Where to populate the list data from'},
 		enum: {
 			type: 'mgTable',
@@ -26,37 +33,22 @@ macgyver.register('mgChoiceDropdown', {
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 		focus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},
 	},
-	format: true, // FIXME: Not sure about this, what if we need to lookup the value by the enum ID?
-	shorthand: ['choice', 'choose', 'dropdown', 'pick'],
-});
-
-export default Vue.component('mgChoiceDropdown', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-		value: [],
-		enumIter: [],
-	}},
-	props: {
-		config: Object,
-	},
 	created() {
-		this.$mgForm.inject(this);
 		this.$on('mgValidate', reply => {
-			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
+			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
 		});
 
-		this.$watch('$props.config.enumUrl', ()=> {
-			if (!this.$props.config.enumUrl) return;
-			this.$macgyver.utils.fetch(this.$props.config.enumUrl, {type: 'array'})
+		this.$watch('$props.enumUrl', ()=> {
+			if (!this.$props.enumUrl) return;
+			this.$macgyver.utils.fetch(this.$props.enumUrl, {type: 'array'})
 				.then(data => this.setEnum(data))
 		}, {immediate: true});
 
-		this.$watch('$props.config.enum', ()=> {
-			if (_.isArray(this.$props.config.enum) && _.isString(this.$props.config.enum[0])) { // Array of strings
-				this.setEnum(this.$props.config.enum.map(i => ({id: _.camelCase(i), title: i})));
-			} else if (_.isArray(this.$props.config.enum) && _.isObject(this.$props.config.enum[0])) { // Collection
-				this.setEnum(this.$props.config.enum);
+		this.$watch('$props.enum', ()=> {
+			if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
+				this.setEnum(this.$props.enum.map(i => ({id: _.camelCase(i), title: i})));
+			} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection
+				this.setEnum(this.$props.enum);
 			}
 		}, {immediate: true});
 	},
@@ -77,13 +69,13 @@ export default Vue.component('mgChoiceDropdown', {
 
 			if (this.data) {
 				this.value = this.enumIter.find(e => e.id == this.data) || this.data;
-			} else if (this.$props.config.default) {
-				this.value = this.enumIter.find(e => e.id == this.$props.config.default) || this.$props.config.default;
+			} else if (this.$props.default) {
+				this.value = this.enumIter.find(e => e.id == this.$props.default) || this.$props.default;
 			}
 		},
 	},
 	mounted() {
-		if (this.$props.config.focus) {
+		if (this.$props.focus) {
 			// NOTE: Focus selection does NOT work if DevTools is open in Chome
 			this.$refs.select.searchEl.focus();
 		}
@@ -97,8 +89,8 @@ export default Vue.component('mgChoiceDropdown', {
 		:value="value"
 		label="title"
 		:options="enumIter"
-		:placeholder="$props.config.placeholder"
-		:clearable="!$props.config.required"
+		:placeholder="$props.placeholder"
+		:clearable="!$props.required"
 		@input="change"
 	>
 		<template #selected-option="option">

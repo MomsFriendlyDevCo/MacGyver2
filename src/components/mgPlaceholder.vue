@@ -1,10 +1,11 @@
 <script>
-macgyver.register('mgPlaceholder', {
-	title: 'Placeholder',
-	icon: 'far fa-construction',
-	category: 'General Decoration',
-	preferId: true,
-	config: {
+export default Vue.mgComponent('mgPlaceholder', {
+	meta: {
+		title: 'Placeholder',
+		icon: 'far fa-construction',
+		category: 'General Decoration',
+	},
+	props: {
 		text: {type: 'mgText'},
 		height: {type: 'mgNumber', default: '100%'},
 		style: {
@@ -19,25 +20,12 @@ macgyver.register('mgPlaceholder', {
 		},
 	},
 });
-
-export default Vue.component('mgPlaceholder', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-	}},
-	props: {
-		config: Object,
-	},
-	created() {
-		this.$mgForm.inject(this);
-	},
-});
 </script>
 
 <template>
-	<div class="mg-placeholder" :class="$props.config.style" :style="`height: ${$props.config.height || 'auto'}`">
-		<div v-if="$props.config.text" class="mg-placeholder-text">
-			{{$props.config.text}}
+	<div class="mg-placeholder" :class="$props.style" :style="`height: ${$props.height || 'auto'}`">
+		<div v-if="$props.text" class="mg-placeholder-text">
+			{{$props.text}}
 		</div>
 	</div>
 </template>

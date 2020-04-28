@@ -2,35 +2,25 @@
 import Swatches from 'vue-swatches';
 import 'vue-swatches/dist/vue-swatches.min.css';
 
-macgyver.register('mgColor', {
-	title: 'Color',
-	icon: 'far fa-paint-roller',
-	category: 'Simple Inputs',
-	preferId: true,
-	config: {
+export default Vue.mgComponent('mgColor', {
+	meta: {
+		title: 'Color',
+		icon: 'far fa-paint-roller',
+		category: 'Simple Inputs',
+		preferId: true,
+		shorthand: ['color', 'hue', 'swatch'],
+	},
+	props: {
 		required: {type: 'mgToggle', default: false},
 		colorSet: {type: 'mgChoiceDropdown', enum: [{id: 'basic', title: 'Basic'}, {id: 'material-light', title: 'Material'}, {id: 'text-advanced', title: 'Full swatch'}], default: 'text-advanced'},
 		interface: {type: 'mgChoiceDropdown', default: 'input', enum: ['input', 'colorOnly']},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
 		popoverSide: {type: 'mgChoiceButtons', enum: ['left', 'right'], advanced: true},
 	},
-	format: true,
-	shorthand: ['color', 'hue', 'swatch'],
-});
-
-export default Vue.component('mgColor', {
-	inject: ['$mgForm'],
-	data() {return {
-		data: undefined,
-	}},
-	props: {
-		config: Object,
-	},
 	components: {Swatches},
 	created() {
-		this.$mgForm.inject(this);
 		this.$on('mgValidate', reply => {
-			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
+			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
 		});
 	},
 	methods: {
@@ -46,12 +36,12 @@ export default Vue.component('mgColor', {
 
 <template>
 	<div class="mg-color">
-		<div v-if="$props.config.interface == 'input'" class="input-group">
+		<div v-if="$props.interface == 'input'" class="input-group">
 			<div class="input-group-prepend">
 				<swatches
 					:value="data"
-					:colors="$props.config.colorSet"
-					:popover-to="$props.config.popoverSide"
+					:colors="$props.colorSet"
+					:popover-to="$props.popoverSide"
 					class="input-group-text"
 					@input="data = $event.toUpperCase()"
 				/>
@@ -60,15 +50,15 @@ export default Vue.component('mgColor', {
 				:value="data"
 				type="text"
 				class="form-control"
-				:placeholder="$props.config.placeholder"
+				:placeholder="$props.placeholder"
 				@input="change"
 			/>
 		</div>
 		<swatches
 			v-else
 			:value="data"
-			:colors="$props.config.colorSet"
-			:popover-to="$props.config.popoverSide"
+			:colors="$props.colorSet"
+			:popover-to="$props.popoverSide"
 			@input="data = $event.toUpperCase()"
 		/>
 	</div>

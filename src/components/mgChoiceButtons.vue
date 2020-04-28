@@ -1,10 +1,15 @@
 <script>
-macgyver.register('mgChoiceButtons', {
-	title: 'Choice Buttons',
-	icon: 'fas fa-ellipsis-h',
-	category: 'Choice Selectors',
-	preferId: true,
-	config: {
+export default Vue.mgComponent('mgChoiceButtons', {
+	meta: {
+		title: 'Choice Buttons',
+		icon: 'fas fa-ellipsis-h',
+		category: 'Choice Selectors',
+		preferId: true,
+	},
+	data() { return {
+		enumIter: [],
+	}},
+	props: {
 		enum: {
 			type: 'mgTable',
 			title: 'List items',
@@ -24,22 +29,9 @@ macgyver.register('mgChoiceButtons', {
 		itemClassActive: {type: 'mgText', default: 'btn btn-primary', advanced: true},
 		itemClassInactive: {type: 'mgText', default: 'btn btn-light', advanced: true},
 	},
-	format: true, // FIXME: Not sure about this, what if we need to lookup the value by the enum ID?
-});
-
-export default Vue.component('mgChoiceButtons', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-		enumIter: [],
-	}},
-	props: {
-		config: Object,
-	},
 	created() {
-		this.$mgForm.inject(this);
 		this.$on('mgValidate', reply => {
-			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
+			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
 		});
 	},
 	methods: {
@@ -49,13 +41,13 @@ export default Vue.component('mgChoiceButtons', {
 		},
 	},
 	watch: {
-		'$props.config.enum': {
+		'$props.enum': {
 			immediate: true,
 			handler() {
-				if (_.isArray(this.$props.config.enum) && _.isString(this.$props.config.enum[0])) { // Array of strings
-					this.enumIter = this.$props.config.enum.map(i => ({id: _.camelCase(i), title: i}));
-				} else if (_.isArray(this.$props.config.enum) && _.isObject(this.$props.config.enum[0])) { // Collection
-					this.enumIter = this.$props.config.enum;
+				if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
+					this.enumIter = this.$props.enum.map(i => ({id: _.camelCase(i), title: i}));
+				} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection
+					this.enumIter = this.$props.enum;
 				}
 			},
 		},
@@ -64,13 +56,13 @@ export default Vue.component('mgChoiceButtons', {
 </script>
 
 <template>
-	<div class="mg-choice-buttons" :class="$props.config.classWrapper">
+	<div class="mg-choice-buttons" :class="$props.classWrapper">
 		<a
 			v-for="item in enumIter"
 			:key="item.id"
 			:class="item.id && data == item.id
-				? item.classActive || item.class || $props.config.itemClassActive
-				: item.classInactive || item.class || $props.config.itemClassInactive
+				? item.classActive || item.class || $props.itemClassActive
+				: item.classInactive || item.class || $props.itemClassInactive
 			"
 			v-tooltip="item.tooltip"
 			@click="select(item)"

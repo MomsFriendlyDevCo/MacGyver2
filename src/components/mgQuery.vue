@@ -1,10 +1,15 @@
 <script>
-macgyver.register('mgQuery', {
-	title: 'Query',
-	icon: 'far fa-filter',
-	category: 'Data display',
-	preferId: true,
-	config: {
+export default Vue.mgComponent('mgQuery', {
+	meta: {
+		title: 'Query',
+		icon: 'far fa-filter',
+		category: 'Data display',
+	},
+	data() { return {
+		queryComponent: [],
+	}},
+	props: {
+		config: Object,
 		/**
 		* The spec is composed of an object lookup with the dotted notation path as the key and an object set of properties
 		* @property {string} [type='string'] The type of the field, used to determine the component to use as the value input
@@ -12,18 +17,7 @@ macgyver.register('mgQuery', {
 		* @property {array <string>|array <object>|string} [enum] If the type is a string this restricts operand values to a list of selectable values. The value can also be one of the following meta values: '$FIELDS' - list all spec fields
 		*/
 		spec: {type: 'mgCodeEditor', syntax: 'json'},
-	},
-});
-
-export default Vue.component('mgQuery', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-		queryComponent: [],
-	}},
-	props: {
-		config: Object,
-		spec: {type: String, default() { return {
+		spec: {type: String, default() { return { // FIXME: Test case
 			_id: {type: 'objectId'},
 			name: {type: 'string'},
 			username: {type: 'string'},
@@ -46,11 +40,9 @@ export default Vue.component('mgQuery', {
 		}}},
 	},
 	created() {
-		this.$mgForm.inject(this);
-
 		this.$watchAll([
-			'$props.config.url',
-			'$props.config.spec',
+			'$props.url',
+			'$props.spec',
 		], this.refresh, {immediate: true});
 	},
 	methods: {
@@ -215,7 +207,7 @@ export default Vue.component('mgQuery', {
 <template>
 	<div>
 		<mg-form
-			:form="`${$props.config.id}-subform`"
+			:form="`${$props.id}-subform`"
 			:config="queryComponent"
 		/>
 		<pre>Data: {{data}}</pre>

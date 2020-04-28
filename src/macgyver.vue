@@ -55,8 +55,6 @@ Vue.prototype.$macgyver = (()=> {
 			...component,
 		};
 
-		console.log('DECLARE', name);
-
 		var vueComponent = {
 			inject: component.inject || ['$mgForm'], // Defer to component injects or default to injecting $mgForm
 			data() { return {
@@ -73,54 +71,62 @@ Vue.prototype.$macgyver = (()=> {
 
 					// FIXME: This needs putting into each mgComponent declaration for Vue validation
 					// Convert prop type to Vue native instances {{{
-					switch (prop.vueType || prop.type) {
-						case 'mgText':
-						case 'mgChoiceButtons':
-						case 'mgChoiceDropdown':
-						case 'mgChoiceRadio':
-						case 'mgChoiceTree':
-						case 'mgCode':
-						case 'mgColor':
-						case 'mgEmail':
-						case 'mgIcon':
-						case 'mgQuery':
-						case 'mgRestQuery':
-						case 'mgUrl':
-						case 'mgWysiwyg':
-							newProp.type = String;
-							break;
-						case 'mgNumber':
-							newProp.type = Number;
-							break;
-						case 'mgChoiceCheckbox':
-						case 'mgToggle':
-							newProp.type = Boolean;
-							break;
-						case 'mgChoiceList':
-						case 'mgChoiceTags':
-						case 'mgTable':
-							newProp.type = Array;
-							break;
-						case 'mgDate':
-							newProp.type = Date;
-							break;
-						case Number:
-						case String:
-						case Array:
-						case Date:
-							console.warn('Used native binding in component prop (e.g. `{type: Array}`). Always use mg* component types so these components are editable in the mgFormEditor');
-							newProp.type = prop.type; // Native Vue types
-							break;
+					if (prop.vueType) {
+						switch (prop.vueType) {
+							// String to type bindings (usually via vueType)
+							case 'array': newProp.type = Array; break;
+							case 'boolean': newProp.type = Boolean; break;
+							case 'date': newProp.type = Date; break;
+							case 'number': newProp.type = Number; break;
+							case 'string': newProp.type = String; break;
+							default:
+								console.warn(`Unknown vueType JS primative "${prop.vueType}" while declaring component "${name}" - assuming "string"`);
+								newProp.type = String;
+						}
+					} else {
+						switch (prop.type) {
+							case 'mgText':
+							case 'mgChoiceButtons':
+							case 'mgChoiceDropdown':
+							case 'mgChoiceRadio':
+							case 'mgChoiceTree':
+							case 'mgCode':
+							case 'mgColor':
+							case 'mgEmail':
+							case 'mgIcon':
+							case 'mgQuery':
+							case 'mgRestQuery':
+							case 'mgUrl':
+							case 'mgWysiwyg':
+								newProp.type = String;
+								break;
+							case 'mgNumber':
+								newProp.type = Number;
+								break;
+							case 'mgChoiceCheckbox':
+							case 'mgToggle':
+								newProp.type = Boolean;
+								break;
+							case 'mgChoiceList':
+							case 'mgChoiceTags':
+							case 'mgTable':
+								newProp.type = Array;
+								break;
+							case 'mgDate':
+								newProp.type = Date;
+								break;
+							case Number:
+							case String:
+							case Array:
+							case Date:
+								console.warn('Used native binding in component prop (e.g. `{type: Array}`). Always use mg* component types so these components are editable in the mgFormEditor');
+								newProp.type = prop.type; // Native Vue types
+								break;
 
-						// String to type bindings (usually via vueType)
-						case 'array': newProp.type = Array; break;
-						case 'boolean': newProp.type = Boolean; break;
-						case 'date': newProp.type = Date; break;
-						case 'number': newProp.type = Number; break;
-						case 'string': newProp.type = String; break;
-						default:
-							console.warn(`Unknown vue type mapping "${prop.type}" assuming "String"`);
-							newProp.type = String;
+							default:
+								console.warn(`Unknown primative mapping of prop type "${prop.type}" while declaring component "${name}" - assuming "String"`);
+								newProp.type = String;
+						}
 					}
 					// }}}
 
@@ -179,6 +185,7 @@ Vue.prototype.$macgyver = (()=> {
 				'updated',
 
 				// Misc
+				'components',
 				'provide',
 			]),
 		};

@@ -1,11 +1,13 @@
 <script>
-macgyver.register({
-	id: 'mgAlert',
-	title: 'Alert Box',
-	icon: 'far fa-exclamation-triangle',
-	category: 'General Decoration',
-	preferId: false,
-	config: {
+export default Vue.mgComponent('mgAlert', {
+	meta: {
+		title: 'Alert Box',
+		icon: 'far fa-exclamation-triangle',
+		category: 'General Decoration',
+		preferId: false,
+	},
+	inject: ['$mgForm'],
+	props: {
 		text: {type: 'mgText', default: 'This is an alert!'},
 		style: {
 			type: 'mgChoiceButtons',
@@ -21,23 +23,10 @@ macgyver.register({
 		},
 	},
 });
-
-export default Vue.component('mgAlert', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-	}},
-	props: {
-		config: Object,
-	},
-	created() {
-		this.$mgForm.inject(this);
-	},
-});
 </script>
 
 <template>
-	<div class="alert" :class="$props.config.style">
-		{{$props.config.text || data}}
+	<div class="alert" :class="$props.style">
+		{{$props.text || data}}
 	</div>
 </template>

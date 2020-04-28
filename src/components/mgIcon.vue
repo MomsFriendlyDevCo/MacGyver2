@@ -1,10 +1,12 @@
 <script>
-macgyver.register('mgIcon', {
-	title: 'Icon',
-	icon: 'far fa-flag',
-	category: 'Simple Inputs',
-	preferId: true,
-	config: {
+export default Vue.mgComponent('mgIcon', {
+	meta: {
+		title: 'Icon',
+		icon: 'far fa-flag',
+		category: 'Simple Inputs',
+		preferId: true,
+	},
+	props: {
 		iconFallback: {type: 'mgIcon', default: 'far fa-info', help: 'The icon to use if non is selected'},
 		required: {type: 'mgToggle', default: false},
 		interface: {type: 'mgChoiceButtons', default: 'modal', enum: ['modal', 'dropdown']},
@@ -13,28 +15,16 @@ macgyver.register('mgIcon', {
 		classActive: {type: 'mgText', advanced: true},
 		classInactive: {type: 'mgText', advanced: true},
 	},
-	format: true,
-});
-
-export default Vue.component('mgIcon', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-	}},
-	props: {
-		config: Object,
-	},
 	created() {
-		this.$mgForm.inject(this);
 		this.$on('mgValidate', reply => {
-			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
+			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
 		});
 	},
 	methods: {
 		selectIcon() {
 			Promise.resolve()
 				.then(()=> this.$macgyver.notify.loading(this._uid, true))
-				.then(()=> this.$http.get(this.$props.config.iconFeed))
+				.then(()=> this.$http.get(this.$props.iconFeed))
 				.then(res => { this.$macgyver.notify.loading(this._uid, false); return res })
 				.then(res => this.$macgyver.$prompt.macgyver({
 					title: 'Select icon',
@@ -68,20 +58,20 @@ export default Vue.component('mgIcon', {
 <template>
 	<div class="mg-icon">
 		<a
-			v-if="$props.config.interface == 'modal'"
+			v-if="$props.interface == 'modal'"
 			@click="selectIcon()"
 			class="btn btn-light btn-icon-fixed"
-			:class="data ? [data, $props.config.classActive || $props.config.class] : [$props.config.iconFallback, $props.config.classInactive || $props.config.class]"
+			:class="data ? [data, $props.classActive || $props.class] : [$props.iconFallback, $props.classInactive || $props.class]"
 		/>
 		<mg-choice-dropdown
-			v-else-if="$props.config.interface == 'dropdown'"
+			v-else-if="$props.interface == 'dropdown'"
 			:form="$props.form"
 			:data="data"
 			:config="{
-				$dataPath: $props.config.$dataPath,
+				$dataPath: $props.$dataPath,
 				enumSource: 'url',
 				enumUrl: {
-					url: $props.config.iconFeed,
+					url: $props.iconFeed,
 					type: 'array',
 					mappings: {
 						id: {required: true, from: 'class'},
@@ -89,8 +79,8 @@ export default Vue.component('mgIcon', {
 						icon: {required: true, from: 'class'},
 					},
 				},
-				default: $props.config.default,
-				required: $props.config.required,
+				default: $props.default,
+				required: $props.required,
 			}"
 		/>
 		<mg-error

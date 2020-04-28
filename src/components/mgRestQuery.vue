@@ -1,10 +1,11 @@
 <script>
-macgyver.register('mgRestQuery', {
-	title: 'ReST Query',
-	icon: 'far fa-database',
-	category: 'Data display',
-	preferId: true,
-	config: {
+export default Vue.mgComponent('mgRestQuery', {
+	meta: {
+		title: 'ReST Query',
+		icon: 'far fa-database',
+		category: 'Data display',
+	},
+	props: {
 		class: {type: 'mgText', advanced: true},
 		classActive: {type: 'mgText', default: 'btn btn-primary', advanced: true},
 		classInactive: {type: 'mgText', default: 'btn btn-light', advanced: true},
@@ -12,17 +13,6 @@ macgyver.register('mgRestQuery', {
 		iconInactive: {type: 'mgIcon', default: 'far fa-plus', advanced: true},
 		textActive: {type: 'mgText', default: 'Edit query', advanced: true},
 		textInactive: {type: 'mgText', default: 'Add query', advanced: true},
-	},
-	format: true,
-});
-
-export default Vue.component('mgRestQuery', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-	}},
-	props: {
-		config: Object,
 	},
 	computed: {
 		codeDisplay() {
@@ -34,9 +24,8 @@ export default Vue.component('mgRestQuery', {
 		},
 	},
 	created() {
-		this.$mgForm.inject(this);
 		this.$on('mgValidate', reply => {
-			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
+			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
 		});
 	},
 	methods: {
@@ -66,10 +55,10 @@ export default Vue.component('mgRestQuery', {
 	<a
 		@click="editQuery()"
 		class="btn btn-light"
-		:class="data ? [data, $props.config.classActive || $props.config.class] : [$props.config.classInactive || $props.config.class]"
+		:class="data ? [data, $props.classActive || $props.class] : [$props.classInactive || $props.class]"
 		v-tooltip="{content: codeDisplay, classes: 'text-left'}"
 	>
-		<i :class="data ? $props.config.iconActive : $props.config.iconInactive"/>
-		{{data ? $props.config.textActive : $props.config.textInactive}}
+		<i :class="data ? $props.iconActive : $props.iconInactive"/>
+		{{data ? $props.textActive : $props.textInactive}}
 	</a>
 </template>

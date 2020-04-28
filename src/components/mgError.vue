@@ -1,33 +1,20 @@
 <script>
-macgyver.register('mgError', {
-	userPlacable: false,
-	title: 'Error display',
-	icon: 'far fa-exclamation-circle',
-	category: 'General Decoration',
-	preferId: false,
-	config: {
-		errorText: {type: 'mgText'},
+export default Vue.mgComponent('mgError', {
+	meta: {
+		title: 'Error display',
+		icon: 'far fa-exclamation-circle',
+		category: 'General Decoration',
 	},
-});
-
-export default Vue.component('mgError', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-	}},
 	props: {
-		config: Object,
-	},
-	created() {
-		this.$mgForm.inject(this);
+		errorText: {type: 'mgText'},
 	},
 	computed: {
 		// Mutate the incomming config back to what the original object probably was
 		displayConfig() {
-			if (!this.$props.config) return 'No config';
-			return this.$props.config
+			if (!this.$props) return 'No config';
+			return this.$props
 				|> v => _.pickBy(v, (v, k) => !k.startsWith('error'))
-				|> v => _.set(v, 'type', this.$props.config.errorWidgetType)
+				|> v => _.set(v, 'type', this.$props.errorWidgetType)
 		},
 	},
 });
@@ -35,7 +22,7 @@ export default Vue.component('mgError', {
 
 <template>
 	<div class="alert alert-danger">
-		{{data || $props.config.errorText}}
+		{{data || $props.errorText}}
 		<pre>Config: {{displayConfig}}</pre>
 		<pre>Data: {{data || 'No data'}}</pre>
 	</div>

@@ -1,10 +1,16 @@
 <script>
-macgyver.register('mgChoicePopup', {
-	title: 'Choice Popup',
-	icon: 'fas fa-window-maximize',
-	category: 'Choice Selectors',
-	preferId: true,
-	config: {
+export default Vue.mgComponent('mgChoicePopup', {
+	meta: {
+		title: 'Choice Popup',
+		icon: 'fas fa-window-maximize',
+		category: 'Choice Selectors',
+		preferId: true,
+	},
+	data() { return {
+		activeTitle: undefined,
+		enumIter: [],
+	}},
+	props: {
 		enum: {
 			type: 'mgTable',
 			title: 'List items',
@@ -24,29 +30,15 @@ macgyver.register('mgChoicePopup', {
 		classActive: {type: 'mgText', default: 'btn btn-primary', advanced: true},
 		classInactive: {type: 'mgText', default: 'btn btn-default', advanced: true},
 	},
-	format: true, // FIXME: Not sure about this, what if we need to lookup the value by the enum ID?
-});
-
-export default Vue.component('mgChoicePopup', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-		activeTitle: undefined,
-		enumIter: [],
-	}},
-	props: {
-		config: Object,
-	},
 	created() {
-		this.$mgForm.inject(this);
 		this.$on('mgValidate', reply => {
-			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
+			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
 		});
 	},
 	methods: {
 		select(id) {
 			this.$prompt.macgyver({
-				title: this.$props.config.popupTitle,
+				title: this.$props.popupTitle,
 				form: {
 					id: 'selected',
 					type: 'mgChoiceButtons',
@@ -77,11 +69,11 @@ export default Vue.component('mgChoicePopup', {
 				this.$set(this, 'activeTitle', activeItem ? activeItem.title : '');
 			}
 		},
-		'$props.config.enumUrl': {
+		'$props.enumUrl': {
 			immediate: true,
 			handler() {
-				if (!this.$props.config.enumUrl) return;
-				this.$macgyver.utils.fetch(this.$props.config.enumUrl, {
+				if (!this.$props.enumUrl) return;
+				this.$macgyver.utils.fetch(this.$props.enumUrl, {
 					type: 'array',
 					mappings: {
 						id: {required: true},
@@ -89,16 +81,16 @@ export default Vue.component('mgChoicePopup', {
 					},
 				})
 					.tap(data => console.log('mgPopup got feed', data))
-					.then(data => this.$set(this.$props.config, 'enum', data))
+					.then(data => this.$set(this.$props, 'enum', data))
 			},
 		},
-		'$props.config.enum': {
+		'$props.enum': {
 			immediate: true,
 			handler() {
-				if (_.isArray(this.$props.config.enum) && _.isString(this.$props.config.enum[0])) { // Array of strings
-					this.enumIter = this.$props.config.enum.map(i => ({id: _.camelCase(i), title: i}));
-				} else if (_.isArray(this.$props.config.enum) && _.isObject(this.$props.config.enum[0])) { // Collection
-					this.enumIter = this.$props.config.enum;
+				if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
+					this.enumIter = this.$props.enum.map(i => ({id: _.camelCase(i), title: i}));
+				} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection
+					this.enumIter = this.$props.enum;
 				}
 			},
 		},
@@ -109,11 +101,11 @@ export default Vue.component('mgChoicePopup', {
 <template>
 	<div class="mg-choice-popup">
 		<a
-			:class="data ? $props.config.classActive : $props.config.classInactive"
+			:class="data ? $props.classActive : $props.classInactive"
 			@click="select()"
 		>
-			<i :class="data ? $props.config.iconActive : $props.config.iconInactive"></i>
-			{{this.data ? activeTitle : $props.config.inactiveText}}
+			<i :class="data ? $props.iconActive : $props.iconInactive"></i>
+			{{this.data ? activeTitle : $props.inactiveText}}
 		</a>
 	</div>
 </template>

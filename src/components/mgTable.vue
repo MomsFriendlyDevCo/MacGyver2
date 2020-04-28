@@ -1,10 +1,15 @@
 <script>
-macgyver.register('mgTable', {
-	title: 'Table layout',
-	icon: 'far fa-table',
-	category: 'Layout',
-	preferId: false,
-	config: {
+export default Vue.mgComponent('mgTable', {
+	meta: {
+		title: 'Table layout',
+		icon: 'far fa-table',
+		category: 'Layout',
+	},
+	data() { return {
+		newRow: [],
+		isAdding: false,
+	}},
+	props: {
 		url: {type: 'mgUrl', relative: true, help: 'Data feed to populate the table'},
 		allowAdd: {type: 'mgToggle', title: 'Allow Row Addition', default: true},
 		allowDelete: {type: 'mgToggle', title: 'Allow Row Deletion', default: true},
@@ -24,29 +29,14 @@ macgyver.register('mgTable', {
 		addButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},
 		rowNumbers: {type: 'mgToggle', help: 'Show the row number at the beginning of each row', default: true},
 	},
-	configChildren: {
+	childProps: {
 		showTitle: {type: 'mgToggle', default: false, title: 'Show Title'},
 	},
-});
-
-export default Vue.component('mgTable', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: [],
-		newRow: [],
-		isAdding: false,
-	}},
-	props: {
-		config: Object,
-	},
-	created() {
-		this.$mgForm.inject(this);
-	},
 	mounted() {
-		this.$watch('$props.config.url', ()=> {
-			if (!this.$props.config.url) return;
-			this.$macgyver.utils.fetch(this.$props.config.url, {type: 'array'})
-				.then(data => this.$set(this.$props.config, 'data', data))
+		this.$watch('$props.url', ()=> {
+			if (!this.$props.url) return;
+			this.$macgyver.utils.fetch(this.$props.url, {type: 'array'})
+				.then(data => this.$set(this.$props, 'data', data))
 		}, {immediate: true});
 	},
 	watch: {
@@ -73,8 +63,8 @@ export default Vue.component('mgTable', {
 	<table class="table table-bordered table-striped table-hover">
 		<thead>
 			<tr>
-				<th v-if="$props.config.rowNumbers" class="row-number">#</th>
-				<th v-for="col in $props.config.items" :key="col.id" :style="(col.width ? 'width: ' + col.width + '; ' : '') + col.class">
+				<th v-if="$props.rowNumbers" class="row-number">#</th>
+				<th v-for="col in $props.items" :key="col.id" :style="(col.width ? 'width: ' + col.width + '; ' : '') + col.class">
 					{{col.title}}
 				</th>
 				<th class="btn-context"></th>
@@ -82,15 +72,15 @@ export default Vue.component('mgTable', {
 		</thead>
 		<tbody>
 			<tr v-if="!data || !data.length">
-				<td :colspan="$props.config.items.length + ($props.config.rowNumbers ? 2 : 1)">
-					<div class="alert alert-warning m-10">{{$props.config.textEmpty || 'No data'}}</div>
+				<td :colspan="$props.items.length + ($props.rowNumbers ? 2 : 1)">
+					<div class="alert alert-warning m-10">{{$props.textEmpty || 'No data'}}</div>
 				</td>
 			</tr>
 			<tr v-for="(row, rowNumber) in data">
-				<td v-if="$props.config.rowNumbers" class="row-number">
+				<td v-if="$props.rowNumbers" class="row-number">
 					{{rowNumber + 1 | number}}
 				</td>
-				<td v-for="col in $props.config.items" :key="col.id" :class="col.class">
+				<td v-for="col in $props.items" :key="col.id" :class="col.class">
 					<mg-component :form="$props.form" :config="col"/>
 				</td>
 				<td class="btn-context">
@@ -99,21 +89,21 @@ export default Vue.component('mgTable', {
 						<ul class="dropdown-menu pull-right">
 							<li><a @click="createRow(rowNumber)"><i class="far fa-arrow-circle-up"></i> Add row above</a></li>
 							<li><a @click="createRow(rowNumber)"><i class="far fa-arrow-circle-down"></i> Add row below</a></li>
-							<li v-if="$props.config.allowDelete" class="dropdown-divider"></li>
-							<li v-if="$props.config.allowDelete" class="dropdown-item-danger"><a @click="deleteRow(rowNumber)"><i class="far fa-trash"></i> Delete</a></li>
+							<li v-if="$props.allowDelete" class="dropdown-divider"></li>
+							<li v-if="$props.allowDelete" class="dropdown-item-danger"><a @click="deleteRow(rowNumber)"><i class="far fa-trash"></i> Delete</a></li>
 						</ul>
 					</div>
 				</td>
 			</tr>
-			<tr class="mgTable-append" v-if="$props.config.allowAdd">
-				<td v-if="$props.config.rowNumbers" class="row-number">
+			<tr class="mgTable-append" v-if="$props.allowAdd">
+				<td v-if="$props.rowNumbers" class="row-number">
 					<i class="far fa-asterisk"></i>
 				</td>
-				<td v-for="(col, colNumber) in $props.config.items" :key="col.id">
+				<td v-for="(col, colNumber) in $props.items" :key="col.id">
 					<mg-component :form="$props.form" :config="col" :data="newRow[colNumber]"/>
 				</td>
 				<td>
-					<a @click="createRow()" :class="isAdding ? $props.config.addButtonActiveClass : $props.config.addButtonInactiveClass"></a>
+					<a @click="createRow()" :class="isAdding ? $props.addButtonActiveClass : $props.addButtonInactiveClass"></a>
 				</td>
 			</tr>
 		</tbody>

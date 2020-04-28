@@ -1,10 +1,15 @@
 <script>
-macgyver.register('mgChoiceCheckbox', {
-	title: 'Checkbox multiple-choice',
-	icon: 'far fa-list',
-	category: 'Choice Selectors',
-	preferId: true,
-	config: {
+export default Vue.mgComponent('mgChoiceCheckbox', {
+	meta: {
+		title: 'Checkbox multiple-choice',
+		icon: 'far fa-list',
+		category: 'Choice Selectors',
+		preferId: true,
+	},
+	data() { return {
+		enumIter: [],
+	}},
+	props: {
 		enum: {
 			type: 'mgList',
 			title: 'List items',
@@ -31,22 +36,9 @@ macgyver.register('mgChoiceCheckbox', {
 			],
 		},
 	},
-	format: true, // FIXME: Not sure about this, what if we need to lookup the value by the enum ID?
-});
-
-export default Vue.component('mgChoiceCheckbox', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-		enumIter: [],
-	}},
-	props: {
-		config: Object,
-	},
 	created() {
-		this.$mgForm.inject(this);
 		this.$on('mgValidate', reply => {
-			if (this.$props.config.required && !this.data) return reply(`${this.$props.config.title} is required`);
+			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
 		});
 
 		if (!_.isArray(this.data)) this.data = [];
@@ -60,22 +52,22 @@ export default Vue.component('mgChoiceCheckbox', {
 			} else {
 				this.data.push(id);
 
-				if (this.$props.config.sort == 'sortId') {
+				if (this.$props.sort == 'sortId') {
 					this.data.sort();
-				} else if (this.$props.config.sort == 'sortTitle') {
-					this.data = _.sortBy(this.data, i => this.config.enum.find(e => e.id == i));
+				} else if (this.$props.sort == 'sortTitle') {
+					this.data = _.sortBy(this.data, i => this.enum.find(e => e.id == i));
 				}
 			}
 		},
 	},
 	watch: {
-		'$props.config.enum': {
+		'$props.enum': {
 			immediate: true,
 			handler() {
-				if (_.isArray(this.$props.config.enum) && _.isString(this.$props.config.enum[0])) { // Array of strings
-					this.enumIter = this.$props.config.enum.map(i => ({id: _.camelCase(i), title: i}));
-				} else if (_.isArray(this.$props.config.enum) && _.isObject(this.$props.config.enum[0])) { // Collection
-					this.enumIter = this.$props.config.enum;
+				if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
+					this.enumIter = this.$props.enum.map(i => ({id: _.camelCase(i), title: i}));
+				} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection
+					this.enumIter = this.$props.enum;
 				}
 			},
 		},
@@ -89,10 +81,10 @@ export default Vue.component('mgChoiceCheckbox', {
 			<input
 				type="checkbox"
 				@change="change(item.id)"
-				:id="`mg-choice-checkbox-${$props.config.id}-${item.id}`"
+				:id="`mg-choice-checkbox-${$props.id}-${item.id}`"
 				:checked="data.includes(item.id)"
 			/>
-			<label class="form-check-label" :for="`mg-choice-checkbox-${$props.config.id}-${item.id}`">
+			<label class="form-check-label" :for="`mg-choice-checkbox-${$props.id}-${item.id}`">
 				{{item.title}}
 			</label>
 		</div>

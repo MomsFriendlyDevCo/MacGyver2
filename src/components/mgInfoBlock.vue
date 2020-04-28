@@ -1,9 +1,15 @@
 <script>
-macgyver.register('mgInfoBlock', {
-	title: 'Info Block',
-	icon: 'far fa-info-square',
-	category: 'Data display',
-	config: {
+export default Vue.mgComponent('mgInfoBlock', {
+	meta: {
+		title: 'Info Block',
+		icon: 'far fa-info-square',
+		category: 'Data display',
+		format: false,
+	},
+	data() { return {
+		isLoading: false,
+	}},
+	props: {
 		text: {type: 'mgText', help: 'Text to display, if a URL is also specified this is overridden when the result loads', default: ''},
 		url: {type: 'mgUrl', relative: true, default: '/api/datafeeds/random/number?$extract=number'},
 		coloring: {
@@ -39,26 +45,12 @@ macgyver.register('mgInfoBlock', {
 			],
 		},
 	},
-	format: false,
-});
-
-export default Vue.component('mgInfoBlock', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-		isLoading: false,
-	}},
-	props: {
-		config: Object,
-	},
 	created() {
-		this.$mgForm.inject(this);
-
-		this.$watch('$props.config.url', ()=> {
-			if (!this.$props.config.url) return;
+		this.$watch('$props.url', ()=> {
+			if (!this.$props.url) return;
 			Promise.resolve()
 				.then(()=> this.isLoading = true)
-				.then(()=> this.$macgyver.utils.fetch(this.$props.config.url, {
+				.then(()=> this.$macgyver.utils.fetch(this.$props.url, {
 					type: 'object',
 					mappings: {extract: {required: true}},
 					format: d => d.extract,
@@ -71,14 +63,14 @@ export default Vue.component('mgInfoBlock', {
 </script>
 
 <template>
-	<div class="card mg-info-block" :class="$props.config.coloring">
+	<div class="card mg-info-block" :class="$props.coloring">
 		<div class="card-body media">
 			<div class="mr-3">
-				<i :class="[isLoading ? $props.config.iconLoading : $props.config.icon, $props.config.iconSize]"/>
+				<i :class="[isLoading ? $props.iconLoading : $props.icon, $props.iconSize]"/>
 			</div>
 			<div class="media-body">
-				<div class="mg-info-block-text">{{data || $props.config.text}}</div>
-				<div class="mg-info-block-title">{{$props.config.title}}</div>
+				<div class="mg-info-block-text">{{data || $props.text}}</div>
+				<div class="mg-info-block-title">{{$props.title}}</div>
 			</div>
 		</div>
 	</div>
