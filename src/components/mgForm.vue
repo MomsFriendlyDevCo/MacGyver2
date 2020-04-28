@@ -122,6 +122,7 @@ export default Vue.component('mgForm', {
 		assignDefaults() {
 			if (!this.spec) return;
 			_.defaultsDeep(this.formData, this.getPrototype());
+			this.$emit('change', this.formData);
 		},
 
 
