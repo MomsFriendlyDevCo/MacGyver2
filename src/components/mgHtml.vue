@@ -10,7 +10,7 @@ export default Vue.mgComponent('mgHtml', {
 		$mgFormEditor: {from: '$mgFormEditor', default: false},
 	},
 	props: {
-		text: {type: 'mgCodeEditor', syntax: 'html'},
+		text: {type: 'mgCode', syntax: 'html'},
 	},
 });
 </script>

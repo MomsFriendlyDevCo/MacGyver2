@@ -67,7 +67,7 @@ export default Vue.mgComponent('mgContainer', {
 		]},
 		onChange: {type: 'string', title: 'Change action', help: 'Action to trigger when the value of this component changes', advanced: true},
 		show: {type: 'mgToggle', default: true, advanced: true, help: 'Whether the item is visible by default'},
-		showIf: {type: 'mgCodeEditor', syntax: 'text', advanced: true, help: 'A simple equality expression or Sift object to deteremine visibility'},
+		showIf: {type: 'mgCode', syntax: 'text', advanced: true, help: 'A simple equality expression or Sift object to deteremine visibility'},
 	},
 	data() { return {
 		highlights: {}, // Lookup of extra classes to add to widgets, each key is the array offset of the widget within this container, the value is an array of classes to add

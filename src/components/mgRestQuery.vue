@@ -37,7 +37,7 @@ export default Vue.mgComponent('mgRestQuery', {
 					form: [
 						{
 							id: 'query',
-							type: 'mgCodeEditor',
+							type: 'mgCode',
 							showTitle: false,
 						},
 					],

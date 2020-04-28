@@ -96,6 +96,8 @@ Vue.prototype.$macgyver = (()=> {
 							case 'mgIcon':
 							case 'mgQuery':
 							case 'mgRestQuery':
+							case 'mgTextArea':
+							case 'mgUnknown':
 							case 'mgUrl':
 							case 'mgWysiwyg':
 								newProp.type = String;
@@ -109,10 +111,12 @@ Vue.prototype.$macgyver = (()=> {
 								break;
 							case 'mgChoiceList':
 							case 'mgChoiceTags':
+							case 'mgList':
 							case 'mgTable':
 								newProp.type = Array;
 								break;
 							case 'mgDate':
+							case 'mgTime':
 								newProp.type = Date;
 								break;
 							case Number:

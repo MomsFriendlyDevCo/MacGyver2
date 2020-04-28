@@ -35,7 +35,7 @@ export default Vue.mgComponent('mgChoiceTags', {
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 		allowCreate: {type: 'mgToggle', default: false, help: 'Allow the user to create their own tags in addition to the supplied ones'},
 		showDropdown: {type: 'mgToggle', default: true, help: 'When clicking, show a dropdown box. Disabling will only allow the user to use existing tags'},
-		maxVisible: {type: 'number', default: 0, help: 'Maximum number of tags to display before showing helper text, set to zero to disable'},
+		maxVisible: {type: 'mgNumber', default: 0, help: 'Maximum number of tags to display before showing helper text, set to zero to disable'},
 	},
 	created() {
 		this.$on('mgValidate', reply => {

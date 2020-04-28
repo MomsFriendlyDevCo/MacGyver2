@@ -16,7 +16,7 @@ export default Vue.mgComponent('mgQuery', {
 		* @property {boolean} [showOperand=true] Whether to allow the user to select the operand ("Equals", "Is in" etc.) if false this only allows straight equality
 		* @property {array <string>|array <object>|string} [enum] If the type is a string this restricts operand values to a list of selectable values. The value can also be one of the following meta values: '$FIELDS' - list all spec fields
 		*/
-		spec: {type: 'mgCodeEditor', syntax: 'json'},
+		spec: {type: 'mgCode', syntax: 'json'},
 		spec: {type: String, default() { return { // FIXME: Test case
 			_id: {type: 'objectId'},
 			name: {type: 'string'},

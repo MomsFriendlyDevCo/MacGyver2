@@ -15,8 +15,9 @@ export default Vue.mgComponent('mgTable', {
 		allowDelete: {type: 'mgToggle', title: 'Allow Row Deletion', default: true},
 		textEmpty: {type: 'mgText', title: 'No data message', default: 'No data'},
 		items: {
-			type: 'mgTableEditor',
-			title: 'Column setup',
+			type: 'mgAlert',
+			vueType: 'array',
+			text: 'Use the editor to define child widgets',
 			default: [
 				/* e.g.
 				{id: 'col1', type: 'mgText'},
