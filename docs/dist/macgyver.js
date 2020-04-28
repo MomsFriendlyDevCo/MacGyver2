@@ -14725,430 +14725,13 @@
                         'default': __vue_component__$D
             });
 
-            function _typeof$1(obj) {
-              "@babel/helpers - typeof";
+            var vueInputFacade_umd_min = createCommonjsModule(function (module, exports) {
+            (function(e,t){module.exports=t();})("undefined"!==typeof self?self:commonjsGlobal,(function(){return function(e){var t={};function n(r){if(t[r])return t[r].exports;var o=t[r]={i:r,l:!1,exports:{}};return e[r].call(o.exports,o,o.exports,n),o.l=!0,o.exports}return n.m=e,n.c=t,n.d=function(e,t,r){n.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:r});},n.r=function(e){"undefined"!==typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0});},n.t=function(e,t){if(1&t&&(e=n(e)),8&t)return e;if(4&t&&"object"===typeof e&&e&&e.__esModule)return e;var r=Object.create(null);if(n.r(r),Object.defineProperty(r,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var o in e)n.d(r,o,function(t){return e[t]}.bind(null,o));return r},n.n=function(e){var t=e&&e.__esModule?function(){return e["default"]}:function(){return e};return n.d(t,"a",t),t},n.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},n.p="",n(n.s="fb15")}({"0cfb":function(e,t,n){var r=n("83ab"),o=n("d039"),i=n("cc12");e.exports=!r&&!o((function(){return 7!=Object.defineProperty(i("div"),"a",{get:function(){return 7}}).a}));},"25f0":function(e,t,n){var r=n("6eeb"),o=n("825a"),i=n("d039"),a=n("ad6d"),u="toString",c=RegExp.prototype,s=c[u],f=i((function(){return "/a/b"!=s.call({source:"a",flags:"b"})})),l=s.name!=u;(f||l)&&r(RegExp.prototype,u,(function(){var e=o(this),t=String(e.source),n=e.flags,r=String(void 0===n&&e instanceof RegExp&&!("flags"in c)?a.call(e):n);return "/"+t+"/"+r}),{unsafe:!0});},5135:function(e,t){var n={}.hasOwnProperty;e.exports=function(e,t){return n.call(e,t)};},5692:function(e,t,n){var r=n("c430"),o=n("c6cd");(e.exports=function(e,t){return o[e]||(o[e]=void 0!==t?t:{})})("versions",[]).push({version:"3.4.2",mode:r?"pure":"global",copyright:"© 2019 Denis Pushkarev (zloirock.ru)"});},"5c6c":function(e,t){e.exports=function(e,t){return {enumerable:!(1&e),configurable:!(2&e),writable:!(4&e),value:t}};},"69f3":function(e,t,n){var r,o,i,a=n("7f9a"),u=n("da84"),c=n("861d"),s=n("9112"),f=n("5135"),l=n("f772"),d=n("d012"),p=u.WeakMap,m=function(e){return i(e)?o(e):r(e,{})},v=function(e){return function(t){var n;if(!c(t)||(n=o(t)).type!==e)throw TypeError("Incompatible receiver, "+e+" required");return n}};if(a){var h=new p,g=h.get,b=h.has,y=h.set;r=function(e,t){return y.call(h,e,t),t},o=function(e){return g.call(h,e)||{}},i=function(e){return b.call(h,e)};}else{var k=l("state");d[k]=!0,r=function(e,t){return s(e,k,t),t},o=function(e){return f(e,k)?e[k]:{}},i=function(e){return f(e,k)};}e.exports={set:r,get:o,has:i,enforce:m,getterFor:v};},"6eeb":function(e,t,n){var r=n("da84"),o=n("5692"),i=n("9112"),a=n("5135"),u=n("ce4e"),c=n("9e81"),s=n("69f3"),f=s.get,l=s.enforce,d=String(c).split("toString");o("inspectSource",(function(e){return c.call(e)})),(e.exports=function(e,t,n,o){var c=!!o&&!!o.unsafe,s=!!o&&!!o.enumerable,f=!!o&&!!o.noTargetGet;"function"==typeof n&&("string"!=typeof t||a(n,"name")||i(n,"name",t),l(n).source=d.join("string"==typeof t?t:"")),e!==r?(c?!f&&e[t]&&(s=!0):delete e[t],s?e[t]=n:i(e,t,n)):s?e[t]=n:u(t,n);})(Function.prototype,"toString",(function(){return "function"==typeof this&&f(this).source||c.call(this)}));},"7f9a":function(e,t,n){var r=n("da84"),o=n("9e81"),i=r.WeakMap;e.exports="function"===typeof i&&/native code/.test(o.call(i));},"825a":function(e,t,n){var r=n("861d");e.exports=function(e){if(!r(e))throw TypeError(String(e)+" is not an object");return e};},"83ab":function(e,t,n){var r=n("d039");e.exports=!r((function(){return 7!=Object.defineProperty({},"a",{get:function(){return 7}}).a}));},"861d":function(e,t){e.exports=function(e){return "object"===typeof e?null!==e:"function"===typeof e};},"90e3":function(e,t){var n=0,r=Math.random();e.exports=function(e){return "Symbol("+String(void 0===e?"":e)+")_"+(++n+r).toString(36)};},9112:function(e,t,n){var r=n("83ab"),o=n("9bf2"),i=n("5c6c");e.exports=r?function(e,t,n){return o.f(e,t,i(1,n))}:function(e,t,n){return e[t]=n,e};},"9bf2":function(e,t,n){var r=n("83ab"),o=n("0cfb"),i=n("825a"),a=n("c04e"),u=Object.defineProperty;t.f=r?u:function(e,t,n){if(i(e),t=a(t,!0),i(n),o)try{return u(e,t,n)}catch(r){}if("get"in n||"set"in n)throw TypeError("Accessors not supported");return "value"in n&&(e[t]=n.value),e};},"9e81":function(e,t,n){var r=n("5692");e.exports=r("native-function-to-string",Function.toString);},ad6d:function(e,t,n){var r=n("825a");e.exports=function(){var e=r(this),t="";return e.global&&(t+="g"),e.ignoreCase&&(t+="i"),e.multiline&&(t+="m"),e.dotAll&&(t+="s"),e.unicode&&(t+="u"),e.sticky&&(t+="y"),t};},c04e:function(e,t,n){var r=n("861d");e.exports=function(e,t){if(!r(e))return e;var n,o;if(t&&"function"==typeof(n=e.toString)&&!r(o=n.call(e)))return o;if("function"==typeof(n=e.valueOf)&&!r(o=n.call(e)))return o;if(!t&&"function"==typeof(n=e.toString)&&!r(o=n.call(e)))return o;throw TypeError("Can't convert object to primitive value")};},c430:function(e,t){e.exports=!1;},c6cd:function(e,t,n){var r=n("da84"),o=n("ce4e"),i="__core-js_shared__",a=r[i]||o(i,{});e.exports=a;},c8ba:function(e,t){var n;n=function(){return this}();try{n=n||new Function("return this")();}catch(r){"object"===typeof window&&(n=window);}e.exports=n;},cc12:function(e,t,n){var r=n("da84"),o=n("861d"),i=r.document,a=o(i)&&o(i.createElement);e.exports=function(e){return a?i.createElement(e):{}};},ce4e:function(e,t,n){var r=n("da84"),o=n("9112");e.exports=function(e,t){try{o(r,e,t);}catch(n){r[e]=t;}return t};},d012:function(e,t){e.exports={};},d039:function(e,t){e.exports=function(e){try{return !!e()}catch(t){return !0}};},da84:function(e,t,n){(function(t){var n=function(e){return e&&e.Math==Math&&e};e.exports=n("object"==typeof globalThis&&globalThis)||n("object"==typeof window&&window)||n("object"==typeof self&&self)||n("object"==typeof t&&t)||Function("return this")();}).call(this,n("c8ba"));},f772:function(e,t,n){var r=n("5692"),o=n("90e3"),i=r("keys");e.exports=function(e){return i[e]||(i[e]=o(e))};},fb15:function(e,t,n){var r;(n.r(t),"undefined"!==typeof window)&&((r=window.document.currentScript)&&(r=r.src.match(/(.+\/)[^/]+\.js(\?.*)?$/))&&(n.p=r[1]));var o={"#":{pattern:/\d/},X:{pattern:/[0-9a-z]/i},S:{pattern:/[a-z]/i},A:{pattern:/[a-z]/i,transform:e=>e.toLocaleUpperCase()},a:{pattern:/[a-z]/i,transform:e=>e.toLocaleLowerCase()},"\\":{escape:!0}};n("25f0");const i="__input-facade__";function a(e=""){this.masked=this.raw=e;}function u(){return new CustomEvent("input",{bubbles:!0,cancelable:!0,detail:{facade:!0}})}function c(e={}){return (Array.isArray(e)||"string"===typeof e)&&(e={mask:e}),e}function s(e){const t=e instanceof HTMLInputElement?e:e.querySelector("input");if(!t)throw new Error("facade directive requires an input element");return t}function f(e){const{target:t,detail:n}=e;if(n&&n.facade)return !1;e.stopPropagation();const r=t.value,o=t.selectionEnd;d(t,{emit:!1}),l(e,r,o),t.dispatchEvent(u());}function l(e,t,n){const{target:r}=e,o=["text","tel","search",null].includes(r.getAttribute("type")),a=r[i]&&r[i].config;if(r!==document.activeElement||!o||!a.mask)return;const u="insertFromPaste"===e.inputType,c=(e.data||u)&&n==t.length;let s=t[n-1];const f=r.value.toLocaleLowerCase();let l=n;if(c)l=f.length;else if(s){s=s.toLocaleLowerCase();let e=l;while(e<=f.length&&f.charAt(e-1)!==s)e++;l=e<=f.length?e:l-1;}r.setSelectionRange(l,l),setTimeout((function(){r.setSelectionRange(l,l);}),0);}function d(e,{emit:t=!0,force:n=!1}={}){const{config:r,oldValue:o}=e[i];if(n||o!==e.value){const n=g(e.value,r);e[i].oldValue=n.masked,e.value!==n.masked&&(e.value=n.masked),e.unmaskedValue=n.raw,t&&e.dispatchEvent(u());}}let p=o;function m(e){p=e;}function v(e,t={}){const n=t.masks.slice().sort((e,t)=>e.length-t.length),r=e=>Object.assign({},t,e),o=(t,n)=>{const o=h(e,r({mask:n,short:!0}));return o.masked.length>t.length};for(let i=0;i<n.length;i++){const t=n[i],a=n[i+1];if(!a||!o(t,a))return h(e,r({mask:t}))}return new a}function h(e="",t={}){let{mask:n="",tokens:r,short:o=!1}=t;r=r?Object.assign({},p,r):p,e=e.toString();let i=new a,u=!1,c=0,s=0,f="";while(s<n.length){const t=n[s],a=r[t];let l=e[c];if(!l&&(o||a))break;if(a&&!u){if(a.escape){u=!0,s++;continue}a.pattern.test(l)&&(l=a.transform?a.transform(l):l,i.raw+=l,i.masked+=f+l,f="",s++),c++;}else f+=t,l===t&&c++,u=!1,s++;}return i.raw&&!o&&(i.masked+=f),i}function g(e,t){return t=c(t),t.mask?Array.isArray(t.mask)?v(e,Object.assign({},t,{masks:t.mask})):h(e,t):new a(e)}const b=i;var y={bind:function(e,t){e=s(e),e.addEventListener("input",f,!0),e[b]={config:c(t.value)},d(e);},update:(e,{value:t,oldValue:n})=>{e=s(e),t!==n?(e[b].config=c(t),d(e,{force:!0})):d(e);},unbind:e=>e.removeEventListener("input",f,!0)},k=function(){var e=this,t=e.$createElement,n=e._self._c||t;return n("input",{directives:[{name:"facade",rawName:"v-facade",value:e.config,expression:"config"}],attrs:{type:"text"},domProps:{value:e.maskedValue},on:{input:e.input,blur:function(t){return e.$emit("blur")},focus:function(t){return e.$emit("focus")}}})},w=[],x={name:"InputFacade",props:{mask:[String,Array],masked:{type:Boolean,default:!1},tokens:Object,value:[String,Number]},directives:{facade:y},data(){return {emittedValue:this.value,maskedValue:this.value,unmaskedValue:null}},watch:{value(e){e!==this.emittedValue&&(this.maskedValue=e);},mask(e){e||(this.maskedValue=this.unmaskedValue);},masked(){this.refresh();}},computed:{config(){return {mask:this.mask,tokens:this.tokens}}},methods:{input({target:e}){this.maskedValue=e.value,this.unmaskedValue=e.unmaskedValue,this.refresh();},refresh(){let e=this.mask&&this.masked?this.maskedValue:this.unmaskedValue;this.emittedValue!==e&&(this.emittedValue=e,this.$emit("input",e));}}},_=x;function S(e,t,n,r,o,i,a,u){var c,s="function"===typeof e?e.options:e;if(t&&(s.render=t,s.staticRenderFns=n,s._compiled=!0),r&&(s.functional=!0),i&&(s._scopeId="data-v-"+i),a?(c=function(e){e=e||this.$vnode&&this.$vnode.ssrContext||this.parent&&this.parent.$vnode&&this.parent.$vnode.ssrContext,e||"undefined"===typeof __VUE_SSR_CONTEXT__||(e=__VUE_SSR_CONTEXT__),o&&o.call(this,e),e&&e._registeredComponents&&e._registeredComponents.add(a);},s._ssrRegister=c):o&&(c=u?function(){o.call(this,this.$root.$options.shadowRoot);}:o),c)if(s.functional){s._injectStyles=c;var f=s.render;s.render=function(e,t){return c.call(t),f(e,t)};}else{var l=s.beforeCreate;s.beforeCreate=l?[].concat(l,c):[c];}return {exports:e,options:s}}var j=S(_,k,w,!1,null,null,null),E=j.exports;function V(e,t={}){t.tokens&&m(t.tokens),e.component(E.name,E),e.directive(t.name||"facade",y),e.filter(t.name||"facade",O);}function O(e,t){return g(e,t).masked}var T=V;"undefined"!==typeof window&&window.Vue&&window.Vue.use(V),n.d(t,"InputFacade",(function(){return E})),n.d(t,"facade",(function(){return y})),n.d(t,"tokens",(function(){return o})),n.d(t,"masker",(function(){return g})),n.d(t,"filter",(function(){return O}));t["default"]=T;}})}));
+            });
 
-              if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-                _typeof$1 = function (obj) {
-                  return typeof obj;
-                };
-              } else {
-                _typeof$1 = function (obj) {
-                  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-                };
-              }
+            var InputFacade = unwrapExports(vueInputFacade_umd_min);
 
-              return _typeof$1(obj);
-            }
-
-            function _defineProperty$2(obj, key, value) {
-              if (key in obj) {
-                Object.defineProperty(obj, key, {
-                  value: value,
-                  enumerable: true,
-                  configurable: true,
-                  writable: true
-                });
-              } else {
-                obj[key] = value;
-              }
-
-              return obj;
-            }
-
-            function ownKeys$1(object, enumerableOnly) {
-              var keys = Object.keys(object);
-
-              if (Object.getOwnPropertySymbols) {
-                var symbols = Object.getOwnPropertySymbols(object);
-                if (enumerableOnly) symbols = symbols.filter(function (sym) {
-                  return Object.getOwnPropertyDescriptor(object, sym).enumerable;
-                });
-                keys.push.apply(keys, symbols);
-              }
-
-              return keys;
-            }
-
-            function _objectSpread2$1(target) {
-              for (var i = 1; i < arguments.length; i++) {
-                var source = arguments[i] != null ? arguments[i] : {};
-
-                if (i % 2) {
-                  ownKeys$1(Object(source), true).forEach(function (key) {
-                    _defineProperty$2(target, key, source[key]);
-                  });
-                } else if (Object.getOwnPropertyDescriptors) {
-                  Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
-                } else {
-                  ownKeys$1(Object(source)).forEach(function (key) {
-                    Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
-                  });
-                }
-              }
-
-              return target;
-            }
-
-            var placeholderChar = '_';
-            var strFunction = 'function';
-
-            var emptyArray = [];
-            function convertMaskToPlaceholder() {
-              var mask = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : emptyArray;
-              var placeholderChar$1 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : placeholderChar;
-
-              if (!isArray$2(mask)) {
-                throw new Error('Text-mask:convertMaskToPlaceholder; The mask property must be an array.');
-              }
-
-              if (mask.indexOf(placeholderChar$1) !== -1) {
-                throw new Error('Placeholder character must not be used as part of the mask. Please specify a character ' + 'that is not present in your mask as your placeholder character.\n\n' + "The placeholder character that was received is: ".concat(JSON.stringify(placeholderChar$1), "\n\n") + "The mask that was received is: ".concat(JSON.stringify(mask)));
-              }
-
-              return mask.map(function (char) {
-                return char instanceof RegExp ? placeholderChar$1 : char;
-              }).join('');
-            }
-            function isArray$2(value) {
-              return Array.isArray && Array.isArray(value) || value instanceof Array;
-            }
-            var strCaretTrap = '[]';
-            function processCaretTraps(mask) {
-              var indexes = [];
-              var indexOfCaretTrap;
-
-              while (indexOfCaretTrap = mask.indexOf(strCaretTrap), indexOfCaretTrap !== -1) {
-                indexes.push(indexOfCaretTrap);
-                mask.splice(indexOfCaretTrap, 1);
-              }
-
-              return {
-                maskWithoutCaretTraps: mask,
-                indexes: indexes
-              };
-            }
-
-            var emptyArray$1 = [];
-            var emptyString = '';
-            function conformToMask() {
-              var rawValue = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : emptyString;
-              var mask = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : emptyArray$1;
-              var config = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-              if (!isArray$2(mask)) {
-                if (_typeof$1(mask) === strFunction) {
-                  mask = mask(rawValue, config);
-                  mask = processCaretTraps(mask).maskWithoutCaretTraps;
-                } else {
-                  throw new Error('Text-mask:conformToMask; The mask property must be an array.');
-                }
-              }
-
-              var _config$guide = config.guide,
-                  guide = _config$guide === void 0 ? true : _config$guide,
-                  _config$previousConfo = config.previousConformedValue,
-                  previousConformedValue = _config$previousConfo === void 0 ? emptyString : _config$previousConfo,
-                  _config$placeholderCh = config.placeholderChar,
-                  placeholderChar$1 = _config$placeholderCh === void 0 ? placeholderChar : _config$placeholderCh,
-                  _config$placeholder = config.placeholder,
-                  placeholder = _config$placeholder === void 0 ? convertMaskToPlaceholder(mask, placeholderChar$1) : _config$placeholder,
-                  currentCaretPosition = config.currentCaretPosition,
-                  keepCharPositions = config.keepCharPositions;
-              var suppressGuide = guide === false && previousConformedValue !== undefined;
-              var rawValueLength = rawValue.length;
-              var previousConformedValueLength = previousConformedValue.length;
-              var placeholderLength = placeholder.length;
-              var maskLength = mask.length;
-              var editDistance = rawValueLength - previousConformedValueLength;
-              var isAddition = editDistance > 0;
-              var indexOfFirstChange = currentCaretPosition + (isAddition ? -editDistance : 0);
-              var indexOfLastChange = indexOfFirstChange + Math.abs(editDistance);
-
-              if (keepCharPositions === true && !isAddition) {
-                var compensatingPlaceholderChars = emptyString;
-
-                for (var i = indexOfFirstChange; i < indexOfLastChange; i++) {
-                  if (placeholder[i] === placeholderChar$1) {
-                    compensatingPlaceholderChars += placeholderChar$1;
-                  }
-                }
-
-                rawValue = rawValue.slice(0, indexOfFirstChange) + compensatingPlaceholderChars + rawValue.slice(indexOfFirstChange, rawValueLength);
-              }
-
-              var rawValueArr = rawValue.split(emptyString).map(function (char, i) {
-                return {
-                  char: char,
-                  isNew: i >= indexOfFirstChange && i < indexOfLastChange
-                };
-              });
-
-              for (var _i = rawValueLength - 1; _i >= 0; _i--) {
-                var char = rawValueArr[_i].char;
-
-                if (char !== placeholderChar$1) {
-                  var shouldOffset = _i >= indexOfFirstChange && previousConformedValueLength === maskLength;
-
-                  if (char === placeholder[shouldOffset ? _i - editDistance : _i]) {
-                    rawValueArr.splice(_i, 1);
-                  }
-                }
-              }
-
-              var conformedValue = emptyString;
-              var someCharsRejected = false;
-
-              placeholderLoop: for (var _i2 = 0; _i2 < placeholderLength; _i2++) {
-                var charInPlaceholder = placeholder[_i2];
-
-                if (charInPlaceholder === placeholderChar$1) {
-                  if (rawValueArr.length > 0) {
-                    while (rawValueArr.length > 0) {
-                      var _rawValueArr$shift = rawValueArr.shift(),
-                          rawValueChar = _rawValueArr$shift.char,
-                          isNew = _rawValueArr$shift.isNew;
-
-                      if (rawValueChar === placeholderChar$1 && suppressGuide !== true) {
-                        conformedValue += placeholderChar$1;
-                        continue placeholderLoop;
-                      } else if (mask[_i2].test(rawValueChar)) {
-                        if (keepCharPositions !== true || isNew === false || previousConformedValue === emptyString || guide === false || !isAddition) {
-                          conformedValue += rawValueChar;
-                        } else {
-                          var rawValueArrLength = rawValueArr.length;
-                          var indexOfNextAvailablePlaceholderChar = null;
-
-                          for (var _i3 = 0; _i3 < rawValueArrLength; _i3++) {
-                            var charData = rawValueArr[_i3];
-
-                            if (charData.char !== placeholderChar$1 && charData.isNew === false) {
-                              break;
-                            }
-
-                            if (charData.char === placeholderChar$1) {
-                              indexOfNextAvailablePlaceholderChar = _i3;
-                              break;
-                            }
-                          }
-
-                          if (indexOfNextAvailablePlaceholderChar !== null) {
-                            conformedValue += rawValueChar;
-                            rawValueArr.splice(indexOfNextAvailablePlaceholderChar, 1);
-                          } else {
-                            _i2--;
-                          }
-                        }
-
-                        continue placeholderLoop;
-                      } else {
-                        someCharsRejected = true;
-                      }
-                    }
-                  }
-
-                  if (suppressGuide === false) {
-                    conformedValue += placeholder.substr(_i2, placeholderLength);
-                  }
-
-                  break;
-                } else {
-                  conformedValue += charInPlaceholder;
-                }
-              }
-
-              if (suppressGuide && isAddition === false) {
-                var indexOfLastFilledPlaceholderChar = null;
-
-                for (var _i4 = 0; _i4 < conformedValue.length; _i4++) {
-                  if (placeholder[_i4] === placeholderChar$1) {
-                    indexOfLastFilledPlaceholderChar = _i4;
-                  }
-                }
-
-                if (indexOfLastFilledPlaceholderChar !== null) {
-                  conformedValue = conformedValue.substr(0, indexOfLastFilledPlaceholderChar + 1);
-                } else {
-                  conformedValue = emptyString;
-                }
-              }
-
-              return {
-                conformedValue: conformedValue,
-                meta: {
-                  someCharsRejected: someCharsRejected
-                }
-              };
-            }
-
-            var NEXT_CHAR_OPTIONAL = {
-              __nextCharOptional__: true
-            };
-            var defaultMaskReplacers = {
-              '#': /\d/,
-              A: /[a-z]/i,
-              N: /[a-z0-9]/i,
-              '?': NEXT_CHAR_OPTIONAL,
-              X: /./
-            };
-
-            var stringToRegexp = function stringToRegexp(str) {
-              var lastSlash = str.lastIndexOf('/');
-              return new RegExp(str.slice(1, lastSlash), str.slice(lastSlash + 1));
-            };
-
-            var makeRegexpOptional = function makeRegexpOptional(charRegexp) {
-              return stringToRegexp(charRegexp.toString().replace(/.(\/)[gmiyus]{0,6}$/, function (match) {
-                return match.replace('/', '?/');
-              }));
-            };
-
-            var escapeIfNeeded = function escapeIfNeeded(char) {
-              return '[\\^$.|?*+()'.indexOf(char) > -1 ? "\\".concat(char) : char;
-            };
-
-            var charRegexp = function charRegexp(char) {
-              return new RegExp("/[".concat(escapeIfNeeded(char), "]/"));
-            };
-
-            var isRegexp = function isRegexp(entity) {
-              return entity instanceof RegExp;
-            };
-
-            var castToRegexp = function castToRegexp(char) {
-              return isRegexp(char) ? char : charRegexp(char);
-            };
-
-            function stringMaskToRegExpMask(stringMask) {
-              return stringMask.split('').map(function (char, index, array) {
-                var maskChar = defaultMaskReplacers[char] || char;
-                var previousChar = array[index - 1];
-                var previousMaskChar = defaultMaskReplacers[previousChar] || previousChar;
-
-                if (maskChar === NEXT_CHAR_OPTIONAL) {
-                  return null;
-                }
-
-                if (previousMaskChar === NEXT_CHAR_OPTIONAL) {
-                  return makeRegexpOptional(castToRegexp(maskChar));
-                }
-
-                return maskChar;
-              }).filter(Boolean);
-            }
-
-            var trigger = function trigger(el, type) {
-              var e = document.createEvent('HTMLEvents');
-              e.initEvent(type, true, true);
-              el.dispatchEvent(e);
-            };
-            var queryInputElementInside = function queryInputElementInside(el) {
-              return el instanceof HTMLInputElement ? el : el.querySelector('input') || el;
-            };
-
-            var inBrowser = typeof window !== 'undefined';
-            var UA = inBrowser && window.navigator.userAgent.toLowerCase();
-            var isEdge = UA && UA.indexOf('edge/') > 0;
-            var isAndroid = UA && UA.indexOf('android') > 0;
-            var isChrome = UA && /chrome\/\d+/.test(UA) && !isEdge;
-
-            function createOptions() {
-              var elementOptions = new Map();
-              var defaultOptions = {
-                previousValue: '',
-                mask: []
-              };
-
-              function get(el) {
-                return elementOptions.get(el) || _objectSpread2$1({}, defaultOptions);
-              }
-
-              function partiallyUpdate(el, newOptions) {
-                elementOptions.set(el, _objectSpread2$1({}, get(el), {}, newOptions));
-              }
-
-              function remove(el) {
-                elementOptions.delete(el);
-              }
-
-              return {
-                partiallyUpdate: partiallyUpdate,
-                remove: remove,
-                get: get
-              };
-            }
-
-            var options = createOptions();
-
-            function triggerInputUpdate(el) {
-              var fn = trigger.bind(null, el, 'input');
-
-              if (isAndroid && isChrome) {
-                setTimeout(fn, 0);
-              } else {
-                fn();
-              }
-            }
-
-            function updateValue(el) {
-              var force = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-              var value = el.value;
-
-              var _options$get = options.get(el),
-                  previousValue = _options$get.previousValue,
-                  mask = _options$get.mask;
-
-              var isValueChanged = value !== previousValue;
-              var isLengthIncreased = value.length > previousValue.length;
-              var isUpdateNeeded = value && isValueChanged && isLengthIncreased;
-
-              if (force || isUpdateNeeded) {
-                var _conformToMask = conformToMask(value, mask, {
-                  guide: false
-                }),
-                    conformedValue = _conformToMask.conformedValue;
-
-                el.value = conformedValue;
-                triggerInputUpdate(el);
-              }
-
-              options.partiallyUpdate(el, {
-                previousValue: value
-              });
-            }
-
-            function updateMask(el, mask) {
-              options.partiallyUpdate(el, {
-                mask: stringMaskToRegExpMask(mask)
-              });
-            }
-
-            var directive = {
-              bind: function bind(el, _ref) {
-                var value = _ref.value;
-                el = queryInputElementInside(el);
-                updateMask(el, value);
-                updateValue(el);
-              },
-              componentUpdated: function componentUpdated(el, _ref2) {
-                var value = _ref2.value,
-                    oldValue = _ref2.oldValue;
-                el = queryInputElementInside(el);
-                var isMaskChanged = value !== oldValue;
-
-                if (isMaskChanged) {
-                  updateMask(el, value);
-                }
-
-                updateValue(el, isMaskChanged);
-              },
-              unbind: function unbind(el) {
-                el = queryInputElementInside(el);
-                options.remove(el);
-              }
-            };
-
-            Vue.directive('mask', directive);
+            Vue.use(InputFacade);
             macgyver.register('mgText', {
               title: 'Text',
               icon: 'far fa-edit',
@@ -15174,7 +14757,7 @@
                 },
                 mask: {
                   type: 'mgText',
-                  help: 'Text input mask to restrict to'
+                  help: 'Text input mask to restrict to, #=Number, S=Letter, X=Alpha-numeric, A=Alpha Uppercase, a=Alpha lowercase, \=Escape'
                 },
                 focus: {
                   type: 'mgToggle',
@@ -15312,6 +14895,12 @@
                       rawName: "v-model",
                       value: _vm.data,
                       expression: "data"
+                    },
+                    {
+                      name: "facade",
+                      rawName: "v-facade",
+                      value: _vm.$props.config.mask,
+                      expression: "$props.config.mask"
                     }
                   ],
                   staticClass: "form-control",
@@ -28163,18 +27752,18 @@
               }
             };
 
-            function _typeof$2(obj) {
+            function _typeof$1(obj) {
               if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
-                _typeof$2 = function (obj) {
+                _typeof$1 = function (obj) {
                   return typeof obj;
                 };
               } else {
-                _typeof$2 = function (obj) {
+                _typeof$1 = function (obj) {
                   return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
                 };
               }
 
-              return _typeof$2(obj);
+              return _typeof$1(obj);
             }
 
             function _classCallCheck(instance, Constructor) {
@@ -28291,7 +27880,7 @@
              */
             function mergeDeep(target, source) {
               var isObject = function isObject(obj) {
-                return obj && _typeof$2(obj) === "object";
+                return obj && _typeof$1(obj) === "object";
               };
 
               if (!isObject(target) || !isObject(source)) {

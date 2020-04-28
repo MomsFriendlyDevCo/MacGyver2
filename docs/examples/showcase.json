@@ -26,7 +26,7 @@
 					"id": "demoTextMask",
 					"type": "mgText",
 					"title": "Text (with mask)",
-					"mask": "#-#-#-#",
+					"mask": "#-#-#-#"
 				},
 				{
 					"id": "demoTextArea",
