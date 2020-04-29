@@ -53,10 +53,10 @@ export default Vue.component('mgForm', {
 
 		this.$on('mgChange', data => {
 			if (this.inRefresh) return;
-			this.$macgyver.utils.setPath(this, `formData.${data.path}`, data.value);
+			this.$macgyver.utils.setPath(this.formData, data.path, data.value);
 			this.$emit('changeItem', data);
 
-			this.$emit('change', this.formData);
+			this.$emit('change', {...this.formData}); // Has to be a shallow clone so we break the reference and Vue updates
 			this.refreshShowIfs();
 		});
 

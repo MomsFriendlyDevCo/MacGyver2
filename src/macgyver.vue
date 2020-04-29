@@ -161,7 +161,7 @@ Vue.prototype.$macgyver = (()=> {
 					refresher();
 					// }}}
 
-					// Inject data watcher which transforms change operations into emitters to the nearest parent form {{{
+					// Data watcher which transforms change operations into emitters to the nearest parent form {{{
 					this.$watch('data', value => {
 						// Emit `mgChange` to form element (if there is a parent form)
 						if (this.$mgForm) this.$mgForm.$emit('mgChange', {path: this.$props.$dataPath, value});

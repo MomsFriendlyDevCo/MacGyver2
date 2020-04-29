@@ -1,0 +1,12 @@
+{
+	"type": "mgContainer",
+	"showTitles": false,
+	"items": [
+		{
+			"id": "content",
+			"type": "mgWysiwyg",
+			"title": "WYSIWYG",
+			"default": "<p>Hello <b>World</b></p>"
+		}
+	]
+}
