@@ -2,7 +2,9 @@ MacGyver
 ========
 Dynamic form widgets for Vue.
 
-MacGyver is a form designer for Vue that works by being given a form definition and a data set.
+MacGyver is a component library and dynamic form designer for Vue.
+
+It can function either as a simple set of powerful independent components or by using a powerful JSON form layout definition.
 
 [LIVE DEMO](https://momsfriendlydevco.github.io/MacGyver2)
 
@@ -11,8 +13,7 @@ Example
 -------
 ```html
 <mg-form
-	:data="{ // Populated as the control values change
-	}"
+	:data="{}" // Populated as the control values change
 	:config="{ // Our form specification
 		type: "mgContainer",
 		items: [
@@ -32,52 +33,86 @@ Example
 />
 ```
 
+or use MacGyver widgets as standalone Vue components:
 
-API Methods
-===========
-MagGyver works by using Vue's template system to nest widgets with data binding.
+
+```html
+<mg-number
+	:value="formData.number"
+	@change="formData.number = $event"
+	:min="0"
+	:max="100"
+/>
+```
 
 
 Creating MacGyver widgets
--------------------------
-Each MagGyver widget begins with `mg` and should be registered via `$macgyver.register()`.
+=========================
+Each MagGyver widget begins with `mg` and should be registered via `Vue.mgComponent(name, definitionObject)`.
 
 ```javascript
-$macgyver.register('mgText', {
-	title: 'Textbox',
-	icon: 'fa fa-pencil-square-o',
-	config: {
+Vue.mgComponent('mgText', {
+	meta: {
+		title: 'Textbox',
+		icon: 'fa fa-pencil-square-o',
+	},
+	props: {
 		placeholder: {type: 'mgText', help: 'Ghost text to display when the textbox has no value'},
 	},
 }));
 ```
 
-The Vue component should be at least the following spec:
-
-```javascript
-Vue.component('mgText', {
-	inject: ['$mgForm'],
-	data() { return {
-		data: undefined,
-	}},
-	created() {
-		this.$mgForm.inject(this);
-	},
-});
-```
-
-**NOTES:**
-* The `$mgForm` element needs injecting into each vue component so it knows its parent form
-* `vm.$mgForm.inject(this)` must be called to register this component instance to the form
-* The `data.data` property (accessed as `vm.data`) holds the current value of the form node. `$props.data` is not used as this means the rebuild of the component on each node value change which is expensive, instead data is populated and watchers are used to broadcast changes into the `mgForm` component
+The `Vue.mgComponent()` function processes the MacGyver widget definition and automatically calls `Vue.component()` to register the Vue counterpart (after converting prop types and adding other syntax glue to the original object).
 
 
-**Injectables:**
+Widget setup
+------------
+MacGyver widgets follow the regular [Vue component syntax](https://vuejs.org/v2/guide/components.html) with some additions:
+
+| Property           | Type                   | Default                     | Description                                                                                |
+|--------------------|------------------------|-----------------------------|--------------------------------------------------------------------------------------------|
+| `meta`             | `object`               | `{}`                        | Meta information object - used by the form editor to configure the widget                  |
+| `meta.title`       | `string`               | The ID via `_.startCase()`  | The human friendly title of the widget                                                     |
+| `meta.icon`        | `string`               | `"far fa-rectangle-wide"`   | The icon CSS class to use in the `mgFormEditor` UI                                         |
+| `meta.shorthand`   | `array`                | `[]`                        | Other aliases the widget answers to in shorthand mode                                      |
+| `meta.category`    | `string`               | `"Misc"`                    | Human readable category to add the widget to in the editor                                 |
+| `meta.preferId`    | `boolean`              | `false`                     | Whether the component should be auto-allocated an ID if the user doesn't provide one       |
+| `meta.format`      | `boolean` / `function` | `true`                      | How to return the short value of the widget, see NOTES                                     |
+| `meta.formatClass` | `string`               | `""`                        | CSS classes to attach when rendering the `format` value, typically used for text alignment |
+| `props`            | `object`               | `{}`                        | Vue [props](https://vuejs.org/v2/guide/components-props.html) definition                   |
+| `props.$dataPath`  | `string`               | Computed                    | Dotted notation path within the form of the value to set when `this.data` changes          |
+| `props.$specPath`  | `string`               | Computed                    | Dotted notation path of the widget spec within the parent `$mgForm` layout                 |
+| `props{}.value`    | `*`                    | *none*                      | If using the widget as a standalone, set the initial value                                 |
+| `props{}.title`    | `string`               | Prop ID via `_.startCase()` | Human readable name for the property in the editor                                         |
+| `props{}.default`  | `*`                    | `undefined`                 | Regular property default value                                                             |
+| `props{}.type`     | `string`               | *none*                      | Unlike Vue props, this should be an `mg*` widget with its config                           |
+| `props{}.help`     | `string`               | `""`                        | Additional help text in the editor                                                         |
+| `props{}.advanced` | `boolean`              | `false`                     | Label the property for advanced users only                                                 |
+| `props{}.*`        | `*`                    | *none*                      | All other MacGyver widget config for the `props{}.type` widget                             |
+| `childProps`       | `object`               | *none*                      | All properties that are inherited by direct child components within a container            |
+| `inject`           | `array` / `object`     | `['$mgForm']`               | What to inject into each MacGyver component, overridable if needed                         |
+| `data`             | `function`             | *none*                      | Data to provide to the component, `this.data` is always available                          |
+| `methods`          | `object`               | `{}`                        | Additional methods to provide, the below methods are always available                      |
+| `methods.mgSetup`  | `function`             | See code                    | Called during the `created` lifecycle hook to populate the data default and setup bindings |
+| `created`          | `function`             | *none*                      | Creation hook, superclassed to call `mgSetup()`. If Specified it is called after this      |
+| `*`                | `*`                    | *none*                      | Various other Vue lifecycle hooks and properties, all are carried into the Vue component   |
+
+
+**NOTES**:
+* `meta.format` returns the human readable value of the component when rendered in tables - if `true` the value is used unchanged. If a function it is called as `(value, config)` and can return a scalar string or a Promisable value which should resolve into a string.
+* `props{}.type` should always be a MacGyver component + config so it can be correctly displayed in the editor. Passing JS primative classes (e.g. `{foo: Number}`) will raise a warning message and is discouraged for anything other than testing
+* `props{}.advanced` can be used to hide more complex properties unless the editor is in advanced editing mode
+* `data()` is called as per the usual Vue setup process, however the `data` value is always provided and is watched by MacGyver for changes. Mutate this value to set new values or emit `mgChange` if needed
+* `childProps` sets up the properties inherited into the `$props` setup by direct children. Items such as `title` are used by elements such as `mgContainer` to render the title of the widget and not the widget itself
+
+
+Injectables
+-----------
 The following injectables can be subscribed to within each component:
 
 | Injectable      | Description                                                                                  |
 |-----------------|----------------------------------------------------------------------------------------------|
-| `$mgForm`       | The parent `mgForm` component, must be subscribed to then used via `vm.$mgForm.inject(this)` |
+| `$mgForm`       | The parent `mgForm` component, automatically applied if `vm.inject` isn't overriden          |
 | `$mgFormEditor` | The optional wrapping `mgFormEditor` component, if present. This is outside the `mgForm` parent, its presense can be used to determine whether to display special edit component features |
 
 To specify optional injectables (e.g. that `$mgFormEditor` _may_ be included but is not essencial) use:
@@ -92,46 +127,20 @@ To specify optional injectables (e.g. that `$mgFormEditor` _may_ be included but
 ```
 
 
-**Events:**
-Each MacGyver component injected with `$mgForm.inject(vm)` can respond to the following events:
+Events
+------
 
-| Event        | Cardinality | Params               | Description                                                                                                           |
-|--------------|-------------|----------------------|-----------------------------------------------------------------------------------------------------------------------|
-| `mgChange`   | Always      | `(path, value)`      | Used to respond to changes in the component state                                                                     |
-| `mgIdentify` | Always      | `(reply <function>)` | Used to retrieve all components, component will reply with its `VueComponent` instance                                |
-| `mgRefresh`  | Always      | `()`                 | Used to force refresh the state of a component                                                                        |
-| `mgValidate` | Optional    | `(reply <function>)` | Used to validate each child component, each component should call `reply()` with string errors should validation fail |
+| Event           | Cardinality   | Params                 | Description                                                                                                  |
+|-----------------|---------------|------------------------|--------------------------------------------------------------------------------------------------------------|
+| `change`        | Optional      | `(*)`                  | Emitted when the widget is a standalone component and its value has changed                                  |
+| `mgChange`      | Always        | `({path, value})`      | Used to respond to changes in the component state                                                            |
+| `mgIdentify`    | Always        | `(reply <function>)`   | Used to retrieve all components, component will reply with its `VueComponent` instance                       |
+| `mgRefresh`     | Always        | `()`                   | Used to force refresh the state of a component                                                               |
+| `mgRefreshForm` | Always        | `()`                   | Used to force refresh the state of all components in a form                                                  |
+| `mgValidate`    | Optional      | `(reply <function>)`   | Used to validate each component, each component should call `reply()` with string errors if validation fails |
 
-
-$macgyver
----------
-The main service / provider within Angular.
-
-**NOTE:** `$macgyverProvider` and `$macgyver` are the same. The provider is available as an alias to allow registration of components during the Angular Config phase.
-
-
-$macgyver.register(id, properties)
-----------------------------------
-Register a widget for use by name. Each id should begin with `mg` and be in camelCase form.
-
-Widgets can contain the following meta properties:
-
-| Property           | Type      | Default                    | Description                                                                                      |
-|--------------------|-----------|----------------------------|--------------------------------------------------------------------------------------------------|
-| `id`               | `string`  | (`id` arg if its provided) | Alternative way to provide an entire config if the `id` parameter is omitted                 |
-| `config`           | `Object`  | *none*                     | Object detailing each optional property the widget can take as a `mgContainer` specification     |
-| `icon`             | `string`  | *none*                     | The icon CSS class to use in the `mgFormEditor` UI                                               |
-| `isContainer`      | `boolean` | `false`                    | Indicates that the widget can contain other widgets (under the `items` array)                    |
-| `isContainerArray` | `boolean` | `false`                    | Addition to `isContainer` that indicates the widget will contain an array of rows (like a table) |
-| `template`         | `string`  | `<COMPONENT_NAME/>`        | Rendering template to be used to draw the element                                                |
-| `title`            | `string`  | The ID via `_.startCase()` | The human friendly title of the widget                                                           |
-| `userPlaceable`    | `boolean` | `false`                    | Whether to hide the object from the user in the `mgFormEditor` UI                                |
-| `shorthand`        | `array`   | `[]`                       | Other aliases the widget answers to in shorthand mode                                            |
-
-
-$macgyver.inject(vm)
---------------------
-Glue various MacGyver emitter handlers to a registered component.
+**NOTES**:
+* All of the above events are automatically added by the `mgSetup()` method when the component is created
 
 
 $macgyver.compileSpec(spec)
