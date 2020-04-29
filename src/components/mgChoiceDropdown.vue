@@ -13,7 +13,7 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 		shorthand: ['choice', 'choose', 'dropdown', 'pick'],
 	},
 	data() { return {
-		value: [],
+		selected: [],
 		enumIter: [],
 	}},
 	props: {
@@ -55,7 +55,7 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 	methods: {
 		change(val) {
 			this.data = val?.id;
-			this.value = val;
+			this.selected = val;
 		},
 
 		/**
@@ -68,9 +68,9 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 			this.enumIter = enumIter;
 
 			if (this.data) {
-				this.value = this.enumIter.find(e => e.id == this.data) || this.data;
+				this.selected = this.enumIter.find(e => e.id == this.data) || this.data;
 			} else if (this.$props.default) {
-				this.value = this.enumIter.find(e => e.id == this.$props.default) || this.$props.default;
+				this.selected = this.enumIter.find(e => e.id == this.$props.default) || this.$props.default;
 			}
 		},
 	},
@@ -86,7 +86,7 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 <template>
 	<v-select
 		ref="select"
-		:value="value"
+		:value="selected"
 		label="title"
 		:options="enumIter"
 		:placeholder="$props.placeholder"
@@ -94,8 +94,8 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 		@input="change"
 	>
 		<template #selected-option="option">
-			<i v-if="value.icon" :class="value.icon"/>
-			{{value.title}}
+			<i v-if="selected.icon" :class="selected.icon"/>
+			{{selected.title}}
 		</template>
 		<template #option="option">
 			<i v-if="option.icon" :class="option.icon"/>
