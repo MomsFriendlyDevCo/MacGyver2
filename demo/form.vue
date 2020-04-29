@@ -4,9 +4,10 @@ export default {
 		config: {},
 		data: {},
 		examples: [
-			'examples/html.json',
 			'examples/mgChoiceTree.json',
+			'examples/mgHtml.json',
 			'examples/mgQuery.json',
+			'examples/mgWysiwyg.json',
 			'examples/simple.json',
 			'examples/shorthand.json',
 			'examples/showcase.json',
