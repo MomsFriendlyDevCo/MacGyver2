@@ -14,14 +14,20 @@ export default {
 				<li class="navbar-item mr-1">
 					<a
 						:class="$route.path == '/' && !$route.query.edit ? 'btn btn-primary text-white' : 'btn btn-light'"
-						@click="$router.push({query: {...$route.query, edit: undefined}})"
+						@click="$router.push({path: '/', query: {...$route.query, edit: undefined}})"
 					>Form view</a>
+				</li>
+				<li class="navbar-item mr-1">
+					<a
+						:class="$route.path == '/' && $route.query.edit  ? 'btn btn-primary text-white' : 'btn btn-light'"
+						@click="$router.push({path: '/', query: {...$route.query, edit: 1}})"
+					>Editor</a>
 				</li>
 				<li class="navbar-item">
 					<a
-						:class="$route.path == '/' && $route.query.edit  ? 'btn btn-primary text-white' : 'btn btn-light'"
-						@click="$router.push({query: {...$route.query, edit: 1}})"
-					>Editor</a>
+						:class="$route.path == '/standalone' ? 'btn btn-primary text-white' : 'btn btn-light'"
+						@click="$router.push({path: '/standalone'})"
+					>Standalone</a>
 				</li>
 			</ul>
 		</div>

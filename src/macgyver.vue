@@ -64,6 +64,7 @@ Vue.prototype.$macgyver = (()=> {
 			props: {
 				$dataPath: {type: String},
 				$specPath: {type: String},
+				value: {},
 				..._.mapValues(component.props || {}, prop => { // Rewrite MacGyver props into Vue compatible props
 					var newProp = {
 						...(prop.default ? {default: prop.default} : {}),
@@ -144,24 +145,26 @@ Vue.prototype.$macgyver = (()=> {
 					// }}}
 
 					// Read in initial data value {{{
-					if (this.$props.$dataPath) {
-						var refresher = ()=> {
+					var refresher = ()=> {
+						if (!this.$mgForm && this.$props.value) { // Standalone value
+							this.data = _.clone(this.$props.value);
+						} else if (this.$props.$dataPath) { // Has a data path
 							this.data = _.get(this.$mgForm.formData, this.$props.$dataPath);
-						};
+						} else if (this.$props.default) { // Has a default
+							this.data = _.clone(this.$props.default);
+						}
+					};
 
-						this.$on('mgRefresh', refresher);
-						this.$on('mgRefreshForm', refresher);
+					this.$on('mgRefresh', refresher);
+					this.$on('mgRefreshForm', refresher);
 
-						refresher();
-					} else if (this.$props.default) { // No data path but there IS a default - link to that instead
-						this.data = _.clone(this.$props.default);
-					}
+					refresher();
 					// }}}
 
 					// Inject data watcher which transforms change operations into emitters to the nearest parent form {{{
 					this.$watch('data', value => {
-						// Emit `mgChange` to form element
-						this.$mgForm.$emit('mgChange', {path: this.$props.$dataPath, value});
+						// Emit `mgChange` to form element (if there is a parent form)
+						if (this.$mgForm) this.$mgForm.$emit('mgChange', {path: this.$props.$dataPath, value});
 
 						// Emit regular `change` event
 						this.$emit('change', value);

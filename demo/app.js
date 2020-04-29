@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 
 import componentDemoForm from './form';
+import componentDemoStandalone from './standalone';
 import navbar from './navbar';
 
 import './services/http';
@@ -12,6 +13,7 @@ $(()=> {
 	app.router = new VueRouter({
 		routes: [
 			{path: '/', component: componentDemoForm},
+			{path: '/standalone', component: componentDemoStandalone},
 		],
 	});
 
