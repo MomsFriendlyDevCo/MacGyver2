@@ -80,6 +80,7 @@ Vue.prototype.$macgyver = (()=> {
 							case 'date': newProp.type = Date; break;
 							case 'number': newProp.type = Number; break;
 							case 'string': newProp.type = String; break;
+							case 'any': break; // Do not append type checking
 							default:
 								console.warn(`Unknown vueType JS primative "${prop.vueType}" while declaring component "${name}" - assuming "string"`);
 								newProp.type = String;

@@ -10,7 +10,7 @@ export default Vue.mgComponent('mgButton', {
 		text: {type: 'mgText'},
 		icon: {type: 'mgIcon', default: 'far fa-check'},
 		tooltip: {type: 'mgText'},
-		action: {type: 'mgText'},
+		action: {type: 'mgText', vueType: 'any'},
 		class: {type: 'mgText', advanced: true, default: 'btn btn-light'},
 	},
 });
