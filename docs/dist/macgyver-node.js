@@ -15297,12 +15297,8 @@ Vue$1.prototype.$macgyver = function () {
         this.mgSetup();
         if (component.created) return component.created.call(this); // Call components own created() method if there is one
       }
-    }, _.pick(component, [// Import remaining Vue properties
-    // Lifecycle hooks:
-    'activated', 'beforeCreate', 'beforeDestroy', 'beforeMount',,
-    /* created - handled above */
-    'deactivated', 'destroyed', 'errorCaptured', 'mounted', 'updated', // Misc
-    'components', 'provide']));
+    }, _.omit(component, [// Import remaining Vue properties that are not explicitly merged in above
+    'inject', 'data', 'props', 'methods', 'created']));
 
     return Vue$1.component(name, vueComponent);
   };

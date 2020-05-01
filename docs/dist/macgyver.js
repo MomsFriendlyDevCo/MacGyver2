@@ -6902,12 +6902,8 @@
           this.mgSetup();
           if (component.created) return component.created.call(this); // Call components own created() method if there is one
         }
-      }, _.pick(component, [// Import remaining Vue properties
-      // Lifecycle hooks:
-      'activated', 'beforeCreate', 'beforeDestroy', 'beforeMount',,
-      /* created - handled above */
-      'deactivated', 'destroyed', 'errorCaptured', 'mounted', 'updated', // Misc
-      'components', 'provide']));
+      }, _.omit(component, [// Import remaining Vue properties that are not explicitly merged in above
+      'inject', 'data', 'props', 'methods', 'created']));
 
       return Vue$1.component(name, vueComponent);
     };
@@ -8174,7 +8170,7 @@
     },
     data: function data() {
       return {
-        value: [],
+        selected: [],
         enumIter: []
       };
     },
@@ -8258,7 +8254,7 @@
     methods: {
       change: function change(val) {
         this.data = val === null || val === void 0 ? void 0 : val.id;
-        this.value = val;
+        this.selected = val;
       },
 
       /**
@@ -8273,11 +8269,11 @@
         this.enumIter = enumIter;
 
         if (this.data) {
-          this.value = this.enumIter.find(function (e) {
+          this.selected = this.enumIter.find(function (e) {
             return e.id == _this2.data;
           }) || this.data;
         } else if (this.$props["default"]) {
-          this.value = this.enumIter.find(function (e) {
+          this.selected = this.enumIter.find(function (e) {
             return e.id == _this2.$props["default"];
           }) || this.$props["default"];
         }
@@ -8302,7 +8298,7 @@
     return _c("v-select", {
       ref: "select",
       attrs: {
-        value: _vm.value,
+        value: _vm.selected,
         label: "title",
         options: _vm.enumIter,
         placeholder: _vm.$props.placeholder,
@@ -8314,8 +8310,10 @@
           key: "selected-option",
           fn: function(option) {
             return [
-              _vm.value.icon ? _c("i", { class: _vm.value.icon }) : _vm._e(),
-              _vm._v("\n\t\t" + _vm._s(_vm.value.title) + "\n\t")
+              _vm.selected.icon
+                ? _c("i", { class: _vm.selected.icon })
+                : _vm._e(),
+              _vm._v("\n\t\t" + _vm._s(_vm.selected.title) + "\n\t")
             ]
           }
         },
@@ -8337,7 +8335,7 @@
     /* style */
     const __vue_inject_styles__$9 = function (inject) {
       if (!inject) return
-      inject("data-v-29516b7c_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Make look consistant with Bootstrap */\n.v-select.open .dropdown-toggle {\n\tborder-color: #5cb3fd;\n}\n\n/* Remove weird dropdown icon that Bootstrap adds */\n.v-select .dropdown-toggle::after {\n\tdisplay: none;\n}\n\n/* Wider spacing for clear button */\n.v-select .dropdown-toggle .clear {\n\tmargin-right: 10px;\n}\n\n/* Align dropdown icon correctly */\n.v-select .open-indicator {\n\tmargin-top: -2px;\n}\n.v-select .vs__selected i {\n\tmargin-right: 5px;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgChoiceDropdown.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AA2GA,wCAAA;AACA;CACA,qBAAA;AACA;;AAEA,mDAAA;AACA;CACA,aAAA;AACA;;AAEA,mCAAA;AACA;CACA,kBAAA;AACA;;AAEA,kCAAA;AACA;CACA,gBAAA;AACA;AAEA;CACA,iBAAA;AACA","file":"mgChoiceDropdown.vue","sourcesContent":["<script>\nimport VueSelect from 'vue-select';\nimport 'vue-select/dist/vue-select.css';\n\nVue.component('v-select', VueSelect);\n\nexport default Vue.mgComponent('mgChoiceDropdown', {\n\tmeta: {\n\t\ttitle: 'Dropdown multiple-choice',\n\t\ticon: 'far fa-chevron-circle-down',\n\t\tcategory: 'Choice Selectors',\n\t\tpreferId: true,\n\t\tshorthand: ['choice', 'choose', 'dropdown', 'pick'],\n\t},\n\tdata() { return {\n\t\tvalue: [],\n\t\tenumIter: [],\n\t}},\n\tprops: {\n\t\tenumSource: {type: 'mgChoiceButtons', default: 'list', enum: ['list', 'url'], default: 'list', help: 'Where to populate the list data from'},\n\t\tenum: {\n\t\t\ttype: 'mgTable',\n\t\t\ttitle: 'List items',\n\t\t\tshowIf: 'enumSource == \"list\"',\n\t\t\titems: [\n\t\t\t\t{id: 'id', type: 'mgText', required: true},\n\t\t\t\t{id: 'title', type: 'mgText', required: true},\n\t\t\t\t{id: 'icon', type: 'mgIcon'},\n\t\t\t],\n\t\t},\n\t\tenumUrl: {type: 'mgUrl', showIf: 'enumSource == \"url\"', help: 'Data feed URL to fetch choice values from'},\n\t\tplaceholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},\n\t\trequired: {type: 'mgToggle', default: false, help: 'One choice must be selected'},\n\t\tfocus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},\n\t},\n\tcreated() {\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);\n\t\t});\n\n\t\tthis.$watch('$props.enumUrl', ()=> {\n\t\t\tif (!this.$props.enumUrl) return;\n\t\t\tthis.$macgyver.utils.fetch(this.$props.enumUrl, {type: 'array'})\n\t\t\t\t.then(data => this.setEnum(data))\n\t\t}, {immediate: true});\n\n\t\tthis.$watch('$props.enum', ()=> {\n\t\t\tif (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings\n\t\t\t\tthis.setEnum(this.$props.enum.map(i => ({id: _.camelCase(i), title: i})));\n\t\t\t} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection\n\t\t\t\tthis.setEnum(this.$props.enum);\n\t\t\t}\n\t\t}, {immediate: true});\n\t},\n\tmethods: {\n\t\tchange(val) {\n\t\t\tthis.data = val?.id;\n\t\t\tthis.value = val;\n\t\t},\n\n\t\t/**\n\t\t* Populate the enumIter object\n\t\t* This function also correctly populates the selected item (or the default)\n\t\t* Each item is assumed to have the spec `{id: String, title: String, icon?: String}`\n\t\t* @param {array<Object>} enumIter The new iterable enum\n\t\t*/\n\t\tsetEnum(enumIter) {\n\t\t\tthis.enumIter = enumIter;\n\n\t\t\tif (this.data) {\n\t\t\t\tthis.value = this.enumIter.find(e => e.id == this.data) || this.data;\n\t\t\t} else if (this.$props.default) {\n\t\t\t\tthis.value = this.enumIter.find(e => e.id == this.$props.default) || this.$props.default;\n\t\t\t}\n\t\t},\n\t},\n\tmounted() {\n\t\tif (this.$props.focus) {\n\t\t\t// NOTE: Focus selection does NOT work if DevTools is open in Chome\n\t\t\tthis.$refs.select.searchEl.focus();\n\t\t}\n\t},\n});\n</script>\n\n<template>\n\t<v-select\n\t\tref=\"select\"\n\t\t:value=\"value\"\n\t\tlabel=\"title\"\n\t\t:options=\"enumIter\"\n\t\t:placeholder=\"$props.placeholder\"\n\t\t:clearable=\"!$props.required\"\n\t\t@input=\"change\"\n\t>\n\t\t<template #selected-option=\"option\">\n\t\t\t<i v-if=\"value.icon\" :class=\"value.icon\"/>\n\t\t\t{{value.title}}\n\t\t</template>\n\t\t<template #option=\"option\">\n\t\t\t<i v-if=\"option.icon\" :class=\"option.icon\"/>\n\t\t\t{{option.title}}\n\t\t</template>\n\t</v-select>\n</template>\n\n<style>\n/* Make look consistant with Bootstrap */\n.v-select.open .dropdown-toggle {\n\tborder-color: #5cb3fd;\n}\n\n/* Remove weird dropdown icon that Bootstrap adds */\n.v-select .dropdown-toggle::after {\n\tdisplay: none;\n}\n\n/* Wider spacing for clear button */\n.v-select .dropdown-toggle .clear {\n\tmargin-right: 10px;\n}\n\n/* Align dropdown icon correctly */\n.v-select .open-indicator {\n\tmargin-top: -2px;\n}\n\n.v-select .vs__selected i {\n\tmargin-right: 5px;\n}\n</style>\n"]}, media: undefined });
+      inject("data-v-4f3d3f5e_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Make look consistant with Bootstrap */\n.v-select.open .dropdown-toggle {\n\tborder-color: #5cb3fd;\n}\n\n/* Remove weird dropdown icon that Bootstrap adds */\n.v-select .dropdown-toggle::after {\n\tdisplay: none;\n}\n\n/* Wider spacing for clear button */\n.v-select .dropdown-toggle .clear {\n\tmargin-right: 10px;\n}\n\n/* Align dropdown icon correctly */\n.v-select .open-indicator {\n\tmargin-top: -2px;\n}\n.v-select .vs__selected i {\n\tmargin-right: 5px;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgChoiceDropdown.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AA2GA,wCAAA;AACA;CACA,qBAAA;AACA;;AAEA,mDAAA;AACA;CACA,aAAA;AACA;;AAEA,mCAAA;AACA;CACA,kBAAA;AACA;;AAEA,kCAAA;AACA;CACA,gBAAA;AACA;AAEA;CACA,iBAAA;AACA","file":"mgChoiceDropdown.vue","sourcesContent":["<script>\nimport VueSelect from 'vue-select';\nimport 'vue-select/dist/vue-select.css';\n\nVue.component('v-select', VueSelect);\n\nexport default Vue.mgComponent('mgChoiceDropdown', {\n\tmeta: {\n\t\ttitle: 'Dropdown multiple-choice',\n\t\ticon: 'far fa-chevron-circle-down',\n\t\tcategory: 'Choice Selectors',\n\t\tpreferId: true,\n\t\tshorthand: ['choice', 'choose', 'dropdown', 'pick'],\n\t},\n\tdata() { return {\n\t\tselected: [],\n\t\tenumIter: [],\n\t}},\n\tprops: {\n\t\tenumSource: {type: 'mgChoiceButtons', default: 'list', enum: ['list', 'url'], default: 'list', help: 'Where to populate the list data from'},\n\t\tenum: {\n\t\t\ttype: 'mgTable',\n\t\t\ttitle: 'List items',\n\t\t\tshowIf: 'enumSource == \"list\"',\n\t\t\titems: [\n\t\t\t\t{id: 'id', type: 'mgText', required: true},\n\t\t\t\t{id: 'title', type: 'mgText', required: true},\n\t\t\t\t{id: 'icon', type: 'mgIcon'},\n\t\t\t],\n\t\t},\n\t\tenumUrl: {type: 'mgUrl', showIf: 'enumSource == \"url\"', help: 'Data feed URL to fetch choice values from'},\n\t\tplaceholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},\n\t\trequired: {type: 'mgToggle', default: false, help: 'One choice must be selected'},\n\t\tfocus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},\n\t},\n\tcreated() {\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);\n\t\t});\n\n\t\tthis.$watch('$props.enumUrl', ()=> {\n\t\t\tif (!this.$props.enumUrl) return;\n\t\t\tthis.$macgyver.utils.fetch(this.$props.enumUrl, {type: 'array'})\n\t\t\t\t.then(data => this.setEnum(data))\n\t\t}, {immediate: true});\n\n\t\tthis.$watch('$props.enum', ()=> {\n\t\t\tif (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings\n\t\t\t\tthis.setEnum(this.$props.enum.map(i => ({id: _.camelCase(i), title: i})));\n\t\t\t} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection\n\t\t\t\tthis.setEnum(this.$props.enum);\n\t\t\t}\n\t\t}, {immediate: true});\n\t},\n\tmethods: {\n\t\tchange(val) {\n\t\t\tthis.data = val?.id;\n\t\t\tthis.selected = val;\n\t\t},\n\n\t\t/**\n\t\t* Populate the enumIter object\n\t\t* This function also correctly populates the selected item (or the default)\n\t\t* Each item is assumed to have the spec `{id: String, title: String, icon?: String}`\n\t\t* @param {array<Object>} enumIter The new iterable enum\n\t\t*/\n\t\tsetEnum(enumIter) {\n\t\t\tthis.enumIter = enumIter;\n\n\t\t\tif (this.data) {\n\t\t\t\tthis.selected = this.enumIter.find(e => e.id == this.data) || this.data;\n\t\t\t} else if (this.$props.default) {\n\t\t\t\tthis.selected = this.enumIter.find(e => e.id == this.$props.default) || this.$props.default;\n\t\t\t}\n\t\t},\n\t},\n\tmounted() {\n\t\tif (this.$props.focus) {\n\t\t\t// NOTE: Focus selection does NOT work if DevTools is open in Chome\n\t\t\tthis.$refs.select.searchEl.focus();\n\t\t}\n\t},\n});\n</script>\n\n<template>\n\t<v-select\n\t\tref=\"select\"\n\t\t:value=\"selected\"\n\t\tlabel=\"title\"\n\t\t:options=\"enumIter\"\n\t\t:placeholder=\"$props.placeholder\"\n\t\t:clearable=\"!$props.required\"\n\t\t@input=\"change\"\n\t>\n\t\t<template #selected-option=\"option\">\n\t\t\t<i v-if=\"selected.icon\" :class=\"selected.icon\"/>\n\t\t\t{{selected.title}}\n\t\t</template>\n\t\t<template #option=\"option\">\n\t\t\t<i v-if=\"option.icon\" :class=\"option.icon\"/>\n\t\t\t{{option.title}}\n\t\t</template>\n\t</v-select>\n</template>\n\n<style>\n/* Make look consistant with Bootstrap */\n.v-select.open .dropdown-toggle {\n\tborder-color: #5cb3fd;\n}\n\n/* Remove weird dropdown icon that Bootstrap adds */\n.v-select .dropdown-toggle::after {\n\tdisplay: none;\n}\n\n/* Wider spacing for clear button */\n.v-select .dropdown-toggle .clear {\n\tmargin-right: 10px;\n}\n\n/* Align dropdown icon correctly */\n.v-select .open-indicator {\n\tmargin-top: -2px;\n}\n\n.v-select .vs__selected i {\n\tmargin-right: 5px;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */

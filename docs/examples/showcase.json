@@ -577,7 +577,7 @@
 				{
 					"id": "demoAlert",
 					"type": "mgAlert",
-					"style": "alert-danger",
+					"className": "alert alert-danger",
 					"title": "Alert",
 					"text": "This is an alert!"
 				},

@@ -7463,22 +7463,22 @@
         type: 'mgText',
         "default": 'This is an alert!'
       },
-      style: {
+      className: {
         type: 'mgChoiceButtons',
         "default": 'alert-info',
         iconSelected: 'fa fa-fw fa-check',
         iconDefault: 'fa fa-fw',
         "enum": [{
-          id: 'alert-success',
+          id: 'alert alert-success',
           "class": 'btn-success'
         }, {
-          id: 'alert-info',
+          id: 'alert alert-info',
           "class": 'btn-info'
         }, {
-          id: 'alert-warning',
+          id: 'alert alert-warning',
           "class": 'btn-warning'
         }, {
-          id: 'alert-danger',
+          id: 'alert alert-danger',
           "class": 'btn-danger'
         }]
       }
@@ -7493,8 +7493,8 @@
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
-    return _c("div", { staticClass: "alert", class: _vm.$props.style }, [
-      _vm._v("\n\t" + _vm._s(_vm.$props.text || _vm.data) + "\n")
+    return _c("div", { class: _vm.$props.className }, [
+      _vm._v("\n\t" + _vm._s(_vm.data || _vm.$props.text) + "\n")
     ])
   };
   var __vue_staticRenderFns__ = [];
@@ -7556,7 +7556,7 @@
         type: 'mgText',
         vueType: 'any'
       },
-      "class": {
+      className: {
         type: 'mgText',
         advanced: true,
         "default": 'btn btn-light'
@@ -7583,7 +7583,7 @@
             expression: "$props.tooltip"
           }
         ],
-        class: _vm.$props.class,
+        class: _vm.$props.className,
         on: {
           click: function($event) {
             return _vm.$mgForm.run(_vm.$props.action)
@@ -12261,7 +12261,7 @@
         help: 'The data source to import icon information',
         relative: true
       },
-      "class": {
+      className: {
         type: 'mgText',
         "default": 'btn btn-light btn-circle',
         advanced: true
@@ -12300,7 +12300,7 @@
             buttons: [],
             // We're capturing the first click so we don't need confirm buttons
             macgyver: [{
-              id: 'class',
+              id: 'className',
               type: 'mgChoiceButtons',
               showTitle: false,
               classWrapper: '',
@@ -12323,7 +12323,7 @@
             }
           });
         }).then(function (form) {
-          return _this2.data = form["class"];
+          return _this2.data = form.className;
         });
       }
     }
@@ -12345,10 +12345,10 @@
           ? _c("a", {
               staticClass: "btn btn-light btn-icon-fixed",
               class: _vm.data
-                ? [_vm.data, _vm.$props.classActive || _vm.$props.class]
+                ? [_vm.data, _vm.$props.classActive || _vm.$props.className]
                 : [
                     _vm.$props.iconFallback,
-                    _vm.$props.classInactive || _vm.$props.class
+                    _vm.$props.classInactive || _vm.$props.className
                   ],
               on: {
                 click: function($event) {
@@ -12391,7 +12391,7 @@
     /* style */
     const __vue_inject_styles__$s = function (inject) {
       if (!inject) return
-      inject("data-v-24a713a6_0", { source: "\n.btn.btn-icon-fixed {\n\tbox-shadow: none;\n\twidth: 32px;\n\theight: 32px;\n\tpadding: 7px 0;\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgIcon.vue"],"names":[],"mappings":";AA6FA;CACA,gBAAA;CACA,WAAA;CACA,YAAA;CACA,cAAA;CACA,aAAA;CACA,uBAAA;CACA,mBAAA;AACA","file":"mgIcon.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgIcon', {\n\tmeta: {\n\t\ttitle: 'Icon',\n\t\ticon: 'far fa-flag',\n\t\tcategory: 'Simple Inputs',\n\t\tpreferId: true,\n\t},\n\tprops: {\n\t\ticonFallback: {type: 'mgIcon', default: 'far fa-info', help: 'The icon to use if non is selected'},\n\t\trequired: {type: 'mgToggle', default: false},\n\t\tinterface: {type: 'mgChoiceButtons', default: 'modal', enum: ['modal', 'dropdown']},\n\t\ticonFeed: {type: 'mgText', default: '/api/webfonts/fa.json', advanced: true, help: 'The data source to import icon information', relative: true},\n\t\tclass: {type: 'mgText', default: 'btn btn-light btn-circle', advanced: true},\n\t\tclassActive: {type: 'mgText', advanced: true},\n\t\tclassInactive: {type: 'mgText', advanced: true},\n\t},\n\tcreated() {\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);\n\t\t});\n\t},\n\tmethods: {\n\t\tselectIcon() {\n\t\t\tPromise.resolve()\n\t\t\t\t.then(()=> this.$macgyver.notify.loading(this._uid, true))\n\t\t\t\t.then(()=> this.$http.get(this.$props.iconFeed))\n\t\t\t\t.then(res => { this.$macgyver.notify.loading(this._uid, false); return res })\n\t\t\t\t.then(res => this.$macgyver.$prompt.macgyver({\n\t\t\t\t\ttitle: 'Select icon',\n\t\t\t\t\tbuttons: [], // We're capturing the first click so we don't need confirm buttons\n\t\t\t\t\tmacgyver: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tid: 'class',\n\t\t\t\t\t\t\ttype: 'mgChoiceButtons',\n\t\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t\tclassWrapper: '',\n\t\t\t\t\t\t\tenum: res.data.map(icon => ({\n\t\t\t\t\t\t\t\tid: icon.class,\n\t\t\t\t\t\t\t\tclass: `btn btn-icon-fixed ${icon.class} fa-fw`,\n\t\t\t\t\t\t\t\tclassActive: `btn btn-primary btn-icon-fixed ${icon.class} fa-fw`,\n\t\t\t\t\t\t\t})),\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t\tonShow: ()=> {\n\t\t\t\t\t\t// Bind to the mg-form element, detect the first change and close the dialog\n\t\t\t\t\t\tthis.$macgyver.$prompt.settings.macgyverForm.$on('mgChange', ()=> setTimeout(()=> { // Timeout not really needed but it lets the button highlight before we close\n\t\t\t\t\t\t\tthis.$macgyver.$prompt.close(true, this.$macgyver.$prompt.settings.value);\n\t\t\t\t\t\t}, 100));\n\t\t\t\t\t},\n\t\t\t\t}))\n\t\t\t\t.then(form => this.data = form.class)\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-icon\">\n\t\t<a\n\t\t\tv-if=\"$props.interface == 'modal'\"\n\t\t\t@click=\"selectIcon()\"\n\t\t\tclass=\"btn btn-light btn-icon-fixed\"\n\t\t\t:class=\"data ? [data, $props.classActive || $props.class] : [$props.iconFallback, $props.classInactive || $props.class]\"\n\t\t/>\n\t\t<mg-choice-dropdown\n\t\t\tv-else-if=\"$props.interface == 'dropdown'\"\n\t\t\t:form=\"$props.form\"\n\t\t\t:data=\"data\"\n\t\t\t:config=\"{\n\t\t\t\t$dataPath: $props.$dataPath,\n\t\t\t\tenumSource: 'url',\n\t\t\t\tenumUrl: {\n\t\t\t\t\turl: $props.iconFeed,\n\t\t\t\t\ttype: 'array',\n\t\t\t\t\tmappings: {\n\t\t\t\t\t\tid: {required: true, from: 'class'},\n\t\t\t\t\t\ttitle: {required: true, from: 'id'},\n\t\t\t\t\t\ticon: {required: true, from: 'class'},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\tdefault: $props.default,\n\t\t\t\trequired: $props.required,\n\t\t\t}\"\n\t\t/>\n\t\t<mg-error\n\t\t\tv-else\n\t\t\t:config=\"{errorText: 'Unknown mgIcon interface'}\"\n\t\t/>\n\t</div>\n</template>\n\n<style>\n.btn.btn-icon-fixed {\n\tbox-shadow: none;\n\twidth: 32px;\n\theight: 32px;\n\tpadding: 7px 0;\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n}\n</style>\n"]}, media: undefined });
+      inject("data-v-7dc20551_0", { source: "\n.btn.btn-icon-fixed {\n\tbox-shadow: none;\n\twidth: 32px;\n\theight: 32px;\n\tpadding: 7px 0;\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgIcon.vue"],"names":[],"mappings":";AA6FA;CACA,gBAAA;CACA,WAAA;CACA,YAAA;CACA,cAAA;CACA,aAAA;CACA,uBAAA;CACA,mBAAA;AACA","file":"mgIcon.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgIcon', {\n\tmeta: {\n\t\ttitle: 'Icon',\n\t\ticon: 'far fa-flag',\n\t\tcategory: 'Simple Inputs',\n\t\tpreferId: true,\n\t},\n\tprops: {\n\t\ticonFallback: {type: 'mgIcon', default: 'far fa-info', help: 'The icon to use if non is selected'},\n\t\trequired: {type: 'mgToggle', default: false},\n\t\tinterface: {type: 'mgChoiceButtons', default: 'modal', enum: ['modal', 'dropdown']},\n\t\ticonFeed: {type: 'mgText', default: '/api/webfonts/fa.json', advanced: true, help: 'The data source to import icon information', relative: true},\n\t\tclassName: {type: 'mgText', default: 'btn btn-light btn-circle', advanced: true},\n\t\tclassActive: {type: 'mgText', advanced: true},\n\t\tclassInactive: {type: 'mgText', advanced: true},\n\t},\n\tcreated() {\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);\n\t\t});\n\t},\n\tmethods: {\n\t\tselectIcon() {\n\t\t\tPromise.resolve()\n\t\t\t\t.then(()=> this.$macgyver.notify.loading(this._uid, true))\n\t\t\t\t.then(()=> this.$http.get(this.$props.iconFeed))\n\t\t\t\t.then(res => { this.$macgyver.notify.loading(this._uid, false); return res })\n\t\t\t\t.then(res => this.$macgyver.$prompt.macgyver({\n\t\t\t\t\ttitle: 'Select icon',\n\t\t\t\t\tbuttons: [], // We're capturing the first click so we don't need confirm buttons\n\t\t\t\t\tmacgyver: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tid: 'className',\n\t\t\t\t\t\t\ttype: 'mgChoiceButtons',\n\t\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t\tclassWrapper: '',\n\t\t\t\t\t\t\tenum: res.data.map(icon => ({\n\t\t\t\t\t\t\t\tid: icon.class,\n\t\t\t\t\t\t\t\tclass: `btn btn-icon-fixed ${icon.class} fa-fw`,\n\t\t\t\t\t\t\t\tclassActive: `btn btn-primary btn-icon-fixed ${icon.class} fa-fw`,\n\t\t\t\t\t\t\t})),\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t\tonShow: ()=> {\n\t\t\t\t\t\t// Bind to the mg-form element, detect the first change and close the dialog\n\t\t\t\t\t\tthis.$macgyver.$prompt.settings.macgyverForm.$on('mgChange', ()=> setTimeout(()=> { // Timeout not really needed but it lets the button highlight before we close\n\t\t\t\t\t\t\tthis.$macgyver.$prompt.close(true, this.$macgyver.$prompt.settings.value);\n\t\t\t\t\t\t}, 100));\n\t\t\t\t\t},\n\t\t\t\t}))\n\t\t\t\t.then(form => this.data = form.className)\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-icon\">\n\t\t<a\n\t\t\tv-if=\"$props.interface == 'modal'\"\n\t\t\t@click=\"selectIcon()\"\n\t\t\tclass=\"btn btn-light btn-icon-fixed\"\n\t\t\t:class=\"data ? [data, $props.classActive || $props.className] : [$props.iconFallback, $props.classInactive || $props.className]\"\n\t\t/>\n\t\t<mg-choice-dropdown\n\t\t\tv-else-if=\"$props.interface == 'dropdown'\"\n\t\t\t:form=\"$props.form\"\n\t\t\t:data=\"data\"\n\t\t\t:config=\"{\n\t\t\t\t$dataPath: $props.$dataPath,\n\t\t\t\tenumSource: 'url',\n\t\t\t\tenumUrl: {\n\t\t\t\t\turl: $props.iconFeed,\n\t\t\t\t\ttype: 'array',\n\t\t\t\t\tmappings: {\n\t\t\t\t\t\tid: {required: true, from: 'class'},\n\t\t\t\t\t\ttitle: {required: true, from: 'id'},\n\t\t\t\t\t\ticon: {required: true, from: 'class'},\n\t\t\t\t\t},\n\t\t\t\t},\n\t\t\t\tdefault: $props.default,\n\t\t\t\trequired: $props.required,\n\t\t\t}\"\n\t\t/>\n\t\t<mg-error\n\t\t\tv-else\n\t\t\t:config=\"{errorText: 'Unknown mgIcon interface'}\"\n\t\t/>\n\t</div>\n</template>\n\n<style>\n.btn.btn-icon-fixed {\n\tbox-shadow: none;\n\twidth: 32px;\n\theight: 32px;\n\tpadding: 7px 0;\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
@@ -12633,7 +12633,7 @@
       text: {
         type: 'mgText'
       },
-      "class": {
+      className: {
         type: 'mgText',
         "default": 'form-control-static',
         advanced: true
@@ -12649,7 +12649,7 @@
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
-    return _c("div", { class: _vm.$props.class }, [
+    return _c("div", { class: _vm.$props.className }, [
       _vm._v("\n\t" + _vm._s(_vm.data || _vm.$props.text) + "\n")
     ])
   };
@@ -13802,7 +13802,7 @@
       category: 'Data display'
     },
     props: {
-      "class": {
+      className: {
         type: 'mgText',
         advanced: true
       },
@@ -13895,8 +13895,8 @@
         ],
         staticClass: "btn btn-light",
         class: _vm.data
-          ? [_vm.data, _vm.$props.classActive || _vm.$props.class]
-          : [_vm.$props.classInactive || _vm.$props.class],
+          ? [_vm.data, _vm.$props.classActive || _vm.$props.className]
+          : [_vm.$props.classInactive || _vm.$props.className],
         on: {
           click: function($event) {
             return _vm.editQuery()
