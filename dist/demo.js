@@ -59,7 +59,7 @@
       return {
         config: {},
         data: {},
-        examples: ['examples/html.json', 'examples/mgChoiceTree.json', 'examples/mgQuery.json', 'examples/simple.json', 'examples/shorthand.json', 'examples/showcase.json', 'examples/showIf.json'],
+        examples: ['examples/mgChoiceTree.json', 'examples/mgHtml.json', 'examples/mgQuery.json', 'examples/mgWysiwyg.json', 'examples/simple.json', 'examples/shorthand.json', 'examples/showcase.json', 'examples/showIf.json'],
         example: this.$route.query.example || 'examples/showcase.json'
       };
     },
@@ -352,7 +352,7 @@
                   staticClass: "card-body",
                   staticStyle: { height: "200px", "overflow-y": "scroll" }
                 },
-                [_c("pre", [_vm._v(_vm._s(_vm._f("json")(_vm.data)))])]
+                [_c("pre", [_vm._v(_vm._s(_vm.data))])]
               )
             ])
           ])
@@ -366,7 +366,7 @@
     /* style */
     const __vue_inject_styles__ = function (inject) {
       if (!inject) return
-      inject("data-v-2264b2aa_0", { source: "\na {\n\tcursor: pointer;\n}\n.card .card-title {\n\tmargin-left: 5px;\n\tmargin-bottom: 0;\n}\n.window-panes {\n\tdisplay: block;\n\tposition: fixed;\n\ttop: 60px;\n\tleft: 10px;\n\tbottom: 10px;\n\tright: 10px;\n}\n.window-panes > * {\n\toverflow: auto;\n\theight: calc(100% - 60px);\n\tdisplay: block;\n\tpadding: 20px;\n}\n.window-panes > .window-pane-left {\n\tposition: fixed;\n\tleft: 10px;\n\twidth: calc(50% - 20px);\n\tz-index: 100;\n}\n.window-panes > .window-pane-right {\n\tposition: fixed;\n\tright: 10px;\n\twidth: calc(50% - 20px);\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/demo/form.vue"],"names":[],"mappings":";AAuGA;CACA,eAAA;AACA;AAEA;CACA,gBAAA;CACA,gBAAA;AACA;AAEA;CACA,cAAA;CACA,eAAA;CACA,SAAA;CACA,UAAA;CACA,YAAA;CACA,WAAA;AACA;AAEA;CACA,cAAA;CACA,yBAAA;CACA,cAAA;CACA,aAAA;AACA;AAEA;CACA,eAAA;CACA,UAAA;CACA,uBAAA;CACA,YAAA;AACA;AAEA;CACA,eAAA;CACA,WAAA;CACA,uBAAA;AACA","file":"form.vue","sourcesContent":["<script>\nexport default {\n\tdata() { return {\n\t\tconfig: {},\n\t\tdata: {},\n\t\texamples: [\n\t\t\t'examples/html.json',\n\t\t\t'examples/mgChoiceTree.json',\n\t\t\t'examples/mgQuery.json',\n\t\t\t'examples/simple.json',\n\t\t\t'examples/shorthand.json',\n\t\t\t'examples/showcase.json',\n\t\t\t'examples/showIf.json',\n\t\t],\n\t\texample: this.$route.query.example || 'examples/showcase.json',\n\t}},\n\tmethods: {\n\t\trandomizeData() {\n\t\t\tthis.data = {\n\t\t\t\tdemoText: 'Hello World ' + _.random(100, 999),\n\t\t\t\tdemoNumberSimple: _.random(100, 999),\n\t\t\t}\n\t\t},\n\t},\n\twatch: {\n\t\texample: {\n\t\t\timmediate: true,\n\t\t\thandler() {\n\t\t\t\tthis.$router.push({query: {...this.$route.query, example: this.example}});\n\n\t\t\t\tthis.$http.get(this.example)\n\t\t\t\t\t.then(res => {\n\t\t\t\t\t\tthis.data = {};\n\t\t\t\t\t\tthis.config = res.data;\n\t\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n};\n</script>\n\n<template>\n\t<div class=\"window-panes\">\n\t\t<div class=\"window-pane-left\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"!$route.query.edit\"\n\t\t\t\t:config=\"config\"\n\t\t\t\t:data=\"data\"\n\t\t\t\t@change=\"data = $event\"\n\t\t\t/>\n\t\t\t<mg-form-editor\n\t\t\t\tv-else\n\t\t\t\t:config=\"config\"\n\t\t\t\t@change=\"config = $event\"\n\t\t\t/>\n\t\t</div>\n\n\t\t<div class=\"window-pane-right\">\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-12\">\n\t\t\t\t\t<div class=\"card\">\n\t\t\t\t\t\t<div class=\"card-header d-flex justify-content-between p-1\">\n\t\t\t\t\t\t\t<h4 class=\"card-title\">Config</h4>\n\t\t\t\t\t\t\t<div class=\"btn-group\">\n\t\t\t\t\t\t\t\t<a class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\">\n\t\t\t\t\t\t\t\t\t{{example}}\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t<ul class=\"dropdown-menu\">\n\t\t\t\t\t\t\t\t\t<li v-for=\"exampleItem in examples\" :key=\"example\">\n\t\t\t\t\t\t\t\t\t\t<a @click=\"example = exampleItem\" class=\"dropdown-item\">\n\t\t\t\t\t\t\t\t\t\t\t<i :class=\"example == exampleItem ? 'fas fa-check-circle' : 'far fa-circle'\"/>\n\t\t\t\t\t\t\t\t\t\t\t{{exampleItem}}\n\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"card-body\" style=\"height: 200px; overflow-y: scroll\">\n\t\t\t\t\t\t\t<pre>{{config}}</pre>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"row mt-3\">\n\t\t\t\t<div class=\"col-12\">\n\t\t\t\t\t<div class=\"card\">\n\t\t\t\t\t\t<div class=\"card-header p-1\">\n\t\t\t\t\t\t\t<div class=\"btn-group float-right m-1\">\n\t\t\t\t\t\t\t\t<a @click=\"randomizeData()\" class=\"btn btn-sm btn-light far fa-random\"/>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<h4 class=\"card-title\">Form data</h4>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"card-body\" style=\"height: 200px; overflow-y: scroll\">\n\t\t\t\t\t\t\t<pre>{{data | json}}</pre>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n\n<style>\na {\n\tcursor: pointer;\n}\n\n.card .card-title {\n\tmargin-left: 5px;\n\tmargin-bottom: 0;\n}\n\n.window-panes {\n\tdisplay: block;\n\tposition: fixed;\n\ttop: 60px;\n\tleft: 10px;\n\tbottom: 10px;\n\tright: 10px;\n}\n\n.window-panes > * {\n\toverflow: auto;\n\theight: calc(100% - 60px);\n\tdisplay: block;\n\tpadding: 20px;\n}\n\n.window-panes > .window-pane-left {\n\tposition: fixed;\n\tleft: 10px;\n\twidth: calc(50% - 20px);\n\tz-index: 100;\n}\n\n.window-panes > .window-pane-right {\n\tposition: fixed;\n\tright: 10px;\n\twidth: calc(50% - 20px);\n}\n</style>\n"]}, media: undefined });
+      inject("data-v-16ad3ca2_0", { source: "\na {\n\tcursor: pointer;\n}\n.card .card-title {\n\tmargin-left: 5px;\n\tmargin-bottom: 0;\n}\n.window-panes {\n\tdisplay: block;\n\tposition: fixed;\n\ttop: 60px;\n\tleft: 10px;\n\tbottom: 10px;\n\tright: 10px;\n}\n.window-panes > * {\n\toverflow: auto;\n\theight: calc(100% - 60px);\n\tdisplay: block;\n\tpadding: 20px;\n}\n.window-panes > .window-pane-left {\n\tposition: fixed;\n\tleft: 10px;\n\twidth: calc(50% - 20px);\n\tz-index: 100;\n}\n.window-panes > .window-pane-right {\n\tposition: fixed;\n\tright: 10px;\n\twidth: calc(50% - 20px);\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/demo/form.vue"],"names":[],"mappings":";AAwGA;CACA,eAAA;AACA;AAEA;CACA,gBAAA;CACA,gBAAA;AACA;AAEA;CACA,cAAA;CACA,eAAA;CACA,SAAA;CACA,UAAA;CACA,YAAA;CACA,WAAA;AACA;AAEA;CACA,cAAA;CACA,yBAAA;CACA,cAAA;CACA,aAAA;AACA;AAEA;CACA,eAAA;CACA,UAAA;CACA,uBAAA;CACA,YAAA;AACA;AAEA;CACA,eAAA;CACA,WAAA;CACA,uBAAA;AACA","file":"form.vue","sourcesContent":["<script>\nexport default {\n\tdata() { return {\n\t\tconfig: {},\n\t\tdata: {},\n\t\texamples: [\n\t\t\t'examples/mgChoiceTree.json',\n\t\t\t'examples/mgHtml.json',\n\t\t\t'examples/mgQuery.json',\n\t\t\t'examples/mgWysiwyg.json',\n\t\t\t'examples/simple.json',\n\t\t\t'examples/shorthand.json',\n\t\t\t'examples/showcase.json',\n\t\t\t'examples/showIf.json',\n\t\t],\n\t\texample: this.$route.query.example || 'examples/showcase.json',\n\t}},\n\tmethods: {\n\t\trandomizeData() {\n\t\t\tthis.data = {\n\t\t\t\tdemoText: 'Hello World ' + _.random(100, 999),\n\t\t\t\tdemoNumberSimple: _.random(100, 999),\n\t\t\t}\n\t\t},\n\t},\n\twatch: {\n\t\texample: {\n\t\t\timmediate: true,\n\t\t\thandler() {\n\t\t\t\tthis.$router.push({query: {...this.$route.query, example: this.example}});\n\n\t\t\t\tthis.$http.get(this.example)\n\t\t\t\t\t.then(res => {\n\t\t\t\t\t\tthis.data = {};\n\t\t\t\t\t\tthis.config = res.data;\n\t\t\t\t\t});\n\t\t\t},\n\t\t},\n\t},\n};\n</script>\n\n<template>\n\t<div class=\"window-panes\">\n\t\t<div class=\"window-pane-left\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"!$route.query.edit\"\n\t\t\t\t:config=\"config\"\n\t\t\t\t:data=\"data\"\n\t\t\t\t@change=\"data = $event\"\n\t\t\t/>\n\t\t\t<mg-form-editor\n\t\t\t\tv-else\n\t\t\t\t:config=\"config\"\n\t\t\t\t@change=\"config = $event\"\n\t\t\t/>\n\t\t</div>\n\n\t\t<div class=\"window-pane-right\">\n\t\t\t<div class=\"row\">\n\t\t\t\t<div class=\"col-12\">\n\t\t\t\t\t<div class=\"card\">\n\t\t\t\t\t\t<div class=\"card-header d-flex justify-content-between p-1\">\n\t\t\t\t\t\t\t<h4 class=\"card-title\">Config</h4>\n\t\t\t\t\t\t\t<div class=\"btn-group\">\n\t\t\t\t\t\t\t\t<a class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\">\n\t\t\t\t\t\t\t\t\t{{example}}\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t<ul class=\"dropdown-menu\">\n\t\t\t\t\t\t\t\t\t<li v-for=\"exampleItem in examples\" :key=\"example\">\n\t\t\t\t\t\t\t\t\t\t<a @click=\"example = exampleItem\" class=\"dropdown-item\">\n\t\t\t\t\t\t\t\t\t\t\t<i :class=\"example == exampleItem ? 'fas fa-check-circle' : 'far fa-circle'\"/>\n\t\t\t\t\t\t\t\t\t\t\t{{exampleItem}}\n\t\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"card-body\" style=\"height: 200px; overflow-y: scroll\">\n\t\t\t\t\t\t\t<pre>{{config}}</pre>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div class=\"row mt-3\">\n\t\t\t\t<div class=\"col-12\">\n\t\t\t\t\t<div class=\"card\">\n\t\t\t\t\t\t<div class=\"card-header p-1\">\n\t\t\t\t\t\t\t<div class=\"btn-group float-right m-1\">\n\t\t\t\t\t\t\t\t<a @click=\"randomizeData()\" class=\"btn btn-sm btn-light far fa-random\"/>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<h4 class=\"card-title\">Form data</h4>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div class=\"card-body\" style=\"height: 200px; overflow-y: scroll\">\n\t\t\t\t\t\t\t<pre>{{data}}</pre>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n\n<style>\na {\n\tcursor: pointer;\n}\n\n.card .card-title {\n\tmargin-left: 5px;\n\tmargin-bottom: 0;\n}\n\n.window-panes {\n\tdisplay: block;\n\tposition: fixed;\n\ttop: 60px;\n\tleft: 10px;\n\tbottom: 10px;\n\tright: 10px;\n}\n\n.window-panes > * {\n\toverflow: auto;\n\theight: calc(100% - 60px);\n\tdisplay: block;\n\tpadding: 20px;\n}\n\n.window-panes > .window-pane-left {\n\tposition: fixed;\n\tleft: 10px;\n\twidth: calc(50% - 20px);\n\tz-index: 100;\n}\n\n.window-panes > .window-pane-right {\n\tposition: fixed;\n\tright: 10px;\n\twidth: calc(50% - 20px);\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
@@ -394,13 +394,149 @@
       undefined
     );
 
-  var script$1 = {};
+  var script$1 = {
+    data: function data() {
+      return {
+        formData: {
+          text: 'Hello world',
+          number: 10
+        }
+      };
+    }
+  };
 
   /* script */
   const __vue_script__$1 = script$1;
 
   /* template */
   var __vue_render__$1 = function() {
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
+    return _c("div", [
+      _c("div", { staticClass: "card mb-2" }, [
+        _c("div", { staticClass: "card-header" }, [_vm._v("mgText")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "card-body row" }, [
+          _c(
+            "div",
+            { staticClass: "col-md-6" },
+            [
+              _c("mg-text", {
+                attrs: { value: _vm.formData.text },
+                on: {
+                  change: function($event) {
+                    _vm.formData.text = $event;
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c("div", [
+                _vm._v("Value: "),
+                _c("code", [_vm._v(_vm._s(_vm.formData.text))])
+              ])
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _vm._m(0)
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "card" }, [
+        _c("div", { staticClass: "card-header" }, [_vm._v("mgNumber")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "card-body row" }, [
+          _c(
+            "div",
+            { staticClass: "col-md-6" },
+            [
+              _c("mg-number", {
+                attrs: { value: _vm.formData.number, min: 0, max: 100 },
+                on: {
+                  change: function($event) {
+                    _vm.formData.number = $event;
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c("div", [
+                _vm._v("Value: "),
+                _c("code", [_vm._v(_vm._s(_vm.formData.number))])
+              ])
+            ],
+            1
+          ),
+          _vm._v(" "),
+          _vm._m(1)
+        ])
+      ])
+    ])
+  };
+  var __vue_staticRenderFns__$1 = [
+    function() {
+      var _vm = this;
+      var _h = _vm.$createElement;
+      var _c = _vm._self._c || _h;
+      return _c("div", { staticClass: "col-md-6" }, [
+        _c("pre", [
+          _vm._v(
+            '<mg-text\n\t:value="formData.text"\n\t@change="formData.text = $event"\n/>'
+          )
+        ])
+      ])
+    },
+    function() {
+      var _vm = this;
+      var _h = _vm.$createElement;
+      var _c = _vm._self._c || _h;
+      return _c("div", { staticClass: "col-md-6" }, [
+        _c("pre", [
+          _vm._v(
+            '<mg-number\n\t:value="formData.number"\n\t@change="formData.number = $event"\n\t:min="0"\n\t:max="100"\n/>'
+          )
+        ])
+      ])
+    }
+  ];
+  __vue_render__$1._withStripped = true;
+
+    /* style */
+    const __vue_inject_styles__$1 = undefined;
+    /* scoped */
+    const __vue_scope_id__$1 = undefined;
+    /* module identifier */
+    const __vue_module_identifier__$1 = undefined;
+    /* functional template */
+    const __vue_is_functional_template__$1 = false;
+    /* style inject */
+    
+    /* style inject SSR */
+    
+    /* style inject shadow dom */
+    
+
+    
+    const __vue_component__$1 = normalizeComponent(
+      { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
+      __vue_inject_styles__$1,
+      __vue_script__$1,
+      __vue_scope_id__$1,
+      __vue_is_functional_template__$1,
+      __vue_module_identifier__$1,
+      false,
+      undefined,
+      undefined,
+      undefined
+    );
+
+  var script$2 = {};
+
+  /* script */
+  const __vue_script__$2 = script$2;
+
+  /* template */
+  var __vue_render__$2 = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -431,6 +567,7 @@
                     on: {
                       click: function($event) {
                         return _vm.$router.push({
+                          path: "/",
                           query: Object.assign({}, _vm.$route.query, {
                             edit: undefined
                           })
@@ -442,7 +579,7 @@
                 )
               ]),
               _vm._v(" "),
-              _c("li", { staticClass: "navbar-item" }, [
+              _c("li", { staticClass: "navbar-item mr-1" }, [
                 _c(
                   "a",
                   {
@@ -453,12 +590,31 @@
                     on: {
                       click: function($event) {
                         return _vm.$router.push({
+                          path: "/",
                           query: Object.assign({}, _vm.$route.query, { edit: 1 })
                         })
                       }
                     }
                   },
                   [_vm._v("Editor")]
+                )
+              ]),
+              _vm._v(" "),
+              _c("li", { staticClass: "navbar-item" }, [
+                _c(
+                  "a",
+                  {
+                    class:
+                      _vm.$route.path == "/standalone"
+                        ? "btn btn-primary text-white"
+                        : "btn btn-light",
+                    on: {
+                      click: function($event) {
+                        return _vm.$router.push({ path: "/standalone" })
+                      }
+                    }
+                  },
+                  [_vm._v("Standalone")]
                 )
               ])
             ])
@@ -469,7 +625,7 @@
       ]
     )
   };
-  var __vue_staticRenderFns__$1 = [
+  var __vue_staticRenderFns__$2 = [
     function() {
       var _vm = this;
       var _h = _vm.$createElement;
@@ -508,33 +664,33 @@
       ])
     }
   ];
-  __vue_render__$1._withStripped = true;
+  __vue_render__$2._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$1 = function (inject) {
+    const __vue_inject_styles__$2 = function (inject) {
       if (!inject) return
-      inject("data-v-46f95e42_0", { source: "\n.navbar .btn.btn-primary > a {\n\tcolor: #FFF;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/demo/navbar.vue"],"names":[],"mappings":";AAuCA;CACA,WAAA;AACA","file":"navbar.vue","sourcesContent":["<script>\nexport default {\n};\n</script>\n\n<template>\n\t<nav class=\"navbar navbar-expand-lg navbar-light bg-light\">\n\t\t<a class=\"navbar-brand\">MacGyver</a>\n\t\t<button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\"#navbarAreas\">\n\t\t\t<span class=\"navbar-toggler-icon\"></span>\n\t\t</button>\n\t\t<div class=\"collapse navbar-collapse\" id=\"navbarAreas\">\n\t\t\t<ul class=\"navbar-nav\">\n\t\t\t\t<li class=\"navbar-item mr-1\">\n\t\t\t\t\t<a\n\t\t\t\t\t\t:class=\"$route.path == '/' && !$route.query.edit ? 'btn btn-primary text-white' : 'btn btn-light'\"\n\t\t\t\t\t\t@click=\"$router.push({query: {...$route.query, edit: undefined}})\"\n\t\t\t\t\t>Form view</a>\n\t\t\t\t</li>\n\t\t\t\t<li class=\"navbar-item\">\n\t\t\t\t\t<a\n\t\t\t\t\t\t:class=\"$route.path == '/' && $route.query.edit  ? 'btn btn-primary text-white' : 'btn btn-light'\"\n\t\t\t\t\t\t@click=\"$router.push({query: {...$route.query, edit: 1}})\"\n\t\t\t\t\t>Editor</a>\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<ul class=\"navbar-nav\">\n\t\t\t<li class=\"navbar-item\">\n\t\t\t\t<a href=\"https://github.com/MomsFriendlyDevCo/MacGyver2\" class=\"btn btn-light\">\n\t\t\t\t\t<i class=\"fab fa-github\"/>\n\t\t\t\t\tGitHub\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t</ul>\n\t</nav>\n</template>\n\n<style>\n.navbar .btn.btn-primary > a {\n\tcolor: #FFF;\n}\n</style>\n"]}, media: undefined });
+      inject("data-v-92a5105a_0", { source: "\n.navbar .btn.btn-primary > a {\n\tcolor: #FFF;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/demo/navbar.vue"],"names":[],"mappings":";AA6CA;CACA,WAAA;AACA","file":"navbar.vue","sourcesContent":["<script>\nexport default {\n};\n</script>\n\n<template>\n\t<nav class=\"navbar navbar-expand-lg navbar-light bg-light\">\n\t\t<a class=\"navbar-brand\">MacGyver</a>\n\t\t<button class=\"navbar-toggler\" type=\"button\" data-toggle=\"collapse\" data-target=\"#navbarAreas\">\n\t\t\t<span class=\"navbar-toggler-icon\"></span>\n\t\t</button>\n\t\t<div class=\"collapse navbar-collapse\" id=\"navbarAreas\">\n\t\t\t<ul class=\"navbar-nav\">\n\t\t\t\t<li class=\"navbar-item mr-1\">\n\t\t\t\t\t<a\n\t\t\t\t\t\t:class=\"$route.path == '/' && !$route.query.edit ? 'btn btn-primary text-white' : 'btn btn-light'\"\n\t\t\t\t\t\t@click=\"$router.push({path: '/', query: {...$route.query, edit: undefined}})\"\n\t\t\t\t\t>Form view</a>\n\t\t\t\t</li>\n\t\t\t\t<li class=\"navbar-item mr-1\">\n\t\t\t\t\t<a\n\t\t\t\t\t\t:class=\"$route.path == '/' && $route.query.edit  ? 'btn btn-primary text-white' : 'btn btn-light'\"\n\t\t\t\t\t\t@click=\"$router.push({path: '/', query: {...$route.query, edit: 1}})\"\n\t\t\t\t\t>Editor</a>\n\t\t\t\t</li>\n\t\t\t\t<li class=\"navbar-item\">\n\t\t\t\t\t<a\n\t\t\t\t\t\t:class=\"$route.path == '/standalone' ? 'btn btn-primary text-white' : 'btn btn-light'\"\n\t\t\t\t\t\t@click=\"$router.push({path: '/standalone'})\"\n\t\t\t\t\t>Standalone</a>\n\t\t\t\t</li>\n\t\t\t</ul>\n\t\t</div>\n\t\t<ul class=\"navbar-nav\">\n\t\t\t<li class=\"navbar-item\">\n\t\t\t\t<a href=\"https://github.com/MomsFriendlyDevCo/MacGyver2\" class=\"btn btn-light\">\n\t\t\t\t\t<i class=\"fab fa-github\"/>\n\t\t\t\t\tGitHub\n\t\t\t\t</a>\n\t\t\t</li>\n\t\t</ul>\n\t</nav>\n</template>\n\n<style>\n.navbar .btn.btn-primary > a {\n\tcolor: #FFF;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
-    const __vue_scope_id__$1 = undefined;
+    const __vue_scope_id__$2 = undefined;
     /* module identifier */
-    const __vue_module_identifier__$1 = undefined;
+    const __vue_module_identifier__$2 = undefined;
     /* functional template */
-    const __vue_is_functional_template__$1 = false;
+    const __vue_is_functional_template__$2 = false;
     /* style inject SSR */
     
     /* style inject shadow dom */
     
 
     
-    const __vue_component__$1 = normalizeComponent(
-      { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
-      __vue_inject_styles__$1,
-      __vue_script__$1,
-      __vue_scope_id__$1,
-      __vue_is_functional_template__$1,
-      __vue_module_identifier__$1,
+    const __vue_component__$2 = normalizeComponent(
+      { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
+      __vue_inject_styles__$2,
+      __vue_script__$2,
+      __vue_scope_id__$2,
+      __vue_is_functional_template__$2,
+      __vue_module_identifier__$2,
       false,
       createInjector,
       undefined,
@@ -2454,21 +2610,21 @@
     return axios;
   }();
 
-  var script$2 = Vue.prototype.$http;
+  var script$3 = Vue.prototype.$http;
 
   /* script */
-  const __vue_script__$2 = script$2;
+  const __vue_script__$3 = script$3;
 
   /* template */
 
     /* style */
-    const __vue_inject_styles__$2 = undefined;
+    const __vue_inject_styles__$3 = undefined;
     /* scoped */
-    const __vue_scope_id__$2 = undefined;
+    const __vue_scope_id__$3 = undefined;
     /* module identifier */
-    const __vue_module_identifier__$2 = undefined;
+    const __vue_module_identifier__$3 = undefined;
     /* functional template */
-    const __vue_is_functional_template__$2 = undefined;
+    const __vue_is_functional_template__$3 = undefined;
     /* style inject */
     
     /* style inject SSR */
@@ -2477,13 +2633,13 @@
     
 
     
-    const __vue_component__$2 = normalizeComponent(
+    const __vue_component__$3 = normalizeComponent(
       {},
-      __vue_inject_styles__$2,
-      __vue_script__$2,
-      __vue_scope_id__$2,
-      __vue_is_functional_template__$2,
-      __vue_module_identifier__$2,
+      __vue_inject_styles__$3,
+      __vue_script__$3,
+      __vue_scope_id__$3,
+      __vue_is_functional_template__$3,
+      __vue_module_identifier__$3,
       false,
       undefined,
       undefined,
@@ -2496,13 +2652,16 @@
       routes: [{
         path: '/',
         component: __vue_component__
+      }, {
+        path: '/standalone',
+        component: __vue_component__$1
       }]
     });
     app.vue = new Vue$1({
       el: '#app',
       router: app.router,
       components: {
-        navbar: __vue_component__$1
+        navbar: __vue_component__$2
       }
     });
   });

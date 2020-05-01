@@ -1448,6 +1448,537 @@ function get(object, path, defaultValue) {
 
 var get_1 = get;
 
+/**
+ * A specialized version of `_.reduce` for arrays without support for
+ * iteratee shorthands.
+ *
+ * @private
+ * @param {Array} [array] The array to iterate over.
+ * @param {Function} iteratee The function invoked per iteration.
+ * @param {*} [accumulator] The initial value.
+ * @param {boolean} [initAccum] Specify using the first element of `array` as
+ *  the initial value.
+ * @returns {*} Returns the accumulated value.
+ */
+function arrayReduce(array, iteratee, accumulator, initAccum) {
+  var index = -1,
+      length = array == null ? 0 : array.length;
+
+  if (initAccum && length) {
+    accumulator = array[++index];
+  }
+  while (++index < length) {
+    accumulator = iteratee(accumulator, array[index], index, array);
+  }
+  return accumulator;
+}
+
+var _arrayReduce = arrayReduce;
+
+/**
+ * The base implementation of `_.propertyOf` without support for deep paths.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @returns {Function} Returns the new accessor function.
+ */
+function basePropertyOf(object) {
+  return function(key) {
+    return object == null ? undefined : object[key];
+  };
+}
+
+var _basePropertyOf = basePropertyOf;
+
+/** Used to map Latin Unicode letters to basic Latin letters. */
+var deburredLetters = {
+  // Latin-1 Supplement block.
+  '\xc0': 'A',  '\xc1': 'A', '\xc2': 'A', '\xc3': 'A', '\xc4': 'A', '\xc5': 'A',
+  '\xe0': 'a',  '\xe1': 'a', '\xe2': 'a', '\xe3': 'a', '\xe4': 'a', '\xe5': 'a',
+  '\xc7': 'C',  '\xe7': 'c',
+  '\xd0': 'D',  '\xf0': 'd',
+  '\xc8': 'E',  '\xc9': 'E', '\xca': 'E', '\xcb': 'E',
+  '\xe8': 'e',  '\xe9': 'e', '\xea': 'e', '\xeb': 'e',
+  '\xcc': 'I',  '\xcd': 'I', '\xce': 'I', '\xcf': 'I',
+  '\xec': 'i',  '\xed': 'i', '\xee': 'i', '\xef': 'i',
+  '\xd1': 'N',  '\xf1': 'n',
+  '\xd2': 'O',  '\xd3': 'O', '\xd4': 'O', '\xd5': 'O', '\xd6': 'O', '\xd8': 'O',
+  '\xf2': 'o',  '\xf3': 'o', '\xf4': 'o', '\xf5': 'o', '\xf6': 'o', '\xf8': 'o',
+  '\xd9': 'U',  '\xda': 'U', '\xdb': 'U', '\xdc': 'U',
+  '\xf9': 'u',  '\xfa': 'u', '\xfb': 'u', '\xfc': 'u',
+  '\xdd': 'Y',  '\xfd': 'y', '\xff': 'y',
+  '\xc6': 'Ae', '\xe6': 'ae',
+  '\xde': 'Th', '\xfe': 'th',
+  '\xdf': 'ss',
+  // Latin Extended-A block.
+  '\u0100': 'A',  '\u0102': 'A', '\u0104': 'A',
+  '\u0101': 'a',  '\u0103': 'a', '\u0105': 'a',
+  '\u0106': 'C',  '\u0108': 'C', '\u010a': 'C', '\u010c': 'C',
+  '\u0107': 'c',  '\u0109': 'c', '\u010b': 'c', '\u010d': 'c',
+  '\u010e': 'D',  '\u0110': 'D', '\u010f': 'd', '\u0111': 'd',
+  '\u0112': 'E',  '\u0114': 'E', '\u0116': 'E', '\u0118': 'E', '\u011a': 'E',
+  '\u0113': 'e',  '\u0115': 'e', '\u0117': 'e', '\u0119': 'e', '\u011b': 'e',
+  '\u011c': 'G',  '\u011e': 'G', '\u0120': 'G', '\u0122': 'G',
+  '\u011d': 'g',  '\u011f': 'g', '\u0121': 'g', '\u0123': 'g',
+  '\u0124': 'H',  '\u0126': 'H', '\u0125': 'h', '\u0127': 'h',
+  '\u0128': 'I',  '\u012a': 'I', '\u012c': 'I', '\u012e': 'I', '\u0130': 'I',
+  '\u0129': 'i',  '\u012b': 'i', '\u012d': 'i', '\u012f': 'i', '\u0131': 'i',
+  '\u0134': 'J',  '\u0135': 'j',
+  '\u0136': 'K',  '\u0137': 'k', '\u0138': 'k',
+  '\u0139': 'L',  '\u013b': 'L', '\u013d': 'L', '\u013f': 'L', '\u0141': 'L',
+  '\u013a': 'l',  '\u013c': 'l', '\u013e': 'l', '\u0140': 'l', '\u0142': 'l',
+  '\u0143': 'N',  '\u0145': 'N', '\u0147': 'N', '\u014a': 'N',
+  '\u0144': 'n',  '\u0146': 'n', '\u0148': 'n', '\u014b': 'n',
+  '\u014c': 'O',  '\u014e': 'O', '\u0150': 'O',
+  '\u014d': 'o',  '\u014f': 'o', '\u0151': 'o',
+  '\u0154': 'R',  '\u0156': 'R', '\u0158': 'R',
+  '\u0155': 'r',  '\u0157': 'r', '\u0159': 'r',
+  '\u015a': 'S',  '\u015c': 'S', '\u015e': 'S', '\u0160': 'S',
+  '\u015b': 's',  '\u015d': 's', '\u015f': 's', '\u0161': 's',
+  '\u0162': 'T',  '\u0164': 'T', '\u0166': 'T',
+  '\u0163': 't',  '\u0165': 't', '\u0167': 't',
+  '\u0168': 'U',  '\u016a': 'U', '\u016c': 'U', '\u016e': 'U', '\u0170': 'U', '\u0172': 'U',
+  '\u0169': 'u',  '\u016b': 'u', '\u016d': 'u', '\u016f': 'u', '\u0171': 'u', '\u0173': 'u',
+  '\u0174': 'W',  '\u0175': 'w',
+  '\u0176': 'Y',  '\u0177': 'y', '\u0178': 'Y',
+  '\u0179': 'Z',  '\u017b': 'Z', '\u017d': 'Z',
+  '\u017a': 'z',  '\u017c': 'z', '\u017e': 'z',
+  '\u0132': 'IJ', '\u0133': 'ij',
+  '\u0152': 'Oe', '\u0153': 'oe',
+  '\u0149': "'n", '\u017f': 's'
+};
+
+/**
+ * Used by `_.deburr` to convert Latin-1 Supplement and Latin Extended-A
+ * letters to basic Latin letters.
+ *
+ * @private
+ * @param {string} letter The matched letter to deburr.
+ * @returns {string} Returns the deburred letter.
+ */
+var deburrLetter = _basePropertyOf(deburredLetters);
+
+var _deburrLetter = deburrLetter;
+
+/** Used to match Latin Unicode letters (excluding mathematical operators). */
+var reLatin = /[\xc0-\xd6\xd8-\xf6\xf8-\xff\u0100-\u017f]/g;
+
+/** Used to compose unicode character classes. */
+var rsComboMarksRange = '\\u0300-\\u036f',
+    reComboHalfMarksRange = '\\ufe20-\\ufe2f',
+    rsComboSymbolsRange = '\\u20d0-\\u20ff',
+    rsComboRange = rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange;
+
+/** Used to compose unicode capture groups. */
+var rsCombo = '[' + rsComboRange + ']';
+
+/**
+ * Used to match [combining diacritical marks](https://en.wikipedia.org/wiki/Combining_Diacritical_Marks) and
+ * [combining diacritical marks for symbols](https://en.wikipedia.org/wiki/Combining_Diacritical_Marks_for_Symbols).
+ */
+var reComboMark = RegExp(rsCombo, 'g');
+
+/**
+ * Deburrs `string` by converting
+ * [Latin-1 Supplement](https://en.wikipedia.org/wiki/Latin-1_Supplement_(Unicode_block)#Character_table)
+ * and [Latin Extended-A](https://en.wikipedia.org/wiki/Latin_Extended-A)
+ * letters to basic Latin letters and removing
+ * [combining diacritical marks](https://en.wikipedia.org/wiki/Combining_Diacritical_Marks).
+ *
+ * @static
+ * @memberOf _
+ * @since 3.0.0
+ * @category String
+ * @param {string} [string=''] The string to deburr.
+ * @returns {string} Returns the deburred string.
+ * @example
+ *
+ * _.deburr('déjà vu');
+ * // => 'deja vu'
+ */
+function deburr(string) {
+  string = toString_1(string);
+  return string && string.replace(reLatin, _deburrLetter).replace(reComboMark, '');
+}
+
+var deburr_1 = deburr;
+
+/** Used to match words composed of alphanumeric characters. */
+var reAsciiWord = /[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g;
+
+/**
+ * Splits an ASCII `string` into an array of its words.
+ *
+ * @private
+ * @param {string} The string to inspect.
+ * @returns {Array} Returns the words of `string`.
+ */
+function asciiWords(string) {
+  return string.match(reAsciiWord) || [];
+}
+
+var _asciiWords = asciiWords;
+
+/** Used to detect strings that need a more robust regexp to match words. */
+var reHasUnicodeWord = /[a-z][A-Z]|[A-Z]{2}[a-z]|[0-9][a-zA-Z]|[a-zA-Z][0-9]|[^a-zA-Z0-9 ]/;
+
+/**
+ * Checks if `string` contains a word composed of Unicode symbols.
+ *
+ * @private
+ * @param {string} string The string to inspect.
+ * @returns {boolean} Returns `true` if a word is found, else `false`.
+ */
+function hasUnicodeWord(string) {
+  return reHasUnicodeWord.test(string);
+}
+
+var _hasUnicodeWord = hasUnicodeWord;
+
+/** Used to compose unicode character classes. */
+var rsAstralRange = '\\ud800-\\udfff',
+    rsComboMarksRange$1 = '\\u0300-\\u036f',
+    reComboHalfMarksRange$1 = '\\ufe20-\\ufe2f',
+    rsComboSymbolsRange$1 = '\\u20d0-\\u20ff',
+    rsComboRange$1 = rsComboMarksRange$1 + reComboHalfMarksRange$1 + rsComboSymbolsRange$1,
+    rsDingbatRange = '\\u2700-\\u27bf',
+    rsLowerRange = 'a-z\\xdf-\\xf6\\xf8-\\xff',
+    rsMathOpRange = '\\xac\\xb1\\xd7\\xf7',
+    rsNonCharRange = '\\x00-\\x2f\\x3a-\\x40\\x5b-\\x60\\x7b-\\xbf',
+    rsPunctuationRange = '\\u2000-\\u206f',
+    rsSpaceRange = ' \\t\\x0b\\f\\xa0\\ufeff\\n\\r\\u2028\\u2029\\u1680\\u180e\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200a\\u202f\\u205f\\u3000',
+    rsUpperRange = 'A-Z\\xc0-\\xd6\\xd8-\\xde',
+    rsVarRange = '\\ufe0e\\ufe0f',
+    rsBreakRange = rsMathOpRange + rsNonCharRange + rsPunctuationRange + rsSpaceRange;
+
+/** Used to compose unicode capture groups. */
+var rsApos = "['\u2019]",
+    rsBreak = '[' + rsBreakRange + ']',
+    rsCombo$1 = '[' + rsComboRange$1 + ']',
+    rsDigits = '\\d+',
+    rsDingbat = '[' + rsDingbatRange + ']',
+    rsLower = '[' + rsLowerRange + ']',
+    rsMisc = '[^' + rsAstralRange + rsBreakRange + rsDigits + rsDingbatRange + rsLowerRange + rsUpperRange + ']',
+    rsFitz = '\\ud83c[\\udffb-\\udfff]',
+    rsModifier = '(?:' + rsCombo$1 + '|' + rsFitz + ')',
+    rsNonAstral = '[^' + rsAstralRange + ']',
+    rsRegional = '(?:\\ud83c[\\udde6-\\uddff]){2}',
+    rsSurrPair = '[\\ud800-\\udbff][\\udc00-\\udfff]',
+    rsUpper = '[' + rsUpperRange + ']',
+    rsZWJ = '\\u200d';
+
+/** Used to compose unicode regexes. */
+var rsMiscLower = '(?:' + rsLower + '|' + rsMisc + ')',
+    rsMiscUpper = '(?:' + rsUpper + '|' + rsMisc + ')',
+    rsOptContrLower = '(?:' + rsApos + '(?:d|ll|m|re|s|t|ve))?',
+    rsOptContrUpper = '(?:' + rsApos + '(?:D|LL|M|RE|S|T|VE))?',
+    reOptMod = rsModifier + '?',
+    rsOptVar = '[' + rsVarRange + ']?',
+    rsOptJoin = '(?:' + rsZWJ + '(?:' + [rsNonAstral, rsRegional, rsSurrPair].join('|') + ')' + rsOptVar + reOptMod + ')*',
+    rsOrdLower = '\\d*(?:1st|2nd|3rd|(?![123])\\dth)(?=\\b|[A-Z_])',
+    rsOrdUpper = '\\d*(?:1ST|2ND|3RD|(?![123])\\dTH)(?=\\b|[a-z_])',
+    rsSeq = rsOptVar + reOptMod + rsOptJoin,
+    rsEmoji = '(?:' + [rsDingbat, rsRegional, rsSurrPair].join('|') + ')' + rsSeq;
+
+/** Used to match complex or compound words. */
+var reUnicodeWord = RegExp([
+  rsUpper + '?' + rsLower + '+' + rsOptContrLower + '(?=' + [rsBreak, rsUpper, '$'].join('|') + ')',
+  rsMiscUpper + '+' + rsOptContrUpper + '(?=' + [rsBreak, rsUpper + rsMiscLower, '$'].join('|') + ')',
+  rsUpper + '?' + rsMiscLower + '+' + rsOptContrLower,
+  rsUpper + '+' + rsOptContrUpper,
+  rsOrdUpper,
+  rsOrdLower,
+  rsDigits,
+  rsEmoji
+].join('|'), 'g');
+
+/**
+ * Splits a Unicode `string` into an array of its words.
+ *
+ * @private
+ * @param {string} The string to inspect.
+ * @returns {Array} Returns the words of `string`.
+ */
+function unicodeWords(string) {
+  return string.match(reUnicodeWord) || [];
+}
+
+var _unicodeWords = unicodeWords;
+
+/**
+ * Splits `string` into an array of its words.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.0.0
+ * @category String
+ * @param {string} [string=''] The string to inspect.
+ * @param {RegExp|string} [pattern] The pattern to match words.
+ * @param- {Object} [guard] Enables use as an iteratee for methods like `_.map`.
+ * @returns {Array} Returns the words of `string`.
+ * @example
+ *
+ * _.words('fred, barney, & pebbles');
+ * // => ['fred', 'barney', 'pebbles']
+ *
+ * _.words('fred, barney, & pebbles', /[^, ]+/g);
+ * // => ['fred', 'barney', '&', 'pebbles']
+ */
+function words(string, pattern, guard) {
+  string = toString_1(string);
+  pattern = guard ? undefined : pattern;
+
+  if (pattern === undefined) {
+    return _hasUnicodeWord(string) ? _unicodeWords(string) : _asciiWords(string);
+  }
+  return string.match(pattern) || [];
+}
+
+var words_1 = words;
+
+/** Used to compose unicode capture groups. */
+var rsApos$1 = "['\u2019]";
+
+/** Used to match apostrophes. */
+var reApos = RegExp(rsApos$1, 'g');
+
+/**
+ * Creates a function like `_.camelCase`.
+ *
+ * @private
+ * @param {Function} callback The function to combine each word.
+ * @returns {Function} Returns the new compounder function.
+ */
+function createCompounder(callback) {
+  return function(string) {
+    return _arrayReduce(words_1(deburr_1(string).replace(reApos, '')), callback, '');
+  };
+}
+
+var _createCompounder = createCompounder;
+
+/**
+ * The base implementation of `_.slice` without an iteratee call guard.
+ *
+ * @private
+ * @param {Array} array The array to slice.
+ * @param {number} [start=0] The start position.
+ * @param {number} [end=array.length] The end position.
+ * @returns {Array} Returns the slice of `array`.
+ */
+function baseSlice(array, start, end) {
+  var index = -1,
+      length = array.length;
+
+  if (start < 0) {
+    start = -start > length ? 0 : (length + start);
+  }
+  end = end > length ? length : end;
+  if (end < 0) {
+    end += length;
+  }
+  length = start > end ? 0 : ((end - start) >>> 0);
+  start >>>= 0;
+
+  var result = Array(length);
+  while (++index < length) {
+    result[index] = array[index + start];
+  }
+  return result;
+}
+
+var _baseSlice = baseSlice;
+
+/**
+ * Casts `array` to a slice if it's needed.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {number} start The start position.
+ * @param {number} [end=array.length] The end position.
+ * @returns {Array} Returns the cast slice.
+ */
+function castSlice(array, start, end) {
+  var length = array.length;
+  end = end === undefined ? length : end;
+  return (!start && end >= length) ? array : _baseSlice(array, start, end);
+}
+
+var _castSlice = castSlice;
+
+/** Used to compose unicode character classes. */
+var rsAstralRange$1 = '\\ud800-\\udfff',
+    rsComboMarksRange$2 = '\\u0300-\\u036f',
+    reComboHalfMarksRange$2 = '\\ufe20-\\ufe2f',
+    rsComboSymbolsRange$2 = '\\u20d0-\\u20ff',
+    rsComboRange$2 = rsComboMarksRange$2 + reComboHalfMarksRange$2 + rsComboSymbolsRange$2,
+    rsVarRange$1 = '\\ufe0e\\ufe0f';
+
+/** Used to compose unicode capture groups. */
+var rsZWJ$1 = '\\u200d';
+
+/** Used to detect strings with [zero-width joiners or code points from the astral planes](http://eev.ee/blog/2015/09/12/dark-corners-of-unicode/). */
+var reHasUnicode = RegExp('[' + rsZWJ$1 + rsAstralRange$1  + rsComboRange$2 + rsVarRange$1 + ']');
+
+/**
+ * Checks if `string` contains Unicode symbols.
+ *
+ * @private
+ * @param {string} string The string to inspect.
+ * @returns {boolean} Returns `true` if a symbol is found, else `false`.
+ */
+function hasUnicode(string) {
+  return reHasUnicode.test(string);
+}
+
+var _hasUnicode = hasUnicode;
+
+/**
+ * Converts an ASCII `string` to an array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the converted array.
+ */
+function asciiToArray(string) {
+  return string.split('');
+}
+
+var _asciiToArray = asciiToArray;
+
+/** Used to compose unicode character classes. */
+var rsAstralRange$2 = '\\ud800-\\udfff',
+    rsComboMarksRange$3 = '\\u0300-\\u036f',
+    reComboHalfMarksRange$3 = '\\ufe20-\\ufe2f',
+    rsComboSymbolsRange$3 = '\\u20d0-\\u20ff',
+    rsComboRange$3 = rsComboMarksRange$3 + reComboHalfMarksRange$3 + rsComboSymbolsRange$3,
+    rsVarRange$2 = '\\ufe0e\\ufe0f';
+
+/** Used to compose unicode capture groups. */
+var rsAstral = '[' + rsAstralRange$2 + ']',
+    rsCombo$2 = '[' + rsComboRange$3 + ']',
+    rsFitz$1 = '\\ud83c[\\udffb-\\udfff]',
+    rsModifier$1 = '(?:' + rsCombo$2 + '|' + rsFitz$1 + ')',
+    rsNonAstral$1 = '[^' + rsAstralRange$2 + ']',
+    rsRegional$1 = '(?:\\ud83c[\\udde6-\\uddff]){2}',
+    rsSurrPair$1 = '[\\ud800-\\udbff][\\udc00-\\udfff]',
+    rsZWJ$2 = '\\u200d';
+
+/** Used to compose unicode regexes. */
+var reOptMod$1 = rsModifier$1 + '?',
+    rsOptVar$1 = '[' + rsVarRange$2 + ']?',
+    rsOptJoin$1 = '(?:' + rsZWJ$2 + '(?:' + [rsNonAstral$1, rsRegional$1, rsSurrPair$1].join('|') + ')' + rsOptVar$1 + reOptMod$1 + ')*',
+    rsSeq$1 = rsOptVar$1 + reOptMod$1 + rsOptJoin$1,
+    rsSymbol = '(?:' + [rsNonAstral$1 + rsCombo$2 + '?', rsCombo$2, rsRegional$1, rsSurrPair$1, rsAstral].join('|') + ')';
+
+/** Used to match [string symbols](https://mathiasbynens.be/notes/javascript-unicode). */
+var reUnicode = RegExp(rsFitz$1 + '(?=' + rsFitz$1 + ')|' + rsSymbol + rsSeq$1, 'g');
+
+/**
+ * Converts a Unicode `string` to an array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the converted array.
+ */
+function unicodeToArray(string) {
+  return string.match(reUnicode) || [];
+}
+
+var _unicodeToArray = unicodeToArray;
+
+/**
+ * Converts `string` to an array.
+ *
+ * @private
+ * @param {string} string The string to convert.
+ * @returns {Array} Returns the converted array.
+ */
+function stringToArray(string) {
+  return _hasUnicode(string)
+    ? _unicodeToArray(string)
+    : _asciiToArray(string);
+}
+
+var _stringToArray = stringToArray;
+
+/**
+ * Creates a function like `_.lowerFirst`.
+ *
+ * @private
+ * @param {string} methodName The name of the `String` case method to use.
+ * @returns {Function} Returns the new case function.
+ */
+function createCaseFirst(methodName) {
+  return function(string) {
+    string = toString_1(string);
+
+    var strSymbols = _hasUnicode(string)
+      ? _stringToArray(string)
+      : undefined;
+
+    var chr = strSymbols
+      ? strSymbols[0]
+      : string.charAt(0);
+
+    var trailing = strSymbols
+      ? _castSlice(strSymbols, 1).join('')
+      : string.slice(1);
+
+    return chr[methodName]() + trailing;
+  };
+}
+
+var _createCaseFirst = createCaseFirst;
+
+/**
+ * Converts the first character of `string` to upper case.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category String
+ * @param {string} [string=''] The string to convert.
+ * @returns {string} Returns the converted string.
+ * @example
+ *
+ * _.upperFirst('fred');
+ * // => 'Fred'
+ *
+ * _.upperFirst('FRED');
+ * // => 'FRED'
+ */
+var upperFirst = _createCaseFirst('toUpperCase');
+
+var upperFirst_1 = upperFirst;
+
+/**
+ * Converts `string` to
+ * [start case](https://en.wikipedia.org/wiki/Letter_case#Stylistic_or_specialised_usage).
+ *
+ * @static
+ * @memberOf _
+ * @since 3.1.0
+ * @category String
+ * @param {string} [string=''] The string to convert.
+ * @returns {string} Returns the start cased string.
+ * @example
+ *
+ * _.startCase('--foo-bar--');
+ * // => 'Foo Bar'
+ *
+ * _.startCase('fooBar');
+ * // => 'Foo Bar'
+ *
+ * _.startCase('__FOO_BAR__');
+ * // => 'FOO BAR'
+ */
+var startCase = _createCompounder(function(result, word, index) {
+  return result + (index ? ' ' : '') + upperFirst_1(word);
+});
+
+var startCase_1 = startCase;
+
 var defineProperty = (function() {
   try {
     var func = _getNative(Object, 'defineProperty');
@@ -4381,6 +4912,92 @@ function has(object, path) {
 
 var has_1 = has;
 
+/** `Object#toString` result references. */
+var objectTag$4 = '[object Object]';
+
+/** Used for built-in method references. */
+var funcProto$2 = Function.prototype,
+    objectProto$h = Object.prototype;
+
+/** Used to resolve the decompiled source of functions. */
+var funcToString$2 = funcProto$2.toString;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty$e = objectProto$h.hasOwnProperty;
+
+/** Used to infer the `Object` constructor. */
+var objectCtorString = funcToString$2.call(Object);
+
+/**
+ * Checks if `value` is a plain object, that is, an object created by the
+ * `Object` constructor or one with a `[[Prototype]]` of `null`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.8.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
+ * @example
+ *
+ * function Foo() {
+ *   this.a = 1;
+ * }
+ *
+ * _.isPlainObject(new Foo);
+ * // => false
+ *
+ * _.isPlainObject([1, 2, 3]);
+ * // => false
+ *
+ * _.isPlainObject({ 'x': 0, 'y': 0 });
+ * // => true
+ *
+ * _.isPlainObject(Object.create(null));
+ * // => true
+ */
+function isPlainObject(value) {
+  if (!isObjectLike_1(value) || _baseGetTag(value) != objectTag$4) {
+    return false;
+  }
+  var proto = _getPrototype(value);
+  if (proto === null) {
+    return true;
+  }
+  var Ctor = hasOwnProperty$e.call(proto, 'constructor') && proto.constructor;
+  return typeof Ctor == 'function' && Ctor instanceof Ctor &&
+    funcToString$2.call(Ctor) == objectCtorString;
+}
+
+var isPlainObject_1 = isPlainObject;
+
+/** `Object#toString` result references. */
+var stringTag$4 = '[object String]';
+
+/**
+ * Checks if `value` is classified as a `String` primitive or object.
+ *
+ * @static
+ * @since 0.1.0
+ * @memberOf _
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a string, else `false`.
+ * @example
+ *
+ * _.isString('abc');
+ * // => true
+ *
+ * _.isString(1);
+ * // => false
+ */
+function isString(value) {
+  return typeof value == 'string' ||
+    (!isArray_1(value) && isObjectLike_1(value) && _baseGetTag(value) == stringTag$4);
+}
+
+var isString_1 = isString;
+
 /**
  * A specialized version of `_.every` for arrays without support for
  * iteratee shorthands.
@@ -4707,10 +5324,10 @@ function baseRest(func, start) {
 var _baseRest = baseRest;
 
 /** Used for built-in method references. */
-var objectProto$h = Object.prototype;
+var objectProto$i = Object.prototype;
 
 /** Used to check objects for own properties. */
-var hasOwnProperty$e = objectProto$h.hasOwnProperty;
+var hasOwnProperty$f = objectProto$i.hasOwnProperty;
 
 /**
  * Assigns own and inherited enumerable string keyed properties of source
@@ -4755,7 +5372,7 @@ var defaults = _baseRest(function(object, sources) {
       var value = object[key];
 
       if (value === undefined ||
-          (eq_1(value, objectProto$h[key]) && !hasOwnProperty$e.call(object, key))) {
+          (eq_1(value, objectProto$i[key]) && !hasOwnProperty$f.call(object, key))) {
         object[key] = source[key];
       }
     }
@@ -4765,623 +5382,6 @@ var defaults = _baseRest(function(object, sources) {
 });
 
 var defaults_1 = defaults;
-
-/**
- * A specialized version of `_.reduce` for arrays without support for
- * iteratee shorthands.
- *
- * @private
- * @param {Array} [array] The array to iterate over.
- * @param {Function} iteratee The function invoked per iteration.
- * @param {*} [accumulator] The initial value.
- * @param {boolean} [initAccum] Specify using the first element of `array` as
- *  the initial value.
- * @returns {*} Returns the accumulated value.
- */
-function arrayReduce(array, iteratee, accumulator, initAccum) {
-  var index = -1,
-      length = array == null ? 0 : array.length;
-
-  if (initAccum && length) {
-    accumulator = array[++index];
-  }
-  while (++index < length) {
-    accumulator = iteratee(accumulator, array[index], index, array);
-  }
-  return accumulator;
-}
-
-var _arrayReduce = arrayReduce;
-
-/**
- * The base implementation of `_.propertyOf` without support for deep paths.
- *
- * @private
- * @param {Object} object The object to query.
- * @returns {Function} Returns the new accessor function.
- */
-function basePropertyOf(object) {
-  return function(key) {
-    return object == null ? undefined : object[key];
-  };
-}
-
-var _basePropertyOf = basePropertyOf;
-
-/** Used to map Latin Unicode letters to basic Latin letters. */
-var deburredLetters = {
-  // Latin-1 Supplement block.
-  '\xc0': 'A',  '\xc1': 'A', '\xc2': 'A', '\xc3': 'A', '\xc4': 'A', '\xc5': 'A',
-  '\xe0': 'a',  '\xe1': 'a', '\xe2': 'a', '\xe3': 'a', '\xe4': 'a', '\xe5': 'a',
-  '\xc7': 'C',  '\xe7': 'c',
-  '\xd0': 'D',  '\xf0': 'd',
-  '\xc8': 'E',  '\xc9': 'E', '\xca': 'E', '\xcb': 'E',
-  '\xe8': 'e',  '\xe9': 'e', '\xea': 'e', '\xeb': 'e',
-  '\xcc': 'I',  '\xcd': 'I', '\xce': 'I', '\xcf': 'I',
-  '\xec': 'i',  '\xed': 'i', '\xee': 'i', '\xef': 'i',
-  '\xd1': 'N',  '\xf1': 'n',
-  '\xd2': 'O',  '\xd3': 'O', '\xd4': 'O', '\xd5': 'O', '\xd6': 'O', '\xd8': 'O',
-  '\xf2': 'o',  '\xf3': 'o', '\xf4': 'o', '\xf5': 'o', '\xf6': 'o', '\xf8': 'o',
-  '\xd9': 'U',  '\xda': 'U', '\xdb': 'U', '\xdc': 'U',
-  '\xf9': 'u',  '\xfa': 'u', '\xfb': 'u', '\xfc': 'u',
-  '\xdd': 'Y',  '\xfd': 'y', '\xff': 'y',
-  '\xc6': 'Ae', '\xe6': 'ae',
-  '\xde': 'Th', '\xfe': 'th',
-  '\xdf': 'ss',
-  // Latin Extended-A block.
-  '\u0100': 'A',  '\u0102': 'A', '\u0104': 'A',
-  '\u0101': 'a',  '\u0103': 'a', '\u0105': 'a',
-  '\u0106': 'C',  '\u0108': 'C', '\u010a': 'C', '\u010c': 'C',
-  '\u0107': 'c',  '\u0109': 'c', '\u010b': 'c', '\u010d': 'c',
-  '\u010e': 'D',  '\u0110': 'D', '\u010f': 'd', '\u0111': 'd',
-  '\u0112': 'E',  '\u0114': 'E', '\u0116': 'E', '\u0118': 'E', '\u011a': 'E',
-  '\u0113': 'e',  '\u0115': 'e', '\u0117': 'e', '\u0119': 'e', '\u011b': 'e',
-  '\u011c': 'G',  '\u011e': 'G', '\u0120': 'G', '\u0122': 'G',
-  '\u011d': 'g',  '\u011f': 'g', '\u0121': 'g', '\u0123': 'g',
-  '\u0124': 'H',  '\u0126': 'H', '\u0125': 'h', '\u0127': 'h',
-  '\u0128': 'I',  '\u012a': 'I', '\u012c': 'I', '\u012e': 'I', '\u0130': 'I',
-  '\u0129': 'i',  '\u012b': 'i', '\u012d': 'i', '\u012f': 'i', '\u0131': 'i',
-  '\u0134': 'J',  '\u0135': 'j',
-  '\u0136': 'K',  '\u0137': 'k', '\u0138': 'k',
-  '\u0139': 'L',  '\u013b': 'L', '\u013d': 'L', '\u013f': 'L', '\u0141': 'L',
-  '\u013a': 'l',  '\u013c': 'l', '\u013e': 'l', '\u0140': 'l', '\u0142': 'l',
-  '\u0143': 'N',  '\u0145': 'N', '\u0147': 'N', '\u014a': 'N',
-  '\u0144': 'n',  '\u0146': 'n', '\u0148': 'n', '\u014b': 'n',
-  '\u014c': 'O',  '\u014e': 'O', '\u0150': 'O',
-  '\u014d': 'o',  '\u014f': 'o', '\u0151': 'o',
-  '\u0154': 'R',  '\u0156': 'R', '\u0158': 'R',
-  '\u0155': 'r',  '\u0157': 'r', '\u0159': 'r',
-  '\u015a': 'S',  '\u015c': 'S', '\u015e': 'S', '\u0160': 'S',
-  '\u015b': 's',  '\u015d': 's', '\u015f': 's', '\u0161': 's',
-  '\u0162': 'T',  '\u0164': 'T', '\u0166': 'T',
-  '\u0163': 't',  '\u0165': 't', '\u0167': 't',
-  '\u0168': 'U',  '\u016a': 'U', '\u016c': 'U', '\u016e': 'U', '\u0170': 'U', '\u0172': 'U',
-  '\u0169': 'u',  '\u016b': 'u', '\u016d': 'u', '\u016f': 'u', '\u0171': 'u', '\u0173': 'u',
-  '\u0174': 'W',  '\u0175': 'w',
-  '\u0176': 'Y',  '\u0177': 'y', '\u0178': 'Y',
-  '\u0179': 'Z',  '\u017b': 'Z', '\u017d': 'Z',
-  '\u017a': 'z',  '\u017c': 'z', '\u017e': 'z',
-  '\u0132': 'IJ', '\u0133': 'ij',
-  '\u0152': 'Oe', '\u0153': 'oe',
-  '\u0149': "'n", '\u017f': 's'
-};
-
-/**
- * Used by `_.deburr` to convert Latin-1 Supplement and Latin Extended-A
- * letters to basic Latin letters.
- *
- * @private
- * @param {string} letter The matched letter to deburr.
- * @returns {string} Returns the deburred letter.
- */
-var deburrLetter = _basePropertyOf(deburredLetters);
-
-var _deburrLetter = deburrLetter;
-
-/** Used to match Latin Unicode letters (excluding mathematical operators). */
-var reLatin = /[\xc0-\xd6\xd8-\xf6\xf8-\xff\u0100-\u017f]/g;
-
-/** Used to compose unicode character classes. */
-var rsComboMarksRange = '\\u0300-\\u036f',
-    reComboHalfMarksRange = '\\ufe20-\\ufe2f',
-    rsComboSymbolsRange = '\\u20d0-\\u20ff',
-    rsComboRange = rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange;
-
-/** Used to compose unicode capture groups. */
-var rsCombo = '[' + rsComboRange + ']';
-
-/**
- * Used to match [combining diacritical marks](https://en.wikipedia.org/wiki/Combining_Diacritical_Marks) and
- * [combining diacritical marks for symbols](https://en.wikipedia.org/wiki/Combining_Diacritical_Marks_for_Symbols).
- */
-var reComboMark = RegExp(rsCombo, 'g');
-
-/**
- * Deburrs `string` by converting
- * [Latin-1 Supplement](https://en.wikipedia.org/wiki/Latin-1_Supplement_(Unicode_block)#Character_table)
- * and [Latin Extended-A](https://en.wikipedia.org/wiki/Latin_Extended-A)
- * letters to basic Latin letters and removing
- * [combining diacritical marks](https://en.wikipedia.org/wiki/Combining_Diacritical_Marks).
- *
- * @static
- * @memberOf _
- * @since 3.0.0
- * @category String
- * @param {string} [string=''] The string to deburr.
- * @returns {string} Returns the deburred string.
- * @example
- *
- * _.deburr('déjà vu');
- * // => 'deja vu'
- */
-function deburr(string) {
-  string = toString_1(string);
-  return string && string.replace(reLatin, _deburrLetter).replace(reComboMark, '');
-}
-
-var deburr_1 = deburr;
-
-/** Used to match words composed of alphanumeric characters. */
-var reAsciiWord = /[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g;
-
-/**
- * Splits an ASCII `string` into an array of its words.
- *
- * @private
- * @param {string} The string to inspect.
- * @returns {Array} Returns the words of `string`.
- */
-function asciiWords(string) {
-  return string.match(reAsciiWord) || [];
-}
-
-var _asciiWords = asciiWords;
-
-/** Used to detect strings that need a more robust regexp to match words. */
-var reHasUnicodeWord = /[a-z][A-Z]|[A-Z]{2}[a-z]|[0-9][a-zA-Z]|[a-zA-Z][0-9]|[^a-zA-Z0-9 ]/;
-
-/**
- * Checks if `string` contains a word composed of Unicode symbols.
- *
- * @private
- * @param {string} string The string to inspect.
- * @returns {boolean} Returns `true` if a word is found, else `false`.
- */
-function hasUnicodeWord(string) {
-  return reHasUnicodeWord.test(string);
-}
-
-var _hasUnicodeWord = hasUnicodeWord;
-
-/** Used to compose unicode character classes. */
-var rsAstralRange = '\\ud800-\\udfff',
-    rsComboMarksRange$1 = '\\u0300-\\u036f',
-    reComboHalfMarksRange$1 = '\\ufe20-\\ufe2f',
-    rsComboSymbolsRange$1 = '\\u20d0-\\u20ff',
-    rsComboRange$1 = rsComboMarksRange$1 + reComboHalfMarksRange$1 + rsComboSymbolsRange$1,
-    rsDingbatRange = '\\u2700-\\u27bf',
-    rsLowerRange = 'a-z\\xdf-\\xf6\\xf8-\\xff',
-    rsMathOpRange = '\\xac\\xb1\\xd7\\xf7',
-    rsNonCharRange = '\\x00-\\x2f\\x3a-\\x40\\x5b-\\x60\\x7b-\\xbf',
-    rsPunctuationRange = '\\u2000-\\u206f',
-    rsSpaceRange = ' \\t\\x0b\\f\\xa0\\ufeff\\n\\r\\u2028\\u2029\\u1680\\u180e\\u2000\\u2001\\u2002\\u2003\\u2004\\u2005\\u2006\\u2007\\u2008\\u2009\\u200a\\u202f\\u205f\\u3000',
-    rsUpperRange = 'A-Z\\xc0-\\xd6\\xd8-\\xde',
-    rsVarRange = '\\ufe0e\\ufe0f',
-    rsBreakRange = rsMathOpRange + rsNonCharRange + rsPunctuationRange + rsSpaceRange;
-
-/** Used to compose unicode capture groups. */
-var rsApos = "['\u2019]",
-    rsBreak = '[' + rsBreakRange + ']',
-    rsCombo$1 = '[' + rsComboRange$1 + ']',
-    rsDigits = '\\d+',
-    rsDingbat = '[' + rsDingbatRange + ']',
-    rsLower = '[' + rsLowerRange + ']',
-    rsMisc = '[^' + rsAstralRange + rsBreakRange + rsDigits + rsDingbatRange + rsLowerRange + rsUpperRange + ']',
-    rsFitz = '\\ud83c[\\udffb-\\udfff]',
-    rsModifier = '(?:' + rsCombo$1 + '|' + rsFitz + ')',
-    rsNonAstral = '[^' + rsAstralRange + ']',
-    rsRegional = '(?:\\ud83c[\\udde6-\\uddff]){2}',
-    rsSurrPair = '[\\ud800-\\udbff][\\udc00-\\udfff]',
-    rsUpper = '[' + rsUpperRange + ']',
-    rsZWJ = '\\u200d';
-
-/** Used to compose unicode regexes. */
-var rsMiscLower = '(?:' + rsLower + '|' + rsMisc + ')',
-    rsMiscUpper = '(?:' + rsUpper + '|' + rsMisc + ')',
-    rsOptContrLower = '(?:' + rsApos + '(?:d|ll|m|re|s|t|ve))?',
-    rsOptContrUpper = '(?:' + rsApos + '(?:D|LL|M|RE|S|T|VE))?',
-    reOptMod = rsModifier + '?',
-    rsOptVar = '[' + rsVarRange + ']?',
-    rsOptJoin = '(?:' + rsZWJ + '(?:' + [rsNonAstral, rsRegional, rsSurrPair].join('|') + ')' + rsOptVar + reOptMod + ')*',
-    rsOrdLower = '\\d*(?:1st|2nd|3rd|(?![123])\\dth)(?=\\b|[A-Z_])',
-    rsOrdUpper = '\\d*(?:1ST|2ND|3RD|(?![123])\\dTH)(?=\\b|[a-z_])',
-    rsSeq = rsOptVar + reOptMod + rsOptJoin,
-    rsEmoji = '(?:' + [rsDingbat, rsRegional, rsSurrPair].join('|') + ')' + rsSeq;
-
-/** Used to match complex or compound words. */
-var reUnicodeWord = RegExp([
-  rsUpper + '?' + rsLower + '+' + rsOptContrLower + '(?=' + [rsBreak, rsUpper, '$'].join('|') + ')',
-  rsMiscUpper + '+' + rsOptContrUpper + '(?=' + [rsBreak, rsUpper + rsMiscLower, '$'].join('|') + ')',
-  rsUpper + '?' + rsMiscLower + '+' + rsOptContrLower,
-  rsUpper + '+' + rsOptContrUpper,
-  rsOrdUpper,
-  rsOrdLower,
-  rsDigits,
-  rsEmoji
-].join('|'), 'g');
-
-/**
- * Splits a Unicode `string` into an array of its words.
- *
- * @private
- * @param {string} The string to inspect.
- * @returns {Array} Returns the words of `string`.
- */
-function unicodeWords(string) {
-  return string.match(reUnicodeWord) || [];
-}
-
-var _unicodeWords = unicodeWords;
-
-/**
- * Splits `string` into an array of its words.
- *
- * @static
- * @memberOf _
- * @since 3.0.0
- * @category String
- * @param {string} [string=''] The string to inspect.
- * @param {RegExp|string} [pattern] The pattern to match words.
- * @param- {Object} [guard] Enables use as an iteratee for methods like `_.map`.
- * @returns {Array} Returns the words of `string`.
- * @example
- *
- * _.words('fred, barney, & pebbles');
- * // => ['fred', 'barney', 'pebbles']
- *
- * _.words('fred, barney, & pebbles', /[^, ]+/g);
- * // => ['fred', 'barney', '&', 'pebbles']
- */
-function words(string, pattern, guard) {
-  string = toString_1(string);
-  pattern = guard ? undefined : pattern;
-
-  if (pattern === undefined) {
-    return _hasUnicodeWord(string) ? _unicodeWords(string) : _asciiWords(string);
-  }
-  return string.match(pattern) || [];
-}
-
-var words_1 = words;
-
-/** Used to compose unicode capture groups. */
-var rsApos$1 = "['\u2019]";
-
-/** Used to match apostrophes. */
-var reApos = RegExp(rsApos$1, 'g');
-
-/**
- * Creates a function like `_.camelCase`.
- *
- * @private
- * @param {Function} callback The function to combine each word.
- * @returns {Function} Returns the new compounder function.
- */
-function createCompounder(callback) {
-  return function(string) {
-    return _arrayReduce(words_1(deburr_1(string).replace(reApos, '')), callback, '');
-  };
-}
-
-var _createCompounder = createCompounder;
-
-/**
- * The base implementation of `_.slice` without an iteratee call guard.
- *
- * @private
- * @param {Array} array The array to slice.
- * @param {number} [start=0] The start position.
- * @param {number} [end=array.length] The end position.
- * @returns {Array} Returns the slice of `array`.
- */
-function baseSlice(array, start, end) {
-  var index = -1,
-      length = array.length;
-
-  if (start < 0) {
-    start = -start > length ? 0 : (length + start);
-  }
-  end = end > length ? length : end;
-  if (end < 0) {
-    end += length;
-  }
-  length = start > end ? 0 : ((end - start) >>> 0);
-  start >>>= 0;
-
-  var result = Array(length);
-  while (++index < length) {
-    result[index] = array[index + start];
-  }
-  return result;
-}
-
-var _baseSlice = baseSlice;
-
-/**
- * Casts `array` to a slice if it's needed.
- *
- * @private
- * @param {Array} array The array to inspect.
- * @param {number} start The start position.
- * @param {number} [end=array.length] The end position.
- * @returns {Array} Returns the cast slice.
- */
-function castSlice(array, start, end) {
-  var length = array.length;
-  end = end === undefined ? length : end;
-  return (!start && end >= length) ? array : _baseSlice(array, start, end);
-}
-
-var _castSlice = castSlice;
-
-/** Used to compose unicode character classes. */
-var rsAstralRange$1 = '\\ud800-\\udfff',
-    rsComboMarksRange$2 = '\\u0300-\\u036f',
-    reComboHalfMarksRange$2 = '\\ufe20-\\ufe2f',
-    rsComboSymbolsRange$2 = '\\u20d0-\\u20ff',
-    rsComboRange$2 = rsComboMarksRange$2 + reComboHalfMarksRange$2 + rsComboSymbolsRange$2,
-    rsVarRange$1 = '\\ufe0e\\ufe0f';
-
-/** Used to compose unicode capture groups. */
-var rsZWJ$1 = '\\u200d';
-
-/** Used to detect strings with [zero-width joiners or code points from the astral planes](http://eev.ee/blog/2015/09/12/dark-corners-of-unicode/). */
-var reHasUnicode = RegExp('[' + rsZWJ$1 + rsAstralRange$1  + rsComboRange$2 + rsVarRange$1 + ']');
-
-/**
- * Checks if `string` contains Unicode symbols.
- *
- * @private
- * @param {string} string The string to inspect.
- * @returns {boolean} Returns `true` if a symbol is found, else `false`.
- */
-function hasUnicode(string) {
-  return reHasUnicode.test(string);
-}
-
-var _hasUnicode = hasUnicode;
-
-/**
- * Converts an ASCII `string` to an array.
- *
- * @private
- * @param {string} string The string to convert.
- * @returns {Array} Returns the converted array.
- */
-function asciiToArray(string) {
-  return string.split('');
-}
-
-var _asciiToArray = asciiToArray;
-
-/** Used to compose unicode character classes. */
-var rsAstralRange$2 = '\\ud800-\\udfff',
-    rsComboMarksRange$3 = '\\u0300-\\u036f',
-    reComboHalfMarksRange$3 = '\\ufe20-\\ufe2f',
-    rsComboSymbolsRange$3 = '\\u20d0-\\u20ff',
-    rsComboRange$3 = rsComboMarksRange$3 + reComboHalfMarksRange$3 + rsComboSymbolsRange$3,
-    rsVarRange$2 = '\\ufe0e\\ufe0f';
-
-/** Used to compose unicode capture groups. */
-var rsAstral = '[' + rsAstralRange$2 + ']',
-    rsCombo$2 = '[' + rsComboRange$3 + ']',
-    rsFitz$1 = '\\ud83c[\\udffb-\\udfff]',
-    rsModifier$1 = '(?:' + rsCombo$2 + '|' + rsFitz$1 + ')',
-    rsNonAstral$1 = '[^' + rsAstralRange$2 + ']',
-    rsRegional$1 = '(?:\\ud83c[\\udde6-\\uddff]){2}',
-    rsSurrPair$1 = '[\\ud800-\\udbff][\\udc00-\\udfff]',
-    rsZWJ$2 = '\\u200d';
-
-/** Used to compose unicode regexes. */
-var reOptMod$1 = rsModifier$1 + '?',
-    rsOptVar$1 = '[' + rsVarRange$2 + ']?',
-    rsOptJoin$1 = '(?:' + rsZWJ$2 + '(?:' + [rsNonAstral$1, rsRegional$1, rsSurrPair$1].join('|') + ')' + rsOptVar$1 + reOptMod$1 + ')*',
-    rsSeq$1 = rsOptVar$1 + reOptMod$1 + rsOptJoin$1,
-    rsSymbol = '(?:' + [rsNonAstral$1 + rsCombo$2 + '?', rsCombo$2, rsRegional$1, rsSurrPair$1, rsAstral].join('|') + ')';
-
-/** Used to match [string symbols](https://mathiasbynens.be/notes/javascript-unicode). */
-var reUnicode = RegExp(rsFitz$1 + '(?=' + rsFitz$1 + ')|' + rsSymbol + rsSeq$1, 'g');
-
-/**
- * Converts a Unicode `string` to an array.
- *
- * @private
- * @param {string} string The string to convert.
- * @returns {Array} Returns the converted array.
- */
-function unicodeToArray(string) {
-  return string.match(reUnicode) || [];
-}
-
-var _unicodeToArray = unicodeToArray;
-
-/**
- * Converts `string` to an array.
- *
- * @private
- * @param {string} string The string to convert.
- * @returns {Array} Returns the converted array.
- */
-function stringToArray(string) {
-  return _hasUnicode(string)
-    ? _unicodeToArray(string)
-    : _asciiToArray(string);
-}
-
-var _stringToArray = stringToArray;
-
-/**
- * Creates a function like `_.lowerFirst`.
- *
- * @private
- * @param {string} methodName The name of the `String` case method to use.
- * @returns {Function} Returns the new case function.
- */
-function createCaseFirst(methodName) {
-  return function(string) {
-    string = toString_1(string);
-
-    var strSymbols = _hasUnicode(string)
-      ? _stringToArray(string)
-      : undefined;
-
-    var chr = strSymbols
-      ? strSymbols[0]
-      : string.charAt(0);
-
-    var trailing = strSymbols
-      ? _castSlice(strSymbols, 1).join('')
-      : string.slice(1);
-
-    return chr[methodName]() + trailing;
-  };
-}
-
-var _createCaseFirst = createCaseFirst;
-
-/**
- * Converts the first character of `string` to upper case.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category String
- * @param {string} [string=''] The string to convert.
- * @returns {string} Returns the converted string.
- * @example
- *
- * _.upperFirst('fred');
- * // => 'Fred'
- *
- * _.upperFirst('FRED');
- * // => 'FRED'
- */
-var upperFirst = _createCaseFirst('toUpperCase');
-
-var upperFirst_1 = upperFirst;
-
-/**
- * Converts `string` to
- * [start case](https://en.wikipedia.org/wiki/Letter_case#Stylistic_or_specialised_usage).
- *
- * @static
- * @memberOf _
- * @since 3.1.0
- * @category String
- * @param {string} [string=''] The string to convert.
- * @returns {string} Returns the start cased string.
- * @example
- *
- * _.startCase('--foo-bar--');
- * // => 'Foo Bar'
- *
- * _.startCase('fooBar');
- * // => 'Foo Bar'
- *
- * _.startCase('__FOO_BAR__');
- * // => 'FOO BAR'
- */
-var startCase = _createCompounder(function(result, word, index) {
-  return result + (index ? ' ' : '') + upperFirst_1(word);
-});
-
-var startCase_1 = startCase;
-
-/** `Object#toString` result references. */
-var stringTag$4 = '[object String]';
-
-/**
- * Checks if `value` is classified as a `String` primitive or object.
- *
- * @static
- * @since 0.1.0
- * @memberOf _
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a string, else `false`.
- * @example
- *
- * _.isString('abc');
- * // => true
- *
- * _.isString(1);
- * // => false
- */
-function isString(value) {
-  return typeof value == 'string' ||
-    (!isArray_1(value) && isObjectLike_1(value) && _baseGetTag(value) == stringTag$4);
-}
-
-var isString_1 = isString;
-
-/** `Object#toString` result references. */
-var objectTag$4 = '[object Object]';
-
-/** Used for built-in method references. */
-var funcProto$2 = Function.prototype,
-    objectProto$i = Object.prototype;
-
-/** Used to resolve the decompiled source of functions. */
-var funcToString$2 = funcProto$2.toString;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty$f = objectProto$i.hasOwnProperty;
-
-/** Used to infer the `Object` constructor. */
-var objectCtorString = funcToString$2.call(Object);
-
-/**
- * Checks if `value` is a plain object, that is, an object created by the
- * `Object` constructor or one with a `[[Prototype]]` of `null`.
- *
- * @static
- * @memberOf _
- * @since 0.8.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
- * @example
- *
- * function Foo() {
- *   this.a = 1;
- * }
- *
- * _.isPlainObject(new Foo);
- * // => false
- *
- * _.isPlainObject([1, 2, 3]);
- * // => false
- *
- * _.isPlainObject({ 'x': 0, 'y': 0 });
- * // => true
- *
- * _.isPlainObject(Object.create(null));
- * // => true
- */
-function isPlainObject(value) {
-  if (!isObjectLike_1(value) || _baseGetTag(value) != objectTag$4) {
-    return false;
-  }
-  var proto = _getPrototype(value);
-  if (proto === null) {
-    return true;
-  }
-  var Ctor = hasOwnProperty$f.call(proto, 'constructor') && proto.constructor;
-  return typeof Ctor == 'function' && Ctor instanceof Ctor &&
-    funcToString$2.call(Ctor) == objectCtorString;
-}
-
-var isPlainObject_1 = isPlainObject;
 
 var typeChecker = function (type) {
     var typeString = "[object " + type + "]";
@@ -5927,55 +5927,6 @@ var $macgyver = {};
 */
 
 $macgyver.widgets = {};
-/**
-* Add a known widget to the widgets lookup object
-* @param {string} [id] The unique ID of the widget to add (this is optional if id is specified in properties)
-* @param {Object} [properties] Optional properties of the widget to add
-* @param {boolean} [options.isContainer] Indicates that the widget can contain other widgets (under the `items` array)
-* @param {boolean} [options.isContainerArray] Addition to `isContainer` that indicates the widget will contain an array of rows (like a table)
-* @param {string} [options.title=id] Optional human readable title of the widget
-* @param {string} [options.icon="far fa-square"] Optional icon to display in the form editor
-* @param {Object} [options.config] Optional list of configuration the widget takes, this is in the form of a MacGyver form
-* @param {boolean} [options.userPlaceable=true] Whether this component should be listed as placeable by the user (if false, its hidden in the mgFormEditor UI)
-* @param {string} [options.category="Misc"] Which category this widget fits into when displaying the 'Add widget' dialog in mgFormEditor
-* @param {boolean|function} [options.format=false] Whether the value of the widget can be exposed as a string. If this is === true the exact value is used, if === false (default) it will be ignored when making a digest of the form, if a function it will be called as (value) and expected to return a string value. NOTE: In the spec file, which is a flat JSON file any function argument will be overridden to `true`
-* @param {string} [options.formatAlign='left'] The prefered column alignment when showing the result of `options.format`
-* @param {boolean} [options.preferId=true] Whether the widget recommends needing an ID when its created, if false, no default ID is allocated via mgFormEditor
-* @param {array <string>} [options.shorthand] Other aliases the widget answers to in shorthand mode (e.g. `{shorthand: ['boolean']}` will map that widget to the boolean type
-*
-* @returns {$macgyver} This chainable object
-*/
-
-$macgyver.register = function (id, options) {
-  // Argument mangling {{{
-  if (id && options) {
-    // both id + options
-    options.id = id;
-  } else if (isPlainObject_1(id)) {
-    // Just options
-    var _ref = [id.id, id];
-    id = _ref[0];
-    options = _ref[1];
-  } else {
-    throw new Error('$macgyver.register(id, options) requires either an ID + options or an options object');
-  } // }}}
-
-
-  if (!isString_1(options.id) || !options.id.startsWith('mg')) throw new Error('Widget IDs must be simple strings beginning with "mg*"');
-  $macgyver.widgets[options.id] = _objectSpread2({
-    title: startCase_1(options.id),
-    userPlaceable: true,
-    category: 'Misc',
-    icon: 'far far-square',
-    format: false,
-    formatAlign: 'left',
-    isContainer: false,
-    isContainerArray: false,
-    preferId: true
-  }, options);
-  return $macgyver;
-};
-
 $macgyver.$nextId = 0;
 
 $macgyver.nextId = function () {
@@ -6268,7 +6219,7 @@ $macgyver.compileSpec = function (spec, options) {
         return !has_1(v, 'id') && (!has_1(v, 'type') || v.type != 'mgContainer');
       });
     },
-    // Each item lacks and ID and either doesn't have a type or that type is not a container
+    // Each item lacks an ID and either doesn't have a type or that type is not a container
     convertShorthandTranslate: function convertShorthandTranslate(spec) {
       return {
         type: 'mgContainer',
@@ -6344,11 +6295,11 @@ $macgyver.compileSpec = function (spec, options) {
       widget.errorWidgetType = widget.type;
       widget.type = 'mgError';
     } else if (settings.widgetDefaults) {
-      var _ref2, _$macgyver$widgets$wi;
+      var _ref, _$macgyver$widgets$wi;
 
-      Object.assign(widget, (_ref2 = (_$macgyver$widgets$wi = $macgyver.widgets[widget.type].config, pickBy_1(_$macgyver$widgets$wi, function (v, k) {
+      Object.assign(widget, (_ref = (_$macgyver$widgets$wi = $macgyver.widgets[widget.type].config, pickBy_1(_$macgyver$widgets$wi, function (v, k) {
         return !has_1(widget, k) && has_1(v, 'default');
-      })), mapValues_1(_ref2, function (v) {
+      })), mapValues_1(_ref, function (v) {
         return v["default"];
       })));
     } // Glue .show property to all elements that omit it
@@ -6444,9 +6395,9 @@ $macgyver.utils.fetch = function (url, options) {
   // Injection options from URL {{{
   .then(function () {
     if (isPlainObject_1(url)) {
-      var _ref3 = [url.url, url];
-      url = _ref3[0];
-      options = _ref3[1];
+      var _ref2 = [url.url, url];
+      url = _ref2[0];
+      options = _ref2[1];
     } else {
       options.url = url;
     }
@@ -15175,6 +15126,183 @@ Vue$1.prototype.$macgyver = function () {
   }); // Auto-bind to Axios if its defined
 
   if ($macgyver$1.utils.global.axios) $macgyver$1.$http = $macgyver$1.utils.global.axios;
+
+  Vue$1.mgComponent = function (name, component) {
+    if (macgyver.widgets[name]) throw new Error("Cannot redeclare MacGyver component \"".concat(name, "\""));
+    macgyver.widgets[name] = _objectSpread2({
+      meta: {
+        title: _.startCase(name),
+        icon: 'far fa-rectangle-wide',
+        category: 'Misc',
+        preferId: false,
+        shorthand: [],
+        format: true
+      }
+    }, component);
+
+    var vueComponent = _objectSpread2({
+      inject: component.inject || ['$mgForm'],
+      // Defer to component injects or default to injecting $mgForm
+      data: function data() {
+        return _objectSpread2({
+          data: undefined
+        }, component.data ? component.data() : {});
+      },
+      props: _objectSpread2({
+        $dataPath: {
+          type: String
+        },
+        $specPath: {
+          type: String
+        },
+        value: {}
+      }, _.mapValues(component.props || {}, function (prop) {
+        // Rewrite MacGyver props into Vue compatible props
+        var newProp = _objectSpread2({}, prop["default"] ? {
+          "default": prop["default"]
+        } : {}); // FIXME: This needs putting into each mgComponent declaration for Vue validation
+        // Convert prop type to Vue native instances {{{
+
+
+        if (prop.vueType) {
+          switch (prop.vueType) {
+            // String to type bindings (usually via vueType)
+            case 'array':
+              newProp.type = Array;
+              break;
+
+            case 'boolean':
+              newProp.type = Boolean;
+              break;
+
+            case 'date':
+              newProp.type = Date;
+              break;
+
+            case 'number':
+              newProp.type = Number;
+              break;
+
+            case 'string':
+              newProp.type = String;
+              break;
+
+            case 'any':
+              break;
+            // Do not append type checking
+
+            default:
+              console.warn("Unknown vueType JS primative \"".concat(prop.vueType, "\" while declaring component \"").concat(name, "\" - assuming \"string\""));
+              newProp.type = String;
+          }
+        } else {
+          switch (prop.type) {
+            case 'mgText':
+            case 'mgChoiceButtons':
+            case 'mgChoiceDropdown':
+            case 'mgChoiceRadio':
+            case 'mgChoiceTree':
+            case 'mgCode':
+            case 'mgColor':
+            case 'mgEmail':
+            case 'mgIcon':
+            case 'mgQuery':
+            case 'mgRestQuery':
+            case 'mgTextArea':
+            case 'mgUnknown':
+            case 'mgUrl':
+            case 'mgWysiwyg':
+              newProp.type = String;
+              break;
+
+            case 'mgNumber':
+              newProp.type = Number;
+              break;
+
+            case 'mgChoiceCheckbox':
+            case 'mgToggle':
+              newProp.type = Boolean;
+              break;
+
+            case 'mgChoiceList':
+            case 'mgChoiceTags':
+            case 'mgList':
+            case 'mgTable':
+              newProp.type = Array;
+              break;
+
+            case 'mgDate':
+            case 'mgTime':
+              newProp.type = Date;
+              break;
+
+            case Number:
+            case String:
+            case Array:
+            case Date:
+              console.warn('Used native binding in component prop (e.g. `{type: Array}`). Always use mg* component types so these components are editable in the mgFormEditor');
+              newProp.type = prop.type; // Native Vue types
+
+              break;
+
+            default:
+              console.warn("Unknown primative mapping of prop type \"".concat(prop.type, "\" while declaring component \"").concat(name, "\" - assuming \"String\""));
+              newProp.type = String;
+          }
+        } // }}}
+
+
+        return newProp;
+      })),
+      methods: _objectSpread2({
+        mgSetup: function mgSetup() {
+          var _this = this;
+
+          // Setup event listners {{{
+          this.$on('mgIdentify', function (reply) {
+            return reply(component);
+          }); // }}}
+          // Read in initial data value {{{
+
+          var refresher = function refresher() {
+            if (!_this.$mgForm && _this.$props.value) {
+              // Standalone value
+              _this.data = _.clone(_this.$props.value);
+            } else if (_this.$props.$dataPath) {
+              // Has a data path
+              _this.data = _.get(_this.$mgForm.formData, _this.$props.$dataPath);
+            } else if (_this.$props["default"]) {
+              // Has a default
+              _this.data = _.clone(_this.$props["default"]);
+            }
+          };
+
+          this.$on('mgRefresh', refresher);
+          this.$on('mgRefreshForm', refresher);
+          refresher(); // }}}
+          // Data watcher which transforms change operations into emitters to the nearest parent form {{{
+
+          this.$watch('data', function (value) {
+            // Emit `mgChange` to form element (if there is a parent form)
+            if (_this.$mgForm) _this.$mgForm.$emit('mgChange', {
+              path: _this.$props.$dataPath,
+              value: value
+            }); // Emit regular `change` event
+
+            _this.$emit('change', value);
+          }); // }}}
+        }
+      }, component.methods),
+      created: function created() {
+        this.mgSetup();
+        if (component.created) return component.created.call(this); // Call components own created() method if there is one
+      }
+    }, _.omit(component, [// Import remaining Vue properties that are not explicitly merged in above
+    'inject', 'data', 'props', 'methods', 'created']));
+
+    return Vue$1.component(name, vueComponent);
+  };
+
   return $macgyver$1;
 }();
 
