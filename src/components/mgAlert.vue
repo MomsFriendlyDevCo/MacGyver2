@@ -9,16 +9,16 @@ export default Vue.mgComponent('mgAlert', {
 	inject: ['$mgForm'],
 	props: {
 		text: {type: 'mgText', default: 'This is an alert!'},
-		style: {
+		className: {
 			type: 'mgChoiceButtons',
 			default: 'alert-info',
 			iconSelected: 'fa fa-fw fa-check',
 			iconDefault: 'fa fa-fw',
 			enum: [
-				{id: 'alert-success', class: 'btn-success'},
-				{id: 'alert-info', class: 'btn-info'},
-				{id: 'alert-warning', class: 'btn-warning'},
-				{id: 'alert-danger', class: 'btn-danger'},
+				{id: 'alert alert-success', class: 'btn-success'},
+				{id: 'alert alert-info', class: 'btn-info'},
+				{id: 'alert alert-warning', class: 'btn-warning'},
+				{id: 'alert alert-danger', class: 'btn-danger'},
 			],
 		},
 	},
@@ -26,7 +26,7 @@ export default Vue.mgComponent('mgAlert', {
 </script>
 
 <template>
-	<div class="alert" :class="$props.style">
-		{{$props.text || data}}
+	<div :class="$props.className">
+		{{data || $props.text}}
 	</div>
 </template>

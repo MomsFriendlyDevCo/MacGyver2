@@ -7,13 +7,13 @@ export default Vue.mgComponent('mgLabel', {
 	},
 	props: {
 		text: {type: 'mgText'},
-		class: {type: 'mgText', default: 'form-control-static', advanced: true},
+		className: {type: 'mgText', default: 'form-control-static', advanced: true},
 	},
 });
 </script>
 
 <template>
-	<div :class="$props.class">
+	<div :class="$props.className">
 		{{data || $props.text}}
 	</div>
 </template>

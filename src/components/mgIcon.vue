@@ -11,7 +11,7 @@ export default Vue.mgComponent('mgIcon', {
 		required: {type: 'mgToggle', default: false},
 		interface: {type: 'mgChoiceButtons', default: 'modal', enum: ['modal', 'dropdown']},
 		iconFeed: {type: 'mgText', default: '/api/webfonts/fa.json', advanced: true, help: 'The data source to import icon information', relative: true},
-		class: {type: 'mgText', default: 'btn btn-light btn-circle', advanced: true},
+		className: {type: 'mgText', default: 'btn btn-light btn-circle', advanced: true},
 		classActive: {type: 'mgText', advanced: true},
 		classInactive: {type: 'mgText', advanced: true},
 	},
@@ -31,7 +31,7 @@ export default Vue.mgComponent('mgIcon', {
 					buttons: [], // We're capturing the first click so we don't need confirm buttons
 					macgyver: [
 						{
-							id: 'class',
+							id: 'className',
 							type: 'mgChoiceButtons',
 							showTitle: false,
 							classWrapper: '',
@@ -49,7 +49,7 @@ export default Vue.mgComponent('mgIcon', {
 						}, 100));
 					},
 				}))
-				.then(form => this.data = form.class)
+				.then(form => this.data = form.className)
 		},
 	},
 });
@@ -61,7 +61,7 @@ export default Vue.mgComponent('mgIcon', {
 			v-if="$props.interface == 'modal'"
 			@click="selectIcon()"
 			class="btn btn-light btn-icon-fixed"
-			:class="data ? [data, $props.classActive || $props.class] : [$props.iconFallback, $props.classInactive || $props.class]"
+			:class="data ? [data, $props.classActive || $props.className] : [$props.iconFallback, $props.classInactive || $props.className]"
 		/>
 		<mg-choice-dropdown
 			v-else-if="$props.interface == 'dropdown'"

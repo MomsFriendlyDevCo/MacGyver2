@@ -11,14 +11,14 @@ export default Vue.mgComponent('mgButton', {
 		icon: {type: 'mgIcon', default: 'far fa-check'},
 		tooltip: {type: 'mgText'},
 		action: {type: 'mgText', vueType: 'any'},
-		class: {type: 'mgText', advanced: true, default: 'btn btn-light'},
+		className: {type: 'mgText', advanced: true, default: 'btn btn-light'},
 	},
 });
 </script>
 
 <template>
 	<a
-		:class="$props.class"
+		:class="$props.className"
 		@click="$mgForm.run($props.action)"
 		v-tooltip="$props.tooltip"
 	>

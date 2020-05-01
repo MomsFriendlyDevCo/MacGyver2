@@ -6,7 +6,7 @@ export default Vue.mgComponent('mgRestQuery', {
 		category: 'Data display',
 	},
 	props: {
-		class: {type: 'mgText', advanced: true},
+		className: {type: 'mgText', advanced: true},
 		classActive: {type: 'mgText', default: 'btn btn-primary', advanced: true},
 		classInactive: {type: 'mgText', default: 'btn btn-light', advanced: true},
 		iconActive: {type: 'mgIcon', default: 'fa fa-database', advanced: true},
@@ -55,7 +55,7 @@ export default Vue.mgComponent('mgRestQuery', {
 	<a
 		@click="editQuery()"
 		class="btn btn-light"
-		:class="data ? [data, $props.classActive || $props.class] : [$props.classInactive || $props.class]"
+		:class="data ? [data, $props.classActive || $props.className] : [$props.classInactive || $props.className]"
 		v-tooltip="{content: codeDisplay, classes: 'text-left'}"
 	>
 		<i :class="data ? $props.iconActive : $props.iconInactive"/>
