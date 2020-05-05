@@ -24,7 +24,7 @@ export default Vue.component('mgFormEditor', {
 		mgFormEditorControls,
 	},
 	data() { return {
-		mode: 'toc', // ENUM: collapsed, toc, editing, adding
+		mode: 'collapsed', // ENUM: collapsed, toc, editing, adding
 		id: this.$macgyver.nextId(), // ID of the editing form item
 		editing: undefined, // The active item we are editing
 		widgetListMode: 'grid',
