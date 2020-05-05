@@ -6542,8 +6542,11 @@ $macgyver.utils.evalCompile = function (expression) {
     } else if (/^(["']).*\1$/.test(match.groups.right)) {
       // Enclosed in " or '
       match.groups.right = match.groups.right.substr(1, match.groups.right.length - 2);
-    }
+    } // Convert string to boolean
 
+
+    if (isString_1(match.groups.right) && match.groups.right.toLowerCase() === 'true') match.groups.right = true;
+    if (isString_1(match.groups.right) && match.groups.right.toLowerCase() === 'false') match.groups.right = false;
     var obj;
 
     if (['=', '==', '$eq'].includes(match.groups.operand)) {
@@ -6558,7 +6561,7 @@ $macgyver.utils.evalCompile = function (expression) {
 
     return asFunc ? createDefaultQueryTester(obj) : obj;
   } else {
-    throw new Error("Error parsinng expression \"".concat(expression, "\", $macgyver.utils.evelParse() can only process simple expressions for now, use Sift object syntax for more complex tests"));
+    throw new Error("Error parsinng expression \"".concat(expression, "\", $macgyver.utils.evalCompile() can only process simple expressions for now, use Sift object syntax for more complex tests"));
   }
 };
 /**
