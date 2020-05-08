@@ -5920,6 +5920,7 @@ var createDefaultQueryTester = function (query, _a) {
     });
 };
 
+var _this = undefined;
 var $macgyver = {};
 /**
 * Storage for all MacGyver registered widgets
@@ -6577,28 +6578,79 @@ $macgyver.utils.evalMatch = function (expression, env) {
   return [env].filter($macgyver.utils.evalCompile(expression)).length == 1;
 };
 /**
-* Navigate down a dotted notation path and set the final value using Vue.set() (or simple object mutation if Vue is not available)
-* This function is designed to work as simillaly as possible to _.set()
-* @param {Object} target The source object, usually the root controller
-* @param {string|array} path Either a path in dotted or array notation
-* @param {*} value The value set
+* Set a dotted notation or array path to a set value
+* This function will correctly populate any missing entities, calling vm.$set on each traversal of the path
+* Passing undefined as a value removes the key (unless removeUndefined is set to false)
+* *
+* @param {Object} [target] The target to set the path of, if omitted the `vm` object is used as the base for traversal
+* @param {string|array} path The path to set within the target / vm
+* @param {*} value The value to set
+* @param {Object} [options] Additional options
+* @param {boolean} [options.arrayNumeric=true] Process numeric path segments as arrays
+* @param {boolean} [options.removeUndefined=true] If undefined is specified as a value the key is removed instead of being set
+* @param {boolean} [options.debug=false] Also print out debugging information when setting the value
+* @returns {Object} The set value, like $set()
+*
+* @example Set a deeply nested path within a target object
+* $macgyver.utils.setPath(this, 'foo.bar.baz', 123); // this.$data.foo.bar.baz = 123
+*
+* @example Set a deeply nested path, with arrays, assuming VM as the root node
+* $macgyver.utils.setPath('foo.1.bar', 123); // vm.$data.foo = [{bar: 123}]
 */
 
 
-$macgyver.utils.setPath = function (target, path, value) {
-  var chunks = typeof path == 'string' ? path.split('.') : path; // Ensure all paths up to this chunk-1 exist
+$macgyver.utils.setPath = function (target, path, value, options) {
+  // Argument mangling {{{
+  if (isString_1(target) || isArray_1(target) || value === undefined) {
+    // called as (path, value)
+    var _ref3 = [_this, target, path, value];
+    target = _ref3[0];
+    path = _ref3[1];
+    value = _ref3[2];
+    options = _ref3[3];
+  } else if (!isObject_1(target)) {
+    throw new Error('Cannot use $setPath on non-object target');
+  } // }}}
 
-  var targ = target;
 
-  for (var i = 0; i < chunks.length - 1; i++) {
-    if (targ[chunks[i]] === undefined) {
-      targ = $macgyver.utils.set(targ, chunks[i], {}); // Traversal point not yet setup
+  var settings = _objectSpread2({
+    arrayNumeric: true,
+    debug: false,
+    removeUndefined: true
+  }, options);
+
+  if (settings.debug) console.debug('[$setPath]', path, '=', value, {
+    target: target,
+    options: options
+  });
+  var node = target;
+  if (!path) throw new Error('Cannot $setPath with undefined path');
+  (isString_1(path) ? path.split('.') : path).some(function (chunk, chunkIndex, chunks) {
+    if (chunkIndex == chunks.length - 1) {
+      // Leaf node
+      if (settings.removeUndefined && value === undefined) {
+        $macgyver.utils.unset(node, chunk);
+      } else {
+        $macgyver.utils.set(node, chunk, value);
+      }
+    } else if (node[chunk] === undefined) {
+      // This chunk (and all following chunks) does't exist - populate from here
+      chunks.slice(chunkIndex).forEach(function (chunk) {
+        if (settings.arrayNumeric && isFinite(chunk)) {
+          $macgyver.utils.set(node, chunk, []);
+        } else {
+          $macgyver.utils.set(node, chunk, {});
+        }
+
+        node = node[chunk];
+      });
+      return true;
     } else {
-      targ = targ[chunks[i]]; // Recurse into the newly created child (or the existing branch)
+      node = node[chunk];
+      return false;
     }
-  }
-
-  return $macgyver.utils.set(targ, chunks[chunks.length - 1], value);
+  });
+  return value;
 };
 /**
 * Mapping around Vue.set (if its available) or simple key/val setting
@@ -6611,6 +6663,15 @@ $macgyver.utils.setPath = function (target, path, value) {
 
 $macgyver.utils.set = $macgyver.utils.global.Vue ? Vue.set : function (target, key, val) {
   return target[key] = val;
+};
+/**
+* Mapping around Vue.unset (if its available) or simple key delettion
+* @param {Object} target The target object to mutate
+* @param {string} key The key to remove
+*/
+
+$macgyver.utils.unset = $macgyver.utils.global.Vue ? Vue.unset : function (target, key) {
+  delete target[key];
 };
 /**
 * Provides a function to quickly get a data path on a Vue component by its path
