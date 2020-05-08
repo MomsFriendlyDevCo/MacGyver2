@@ -32,7 +32,7 @@ export default Vue.component('mgForm', {
 		editing: false, // Set by mgFormEditor when its this components parent
 		errors: [], // array <Object> {error}
 		spec: undefined, // Calculated version of config after its been though $macgyver.compileSpec()
-		formData: undefined, // Calculated version of $props.data after default population
+		formData: {}, // Calculated version of $props.data after default population
 		inRefresh: false, // Whether we are doing a refresh from the top-down, prevents recursive refreshing
 	}},
 	props: {
@@ -50,6 +50,17 @@ export default Vue.component('mgForm', {
 	},
 	created() {
 		this.id = this.id || this.$props.form || this.$macgyver.nextId();
+	},
+	mounted() {
+		this.$watch('$props.config', ()=> {
+			// console.log('mgForm config clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
+			this.rebuild();
+		}, {immediate: true});
+
+		this.$watch('$props.data', ()=> {
+			// console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
+			this.rebuildData();
+		}, {immediate: true, deep: true});
 
 		this.$on('mgChange', data => {
 			if (this.inRefresh) return;
@@ -62,17 +73,6 @@ export default Vue.component('mgForm', {
 
 		this.$on('mgErrors', errors => this.errors = errors);
 		// this.$on('mgForm.rebuild', ()=> this.rebuild()); // FIXME: Needed after new mgForm config clobber detection?
-	},
-	mounted() {
-		this.$watch('$props.config', ()=> {
-			// console.log('mgForm config clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
-			this.rebuild();
-		}, {immediate: true});
-
-		this.$watch('$props.data', ()=> {
-			// console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
-			this.rebuildData();
-		}, {immediate: true, deep: true});
 	},
 	methods: {
 		/**
@@ -94,7 +94,7 @@ export default Vue.component('mgForm', {
 			if (this.inRefresh) return;
 			this.inRefresh = true;
 
-			this.formData = _.cloneDeep(this.$props.data);
+			this.formData = this.$props.data ? _.cloneDeep(this.$props.data) : {};
 
 			if (this.$props.populateDefaults) this.assignDefaults();
 			this.refreshShowIfs();
