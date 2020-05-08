@@ -104,7 +104,7 @@ $macgyver.forms.getPrototype = spec =>
 	$macgyver
 		.flatten(spec, {type: 'spec', want: 'array', wantDataPath: true})
 		.reduce((data, node) => {
-			if (!node.default) return data; // No default speciifed - skip
+			if (!node.path || !node.default) return data; // No path or default speciifed - skip
 
 			$macgyver.utils.setPath(data, node.path, node.default);
 			return data;
