@@ -151,6 +151,49 @@ Events
 * All of the above events are automatically added by the `mgSetup()` method when the component is created
 
 
+Component Skeleton
+------------------
+In essence the following base skeleton is used for any component that is instantiated via `Vue.mgComponent(name, spec)`.
+This contains all the injectables, default data props, default events and other hooks.
+This structure can be considered a `Vue.mixin()` / `_.merge()` equivalent where all items are deep merged.
+
+```javascript
+Vue.mgComponent('mgAcmeComponent', {
+	meta: {
+		title: 'mgAcmeComponent',                            // Calculated via _.startCase() from the name
+		icon: 'far fa-rectangle-wide',
+		category: 'Misc',
+		preferId: false,
+		shorthand: [],
+		format: true,
+		formatClass: '',
+	},
+	inject: {
+		$mgForm: {from: '$mgForm', default: false},          // Will be falsy if the component is stand-alone
+	},
+	props: {
+		$dataPath: {type: String},                           // Default is set when component is populated (when inside an mg-form)
+		$specPath: {type: String},                           // Default is set when component is popualted (when inside an mg-form)
+		value: {},                                           // Default is populated when a stand-alone component
+	},
+	methods: {
+		mgSetup() {                                          // Function which sets up event handlers and data watcher
+			// ... //
+		},
+	},
+	created() {
+		this.mgSetup();                                      // Called on every create
+		// ... //                                            // component created() lifecycle hook is called here
+	},
+	// ... //                                                    // Remaining component properties, methods and lifecycle hooks
+});
+```
+
+
+API
+===
+
+
 $macgyver.compileSpec(spec)
 --------------------------
 Attempt to compile up a 'rough' MacGyver spec into a pristine one.

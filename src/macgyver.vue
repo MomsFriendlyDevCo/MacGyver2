@@ -51,6 +51,7 @@ Vue.prototype.$macgyver = (()=> {
 				preferId: false,
 				shorthand: [],
 				format: true,
+				formatClass: '',
 			},
 			...component,
 		};
