@@ -572,25 +572,69 @@ $macgyver.utils.evalMatch = (expression, env) => {
 
 
 /**
-* Navigate down a dotted notation path and set the final value using Vue.set() (or simple object mutation if Vue is not available)
-* This function is designed to work as simillaly as possible to _.set()
-* @param {Object} target The source object, usually the root controller
-* @param {string|array} path Either a path in dotted or array notation
-* @param {*} value The value set
+* Set a dotted notation or array path to a set value
+* This function will correctly populate any missing entities, calling vm.$set on each traversal of the path
+* Passing undefined as a value removes the key (unless removeUndefined is set to false)
+* *
+* @param {Object} [target] The target to set the path of, if omitted the `vm` object is used as the base for traversal
+* @param {string|array} path The path to set within the target / vm
+* @param {*} value The value to set
+* @param {Object} [options] Additional options
+* @param {boolean} [options.arrayNumeric=true] Process numeric path segments as arrays
+* @param {boolean} [options.removeUndefined=true] If undefined is specified as a value the key is removed instead of being set
+* @param {boolean} [options.debug=false] Also print out debugging information when setting the value
+* @returns {Object} The set value, like $set()
+*
+* @example Set a deeply nested path within a target object
+* $macgyver.utils.setPath(this, 'foo.bar.baz', 123); // this.$data.foo.bar.baz = 123
+*
+* @example Set a deeply nested path, with arrays, assuming VM as the root node
+* $macgyver.utils.setPath('foo.1.bar', 123); // vm.$data.foo = [{bar: 123}]
 */
-$macgyver.utils.setPath = (target, path, value) => {
-	var chunks = typeof path == 'string' ? path.split('.') : path;
-
-	// Ensure all paths up to this chunk-1 exist
-	var targ = target;
-	for (var i = 0; i < chunks.length - 1; i++) {
-		if (targ[chunks[i]] === undefined) {
-			targ = $macgyver.utils.set(targ, chunks[i], {}); // Traversal point not yet setup
-		} else {
-			targ = targ[chunks[i]]; // Recurse into the newly created child (or the existing branch)
-		}
+$macgyver.utils.setPath = (target, path, value, options) => {
+	// Argument mangling {{{
+	if (_.isString(target) || _.isArray(target) || value === undefined) { // called as (path, value)
+		[target, path, value, options] = [this, target, path, value];
+	} else if (!_.isObject(target)) {
+		throw new Error('Cannot use $setPath on non-object target');
 	}
-	return $macgyver.utils.set(targ, chunks[chunks.length-1], value);
+	// }}}
+
+	var settings = {
+		arrayNumeric: true,
+		debug: false,
+		removeUndefined: true,
+		...options,
+	};
+
+	if (settings.debug) console.debug('[$setPath]', path, '=', value, {target, options});
+
+	var node = target;
+	if (!path) throw new Error('Cannot $setPath with undefined path');
+	(_.isString(path) ? path.split('.') : path).some((chunk, chunkIndex, chunks) => {
+		if (chunkIndex == chunks.length - 1) { // Leaf node
+			if (settings.removeUndefined && value === undefined) {
+				$macgyver.utils.unset(node, chunk);
+			} else {
+				$macgyver.utils.set(node, chunk, value);
+			}
+		} else if (node[chunk] === undefined) { // This chunk (and all following chunks) does't exist - populate from here
+			chunks.slice(chunkIndex).forEach(chunk => {
+				if (settings.arrayNumeric && isFinite(chunk)) {
+					$macgyver.utils.set(node, chunk, []);
+				} else {
+					$macgyver.utils.set(node, chunk, {});
+				}
+				node = node[chunk];
+			});
+			return true;
+		} else {
+			node = node[chunk];
+			return false;
+		}
+	});
+
+	return value;
 };
 
 
@@ -602,6 +646,14 @@ $macgyver.utils.setPath = (target, path, value) => {
 * @returns {*} The set value
 */
 $macgyver.utils.set = $macgyver.utils.global.Vue ? Vue.set : (target, key, val) => target[key] = val;
+
+
+/**
+* Mapping around Vue.unset (if its available) or simple key delettion
+* @param {Object} target The target object to mutate
+* @param {string} key The key to remove
+*/
+$macgyver.utils.unset = $macgyver.utils.global.Vue ? Vue.unset : (target, key) => { delete target[key] };
 
 
 /**
