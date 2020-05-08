@@ -65,27 +65,24 @@ export default Vue.mgComponent('mgIcon', {
 		/>
 		<mg-choice-dropdown
 			v-else-if="$props.interface == 'dropdown'"
-			:form="$props.form"
-			:data="data"
-			:config="{
-				$dataPath: $props.$dataPath,
-				enumSource: 'url',
-				enumUrl: {
-					url: $props.iconFeed,
-					type: 'array',
-					mappings: {
-						id: {required: true, from: 'class'},
-						title: {required: true, from: 'id'},
-						icon: {required: true, from: 'class'},
-					},
+			enum-source="url"
+			:enum-url="{
+				url: $props.iconFeed,
+				type: 'array',
+				mappings: {
+					id: {required: true, from: 'class'},
+					title: {required: true, from: 'id'},
+					icon: {required: true, from: 'class'},
 				},
-				default: $props.default,
-				required: $props.required,
 			}"
+			:default="$props.default"
+			:required="$props.required"
+			:value="data"
+			@change="data = $event"
 		/>
 		<mg-error
 			v-else
-			:config="{errorText: 'Unknown mgIcon interface'}"
+			error-text="Unknown mgIcon interface"
 		/>
 	</div>
 </template>

@@ -38,6 +38,7 @@ export default Vue.mgComponent('mgContainer', {
 				{id: 'titles-above', title: 'Titles above'},
 			],
 		},
+		title: {type: 'mgText', showIf: {layout: 'card'}},
 		showTitles: {type: 'mgToggle', default: true, help: 'Show titles for fields', showIf: {layout: {$in: ['form', 'card']}}},
 		columnHeaders: {type: 'mgToggle', default: false, help: 'Show column headers', showIf: "layout == 'columns'"},
 		collapsable: {type: 'mgToggle', default: false, help: 'This card can be hidden', showIf: "layout == 'card'"},

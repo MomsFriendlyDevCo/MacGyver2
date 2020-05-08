@@ -65,7 +65,10 @@ export default Vue.mgComponent('mgGridDashboard', {
 			:h="item.h"
 			:i="item.i"
 		>
-			<mg-component :form="$props.form" :config="item"/>
+			<mg-component
+				:form="$props.form"
+				:config="item"
+			/>
 		</grid-item>
 	</grid-layout>
 </template>

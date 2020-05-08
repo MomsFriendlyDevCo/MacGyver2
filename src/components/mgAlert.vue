@@ -6,7 +6,6 @@ export default Vue.mgComponent('mgAlert', {
 		category: 'General Decoration',
 		preferId: false,
 	},
-	inject: ['$mgForm'],
 	props: {
 		text: {type: 'mgText', default: 'This is an alert!'},
 		className: {

@@ -82,7 +82,10 @@ export default Vue.mgComponent('mgTable', {
 					{{rowNumber + 1 | number}}
 				</td>
 				<td v-for="col in $props.items" :key="col.id" :class="col.class">
-					<mg-component :form="$props.form" :config="col"/>
+					<mg-component
+						:form="$props.form"
+						:config="col"
+					/>
 				</td>
 				<td class="btn-context">
 					<div class="btn-group">
@@ -101,7 +104,11 @@ export default Vue.mgComponent('mgTable', {
 					<i class="far fa-asterisk"></i>
 				</td>
 				<td v-for="(col, colNumber) in $props.items" :key="col.id">
-					<mg-component :form="$props.form" :config="col" :data="newRow[colNumber]"/>
+					<mg-component
+						:form="$props.form"
+						:config="col"
+						:data="newRow[colNumber]"
+					/>
 				</td>
 				<td>
 					<a @click="createRow()" :class="isAdding ? $props.addButtonActiveClass : $props.addButtonInactiveClass"></a>

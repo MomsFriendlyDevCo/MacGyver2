@@ -18,11 +18,10 @@ export default Vue.mgComponent('mgHtml', {
 <template>
 	<div>
 		<div v-if="!$mgFormEditor" v-html="data || $props.text" class="form-control-static"/>
-		<mg-form
+		<mg-wysiwyg
 			v-else
-			:config="{id: 'content', type: 'mgWysiwyg'}"
-			:data="{content: data === undefined ? $props.text : data}"
-			@change="$mgFormEditor.mutatePath(`${config.$specPath}.text`, $event.content)"
+			:value="data === undefined ? $props.text : data"
+			@change="data = $event"
 		/>
 	</div>
 </template>
