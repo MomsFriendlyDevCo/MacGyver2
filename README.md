@@ -112,7 +112,7 @@ The following injectables can be subscribed to within each component:
 
 | Injectable      | Description                                                                                  |
 |-----------------|----------------------------------------------------------------------------------------------|
-| `$mgForm`       | The parent `mgForm` component, automatically applied if `vm.inject` isn't overriden          |
+| `$mgForm`       | The optional parent `mgForm` component, automatically applied if `vm.inject` isn't overriden |
 | `$mgFormEditor` | The optional wrapping `mgFormEditor` component, if present. This is outside the `mgForm` parent, its presense can be used to determine whether to display special edit component features |
 
 To specify optional injectables (e.g. that `$mgFormEditor` _may_ be included but is not essencial) use:
@@ -120,11 +120,17 @@ To specify optional injectables (e.g. that `$mgFormEditor` _may_ be included but
 ```javascript
 {
 	inject: {
-		$mgForm: {from: '$mgForm'},
+		$mgForm: {from: '$mgForm', default: false},
 		$mgFormEditor: {from: '$mgFormEditor', default: false},
 	},
 }
 ```
+
+
+**NOTES:**
+
+* `$mgForm` is only injected if the component is used inside a `<mg-form/>` component, otherwise its falsy. This usually occurs when the component is used as a standalone e.g. `<mg-button/>`
+* `$mgFormEditor` is only injected if the form is wrapped within a editor context, check for its truthy status to determine if the widget should apply editable behaviours
 
 
 Events
