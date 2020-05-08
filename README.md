@@ -86,6 +86,7 @@ MacGyver widgets follow the regular [Vue component syntax](https://vuejs.org/v2/
 | `props{}.title`    | `string`               | Prop ID via `_.startCase()` | Human readable name for the property in the editor                                         |
 | `props{}.default`  | `*`                    | `undefined`                 | Regular property default value                                                             |
 | `props{}.type`     | `string`               | *none*                      | Unlike Vue props, this should be an `mg*` widget with its config                           |
+| `props{}.vueType`  | `string` / `array`     | Computed                    | Type validator to pass to view, this should be an array or string, not native types        |
 | `props{}.help`     | `string`               | `""`                        | Additional help text in the editor                                                         |
 | `props{}.advanced` | `boolean`              | `false`                     | Label the property for advanced users only                                                 |
 | `props{}.*`        | `*`                    | *none*                      | All other MacGyver widget config for the `props{}.type` widget                             |
@@ -102,6 +103,7 @@ MacGyver widgets follow the regular [Vue component syntax](https://vuejs.org/v2/
 * `meta.format` returns the human readable value of the component when rendered in tables - if `true` the value is used unchanged. If a function it is called as `(value, config)` and can return a scalar string or a Promisable value which should resolve into a string.
 * `props{}.type` should always be a MacGyver component + config so it can be correctly displayed in the editor. Passing JS primative classes (e.g. `{foo: Number}`) will raise a warning message and is discouraged for anything other than testing
 * `props{}.advanced` can be used to hide more complex properties unless the editor is in advanced editing mode
+* `props{}.vueType` can override the "guessed" type to pass to Vue as a prop validator. Pass strings or arrays of strings not native types - for example `{vueType: 'string'}` or `{vueType: ['array', 'number']}` are both correct, `{vueType: String}` is not supported
 * `data()` is called as per the usual Vue setup process, however the `data` value is always provided and is watched by MacGyver for changes. Mutate this value to set new values or emit `mgChange` if needed
 * `childProps` sets up the properties inherited into the `$props` setup by direct children. Items such as `title` are used by elements such as `mgContainer` to render the title of the widget and not the widget itself
 

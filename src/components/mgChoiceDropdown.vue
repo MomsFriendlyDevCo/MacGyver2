@@ -28,7 +28,7 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 				{id: 'icon', type: 'mgIcon'},
 			],
 		},
-		enumUrl: {type: 'mgUrl', showIf: 'enumSource == "url"', help: 'Data feed URL to fetch choice values from'},
+		enumUrl: {type: 'mgUrl', vueType: ['string', 'object'], showIf: 'enumSource == "url"', help: 'Data feed URL to fetch choice values from'},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 		focus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},
