@@ -197,40 +197,6 @@ export default Vue.component('mgForm', {
 
 
 		/**
-		* Inject common component functionality into a new child component
-		* @param {VueComponent} component The Vue component we should inject
-		*/
-		inject(component) {
-			console.warn('@DEPRECIATED', 'Call to inject()');
-			component.$on('mgIdentify', reply => reply(component));
-
-			// Read in initial data value
-			if (component.$props.$dataPath) {
-				var refresher = ()=> {
-					component.data = _.get(component.$mgForm.formData, component.$props.$dataPath);
-				};
-
-				component.$on('mgRefresh', refresher);
-				this.$on('mgRefreshForm', refresher);
-
-				refresher();
-			} else if (component.$props.default) { // No data path but there IS a default - link to that instead
-				component.data = _.clone(component.$props.default);
-			}
-
-			// Inject data watcher which transforms change operations into emitters to the nearest parent form {{{
-			component.$watch('data', val => {
-				// Emit `mgChange` to form element
-				this.$emit('mgChange', component.$props.$dataPath, val);
-
-				// If the component also has a .onChange binding fire that
-				if (component.$props.onChange) component.$props.onChange.call(component, val);
-			});
-			// }}}
-		},
-
-
-		/**
 		* Find a VueComponent instance from a specPath
 		* @param {string|array} specPath The specPath to search for
 		* @param {boolean} [throws=true] Throw an error if the path cannot be found (avoid downstream checking if the specPath is valid)
