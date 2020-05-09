@@ -6093,7 +6093,7 @@
       want: 'array',
       wantDataPath: true
     }).reduce(function (data, node) {
-      if (!node["default"]) return data; // No default speciifed - skip
+      if (!node.path || !node["default"]) return data; // No path or default speciifed - skip
 
       $macgyver.utils.setPath(data, node.path, node["default"]);
       return data;
@@ -6805,7 +6805,8 @@
           category: 'Misc',
           preferId: false,
           shorthand: [],
-          format: true
+          format: true,
+          formatClass: ''
         }
       }, component);
 
@@ -6834,36 +6835,45 @@
 
 
           if (prop.vueType) {
-            switch (prop.vueType) {
-              // String to type bindings (usually via vueType)
-              case 'array':
-                newProp.type = Array;
-                break;
+            var propType = _.chain(prop.vueType).castArray() // Splat into an array (even if its a simple string)
+            .map(function (type) {
+              // Map each item into the native type
+              switch (type) {
+                // String to type bindings (usually via vueType)
+                case 'array':
+                  return Array;
 
-              case 'boolean':
-                newProp.type = Boolean;
-                break;
+                case 'boolean':
+                  return Boolean;
 
-              case 'date':
-                newProp.type = Date;
-                break;
+                case 'date':
+                  return Date;
 
-              case 'number':
-                newProp.type = Number;
-                break;
+                case 'number':
+                  return Number;
 
-              case 'string':
-                newProp.type = String;
-                break;
+                case 'object':
+                  return Object;
 
-              case 'any':
-                break;
-              // Do not append type checking
+                case 'string':
+                  return String;
 
-              default:
-                console.warn("Unknown vueType JS primative \"".concat(prop.vueType, "\" while declaring component \"").concat(name, "\" - assuming \"string\""));
-                newProp.type = String;
-            }
+                case 'any':
+                  return;
+                // Do not append type checking
+
+                default:
+                  console.warn("Unknown vueType JS primative \"".concat(type, "\" while declaring component \"").concat(name, "\" - assuming \"string\""));
+                  return String;
+              }
+            }).filter().thru(function (v) {
+              return v.length < 2 ? v[0] : v;
+            }) // Flatten 1 item arrays into its native type
+            .value();
+
+            if (propType) newProp.type = propType; // Only allocate type if there is one (i.e. ignore 'any' types)
+
+            console.log('DEBUG: Conv native type', prop.vueType, '=', propType);
           } else {
             switch (prop.type) {
               case 'mgText':
@@ -6934,7 +6944,7 @@
             // Read in initial data value {{{
 
             var refresher = function refresher() {
-              if (!_this.$mgForm && _this.$props.value) {
+              if (_this.$props.value) {
                 // Standalone value
                 _this.data = _.clone(_this.$props.value);
               } else if (_this.$props.$dataPath) {
@@ -6953,7 +6963,7 @@
 
             this.$watch('data', function (value) {
               // Emit `mgChange` to form element (if there is a parent form)
-              if (_this.$mgForm) _this.$mgForm.$emit('mgChange', {
+              if (_this.$mgForm && _this.$props.$dataPath) _this.$mgForm.$emit('mgChange', {
                 path: _this.$props.$dataPath,
                 value: value
               }); // Emit regular `change` event
@@ -7521,6 +7531,7 @@
       category: 'General Decoration',
       preferId: false
     },
+    inject: ['$mgForm'],
     props: {
       text: {
         type: 'mgText',
@@ -8262,6 +8273,7 @@
       },
       enumUrl: {
         type: 'mgUrl',
+        vueType: ['string', 'object'],
         showIf: 'enumSource == "url"',
         help: 'Data feed URL to fetch choice values from'
       },
@@ -8398,7 +8410,7 @@
     /* style */
     const __vue_inject_styles__$9 = function (inject) {
       if (!inject) return
-      inject("data-v-4f3d3f5e_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Make look consistant with Bootstrap */\n.v-select.open .dropdown-toggle {\n\tborder-color: #5cb3fd;\n}\n\n/* Remove weird dropdown icon that Bootstrap adds */\n.v-select .dropdown-toggle::after {\n\tdisplay: none;\n}\n\n/* Wider spacing for clear button */\n.v-select .dropdown-toggle .clear {\n\tmargin-right: 10px;\n}\n\n/* Align dropdown icon correctly */\n.v-select .open-indicator {\n\tmargin-top: -2px;\n}\n.v-select .vs__selected i {\n\tmargin-right: 5px;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgChoiceDropdown.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AA2GA,wCAAA;AACA;CACA,qBAAA;AACA;;AAEA,mDAAA;AACA;CACA,aAAA;AACA;;AAEA,mCAAA;AACA;CACA,kBAAA;AACA;;AAEA,kCAAA;AACA;CACA,gBAAA;AACA;AAEA;CACA,iBAAA;AACA","file":"mgChoiceDropdown.vue","sourcesContent":["<script>\nimport VueSelect from 'vue-select';\nimport 'vue-select/dist/vue-select.css';\n\nVue.component('v-select', VueSelect);\n\nexport default Vue.mgComponent('mgChoiceDropdown', {\n\tmeta: {\n\t\ttitle: 'Dropdown multiple-choice',\n\t\ticon: 'far fa-chevron-circle-down',\n\t\tcategory: 'Choice Selectors',\n\t\tpreferId: true,\n\t\tshorthand: ['choice', 'choose', 'dropdown', 'pick'],\n\t},\n\tdata() { return {\n\t\tselected: [],\n\t\tenumIter: [],\n\t}},\n\tprops: {\n\t\tenumSource: {type: 'mgChoiceButtons', default: 'list', enum: ['list', 'url'], default: 'list', help: 'Where to populate the list data from'},\n\t\tenum: {\n\t\t\ttype: 'mgTable',\n\t\t\ttitle: 'List items',\n\t\t\tshowIf: 'enumSource == \"list\"',\n\t\t\titems: [\n\t\t\t\t{id: 'id', type: 'mgText', required: true},\n\t\t\t\t{id: 'title', type: 'mgText', required: true},\n\t\t\t\t{id: 'icon', type: 'mgIcon'},\n\t\t\t],\n\t\t},\n\t\tenumUrl: {type: 'mgUrl', showIf: 'enumSource == \"url\"', help: 'Data feed URL to fetch choice values from'},\n\t\tplaceholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},\n\t\trequired: {type: 'mgToggle', default: false, help: 'One choice must be selected'},\n\t\tfocus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},\n\t},\n\tcreated() {\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);\n\t\t});\n\n\t\tthis.$watch('$props.enumUrl', ()=> {\n\t\t\tif (!this.$props.enumUrl) return;\n\t\t\tthis.$macgyver.utils.fetch(this.$props.enumUrl, {type: 'array'})\n\t\t\t\t.then(data => this.setEnum(data))\n\t\t}, {immediate: true});\n\n\t\tthis.$watch('$props.enum', ()=> {\n\t\t\tif (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings\n\t\t\t\tthis.setEnum(this.$props.enum.map(i => ({id: _.camelCase(i), title: i})));\n\t\t\t} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection\n\t\t\t\tthis.setEnum(this.$props.enum);\n\t\t\t}\n\t\t}, {immediate: true});\n\t},\n\tmethods: {\n\t\tchange(val) {\n\t\t\tthis.data = val?.id;\n\t\t\tthis.selected = val;\n\t\t},\n\n\t\t/**\n\t\t* Populate the enumIter object\n\t\t* This function also correctly populates the selected item (or the default)\n\t\t* Each item is assumed to have the spec `{id: String, title: String, icon?: String}`\n\t\t* @param {array<Object>} enumIter The new iterable enum\n\t\t*/\n\t\tsetEnum(enumIter) {\n\t\t\tthis.enumIter = enumIter;\n\n\t\t\tif (this.data) {\n\t\t\t\tthis.selected = this.enumIter.find(e => e.id == this.data) || this.data;\n\t\t\t} else if (this.$props.default) {\n\t\t\t\tthis.selected = this.enumIter.find(e => e.id == this.$props.default) || this.$props.default;\n\t\t\t}\n\t\t},\n\t},\n\tmounted() {\n\t\tif (this.$props.focus) {\n\t\t\t// NOTE: Focus selection does NOT work if DevTools is open in Chome\n\t\t\tthis.$refs.select.searchEl.focus();\n\t\t}\n\t},\n});\n</script>\n\n<template>\n\t<v-select\n\t\tref=\"select\"\n\t\t:value=\"selected\"\n\t\tlabel=\"title\"\n\t\t:options=\"enumIter\"\n\t\t:placeholder=\"$props.placeholder\"\n\t\t:clearable=\"!$props.required\"\n\t\t@input=\"change\"\n\t>\n\t\t<template #selected-option=\"option\">\n\t\t\t<i v-if=\"selected.icon\" :class=\"selected.icon\"/>\n\t\t\t{{selected.title}}\n\t\t</template>\n\t\t<template #option=\"option\">\n\t\t\t<i v-if=\"option.icon\" :class=\"option.icon\"/>\n\t\t\t{{option.title}}\n\t\t</template>\n\t</v-select>\n</template>\n\n<style>\n/* Make look consistant with Bootstrap */\n.v-select.open .dropdown-toggle {\n\tborder-color: #5cb3fd;\n}\n\n/* Remove weird dropdown icon that Bootstrap adds */\n.v-select .dropdown-toggle::after {\n\tdisplay: none;\n}\n\n/* Wider spacing for clear button */\n.v-select .dropdown-toggle .clear {\n\tmargin-right: 10px;\n}\n\n/* Align dropdown icon correctly */\n.v-select .open-indicator {\n\tmargin-top: -2px;\n}\n\n.v-select .vs__selected i {\n\tmargin-right: 5px;\n}\n</style>\n"]}, media: undefined });
+      inject("data-v-1a89d812_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Make look consistant with Bootstrap */\n.v-select.open .dropdown-toggle {\n\tborder-color: #5cb3fd;\n}\n\n/* Remove weird dropdown icon that Bootstrap adds */\n.v-select .dropdown-toggle::after {\n\tdisplay: none;\n}\n\n/* Wider spacing for clear button */\n.v-select .dropdown-toggle .clear {\n\tmargin-right: 10px;\n}\n\n/* Align dropdown icon correctly */\n.v-select .open-indicator {\n\tmargin-top: -2px;\n}\n.v-select .vs__selected i {\n\tmargin-right: 5px;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgChoiceDropdown.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AA2GA,wCAAA;AACA;CACA,qBAAA;AACA;;AAEA,mDAAA;AACA;CACA,aAAA;AACA;;AAEA,mCAAA;AACA;CACA,kBAAA;AACA;;AAEA,kCAAA;AACA;CACA,gBAAA;AACA;AAEA;CACA,iBAAA;AACA","file":"mgChoiceDropdown.vue","sourcesContent":["<script>\nimport VueSelect from 'vue-select';\nimport 'vue-select/dist/vue-select.css';\n\nVue.component('v-select', VueSelect);\n\nexport default Vue.mgComponent('mgChoiceDropdown', {\n\tmeta: {\n\t\ttitle: 'Dropdown multiple-choice',\n\t\ticon: 'far fa-chevron-circle-down',\n\t\tcategory: 'Choice Selectors',\n\t\tpreferId: true,\n\t\tshorthand: ['choice', 'choose', 'dropdown', 'pick'],\n\t},\n\tdata() { return {\n\t\tselected: [],\n\t\tenumIter: [],\n\t}},\n\tprops: {\n\t\tenumSource: {type: 'mgChoiceButtons', default: 'list', enum: ['list', 'url'], default: 'list', help: 'Where to populate the list data from'},\n\t\tenum: {\n\t\t\ttype: 'mgTable',\n\t\t\ttitle: 'List items',\n\t\t\tshowIf: 'enumSource == \"list\"',\n\t\t\titems: [\n\t\t\t\t{id: 'id', type: 'mgText', required: true},\n\t\t\t\t{id: 'title', type: 'mgText', required: true},\n\t\t\t\t{id: 'icon', type: 'mgIcon'},\n\t\t\t],\n\t\t},\n\t\tenumUrl: {type: 'mgUrl', vueType: ['string', 'object'], showIf: 'enumSource == \"url\"', help: 'Data feed URL to fetch choice values from'},\n\t\tplaceholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},\n\t\trequired: {type: 'mgToggle', default: false, help: 'One choice must be selected'},\n\t\tfocus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},\n\t},\n\tcreated() {\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);\n\t\t});\n\n\t\tthis.$watch('$props.enumUrl', ()=> {\n\t\t\tif (!this.$props.enumUrl) return;\n\t\t\tthis.$macgyver.utils.fetch(this.$props.enumUrl, {type: 'array'})\n\t\t\t\t.then(data => this.setEnum(data))\n\t\t}, {immediate: true});\n\n\t\tthis.$watch('$props.enum', ()=> {\n\t\t\tif (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings\n\t\t\t\tthis.setEnum(this.$props.enum.map(i => ({id: _.camelCase(i), title: i})));\n\t\t\t} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection\n\t\t\t\tthis.setEnum(this.$props.enum);\n\t\t\t}\n\t\t}, {immediate: true});\n\t},\n\tmethods: {\n\t\tchange(val) {\n\t\t\tthis.data = val?.id;\n\t\t\tthis.selected = val;\n\t\t},\n\n\t\t/**\n\t\t* Populate the enumIter object\n\t\t* This function also correctly populates the selected item (or the default)\n\t\t* Each item is assumed to have the spec `{id: String, title: String, icon?: String}`\n\t\t* @param {array<Object>} enumIter The new iterable enum\n\t\t*/\n\t\tsetEnum(enumIter) {\n\t\t\tthis.enumIter = enumIter;\n\n\t\t\tif (this.data) {\n\t\t\t\tthis.selected = this.enumIter.find(e => e.id == this.data) || this.data;\n\t\t\t} else if (this.$props.default) {\n\t\t\t\tthis.selected = this.enumIter.find(e => e.id == this.$props.default) || this.$props.default;\n\t\t\t}\n\t\t},\n\t},\n\tmounted() {\n\t\tif (this.$props.focus) {\n\t\t\t// NOTE: Focus selection does NOT work if DevTools is open in Chome\n\t\t\tthis.$refs.select.searchEl.focus();\n\t\t}\n\t},\n});\n</script>\n\n<template>\n\t<v-select\n\t\tref=\"select\"\n\t\t:value=\"selected\"\n\t\tlabel=\"title\"\n\t\t:options=\"enumIter\"\n\t\t:placeholder=\"$props.placeholder\"\n\t\t:clearable=\"!$props.required\"\n\t\t@input=\"change\"\n\t>\n\t\t<template #selected-option=\"option\">\n\t\t\t<i v-if=\"selected.icon\" :class=\"selected.icon\"/>\n\t\t\t{{selected.title}}\n\t\t</template>\n\t\t<template #option=\"option\">\n\t\t\t<i v-if=\"option.icon\" :class=\"option.icon\"/>\n\t\t\t{{option.title}}\n\t\t</template>\n\t</v-select>\n</template>\n\n<style>\n/* Make look consistant with Bootstrap */\n.v-select.open .dropdown-toggle {\n\tborder-color: #5cb3fd;\n}\n\n/* Remove weird dropdown icon that Bootstrap adds */\n.v-select .dropdown-toggle::after {\n\tdisplay: none;\n}\n\n/* Wider spacing for clear button */\n.v-select .dropdown-toggle .clear {\n\tmargin-right: 10px;\n}\n\n/* Align dropdown icon correctly */\n.v-select .open-indicator {\n\tmargin-top: -2px;\n}\n\n.v-select .vs__selected i {\n\tmargin-right: 5px;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
@@ -11731,7 +11743,7 @@
         // array <Object> {error}
         spec: undefined,
         // Calculated version of config after its been though $macgyver.compileSpec()
-        formData: {},
+        formData: undefined,
         // Calculated version of $props.data after default population
         inRefresh: false // Whether we are doing a refresh from the top-down, prevents recursive refreshing
 
@@ -11763,24 +11775,9 @@
       }
     },
     created: function created() {
-      this.id = this.id || this.$props.form || this.$macgyver.nextId();
-    },
-    mounted: function mounted() {
       var _this = this;
 
-      this.$watch('$props.config', function () {
-        // console.log('mgForm config clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
-        _this.rebuild();
-      }, {
-        immediate: true
-      });
-      this.$watch('$props.data', function () {
-        // console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
-        _this.rebuildData();
-      }, {
-        immediate: true,
-        deep: true
-      });
+      this.id = this.id || this.$props.form || this.$macgyver.nextId();
       this.$on('mgChange', function (data) {
         if (_this.inRefresh) return;
 
@@ -11797,6 +11794,23 @@
         return _this.errors = errors;
       }); // this.$on('mgForm.rebuild', ()=> this.rebuild()); // FIXME: Needed after new mgForm config clobber detection?
     },
+    mounted: function mounted() {
+      var _this2 = this;
+
+      this.$watch('$props.config', function () {
+        // console.log('mgForm config clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
+        _this2.rebuild();
+      }, {
+        immediate: true
+      });
+      this.$watch('$props.data', function () {
+        // console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
+        _this2.rebuildData();
+      }, {
+        immediate: true,
+        deep: true
+      });
+    },
     methods: {
       /**
       * Force the form to rebuild its config
@@ -11812,17 +11826,17 @@
       * Force the form to rebuild its data set
       */
       rebuildData: function rebuildData() {
-        var _this2 = this;
+        var _this3 = this;
 
         if (this.inRefresh) return;
         this.inRefresh = true;
-        this.formData = this.$props.data ? _.cloneDeep(this.$props.data) : {};
+        this.formData = _.cloneDeep(this.$props.data);
         if (this.$props.populateDefaults) this.assignDefaults();
         this.refreshShowIfs();
         this.$emit('mgRefreshForm');
         this.$nextTick(function () {
           return (// Wait one tick for all attempts to recall this function recursively to exhaust
-            _this2.inRefresh = false
+            _this3.inRefresh = false
           );
         });
       },
@@ -11831,11 +11845,11 @@
       * Force recomputation of show via showIf values
       */
       refreshShowIfs: function refreshShowIfs() {
-        var _this3 = this;
+        var _this4 = this;
 
         if (!this.spec) return;
         this.spec.showIfs.forEach(function (widget) {
-          return widget.show = _this3.$macgyver.utils.evalMatch(widget.showIf, _this3.formData);
+          return widget.show = _this4.$macgyver.utils.evalMatch(widget.showIf, _this4.formData);
         });
       },
 
@@ -11927,6 +11941,41 @@
 
         (_this$$macgyver$$eval = this.$macgyver.$eval).call.apply(_this$$macgyver$$eval, [context !== null && context !== void 0 ? context : this, action].concat(params)); // }}}
 
+      },
+
+      /**
+      * Inject common component functionality into a new child component
+      * @param {VueComponent} component The Vue component we should inject
+      */
+      inject: function inject(component) {
+        var _this5 = this;
+
+        console.warn('@DEPRECIATED', 'Call to inject()');
+        component.$on('mgIdentify', function (reply) {
+          return reply(component);
+        }); // Read in initial data value
+
+        if (component.$props.$dataPath) {
+          var refresher = function refresher() {
+            component.data = _.get(component.$mgForm.formData, component.$props.$dataPath);
+          };
+
+          component.$on('mgRefresh', refresher);
+          this.$on('mgRefreshForm', refresher);
+          refresher();
+        } else if (component.$props["default"]) {
+          // No data path but there IS a default - link to that instead
+          component.data = _.clone(component.$props["default"]);
+        } // Inject data watcher which transforms change operations into emitters to the nearest parent form {{{
+
+
+        component.$watch('data', function (val) {
+          // Emit `mgChange` to form element
+          _this5.$emit('mgChange', component.$props.$dataPath, val); // If the component also has a .onChange binding fire that
+
+
+          if (component.$props.onChange) component.$props.onChange.call(component, val);
+        }); // }}}
       },
 
       /**

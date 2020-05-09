@@ -6040,7 +6040,7 @@ $macgyver.forms.getPrototype = function (spec) {
     want: 'array',
     wantDataPath: true
   }).reduce(function (data, node) {
-    if (!node["default"]) return data; // No default speciifed - skip
+    if (!node.path || !node["default"]) return data; // No path or default speciifed - skip
 
     $macgyver.utils.setPath(data, node.path, node["default"]);
     return data;
@@ -15200,7 +15200,8 @@ Vue$1.prototype.$macgyver = function () {
         category: 'Misc',
         preferId: false,
         shorthand: [],
-        format: true
+        format: true,
+        formatClass: ''
       }
     }, component);
 
@@ -15229,36 +15230,45 @@ Vue$1.prototype.$macgyver = function () {
 
 
         if (prop.vueType) {
-          switch (prop.vueType) {
-            // String to type bindings (usually via vueType)
-            case 'array':
-              newProp.type = Array;
-              break;
+          var propType = _.chain(prop.vueType).castArray() // Splat into an array (even if its a simple string)
+          .map(function (type) {
+            // Map each item into the native type
+            switch (type) {
+              // String to type bindings (usually via vueType)
+              case 'array':
+                return Array;
 
-            case 'boolean':
-              newProp.type = Boolean;
-              break;
+              case 'boolean':
+                return Boolean;
 
-            case 'date':
-              newProp.type = Date;
-              break;
+              case 'date':
+                return Date;
 
-            case 'number':
-              newProp.type = Number;
-              break;
+              case 'number':
+                return Number;
 
-            case 'string':
-              newProp.type = String;
-              break;
+              case 'object':
+                return Object;
 
-            case 'any':
-              break;
-            // Do not append type checking
+              case 'string':
+                return String;
 
-            default:
-              console.warn("Unknown vueType JS primative \"".concat(prop.vueType, "\" while declaring component \"").concat(name, "\" - assuming \"string\""));
-              newProp.type = String;
-          }
+              case 'any':
+                return;
+              // Do not append type checking
+
+              default:
+                console.warn("Unknown vueType JS primative \"".concat(type, "\" while declaring component \"").concat(name, "\" - assuming \"string\""));
+                return String;
+            }
+          }).filter().thru(function (v) {
+            return v.length < 2 ? v[0] : v;
+          }) // Flatten 1 item arrays into its native type
+          .value();
+
+          if (propType) newProp.type = propType; // Only allocate type if there is one (i.e. ignore 'any' types)
+
+          console.log('DEBUG: Conv native type', prop.vueType, '=', propType);
         } else {
           switch (prop.type) {
             case 'mgText':
@@ -15329,7 +15339,7 @@ Vue$1.prototype.$macgyver = function () {
           // Read in initial data value {{{
 
           var refresher = function refresher() {
-            if (!_this.$mgForm && _this.$props.value) {
+            if (_this.$props.value) {
               // Standalone value
               _this.data = _.clone(_this.$props.value);
             } else if (_this.$props.$dataPath) {
@@ -15348,7 +15358,7 @@ Vue$1.prototype.$macgyver = function () {
 
           this.$watch('data', function (value) {
             // Emit `mgChange` to form element (if there is a parent form)
-            if (_this.$mgForm) _this.$mgForm.$emit('mgChange', {
+            if (_this.$mgForm && _this.$props.$dataPath) _this.$mgForm.$emit('mgChange', {
               path: _this.$props.$dataPath,
               value: value
             }); // Emit regular `change` event

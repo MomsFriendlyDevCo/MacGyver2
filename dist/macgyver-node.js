@@ -15230,43 +15230,43 @@ Vue$1.prototype.$macgyver = function () {
 
 
         if (prop.vueType) {
-          newProp.type = _.chain(prop.vueType).castArray() // Splat into an array (even if its a simple string)
+          var propType = _.chain(prop.vueType).castArray() // Splat into an array (even if its a simple string)
           .map(function (type) {
             // Map each item into the native type
             switch (type) {
               // String to type bindings (usually via vueType)
               case 'array':
-                newProp.type = Array;
-                break;
+                return Array;
 
               case 'boolean':
-                newProp.type = Boolean;
-                break;
+                return Boolean;
 
               case 'date':
-                newProp.type = Date;
-                break;
+                return Date;
 
               case 'number':
-                newProp.type = Number;
-                break;
+                return Number;
+
+              case 'object':
+                return Object;
 
               case 'string':
-                newProp.type = String;
-                break;
+                return String;
 
               case 'any':
-                break;
+                return;
               // Do not append type checking
 
               default:
                 console.warn("Unknown vueType JS primative \"".concat(type, "\" while declaring component \"").concat(name, "\" - assuming \"string\""));
-                newProp.type = String;
+                return String;
             }
-          }).thru(function (v) {
-            return v.length == 1 ? v[0] : v;
+          }).filter().thru(function (v) {
+            return v.length < 2 ? v[0] : v;
           }) // Flatten 1 item arrays into its native type
           .value();
+
+          if (propType) newProp.type = propType; // Only allocate type if there is one (i.e. ignore 'any' types)
         } else {
           switch (prop.type) {
             case 'mgText':
