@@ -50,9 +50,10 @@ export default Vue.mgComponent('mgNumber', {
 </script>
 
 <template>
-	<div class="mg-number">
+	<div class="mg-number" :class="`mg-number-${$props.interface}`">
 		<div v-if="$props.interface == 'slider'">
 			<input v-model="data" type="range" class="form-control" :placeholder="$props.placeholder" :min="$props.min" :max="$props.max" :step="$props.step"/>
+			<label class="mg-number-slider-value">{{data | number}}</label>
 		</div>
 		<div v-else-if="$props.interface == 'bumpers'" class="input-group">
 			<a @click="add(-1)" class="hidden-print" :class="$props.bumperDownClass"></a>
@@ -89,4 +90,89 @@ export default Vue.mgComponent('mgNumber', {
 	-webkit-appearance: none;
 	margin: 0; /* <-- Apparently some margin is still there even though it's hidden */
 }
+
+
+
+/* Slider {{{ */
+.mg-number.mg-number-slider input[type="range"] {
+	display: inline-block;
+	-webkit-appearance: none;
+	width: calc(100% - (73px));
+	height: 10px;
+	border-radius: 5px;
+	background: var(--btn-default-bg);
+	outline: none;
+	padding: 0;
+	margin: 0;
+}
+
+.mg-number.mg-number-slider input[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background: var(--primary);
+	cursor: pointer;
+	-webkit-transition: background .15s ease-in-out;
+	transition: background .15s ease-in-out;
+}
+
+.mg-number.mg-number-slider input[type="range"]::-webkit-slider-thumb:hover,
+.mg-number.mg-number-slider input[type="range"]:active::-webkit-slider-thumb,
+.mg-number.mg-number-slider input[type="range"]::-moz-range-thumb:hover,
+.mg-number.mg-number-slider input[type="range"]:active::-moz-range-thumb {
+	background: var(--primary);
+}
+
+.mg-number.mg-number-slider input[type="range"]::-moz-range-thumb {
+	width: 20px;
+	height: 20px;
+	border: 0;
+	border-radius: 50%;
+	color: var(--btn-default-fg);
+	background: var(--btn-default-bg);
+	cursor: pointer;
+	-moz-transition: background .15s ease-in-out;
+	transition: background .15s ease-in-out;
+}
+
+.mg-number.mg-number-slider input[type="range"]:focus::-webkit-slider-thumb {
+	box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--primary);
+}
+
+.mg-number.mg-number-slider .mg-number-slider-value {
+	display: inline-block;
+	position: relative;
+	width: 60px;
+	line-height: 20px;
+	text-align: center;
+	border-radius: 3px;
+	color: var(--btn-default-fg);
+	background: var(--btn-default-bg);
+	padding: 5px 10px;
+	margin-left: 8px;
+}
+.mg-number.mg-number-slider .mg-number-slider-value:after {
+	position: absolute;
+	top: 8px;
+	left: -7px;
+	width: 0;
+	height: 0;
+	border-top: 7px solid transparent;
+	border-right: 7px solid var(--btn-default-bg);
+	border-bottom: 7px solid transparent;
+	content: '';
+}
+
+::-moz-range-track {
+	background: var(--btn-default-bg);
+	border: 0;
+}
+
+input::-moz-focus-inner,
+input::-moz-focus-outer {
+	border: 0;
+}
+/* }}} */
 </style>

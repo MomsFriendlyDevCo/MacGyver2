@@ -229,3 +229,11 @@ export default Vue.component('mgForm', {
 		/>
 	</form>
 </template>
+
+<style>
+/* Add missing Bootstrap color variables */
+.mg-form {
+	--btn-default-bg: #e9ecef;
+	--btn-default-fg: #495057;
+}
+</style>
