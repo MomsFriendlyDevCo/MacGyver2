@@ -279,7 +279,7 @@ $macgyver.compileSpec = (spec, options) => {
 						.find(wid => {
 							var widget = $macgyver.widgets[wid];
 							return (
-								widget.id.substr(2).toLowerCase() == v.type // Matched after 'mg' part. e.g. 'text' becomes 'mgText'
+								(widget.id || '').substr(2).toLowerCase() == v.type // Matched after 'mg' part. e.g. 'text' becomes 'mgText'
 								|| (widget.shorthand || []).find(s => s == v.type) // Matched a shorthand alias
 							);
 						})
