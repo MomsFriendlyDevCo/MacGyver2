@@ -4794,6 +4794,285 @@
   var cloneDeep_1 = cloneDeep;
 
   /**
+   * Creates a `_.find` or `_.findLast` function.
+   *
+   * @private
+   * @param {Function} findIndexFunc The function to find the collection index.
+   * @returns {Function} Returns the new find function.
+   */
+  function createFind(findIndexFunc) {
+    return function(collection, predicate, fromIndex) {
+      var iterable = Object(collection);
+      if (!isArrayLike_1(collection)) {
+        var iteratee = _baseIteratee(predicate);
+        collection = keys_1(collection);
+        predicate = function(key) { return iteratee(iterable[key], key, iterable); };
+      }
+      var index = findIndexFunc(collection, predicate, fromIndex);
+      return index > -1 ? iterable[iteratee ? collection[index] : index] : undefined;
+    };
+  }
+
+  var _createFind = createFind;
+
+  /**
+   * The base implementation of `_.findIndex` and `_.findLastIndex` without
+   * support for iteratee shorthands.
+   *
+   * @private
+   * @param {Array} array The array to inspect.
+   * @param {Function} predicate The function invoked per iteration.
+   * @param {number} fromIndex The index to search from.
+   * @param {boolean} [fromRight] Specify iterating from right to left.
+   * @returns {number} Returns the index of the matched value, else `-1`.
+   */
+  function baseFindIndex(array, predicate, fromIndex, fromRight) {
+    var length = array.length,
+        index = fromIndex + (fromRight ? 1 : -1);
+
+    while ((fromRight ? index-- : ++index < length)) {
+      if (predicate(array[index], index, array)) {
+        return index;
+      }
+    }
+    return -1;
+  }
+
+  var _baseFindIndex = baseFindIndex;
+
+  /** Used as references for various `Number` constants. */
+  var NAN = 0 / 0;
+
+  /** Used to match leading and trailing whitespace. */
+  var reTrim = /^\s+|\s+$/g;
+
+  /** Used to detect bad signed hexadecimal string values. */
+  var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+
+  /** Used to detect binary string values. */
+  var reIsBinary = /^0b[01]+$/i;
+
+  /** Used to detect octal string values. */
+  var reIsOctal = /^0o[0-7]+$/i;
+
+  /** Built-in method references without a dependency on `root`. */
+  var freeParseInt = parseInt;
+
+  /**
+   * Converts `value` to a number.
+   *
+   * @static
+   * @memberOf _
+   * @since 4.0.0
+   * @category Lang
+   * @param {*} value The value to process.
+   * @returns {number} Returns the number.
+   * @example
+   *
+   * _.toNumber(3.2);
+   * // => 3.2
+   *
+   * _.toNumber(Number.MIN_VALUE);
+   * // => 5e-324
+   *
+   * _.toNumber(Infinity);
+   * // => Infinity
+   *
+   * _.toNumber('3.2');
+   * // => 3.2
+   */
+  function toNumber(value) {
+    if (typeof value == 'number') {
+      return value;
+    }
+    if (isSymbol_1(value)) {
+      return NAN;
+    }
+    if (isObject_1(value)) {
+      var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
+      value = isObject_1(other) ? (other + '') : other;
+    }
+    if (typeof value != 'string') {
+      return value === 0 ? value : +value;
+    }
+    value = value.replace(reTrim, '');
+    var isBinary = reIsBinary.test(value);
+    return (isBinary || reIsOctal.test(value))
+      ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
+      : (reIsBadHex.test(value) ? NAN : +value);
+  }
+
+  var toNumber_1 = toNumber;
+
+  /** Used as references for various `Number` constants. */
+  var INFINITY$2 = 1 / 0,
+      MAX_INTEGER = 1.7976931348623157e+308;
+
+  /**
+   * Converts `value` to a finite number.
+   *
+   * @static
+   * @memberOf _
+   * @since 4.12.0
+   * @category Lang
+   * @param {*} value The value to convert.
+   * @returns {number} Returns the converted number.
+   * @example
+   *
+   * _.toFinite(3.2);
+   * // => 3.2
+   *
+   * _.toFinite(Number.MIN_VALUE);
+   * // => 5e-324
+   *
+   * _.toFinite(Infinity);
+   * // => 1.7976931348623157e+308
+   *
+   * _.toFinite('3.2');
+   * // => 3.2
+   */
+  function toFinite(value) {
+    if (!value) {
+      return value === 0 ? value : 0;
+    }
+    value = toNumber_1(value);
+    if (value === INFINITY$2 || value === -INFINITY$2) {
+      var sign = (value < 0 ? -1 : 1);
+      return sign * MAX_INTEGER;
+    }
+    return value === value ? value : 0;
+  }
+
+  var toFinite_1 = toFinite;
+
+  /**
+   * Converts `value` to an integer.
+   *
+   * **Note:** This method is loosely based on
+   * [`ToInteger`](http://www.ecma-international.org/ecma-262/7.0/#sec-tointeger).
+   *
+   * @static
+   * @memberOf _
+   * @since 4.0.0
+   * @category Lang
+   * @param {*} value The value to convert.
+   * @returns {number} Returns the converted integer.
+   * @example
+   *
+   * _.toInteger(3.2);
+   * // => 3
+   *
+   * _.toInteger(Number.MIN_VALUE);
+   * // => 0
+   *
+   * _.toInteger(Infinity);
+   * // => 1.7976931348623157e+308
+   *
+   * _.toInteger('3.2');
+   * // => 3
+   */
+  function toInteger(value) {
+    var result = toFinite_1(value),
+        remainder = result % 1;
+
+    return result === result ? (remainder ? result - remainder : result) : 0;
+  }
+
+  var toInteger_1 = toInteger;
+
+  /* Built-in method references for those with the same name as other `lodash` methods. */
+  var nativeMax = Math.max;
+
+  /**
+   * This method is like `_.find` except that it returns the index of the first
+   * element `predicate` returns truthy for instead of the element itself.
+   *
+   * @static
+   * @memberOf _
+   * @since 1.1.0
+   * @category Array
+   * @param {Array} array The array to inspect.
+   * @param {Function} [predicate=_.identity] The function invoked per iteration.
+   * @param {number} [fromIndex=0] The index to search from.
+   * @returns {number} Returns the index of the found element, else `-1`.
+   * @example
+   *
+   * var users = [
+   *   { 'user': 'barney',  'active': false },
+   *   { 'user': 'fred',    'active': false },
+   *   { 'user': 'pebbles', 'active': true }
+   * ];
+   *
+   * _.findIndex(users, function(o) { return o.user == 'barney'; });
+   * // => 0
+   *
+   * // The `_.matches` iteratee shorthand.
+   * _.findIndex(users, { 'user': 'fred', 'active': false });
+   * // => 1
+   *
+   * // The `_.matchesProperty` iteratee shorthand.
+   * _.findIndex(users, ['active', false]);
+   * // => 0
+   *
+   * // The `_.property` iteratee shorthand.
+   * _.findIndex(users, 'active');
+   * // => 2
+   */
+  function findIndex(array, predicate, fromIndex) {
+    var length = array == null ? 0 : array.length;
+    if (!length) {
+      return -1;
+    }
+    var index = fromIndex == null ? 0 : toInteger_1(fromIndex);
+    if (index < 0) {
+      index = nativeMax(length + index, 0);
+    }
+    return _baseFindIndex(array, _baseIteratee(predicate), index);
+  }
+
+  var findIndex_1 = findIndex;
+
+  /**
+   * Iterates over elements of `collection`, returning the first element
+   * `predicate` returns truthy for. The predicate is invoked with three
+   * arguments: (value, index|key, collection).
+   *
+   * @static
+   * @memberOf _
+   * @since 0.1.0
+   * @category Collection
+   * @param {Array|Object} collection The collection to inspect.
+   * @param {Function} [predicate=_.identity] The function invoked per iteration.
+   * @param {number} [fromIndex=0] The index to search from.
+   * @returns {*} Returns the matched element, else `undefined`.
+   * @example
+   *
+   * var users = [
+   *   { 'user': 'barney',  'age': 36, 'active': true },
+   *   { 'user': 'fred',    'age': 40, 'active': false },
+   *   { 'user': 'pebbles', 'age': 1,  'active': true }
+   * ];
+   *
+   * _.find(users, function(o) { return o.age < 40; });
+   * // => object for 'barney'
+   *
+   * // The `_.matches` iteratee shorthand.
+   * _.find(users, { 'age': 1, 'active': true });
+   * // => object for 'pebbles'
+   *
+   * // The `_.matchesProperty` iteratee shorthand.
+   * _.find(users, ['active', false]);
+   * // => object for 'fred'
+   *
+   * // The `_.property` iteratee shorthand.
+   * _.find(users, 'active');
+   * // => object for 'barney'
+   */
+  var find = _createFind(findIndex_1);
+
+  var find_1 = find;
+
+  /**
    * Creates a `baseEach` or `baseEachRight` function.
    *
    * @private
@@ -5225,7 +5504,7 @@
   var _apply = apply;
 
   /* Built-in method references for those with the same name as other `lodash` methods. */
-  var nativeMax = Math.max;
+  var nativeMax$1 = Math.max;
 
   /**
    * A specialized version of `baseRest` which transforms the rest array.
@@ -5237,11 +5516,11 @@
    * @returns {Function} Returns the new function.
    */
   function overRest(func, start, transform) {
-    start = nativeMax(start === undefined ? (func.length - 1) : start, 0);
+    start = nativeMax$1(start === undefined ? (func.length - 1) : start, 0);
     return function() {
       var args = arguments,
           index = -1,
-          length = nativeMax(args.length - start, 0),
+          length = nativeMax$1(args.length - start, 0),
           array = Array(length);
 
       while (++index < length) {
@@ -6277,31 +6556,61 @@
       convertShorthandTranslate: function convertShorthandTranslate(spec) {
         return {
           type: 'mgContainer',
-          items: map_1(spec, function (v, k) {
-            return _objectSpread2({
-              id: k
-            }, v, {
-              type: function () {
-                if (isString_1(v)) v = {
-                  type: v
-                }; // Only key given is a string, assume it means type
+          items: map_1(spec, function (widget, id) {
+            var _widget$type;
 
-                if (!v.type) return 'mgText'; // No type given, assume mgText
+            if (isString_1(widget)) widget = {
+              type: widget
+            }; // Widget is a straight string (e.g. 'boolean'), then fall through to type finders
 
-                if (v.type.startsWith('mg')) return v.type; // Type begins with 'mg' - trust the user
+            if ((_widget$type = widget.type) === null || _widget$type === void 0 ? void 0 : _widget$type.startsWith('mg')) {
+              // Already a defined MacGyver spec
+              return widget;
+            } else if (isString_1(id) && id.startsWith('mg')) {
+              // ID is type, payload is widget
+              return _objectSpread2({}, widget, {
+                type: id
+              });
+            } else if (widget.type) {
+              // We have a type - try to match it against known widgets (or error out)
+              var typeLCase = widget.type.toLowerCase();
 
-                v.type = v.type.toLowerCase();
-                return Object.keys($macgyver.widgets) // Search for likely widgets
-                .find(function (wid) {
-                  var widget = $macgyver.widgets[wid];
-                  return widget.id.substr(2).toLowerCase() == v.type // Matched after 'mg' part. e.g. 'text' becomes 'mgText'
-                  || (widget.shorthand || []).find(function (s) {
-                    return s == v.type;
-                  }) // Matched a shorthand alias
-                  ;
-                }) || v.type;
-              }()
-            });
+              var found = find_1($macgyver.widgets, function (mgWidget) {
+                return (// Search for likely widgets
+                  mgWidget.meta.id.substr(2).toLowerCase() == typeLCase // matches `mg${TYPE}`
+                  || mgWidget.meta.shorthand.includes(typeLCase)
+                );
+              } // is included in shorthand alternatives
+              );
+
+              if (found) {
+                // Found either a widget of form `mg${type}` or a widget with that type as a shorthand
+                return _objectSpread2({
+                  id: id
+                }, widget, {
+                  type: found.meta.id
+                });
+              } else {
+                // No idea what this widget is, wrap in an mgError
+                return {
+                  type: 'mgError',
+                  text: "Unknown widget type \"".concat(widget.type, "\": ") + JSON.stringify(widget, null, '\t')
+                };
+              }
+            } else if (isPlainObject_1(widget)) {
+              // Given object but it explicitly does not have a type - assume mgText
+              return _objectSpread2({
+                id: id
+              }, widget, {
+                type: 'mgText'
+              });
+            } else {
+              // Can't determine any type to link against - error out
+              return {
+                type: 'mgError',
+                text: "No widget type specified: " + JSON.stringify(widget, null, '\t')
+              };
+            }
           })
         };
       },
@@ -6343,14 +6652,16 @@
       wantSpecPath: '$specPath'
     }).forEach(function (widget) {
       if (!widget.type || !$macgyver.widgets[widget.type]) {
-        // Remap unknown widget
+        // Remap unknown widget (we already did shorthand remapping above so this should be a 1:1 match)
         console.log("Unknown widget '".concat(widget.type, "'"), widget);
-        widget.errorText = widget.type ? "Unknown widget '".concat(widget.type, "'") : 'Widget type not specified';
-        widget.errorWidgetType = widget.type;
-        widget.type = 'mgError';
+        widget = {
+          type: 'mgError',
+          text: "Unknown widget type \"".concat(widget.type, "\": ") + JSON.stringify(widget)
+        };
       } else if (settings.widgetDefaults) {
         var _ref, _$macgyver$widgets$wi;
 
+        // Apply defaults to widget
         Object.assign(widget, (_ref = (_$macgyver$widgets$wi = $macgyver.widgets[widget.type].config, pickBy_1(_$macgyver$widgets$wi, function (v, k) {
           return !has_1(widget, k) && has_1(v, 'default');
         })), mapValues_1(_ref, function (v) {
@@ -6798,8 +7109,10 @@
 
     Vue$1.mgComponent = function (name, component) {
       if (macgyver.widgets[name]) throw new Error("Cannot redeclare MacGyver component \"".concat(name, "\""));
-      macgyver.widgets[name] = _objectSpread2({
-        meta: {
+      if (!name.startsWith('mg')) throw new Error("All MacGyver components must be prefixed with \"mg\", given \"".concat(name, "\""));
+      macgyver.widgets[name] = _objectSpread2({}, component, {
+        meta: _objectSpread2({
+          id: _.camelCase(name),
           title: _.startCase(name),
           icon: 'far fa-rectangle-wide',
           category: 'Misc',
@@ -6807,8 +7120,8 @@
           shorthand: [],
           format: true,
           formatClass: ''
-        }
-      }, component);
+        }, component.meta)
+      });
 
       var vueComponent = _objectSpread2({
         inject: component.inject || ['$mgForm'],
@@ -9720,9 +10033,7 @@
 
       if (!this.$macgyver.widgets[this.$props.config.type]) return h('mg-error', {
         props: {
-          config: {
-            errorText: "Unknown type: ".concat(this.$props.config.type)
-          }
+          text: "Unknown widget type \"".concat(this.$props.config.type, "\"")
         }
       });
       return h(this.$props.config.type, {
@@ -10725,19 +11036,8 @@
       category: 'General Decoration'
     },
     props: {
-      errorText: {
+      text: {
         type: 'mgText'
-      }
-    },
-    computed: {
-      // Mutate the incomming config back to what the original object probably was
-      displayConfig: function displayConfig() {
-        var _ref, _this$$props;
-
-        if (!this.$props) return 'No config';
-        return _ref = (_this$$props = this.$props, _.pickBy(_this$$props, function (v, k) {
-          return !k.startsWith('error');
-        })), _.set(_ref, 'type', this.$props.errorWidgetType);
       }
     }
   });
@@ -10751,10 +11051,7 @@
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
     return _c("div", { staticClass: "alert alert-danger" }, [
-      _vm._v("\n\t" + _vm._s(_vm.data || _vm.$props.errorText) + "\n\t"),
-      _c("pre", [_vm._v("Config: " + _vm._s(_vm.displayConfig))]),
-      _vm._v(" "),
-      _c("pre", [_vm._v("Data: " + _vm._s(_vm.data || "No data"))])
+      _vm._v("\n\t" + _vm._s(_vm.data || _vm.$props.text) + "\n")
     ])
   };
   var __vue_staticRenderFns__$e = [];
@@ -11868,7 +12165,7 @@
       getPrototype: function getPrototype() {
         if (!this.id) return {}; // Form not yet ready
 
-        return this.$macgyver.forms.getPrototype(this.config);
+        return this.$macgyver.forms.getPrototype(this.spec.spec);
       },
 
       /**
@@ -12000,15 +12297,17 @@
   __vue_render__$h._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$o = undefined;
+    const __vue_inject_styles__$o = function (inject) {
+      if (!inject) return
+      inject("data-v-5ad3d90c_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Add missing Bootstrap color variables */\n.mg-form {\n\t--btn-default-bg: #e9ecef;\n\t--btn-default-fg: #495057;\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgForm.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAyOA,0CAAA;AACA;CACA,yBAAA;CACA,yBAAA;AACA","file":"mgForm.vue","sourcesContent":["<script>\n/**\n* The top level MacGyver form\n* @param {string} [form] Unique form name\n* @param {Object|Array} config The MacGyver form object either in long form nested array structure or short form object (which is converted)\n* @param {boolean} [populateDefaults=true] Apply initial defaults to the data when the config is ready, if false you can call vm.assignDefaults() manually if needed\n* @param {boolean} [actionsFallback=true] Use vm.$eval as a runner when no action listener is found\n* @param {Object|function} [actions] Actions subscribers as an object as a lookup list of action definition string keys and their firable function. Subscriber functions are called with the context as `(...params)`. If the value is a function it is called as the raw contents of the action.\n* @param {Object} [data] The data binding\n*\n* @emits change Emitted as `(data)` whenever any data changes\n* @emits changeItem Emitted as `({path, value})` when any single item changes\n* @emits onAction Emitted as `({action, params})` when any action is fired\n* @emits mgComponent.click Emitted as `(component, event)` on native clicks of a component\n* @emits mgComponent.mouseDown Emitted as `(component, event)` on the native mouseDown event of a component\n* @emits mgComponent.mouseUp Emitted as `(component, event)` on the native mouseUp event of a component\n* @emits mgComponent.mouseMove Emitted as `(component, event)` on the native mouseMove event of a component\n* @emits mgComponent.mouseEnter Emitted as `(component, event)` on the native mouseEnter event of a component\n* @emits mgComponent.mouseLeave Emitted as `(component, event)` on the native mouseLeave event of a component\n* @emits mgComponent.mouseOver Emitted as `(component, event)` on the native mouseOver event of a component\n* @emits mgComponent.mouseOut Emitted as `(component, event)` on the native mouseOut event of a component\n* @emits mgContainer.click Emitted as `(container, specPath, event)` on the native click event of a component within a container\n* @emits mgContainer.mouseEnter Emitted as `(container, specPath, event)` on the native mouseEnter event of a component within a container\n* @emits mgContainer.mouseLeave Emitted as `(container, specPath, event)` on the native mouseLeave event of a component within a container\n*/\nexport default Vue.component('mgForm', {\n\tprovide() { return {\n\t\t$mgForm: this,\n\t}},\n\tdata() { return {\n\t\tid: undefined, // Set on create\n\t\tediting: false, // Set by mgFormEditor when its this components parent\n\t\terrors: [], // array <Object> {error}\n\t\tspec: undefined, // Calculated version of config after its been though $macgyver.compileSpec()\n\t\tformData: {}, // Calculated version of $props.data after default population\n\t\tinRefresh: false, // Whether we are doing a refresh from the top-down, prevents recursive refreshing\n\t}},\n\tprops: {\n\t\tform: String, // Optional overriding form ID\n\t\tconfig: [Object, Array], // Can be a single object, array of objects or shorthand style\n\t\tdata: Object,\n\n\t\tpopulateDefaults: {type: Boolean, default: true},\n\t\tonAction: Function,\n\t\tactionsFallback: {type: Boolean, default: true},\n\t\tactions: { // Object of functions e.g. `{customFunc: ()=> {}}`\n\t\t\ttype: [Function, Object],\n\t\t\tvalidator: v => _.isFunction(v) || _.every(v => _.isFunction(v)),\n\t\t},\n\t},\n\tcreated() {\n\t\tthis.id = this.id || this.$props.form || this.$macgyver.nextId();\n\t},\n\tmounted() {\n\t\tthis.$watch('$props.config', ()=> {\n\t\t\t// console.log('mgForm config clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));\n\t\t\tthis.rebuild();\n\t\t}, {immediate: true});\n\n\t\tthis.$watch('$props.data', ()=> {\n\t\t\t// console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));\n\t\t\tthis.rebuildData();\n\t\t}, {immediate: true, deep: true});\n\n\t\tthis.$on('mgChange', data => {\n\t\t\tif (this.inRefresh) return;\n\t\t\tthis.$macgyver.utils.setPath(this.formData, data.path, data.value);\n\t\t\tthis.$emit('changeItem', data);\n\n\t\t\tthis.$emit('change', {...this.formData}); // Has to be a shallow clone so we break the reference and Vue updates\n\t\t\tthis.refreshShowIfs();\n\t\t});\n\n\t\tthis.$on('mgErrors', errors => this.errors = errors);\n\t\t// this.$on('mgForm.rebuild', ()=> this.rebuild()); // FIXME: Needed after new mgForm config clobber detection?\n\t},\n\tmethods: {\n\t\t/**\n\t\t* Force the form to rebuild its config\n\t\t*/\n\t\trebuild() {\n\t\t\tthis.id = this.id || this.$props.form || this.$macgyver.nextId();\n\t\t\t// console.log(`Rebuild form config for form \"${this.id}\"`);\n\n\t\t\tthis.spec = this.$macgyver.compileSpec(this.$props.config);\n\t\t\tif (!this.spec || !this.spec.spec) throw new Error('Invalid Macgyver form spec');\n\t\t},\n\n\n\t\t/**\n\t\t* Force the form to rebuild its data set\n\t\t*/\n\t\trebuildData() {\n\t\t\tif (this.inRefresh) return;\n\t\t\tthis.inRefresh = true;\n\n\t\t\tthis.formData = this.$props.data ? _.cloneDeep(this.$props.data) : {};\n\n\t\t\tif (this.$props.populateDefaults) this.assignDefaults();\n\t\t\tthis.refreshShowIfs();\n\t\t\tthis.$emit('mgRefreshForm');\n\t\t\tthis.$nextTick(()=> // Wait one tick for all attempts to recall this function recursively to exhaust\n\t\t\t\tthis.inRefresh = false\n\t\t\t);\n\t\t},\n\n\n\t\t/**\n\t\t* Force recomputation of show via showIf values\n\t\t*/\n\t\trefreshShowIfs() {\n\t\t\tif (!this.spec) return;\n\t\t\tthis.spec.showIfs.forEach(widget =>\n\t\t\t\twidget.show = this.$macgyver.utils.evalMatch(widget.showIf, this.formData)\n\t\t\t);\n\t\t},\n\n\n\t\t/**\n\t\t* Assign initial defaults if a value is not in the data object\n\t\t*/\n\t\tassignDefaults() {\n\t\t\tif (!this.spec) return;\n\t\t\t_.defaultsDeep(this.formData, this.getPrototype());\n\t\t\tthis.$emit('change', this.formData);\n\t\t},\n\n\n\t\t/**\n\t\t* Compute the data prototype of the form\n\t\t* This is an empty object with all the defaults populated\n\t\t* @returns {Object} A prototype data object with all defaults populated\n\t\t* @see $macgyver.forms.getPrototype()\n\t\t*/\n\t\tgetPrototype() {\n\t\t\tif (!this.id) return {}; // Form not yet ready\n\t\t\treturn this.$macgyver.forms.getPrototype(this.spec.spec);\n\t\t},\n\n\n\t\t/**\n\t\t* Execute a function within a form\n\t\t* The default behaviour of this function is documented within the function\n\t\t* @param {string|function} action The action(s) to execute\n\t\t* @param {*} [context] The context of the action, defaults to the form component\n\t\t* @param {*} [params...] Additional parameters to execute\n\t\t* @emits mgRun Event fired at the form level only with a single object of the form `{action, params}`. Use the form property handleActions to specify if the form should handle or trap the event to override\n\t\t*/\n\t\trun(action, context, ...params) {\n\t\t\t// 0. See if what we've been passed is already a function {{{\n\t\t\tif (typeof action == 'function') {\n\t\t\t\treturn action.call(context ?? this);\n\t\t\t}\n\t\t\t// }}}\n\n\t\t\t// 1. Emit mgRun to parents and see if they want to handle it {{{\n\t\t\tvar handled = false;\n\t\t\tthis.$emit.up.call(context ?? this, 'mgRun', {action, params}, isHandled => {\n\t\t\t\tif (isHandled) handled = true;\n\t\t\t});\n\t\t\tif (handled) return;\n\t\t\t// }}}\n\n\t\t\t// 2. Use FORM.$props.onAction(action) and see if returns truthy {{{\n\t\t\tif (this.$props.onAction && this.$props.onAction.call(context ?? this, action, ...params)) return;\n\t\t\t// }}}\n\n\t\t\t// 3a. Does FORM.$props.actions exist and is a function which will handle everything? {{{\n\t\t\tif (this.$props.actions && _.isFunction(this.$props.actions)) {\n\t\t\t\tthis.$props.actions.call(context ?? this, action);\n\t\t\t\treturn;\n\t\t\t}\n\t\t\t// }}}\n\n\t\t\t// 3b. Does FORM.$props.actions[action] exist and if so whether it returns truthy {{{\n\t\t\tvar [junk, actionReadable, actionArgs] = /^([a-z0-9\\_]*?)(\\(.*\\))?$/i.exec(action) || [];\n\t\t\tif (actionReadable && this.$props.actions && this.$props.actions[actionReadable]) {\n\t\t\t\t// Collapse strings to functions\n\t\t\t\tvar func = _.isString(this.$props.actions[actionReadable]) ? this[actionReadable]\n\t\t\t\t\t: this.$props.actions[actionReadable];\n\n\t\t\t\t// Tidy up actionArgs\n\t\t\t\tactionArgs = (actionArgs || '')\n\t\t\t\t\t.replace(/^\\(/, '') // Remove preceeding '('\n\t\t\t\t\t.replace(/\\)$/, '') // Remove succeeding ')'\n\t\t\t\t\t.split(',')\n\t\t\t\t\t.map(i => i && JSON.parse(i.replace(/'/g, '\"')));\n\n\t\t\t\tif (func.call(context ?? this, ...actionArgs, ...params)) return;\n\t\t\t}\n\t\t\t// }}}\n\n\t\t\t// 4. If all else failed and FORM.$props.actionsFallback is true - handle it via vm.$eval {{{\n\t\t\tthis.$macgyver.$eval.call(context ?? this, action, ...params);\n\t\t\t// }}}\n\t\t},\n\n\n\t\t/**\n\t\t* Find a VueComponent instance from a specPath\n\t\t* @param {string|array} specPath The specPath to search for\n\t\t* @param {boolean} [throws=true] Throw an error if the path cannot be found (avoid downstream checking if the specPath is valid)\n\t\t* @returns {VueComponent} Either the found VueComponent or `false` if not found\n\t\t*/\n\t\tgetComponentBySpecPath(specPath, throws = true) {\n\t\t\tvar found = false;\n\t\t\tthis.$emit.down('mgIdentify', widget => {\n\t\t\t\tif (!found && widget.$props.$specPath == specPath)\n\t\t\t\t\tfound = widget;\n\t\t\t});\n\t\t\tif (!found && throws) throw new Error(`Cannot edit component by non-existant specPath \"${specPath}\"`);\n\t\t\treturn found;\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<form @submit.prevent=\"submit()\" class=\"form-horizontal mg-form\">\n\t\t<div v-if=\"errors.length\" class=\"alert alert-warning\">\n\t\t\t<ul>\n\t\t\t\t<li v-for=\"err in errors\">{{err.error}}</li>\n\t\t\t</ul>\n\t\t</div>\n\n\t\t<mg-component\n\t\t\tv-if=\"spec\"\n\t\t\t:config=\"spec.spec\"\n\t\t/>\n\t</form>\n</template>\n\n<style>\n/* Add missing Bootstrap color variables */\n.mg-form {\n\t--btn-default-bg: #e9ecef;\n\t--btn-default-fg: #495057;\n}\n</style>\n"]}, media: undefined });
+
+    };
     /* scoped */
     const __vue_scope_id__$o = undefined;
     /* module identifier */
     const __vue_module_identifier__$o = undefined;
     /* functional template */
     const __vue_is_functional_template__$o = false;
-    /* style inject */
-    
     /* style inject SSR */
     
     /* style inject shadow dom */
@@ -12023,7 +12322,7 @@
       __vue_is_functional_template__$o,
       __vue_module_identifier__$o,
       false,
-      undefined,
+      createInjector,
       undefined,
       undefined
     );
@@ -13077,134 +13376,142 @@
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
-    return _c("div", { staticClass: "mg-number" }, [
-      _vm.$props.interface == "slider"
-        ? _c("div", [
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.data,
-                  expression: "data"
-                }
-              ],
-              staticClass: "form-control",
-              attrs: {
-                type: "range",
-                placeholder: _vm.$props.placeholder,
-                min: _vm.$props.min,
-                max: _vm.$props.max,
-                step: _vm.$props.step
-              },
-              domProps: { value: _vm.data },
-              on: {
-                __r: function($event) {
-                  _vm.data = $event.target.value;
-                }
-              }
-            })
-          ])
-        : _vm.$props.interface == "bumpers"
-        ? _c("div", { staticClass: "input-group" }, [
-            _c("a", {
-              staticClass: "hidden-print",
-              class: _vm.$props.bumperDownClass,
-              on: {
-                click: function($event) {
-                  return _vm.add(-1)
-                }
-              }
-            }),
-            _vm._v(" "),
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.data,
-                  expression: "data"
-                }
-              ],
-              staticClass: "form-control",
-              attrs: {
-                type: "number",
-                placeholder: _vm.$props.placeholder,
-                min: _vm.$props.min,
-                max: _vm.$props.max,
-                step: _vm.$props.step
-              },
-              domProps: { value: _vm.data },
-              on: {
-                input: function($event) {
-                  if ($event.target.composing) {
-                    return
+    return _c(
+      "div",
+      { staticClass: "mg-number", class: "mg-number-" + _vm.$props.interface },
+      [
+        _vm.$props.interface == "slider"
+          ? _c("div", [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.data,
+                    expression: "data"
                   }
-                  _vm.data = $event.target.value;
-                }
-              }
-            }),
-            _vm._v(" "),
-            _c("a", {
-              staticClass: "hidden-print",
-              class: _vm.$props.bumperUpClass,
-              on: {
-                click: function($event) {
-                  return _vm.add(1)
-                }
-              }
-            })
-          ])
-        : _vm.$props.interface == "input"
-        ? _c("div", { staticClass: "input-group" }, [
-            _vm.$props.prefix
-              ? _c("div", { class: _vm.$props.prefixClass }, [
-                  _vm._v(_vm._s(_vm.$props.prefix))
-                ])
-              : _vm._e(),
-            _vm._v(" "),
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.data,
-                  expression: "data"
-                }
-              ],
-              staticClass: "form-control",
-              attrs: {
-                type: "number",
-                placeholder: _vm.$props.placeholder,
-                min: _vm.$props.min,
-                max: _vm.$props.max,
-                step: _vm.$props.step
-              },
-              domProps: { value: _vm.data },
-              on: {
-                input: function($event) {
-                  if ($event.target.composing) {
-                    return
+                ],
+                staticClass: "form-control",
+                attrs: {
+                  type: "range",
+                  placeholder: _vm.$props.placeholder,
+                  min: _vm.$props.min,
+                  max: _vm.$props.max,
+                  step: _vm.$props.step
+                },
+                domProps: { value: _vm.data },
+                on: {
+                  __r: function($event) {
+                    _vm.data = $event.target.value;
                   }
-                  _vm.data = $event.target.value;
                 }
-              }
-            }),
-            _vm._v(" "),
-            _vm.$props.suffix
-              ? _c("div", { class: _vm.$props.suffixClass }, [
-                  _vm._v(_vm._s(_vm.$props.suffix))
-                ])
-              : _vm._e()
-          ])
-        : _c("div", { staticClass: "alert alert-warning" }, [
-            _vm._v(
-              "\n\t\tUnknown mgNumber interface '" +
-                _vm._s(_vm.$props.interface) +
-                "'\n\t"
-            )
-          ])
-    ])
+              }),
+              _vm._v(" "),
+              _c("label", { staticClass: "mg-number-slider-value" }, [
+                _vm._v(_vm._s(_vm._f("number")(_vm.data)))
+              ])
+            ])
+          : _vm.$props.interface == "bumpers"
+          ? _c("div", { staticClass: "input-group" }, [
+              _c("a", {
+                staticClass: "hidden-print",
+                class: _vm.$props.bumperDownClass,
+                on: {
+                  click: function($event) {
+                    return _vm.add(-1)
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.data,
+                    expression: "data"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: {
+                  type: "number",
+                  placeholder: _vm.$props.placeholder,
+                  min: _vm.$props.min,
+                  max: _vm.$props.max,
+                  step: _vm.$props.step
+                },
+                domProps: { value: _vm.data },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.data = $event.target.value;
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c("a", {
+                staticClass: "hidden-print",
+                class: _vm.$props.bumperUpClass,
+                on: {
+                  click: function($event) {
+                    return _vm.add(1)
+                  }
+                }
+              })
+            ])
+          : _vm.$props.interface == "input"
+          ? _c("div", { staticClass: "input-group" }, [
+              _vm.$props.prefix
+                ? _c("div", { class: _vm.$props.prefixClass }, [
+                    _vm._v(_vm._s(_vm.$props.prefix))
+                  ])
+                : _vm._e(),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.data,
+                    expression: "data"
+                  }
+                ],
+                staticClass: "form-control",
+                attrs: {
+                  type: "number",
+                  placeholder: _vm.$props.placeholder,
+                  min: _vm.$props.min,
+                  max: _vm.$props.max,
+                  step: _vm.$props.step
+                },
+                domProps: { value: _vm.data },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.data = $event.target.value;
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _vm.$props.suffix
+                ? _c("div", { class: _vm.$props.suffixClass }, [
+                    _vm._v(_vm._s(_vm.$props.suffix))
+                  ])
+                : _vm._e()
+            ])
+          : _c("div", { staticClass: "alert alert-warning" }, [
+              _vm._v(
+                "\n\t\tUnknown mgNumber interface '" +
+                  _vm._s(_vm.$props.interface) +
+                  "'\n\t"
+              )
+            ])
+      ]
+    )
   };
   var __vue_staticRenderFns__$p = [];
   __vue_render__$p._withStripped = true;
@@ -13212,7 +13519,7 @@
     /* style */
     const __vue_inject_styles__$w = function (inject) {
       if (!inject) return
-      inject("data-v-33f0966b_0", { source: "\n.mg-number input[type=number] {\n\tpadding: 0 10px;\n}\n.mg-number .btn {\n\tbox-shadow: none;\n\tborder: 1px solid #f0f0f0;\n\tdisplay: flex;\n\talign-items: center;\n}\n\n/* Hide the spin button in mgNumber controls */\n.mg-number input[type=number]::-webkit-outer-spin-button,\n.mg-number input[type=number]::-webkit-inner-spin-button {\n\t/* display: none; <- Crashes Chrome on hover */\n\t-webkit-appearance: none;\n\tmargin: 0; /* <-- Apparently some margin is still there even though it's hidden */\n}\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgNumber.vue"],"names":[],"mappings":";AAyEA;CACA,eAAA;AACA;AAEA;CACA,gBAAA;CACA,yBAAA;CACA,aAAA;CACA,mBAAA;AACA;;AAEA,8CAAA;AACA;;CAEA,8CAAA;CACA,wBAAA;CACA,SAAA,EAAA,sEAAA;AACA","file":"mgNumber.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgNumber', {\n\tmeta: {\n\t\ttitle: 'Number',\n\t\ticon: 'far fa-sort-numeric-down',\n\t\tcategory: 'Simple Inputs',\n\t\tpreferId: true,\n\t\tshorthand: ['integer', 'int', 'float', 'num'],\n\t\tformat: v => {\n\t\t\tif (!v) return '';\n\t\t\treturn (_.isNumber(v) ? v : parseInt(v)).toLocaleString();\n\t\t},\n\t\tformatClass: 'text-right',\n\t},\n\tprops: {\n\t\tmin: {type: 'mgNumber', title: 'Minimum value'},\n\t\tmax: {type: 'mgNumber', title: 'Maximum value'},\n\t\tstep: {type: 'mgNumber', title: 'Value to increment / decrement by'},\n\t\tplaceholder: {type: 'mgNumber', help: 'Ghost text to display when there is no value'},\n\t\trequired: {type: 'mgToggle', default: false},\n\t\tinterface: {type: 'mgChoiceDropdown', title: 'Interface', help: 'How to allow number input', default: 'bumpers', enum: [\n\t\t\t{id: 'bumpers', title: 'Number input with buttons'},\n\t\t\t{id: 'slider', title: 'Slider bar'},\n\t\t\t{id: 'input', title: 'Number input box only'},\n\t\t]},\n\t\tbumperDownClass: {type: 'mgText', default: 'btn btn-light fa fa-arrow-down input-group-prepend', advanced: true, showIf: 'interface == \"bumpers\"'},\n\t\tbumperUpClass: {type: 'mgText', default: 'btn btn-light fa fa-arrow-up input-group-append', advanced: true, showIf: 'interface == \"bumpers\"'},\n\t\tprefix: {type: 'mgText', title: 'Prefix', help: 'Prefix to show before the input', showIf: 'interface == \"input\"'},\n\t\tprefixClass: {type: 'mgText', default: 'input-group-prepend input-group-text', advanced: true, showIf: 'interface == \"input\"'},\n\t\tsuffix: {type: 'mgText', title: 'Suffix', help: 'Suffix to show after the input', showIf: 'interface == \"input\"'},\n\t\tsuffixClass: {type: 'mgText', default: 'input-group-append input-group-text', advanced: true, showIf: 'interface == \"input\"'},\n\t},\n\tcreated() {\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);\n\t\t\tif (this.$props.min && this.data < this.$props.min) return reply(`${this.$props.title} is too small (minimum value is ${this.$props.min})`);\n\t\t\tif (this.$props.max && this.data > this.$props.max) return reply(`${this.$props.title} is too large (maximum value is ${this.$props.max})`);\n\t\t});\n\t},\n\tmethods: {\n\t\tadd(steps) {\n\t\t\tif (!_.isNumber(this.data)) return this.data = this.$props.min || 0; // Not already a number default to the min or zero\n\n\t\t\tthis.data += steps * (this.$props.step || 1);\n\t\t\tif (this.$props.max && this.data > this.$props.max) this.data = this.$props.max;\n\t\t\tif (this.$props.min && this.data < this.$props.min) this.data = this.$props.min;\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-number\">\n\t\t<div v-if=\"$props.interface == 'slider'\">\n\t\t\t<input v-model=\"data\" type=\"range\" class=\"form-control\" :placeholder=\"$props.placeholder\" :min=\"$props.min\" :max=\"$props.max\" :step=\"$props.step\"/>\n\t\t</div>\n\t\t<div v-else-if=\"$props.interface == 'bumpers'\" class=\"input-group\">\n\t\t\t<a @click=\"add(-1)\" class=\"hidden-print\" :class=\"$props.bumperDownClass\"></a>\n\t\t\t<input v-model=\"data\" type=\"number\" class=\"form-control\" :placeholder=\"$props.placeholder\" :min=\"$props.min\" :max=\"$props.max\" :step=\"$props.step\"/>\n\t\t\t<a @click=\"add(1)\" class=\"hidden-print\" :class=\"$props.bumperUpClass\"></a>\n\t\t</div>\n\t\t<div v-else-if=\"$props.interface == 'input'\" class=\"input-group\">\n\t\t\t<div v-if=\"$props.prefix\" :class=\"$props.prefixClass\">{{$props.prefix}}</div>\n\t\t\t<input v-model=\"data\" type=\"number\" class=\"form-control\" :placeholder=\"$props.placeholder\" :min=\"$props.min\" :max=\"$props.max\" :step=\"$props.step\"/>\n\t\t\t<div v-if=\"$props.suffix\" :class=\"$props.suffixClass\">{{$props.suffix}}</div>\n\t\t</div>\n\t\t<div v-else class=\"alert alert-warning\">\n\t\t\tUnknown mgNumber interface '{{$props.interface}}'\n\t\t</div>\n\t</div>\n</template>\n\n<style>\n.mg-number input[type=number] {\n\tpadding: 0 10px;\n}\n\n.mg-number .btn {\n\tbox-shadow: none;\n\tborder: 1px solid #f0f0f0;\n\tdisplay: flex;\n\talign-items: center;\n}\n\n/* Hide the spin button in mgNumber controls */\n.mg-number input[type=number]::-webkit-outer-spin-button,\n.mg-number input[type=number]::-webkit-inner-spin-button {\n\t/* display: none; <- Crashes Chrome on hover */\n\t-webkit-appearance: none;\n\tmargin: 0; /* <-- Apparently some margin is still there even though it's hidden */\n}\n</style>\n"]}, media: undefined });
+      inject("data-v-21566067_0", { source: "\n.mg-number input[type=number] {\n\tpadding: 0 10px;\n}\n.mg-number .btn {\n\tbox-shadow: none;\n\tborder: 1px solid #f0f0f0;\n\tdisplay: flex;\n\talign-items: center;\n}\n\n/* Hide the spin button in mgNumber controls */\n.mg-number input[type=number]::-webkit-outer-spin-button,\n.mg-number input[type=number]::-webkit-inner-spin-button {\n\t/* display: none; <- Crashes Chrome on hover */\n\t-webkit-appearance: none;\n\tmargin: 0; /* <-- Apparently some margin is still there even though it's hidden */\n}\n\n\n\n/* Slider {{{ */\n.mg-number.mg-number-slider input[type=\"range\"] {\n\tdisplay: inline-block;\n\t-webkit-appearance: none;\n\twidth: calc(100% - (73px));\n\theight: 10px;\n\tborder-radius: 5px;\n\tbackground: var(--btn-default-bg);\n\toutline: none;\n\tpadding: 0;\n\tmargin: 0;\n}\n.mg-number.mg-number-slider input[type=\"range\"]::-webkit-slider-thumb {\n\t-webkit-appearance: none;\n\tappearance: none;\n\twidth: 20px;\n\theight: 20px;\n\tborder-radius: 50%;\n\tbackground: var(--primary);\n\tcursor: pointer;\n\t-webkit-transition: background .15s ease-in-out;\n\ttransition: background .15s ease-in-out;\n}\n.mg-number.mg-number-slider input[type=\"range\"]::-webkit-slider-thumb:hover,\n.mg-number.mg-number-slider input[type=\"range\"]:active::-webkit-slider-thumb,\n.mg-number.mg-number-slider input[type=\"range\"]::-moz-range-thumb:hover,\n.mg-number.mg-number-slider input[type=\"range\"]:active::-moz-range-thumb {\n\tbackground: var(--primary);\n}\n.mg-number.mg-number-slider input[type=\"range\"]::-moz-range-thumb {\n\twidth: 20px;\n\theight: 20px;\n\tborder: 0;\n\tborder-radius: 50%;\n\tcolor: var(--btn-default-fg);\n\tbackground: var(--btn-default-bg);\n\tcursor: pointer;\n\t-moz-transition: background .15s ease-in-out;\n\ttransition: background .15s ease-in-out;\n}\n.mg-number.mg-number-slider input[type=\"range\"]:focus::-webkit-slider-thumb {\n\tbox-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--primary);\n}\n.mg-number.mg-number-slider .mg-number-slider-value {\n\tdisplay: inline-block;\n\tposition: relative;\n\twidth: 60px;\n\tline-height: 20px;\n\ttext-align: center;\n\tborder-radius: 3px;\n\tcolor: var(--btn-default-fg);\n\tbackground: var(--btn-default-bg);\n\tpadding: 5px 10px;\n\tmargin-left: 8px;\n}\n.mg-number.mg-number-slider .mg-number-slider-value:after {\n\tposition: absolute;\n\ttop: 8px;\n\tleft: -7px;\n\twidth: 0;\n\theight: 0;\n\tborder-top: 7px solid transparent;\n\tborder-right: 7px solid var(--btn-default-bg);\n\tborder-bottom: 7px solid transparent;\n\tcontent: '';\n}\n::-moz-range-track {\n\tbackground: var(--btn-default-bg);\n\tborder: 0;\n}\ninput::-moz-focus-inner,\ninput::-moz-focus-outer {\n\tborder: 0;\n}\n/* }}} */\n", map: {"version":3,"sources":["/home/mc/Dropbox/Projects/Node/@momsfriendlydevco/macgyver/src/components/mgNumber.vue"],"names":[],"mappings":";AA0EA;CACA,eAAA;AACA;AAEA;CACA,gBAAA;CACA,yBAAA;CACA,aAAA;CACA,mBAAA;AACA;;AAEA,8CAAA;AACA;;CAEA,8CAAA;CACA,wBAAA;CACA,SAAA,EAAA,sEAAA;AACA;;;;AAIA,eAAA;AACA;CACA,qBAAA;CACA,wBAAA;CACA,0BAAA;CACA,YAAA;CACA,kBAAA;CACA,iCAAA;CACA,aAAA;CACA,UAAA;CACA,SAAA;AACA;AAEA;CACA,wBAAA;CACA,gBAAA;CACA,WAAA;CACA,YAAA;CACA,kBAAA;CACA,0BAAA;CACA,eAAA;CACA,+CAAA;CACA,uCAAA;AACA;AAEA;;;;CAIA,0BAAA;AACA;AAEA;CACA,WAAA;CACA,YAAA;CACA,SAAA;CACA,kBAAA;CACA,4BAAA;CACA,iCAAA;CACA,eAAA;CACA,4CAAA;CACA,uCAAA;AACA;AAEA;CACA,oDAAA;AACA;AAEA;CACA,qBAAA;CACA,kBAAA;CACA,WAAA;CACA,iBAAA;CACA,kBAAA;CACA,kBAAA;CACA,4BAAA;CACA,iCAAA;CACA,iBAAA;CACA,gBAAA;AACA;AACA;CACA,kBAAA;CACA,QAAA;CACA,UAAA;CACA,QAAA;CACA,SAAA;CACA,iCAAA;CACA,6CAAA;CACA,oCAAA;CACA,WAAA;AACA;AAEA;CACA,iCAAA;CACA,SAAA;AACA;AAEA;;CAEA,SAAA;AACA;AACA,QAAA","file":"mgNumber.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgNumber', {\n\tmeta: {\n\t\ttitle: 'Number',\n\t\ticon: 'far fa-sort-numeric-down',\n\t\tcategory: 'Simple Inputs',\n\t\tpreferId: true,\n\t\tshorthand: ['integer', 'int', 'float', 'num'],\n\t\tformat: v => {\n\t\t\tif (!v) return '';\n\t\t\treturn (_.isNumber(v) ? v : parseInt(v)).toLocaleString();\n\t\t},\n\t\tformatClass: 'text-right',\n\t},\n\tprops: {\n\t\tmin: {type: 'mgNumber', title: 'Minimum value'},\n\t\tmax: {type: 'mgNumber', title: 'Maximum value'},\n\t\tstep: {type: 'mgNumber', title: 'Value to increment / decrement by'},\n\t\tplaceholder: {type: 'mgNumber', help: 'Ghost text to display when there is no value'},\n\t\trequired: {type: 'mgToggle', default: false},\n\t\tinterface: {type: 'mgChoiceDropdown', title: 'Interface', help: 'How to allow number input', default: 'bumpers', enum: [\n\t\t\t{id: 'bumpers', title: 'Number input with buttons'},\n\t\t\t{id: 'slider', title: 'Slider bar'},\n\t\t\t{id: 'input', title: 'Number input box only'},\n\t\t]},\n\t\tbumperDownClass: {type: 'mgText', default: 'btn btn-light fa fa-arrow-down input-group-prepend', advanced: true, showIf: 'interface == \"bumpers\"'},\n\t\tbumperUpClass: {type: 'mgText', default: 'btn btn-light fa fa-arrow-up input-group-append', advanced: true, showIf: 'interface == \"bumpers\"'},\n\t\tprefix: {type: 'mgText', title: 'Prefix', help: 'Prefix to show before the input', showIf: 'interface == \"input\"'},\n\t\tprefixClass: {type: 'mgText', default: 'input-group-prepend input-group-text', advanced: true, showIf: 'interface == \"input\"'},\n\t\tsuffix: {type: 'mgText', title: 'Suffix', help: 'Suffix to show after the input', showIf: 'interface == \"input\"'},\n\t\tsuffixClass: {type: 'mgText', default: 'input-group-append input-group-text', advanced: true, showIf: 'interface == \"input\"'},\n\t},\n\tcreated() {\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);\n\t\t\tif (this.$props.min && this.data < this.$props.min) return reply(`${this.$props.title} is too small (minimum value is ${this.$props.min})`);\n\t\t\tif (this.$props.max && this.data > this.$props.max) return reply(`${this.$props.title} is too large (maximum value is ${this.$props.max})`);\n\t\t});\n\t},\n\tmethods: {\n\t\tadd(steps) {\n\t\t\tif (!_.isNumber(this.data)) return this.data = this.$props.min || 0; // Not already a number default to the min or zero\n\n\t\t\tthis.data += steps * (this.$props.step || 1);\n\t\t\tif (this.$props.max && this.data > this.$props.max) this.data = this.$props.max;\n\t\t\tif (this.$props.min && this.data < this.$props.min) this.data = this.$props.min;\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-number\" :class=\"`mg-number-${$props.interface}`\">\n\t\t<div v-if=\"$props.interface == 'slider'\">\n\t\t\t<input v-model=\"data\" type=\"range\" class=\"form-control\" :placeholder=\"$props.placeholder\" :min=\"$props.min\" :max=\"$props.max\" :step=\"$props.step\"/>\n\t\t\t<label class=\"mg-number-slider-value\">{{data | number}}</label>\n\t\t</div>\n\t\t<div v-else-if=\"$props.interface == 'bumpers'\" class=\"input-group\">\n\t\t\t<a @click=\"add(-1)\" class=\"hidden-print\" :class=\"$props.bumperDownClass\"></a>\n\t\t\t<input v-model=\"data\" type=\"number\" class=\"form-control\" :placeholder=\"$props.placeholder\" :min=\"$props.min\" :max=\"$props.max\" :step=\"$props.step\"/>\n\t\t\t<a @click=\"add(1)\" class=\"hidden-print\" :class=\"$props.bumperUpClass\"></a>\n\t\t</div>\n\t\t<div v-else-if=\"$props.interface == 'input'\" class=\"input-group\">\n\t\t\t<div v-if=\"$props.prefix\" :class=\"$props.prefixClass\">{{$props.prefix}}</div>\n\t\t\t<input v-model=\"data\" type=\"number\" class=\"form-control\" :placeholder=\"$props.placeholder\" :min=\"$props.min\" :max=\"$props.max\" :step=\"$props.step\"/>\n\t\t\t<div v-if=\"$props.suffix\" :class=\"$props.suffixClass\">{{$props.suffix}}</div>\n\t\t</div>\n\t\t<div v-else class=\"alert alert-warning\">\n\t\t\tUnknown mgNumber interface '{{$props.interface}}'\n\t\t</div>\n\t</div>\n</template>\n\n<style>\n.mg-number input[type=number] {\n\tpadding: 0 10px;\n}\n\n.mg-number .btn {\n\tbox-shadow: none;\n\tborder: 1px solid #f0f0f0;\n\tdisplay: flex;\n\talign-items: center;\n}\n\n/* Hide the spin button in mgNumber controls */\n.mg-number input[type=number]::-webkit-outer-spin-button,\n.mg-number input[type=number]::-webkit-inner-spin-button {\n\t/* display: none; <- Crashes Chrome on hover */\n\t-webkit-appearance: none;\n\tmargin: 0; /* <-- Apparently some margin is still there even though it's hidden */\n}\n\n\n\n/* Slider {{{ */\n.mg-number.mg-number-slider input[type=\"range\"] {\n\tdisplay: inline-block;\n\t-webkit-appearance: none;\n\twidth: calc(100% - (73px));\n\theight: 10px;\n\tborder-radius: 5px;\n\tbackground: var(--btn-default-bg);\n\toutline: none;\n\tpadding: 0;\n\tmargin: 0;\n}\n\n.mg-number.mg-number-slider input[type=\"range\"]::-webkit-slider-thumb {\n\t-webkit-appearance: none;\n\tappearance: none;\n\twidth: 20px;\n\theight: 20px;\n\tborder-radius: 50%;\n\tbackground: var(--primary);\n\tcursor: pointer;\n\t-webkit-transition: background .15s ease-in-out;\n\ttransition: background .15s ease-in-out;\n}\n\n.mg-number.mg-number-slider input[type=\"range\"]::-webkit-slider-thumb:hover,\n.mg-number.mg-number-slider input[type=\"range\"]:active::-webkit-slider-thumb,\n.mg-number.mg-number-slider input[type=\"range\"]::-moz-range-thumb:hover,\n.mg-number.mg-number-slider input[type=\"range\"]:active::-moz-range-thumb {\n\tbackground: var(--primary);\n}\n\n.mg-number.mg-number-slider input[type=\"range\"]::-moz-range-thumb {\n\twidth: 20px;\n\theight: 20px;\n\tborder: 0;\n\tborder-radius: 50%;\n\tcolor: var(--btn-default-fg);\n\tbackground: var(--btn-default-bg);\n\tcursor: pointer;\n\t-moz-transition: background .15s ease-in-out;\n\ttransition: background .15s ease-in-out;\n}\n\n.mg-number.mg-number-slider input[type=\"range\"]:focus::-webkit-slider-thumb {\n\tbox-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--primary);\n}\n\n.mg-number.mg-number-slider .mg-number-slider-value {\n\tdisplay: inline-block;\n\tposition: relative;\n\twidth: 60px;\n\tline-height: 20px;\n\ttext-align: center;\n\tborder-radius: 3px;\n\tcolor: var(--btn-default-fg);\n\tbackground: var(--btn-default-bg);\n\tpadding: 5px 10px;\n\tmargin-left: 8px;\n}\n.mg-number.mg-number-slider .mg-number-slider-value:after {\n\tposition: absolute;\n\ttop: 8px;\n\tleft: -7px;\n\twidth: 0;\n\theight: 0;\n\tborder-top: 7px solid transparent;\n\tborder-right: 7px solid var(--btn-default-bg);\n\tborder-bottom: 7px solid transparent;\n\tcontent: '';\n}\n\n::-moz-range-track {\n\tbackground: var(--btn-default-bg);\n\tborder: 0;\n}\n\ninput::-moz-focus-inner,\ninput::-moz-focus-outer {\n\tborder: 0;\n}\n/* }}} */\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
@@ -13755,7 +14062,7 @@
                 } else {
                   row.items.push({
                     type: 'mgError',
-                    errorText: "Unsupported operand \"".concat(operand, "\"")
+                    text: "Unsupported operand \"".concat(operand, "\"")
                   });
                 }
 

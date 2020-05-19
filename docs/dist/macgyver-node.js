@@ -4748,6 +4748,285 @@ function cloneDeep(value) {
 var cloneDeep_1 = cloneDeep;
 
 /**
+ * Creates a `_.find` or `_.findLast` function.
+ *
+ * @private
+ * @param {Function} findIndexFunc The function to find the collection index.
+ * @returns {Function} Returns the new find function.
+ */
+function createFind(findIndexFunc) {
+  return function(collection, predicate, fromIndex) {
+    var iterable = Object(collection);
+    if (!isArrayLike_1(collection)) {
+      var iteratee = _baseIteratee(predicate);
+      collection = keys_1(collection);
+      predicate = function(key) { return iteratee(iterable[key], key, iterable); };
+    }
+    var index = findIndexFunc(collection, predicate, fromIndex);
+    return index > -1 ? iterable[iteratee ? collection[index] : index] : undefined;
+  };
+}
+
+var _createFind = createFind;
+
+/**
+ * The base implementation of `_.findIndex` and `_.findLastIndex` without
+ * support for iteratee shorthands.
+ *
+ * @private
+ * @param {Array} array The array to inspect.
+ * @param {Function} predicate The function invoked per iteration.
+ * @param {number} fromIndex The index to search from.
+ * @param {boolean} [fromRight] Specify iterating from right to left.
+ * @returns {number} Returns the index of the matched value, else `-1`.
+ */
+function baseFindIndex(array, predicate, fromIndex, fromRight) {
+  var length = array.length,
+      index = fromIndex + (fromRight ? 1 : -1);
+
+  while ((fromRight ? index-- : ++index < length)) {
+    if (predicate(array[index], index, array)) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+var _baseFindIndex = baseFindIndex;
+
+/** Used as references for various `Number` constants. */
+var NAN = 0 / 0;
+
+/** Used to match leading and trailing whitespace. */
+var reTrim = /^\s+|\s+$/g;
+
+/** Used to detect bad signed hexadecimal string values. */
+var reIsBadHex = /^[-+]0x[0-9a-f]+$/i;
+
+/** Used to detect binary string values. */
+var reIsBinary = /^0b[01]+$/i;
+
+/** Used to detect octal string values. */
+var reIsOctal = /^0o[0-7]+$/i;
+
+/** Built-in method references without a dependency on `root`. */
+var freeParseInt = parseInt;
+
+/**
+ * Converts `value` to a number.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to process.
+ * @returns {number} Returns the number.
+ * @example
+ *
+ * _.toNumber(3.2);
+ * // => 3.2
+ *
+ * _.toNumber(Number.MIN_VALUE);
+ * // => 5e-324
+ *
+ * _.toNumber(Infinity);
+ * // => Infinity
+ *
+ * _.toNumber('3.2');
+ * // => 3.2
+ */
+function toNumber(value) {
+  if (typeof value == 'number') {
+    return value;
+  }
+  if (isSymbol_1(value)) {
+    return NAN;
+  }
+  if (isObject_1(value)) {
+    var other = typeof value.valueOf == 'function' ? value.valueOf() : value;
+    value = isObject_1(other) ? (other + '') : other;
+  }
+  if (typeof value != 'string') {
+    return value === 0 ? value : +value;
+  }
+  value = value.replace(reTrim, '');
+  var isBinary = reIsBinary.test(value);
+  return (isBinary || reIsOctal.test(value))
+    ? freeParseInt(value.slice(2), isBinary ? 2 : 8)
+    : (reIsBadHex.test(value) ? NAN : +value);
+}
+
+var toNumber_1 = toNumber;
+
+/** Used as references for various `Number` constants. */
+var INFINITY$2 = 1 / 0,
+    MAX_INTEGER = 1.7976931348623157e+308;
+
+/**
+ * Converts `value` to a finite number.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.12.0
+ * @category Lang
+ * @param {*} value The value to convert.
+ * @returns {number} Returns the converted number.
+ * @example
+ *
+ * _.toFinite(3.2);
+ * // => 3.2
+ *
+ * _.toFinite(Number.MIN_VALUE);
+ * // => 5e-324
+ *
+ * _.toFinite(Infinity);
+ * // => 1.7976931348623157e+308
+ *
+ * _.toFinite('3.2');
+ * // => 3.2
+ */
+function toFinite(value) {
+  if (!value) {
+    return value === 0 ? value : 0;
+  }
+  value = toNumber_1(value);
+  if (value === INFINITY$2 || value === -INFINITY$2) {
+    var sign = (value < 0 ? -1 : 1);
+    return sign * MAX_INTEGER;
+  }
+  return value === value ? value : 0;
+}
+
+var toFinite_1 = toFinite;
+
+/**
+ * Converts `value` to an integer.
+ *
+ * **Note:** This method is loosely based on
+ * [`ToInteger`](http://www.ecma-international.org/ecma-262/7.0/#sec-tointeger).
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to convert.
+ * @returns {number} Returns the converted integer.
+ * @example
+ *
+ * _.toInteger(3.2);
+ * // => 3
+ *
+ * _.toInteger(Number.MIN_VALUE);
+ * // => 0
+ *
+ * _.toInteger(Infinity);
+ * // => 1.7976931348623157e+308
+ *
+ * _.toInteger('3.2');
+ * // => 3
+ */
+function toInteger(value) {
+  var result = toFinite_1(value),
+      remainder = result % 1;
+
+  return result === result ? (remainder ? result - remainder : result) : 0;
+}
+
+var toInteger_1 = toInteger;
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeMax = Math.max;
+
+/**
+ * This method is like `_.find` except that it returns the index of the first
+ * element `predicate` returns truthy for instead of the element itself.
+ *
+ * @static
+ * @memberOf _
+ * @since 1.1.0
+ * @category Array
+ * @param {Array} array The array to inspect.
+ * @param {Function} [predicate=_.identity] The function invoked per iteration.
+ * @param {number} [fromIndex=0] The index to search from.
+ * @returns {number} Returns the index of the found element, else `-1`.
+ * @example
+ *
+ * var users = [
+ *   { 'user': 'barney',  'active': false },
+ *   { 'user': 'fred',    'active': false },
+ *   { 'user': 'pebbles', 'active': true }
+ * ];
+ *
+ * _.findIndex(users, function(o) { return o.user == 'barney'; });
+ * // => 0
+ *
+ * // The `_.matches` iteratee shorthand.
+ * _.findIndex(users, { 'user': 'fred', 'active': false });
+ * // => 1
+ *
+ * // The `_.matchesProperty` iteratee shorthand.
+ * _.findIndex(users, ['active', false]);
+ * // => 0
+ *
+ * // The `_.property` iteratee shorthand.
+ * _.findIndex(users, 'active');
+ * // => 2
+ */
+function findIndex(array, predicate, fromIndex) {
+  var length = array == null ? 0 : array.length;
+  if (!length) {
+    return -1;
+  }
+  var index = fromIndex == null ? 0 : toInteger_1(fromIndex);
+  if (index < 0) {
+    index = nativeMax(length + index, 0);
+  }
+  return _baseFindIndex(array, _baseIteratee(predicate), index);
+}
+
+var findIndex_1 = findIndex;
+
+/**
+ * Iterates over elements of `collection`, returning the first element
+ * `predicate` returns truthy for. The predicate is invoked with three
+ * arguments: (value, index|key, collection).
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Collection
+ * @param {Array|Object} collection The collection to inspect.
+ * @param {Function} [predicate=_.identity] The function invoked per iteration.
+ * @param {number} [fromIndex=0] The index to search from.
+ * @returns {*} Returns the matched element, else `undefined`.
+ * @example
+ *
+ * var users = [
+ *   { 'user': 'barney',  'age': 36, 'active': true },
+ *   { 'user': 'fred',    'age': 40, 'active': false },
+ *   { 'user': 'pebbles', 'age': 1,  'active': true }
+ * ];
+ *
+ * _.find(users, function(o) { return o.age < 40; });
+ * // => object for 'barney'
+ *
+ * // The `_.matches` iteratee shorthand.
+ * _.find(users, { 'age': 1, 'active': true });
+ * // => object for 'pebbles'
+ *
+ * // The `_.matchesProperty` iteratee shorthand.
+ * _.find(users, ['active', false]);
+ * // => object for 'fred'
+ *
+ * // The `_.property` iteratee shorthand.
+ * _.find(users, 'active');
+ * // => object for 'barney'
+ */
+var find = _createFind(findIndex_1);
+
+var find_1 = find;
+
+/**
  * Creates a `baseEach` or `baseEachRight` function.
  *
  * @private
@@ -5179,7 +5458,7 @@ function apply(func, thisArg, args) {
 var _apply = apply;
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeMax = Math.max;
+var nativeMax$1 = Math.max;
 
 /**
  * A specialized version of `baseRest` which transforms the rest array.
@@ -5191,11 +5470,11 @@ var nativeMax = Math.max;
  * @returns {Function} Returns the new function.
  */
 function overRest(func, start, transform) {
-  start = nativeMax(start === undefined ? (func.length - 1) : start, 0);
+  start = nativeMax$1(start === undefined ? (func.length - 1) : start, 0);
   return function() {
     var args = arguments,
         index = -1,
-        length = nativeMax(args.length - start, 0),
+        length = nativeMax$1(args.length - start, 0),
         array = Array(length);
 
     while (++index < length) {
@@ -6224,31 +6503,48 @@ $macgyver.compileSpec = function (spec, options) {
     convertShorthandTranslate: function convertShorthandTranslate(spec) {
       return {
         type: 'mgContainer',
-        items: map_1(spec, function (v, k) {
-          return _objectSpread2({
-            id: k
-          }, v, {
-            type: function () {
-              if (isString_1(v)) v = {
-                type: v
-              }; // Only key given is a string, assume it means type
+        items: map_1(spec, function (widget, id) {
+          var _widget$type;
 
-              if (!v.type) return 'mgText'; // No type given, assume mgText
+          if ((_widget$type = widget.type) === null || _widget$type === void 0 ? void 0 : _widget$type.startsWith('mg')) {
+            // Already a defined MacGyver spec
+            return widget;
+          } else if (isString_1(id) && id.startsWith('mg')) {
+            // ID is type, payload is widget
+            return _objectSpread2({
+              type: id
+            }, widget);
+          } else if (widget.type) {
+            // We have a type - try to match it against known widgets (or error out)
+            var found = find_1($macgyver.widgets).find(function (widget) {
+              var _widget$meta;
 
-              if (v.type.startsWith('mg')) return v.type; // Type begins with 'mg' - trust the user
+              return (// Search for likely widgets
+                widget.meta.id.substr(2) == widget.type // matches `mg${TYPE}`
+                || ((_widget$meta = widget.meta) === null || _widget$meta === void 0 ? void 0 : _widget$meta.shorthand.includes(widget.type)) // is included in shorthand alternatives
+                ? widget.meta.id : null
+              );
+            });
 
-              v.type = v.type.toLowerCase();
-              return Object.keys($macgyver.widgets) // Search for likely widgets
-              .find(function (wid) {
-                var widget = $macgyver.widgets[wid];
-                return widget.id.substr(2).toLowerCase() == v.type // Matched after 'mg' part. e.g. 'text' becomes 'mgText'
-                || (widget.shorthand || []).find(function (s) {
-                  return s == v.type;
-                }) // Matched a shorthand alias
-                ;
-              }) || v.type;
-            }()
-          });
+            if (found) {
+              // Found either a widget of form `mg${type}` or a widget with that type as a shorthand
+              return _objectSpread2({
+                type: found
+              }, widget);
+            } else {
+              // No idea what this widget is, wrap in an mgError
+              return {
+                type: 'mgError',
+                text: "Unknown widget type \"".concat(widget.type, "\": ") + JSON.stringify(widget, null, '\t')
+              };
+            }
+          } else {
+            // Can't determine any type to link against - error out
+            return {
+              type: 'mgError',
+              text: "No widget type specified: " + JSON.stringify(widget, null, '\t')
+            };
+          }
         })
       };
     },
@@ -6292,9 +6588,10 @@ $macgyver.compileSpec = function (spec, options) {
     if (!widget.type || !$macgyver.widgets[widget.type]) {
       // Remap unknown widget
       console.log("Unknown widget '".concat(widget.type, "'"), widget);
-      widget.errorText = widget.type ? "Unknown widget '".concat(widget.type, "'") : 'Widget type not specified';
-      widget.errorWidgetType = widget.type;
-      widget.type = 'mgError';
+      widget = {
+        type: 'mgError',
+        text: "Unknown widget type \"".concat(widget.type, "\": ") + JSON.stringify(widget)
+      };
     } else if (settings.widgetDefaults) {
       var _ref, _$macgyver$widgets$wi;
 
@@ -6813,7 +7110,7 @@ function toString$1 (val) {
  * Convert an input value to a number for persistence.
  * If the conversion fails, return original string.
  */
-function toNumber (val) {
+function toNumber$1 (val) {
   var n = parseFloat(val);
   return isNaN(n) ? val : n
 }
@@ -9646,7 +9943,7 @@ function prependModifier (value, symbol) {
 
 function installRenderHelpers (target) {
   target._o = markOnce;
-  target._n = toNumber;
+  target._n = toNumber$1;
   target._s = toString$1;
   target._l = renderList;
   target._t = renderSlot;
@@ -13771,7 +14068,7 @@ function isDirtyWithModifiers (elm, newVal) {
   var modifiers = elm._vModifiers; // injected by v-model runtime
   if (isDef(modifiers)) {
     if (modifiers.number) {
-      return toNumber(value) !== toNumber(newVal)
+      return toNumber$1(value) !== toNumber$1(newVal)
     }
     if (modifiers.trim) {
       return value.trim() !== newVal.trim()
@@ -14274,7 +14571,7 @@ function enter (vnode, toggleDisplay) {
     ? (appearCancelled || enterCancelled)
     : enterCancelled;
 
-  var explicitEnterDuration = toNumber(
+  var explicitEnterDuration = toNumber$1(
     isObject$2(duration)
       ? duration.enter
       : duration
@@ -14382,7 +14679,7 @@ function leave (vnode, rm) {
   var expectsCSS = css !== false && !isIE9;
   var userWantsControl = getHookArgumentsLength(leave);
 
-  var explicitLeaveDuration = toNumber(
+  var explicitLeaveDuration = toNumber$1(
     isObject$2(duration)
       ? duration.leave
       : duration
@@ -15193,8 +15490,10 @@ Vue$1.prototype.$macgyver = function () {
 
   Vue$1.mgComponent = function (name, component) {
     if (macgyver.widgets[name]) throw new Error("Cannot redeclare MacGyver component \"".concat(name, "\""));
+    if (!name.startsWith('mg')) throw new Error("All MacGyver components must be prefixed with \"mg\", given \"".concat(name, "\""));
     macgyver.widgets[name] = _objectSpread2({
       meta: {
+        id: _.camelCase(name),
         title: _.startCase(name),
         icon: 'far fa-rectangle-wide',
         category: 'Misc',
@@ -15267,8 +15566,6 @@ Vue$1.prototype.$macgyver = function () {
           .value();
 
           if (propType) newProp.type = propType; // Only allocate type if there is one (i.e. ignore 'any' types)
-
-          console.log('DEBUG: Conv native type', prop.vueType, '=', propType);
         } else {
           switch (prop.type) {
             case 'mgText':
