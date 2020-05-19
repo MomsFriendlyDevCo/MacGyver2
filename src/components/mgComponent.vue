@@ -14,7 +14,7 @@ export default Vue.component('mgComponent', {
 		config: {type: Object, required: true},
 	},
 	render(h) {
-		if (!this.$macgyver.widgets[this.$props.config.type]) return h('mg-error', {props: {config: {errorText: `Unknown type: ${this.$props.config.type}`}}});
+		if (!this.$macgyver.widgets[this.$props.config.type]) return h('mg-error', {props: {text: `Unknown widget type "${this.$props.config.type}"`}});
 
 		return h(this.$props.config.type, {
 			props: this.$props.config,

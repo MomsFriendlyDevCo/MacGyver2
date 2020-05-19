@@ -186,7 +186,7 @@ export default Vue.mgComponent('mgQuery', {
 								} else {
 									row.items.push({
 										type: 'mgError',
-										errorText: `Unsupported operand "${operand}"`,
+										text: `Unsupported operand "${operand}"`,
 									});
 								}
 

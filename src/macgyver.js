@@ -318,12 +318,13 @@ $macgyver.compileSpec = (spec, options) => {
 		wantSpecPath: '$specPath',
 	})
 		.forEach(widget => {
-			if (!widget.type || !$macgyver.widgets[widget.type]) { // Remap unknown widget
+			if (!widget.type || !$macgyver.widgets[widget.type]) { // Remap unknown widget (we already did shorthand remapping above so this should be a 1:1 match)
 				console.log(`Unknown widget '${widget.type}'`, widget);
-				widget.errorText = widget.type ? `Unknown widget '${widget.type}'` : 'Widget type not specified';
-				widget.errorWidgetType = widget.type;
-				widget.type = 'mgError';
-			} else if (settings.widgetDefaults) {
+				widget = {
+					type: 'mgError',
+					text: `Unknown widget type "${widget.type}": ` + JSON.stringify(widget),
+				};
+			} else if (settings.widgetDefaults) { // Apply defaults to widget
 				Object.assign(widget, $macgyver.widgets[widget.type].config
 					|> v => _.pickBy(v, (v, k) => !_.has(widget, k) && _.has(v, 'default'))
 					|> v => _.mapValues(v, v => v.default)
