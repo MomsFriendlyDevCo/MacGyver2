@@ -43,8 +43,12 @@ Vue.prototype.$macgyver = (()=> {
 
 	Vue.mgComponent = function(name, component) {
 		if (macgyver.widgets[name]) throw new Error(`Cannot redeclare MacGyver component "${name}"`);
+		if (!name.startsWith('mg')) throw new Error(`All MacGyver components must be prefixed with "mg", given "${name}"`);
+
 		macgyver.widgets[name] = {
+			...component,
 			meta: {
+				id: _.camelCase(name),
 				title: _.startCase(name),
 				icon: 'far fa-rectangle-wide',
 				category: 'Misc',
@@ -52,8 +56,8 @@ Vue.prototype.$macgyver = (()=> {
 				shorthand: [],
 				format: true,
 				formatClass: '',
+				...component.meta,
 			},
-			...component,
 		};
 
 		var vueComponent = {
