@@ -267,20 +267,25 @@ $macgyver.compileSpec = (spec, options) => {
 		convertShorthandTranslate: spec => ({
 			type: 'mgContainer',
 			items: _.map(spec, (widget, id) => {
+				if (_.isString(widget)) widget = {type: widget}; // Widget is a straight string (e.g. 'boolean'), then fall through to type finders
+
 				if (widget.type?.startsWith('mg')) { // Already a defined MacGyver spec
 					return widget;
 				} else if (_.isString(id) && id.startsWith('mg')) { // ID is type, payload is widget
 					return {...widget, type: id};
 				} else if (widget.type) { // We have a type - try to match it against known widgets (or error out)
+					var typeLCase = widget.type.toLowerCase();
 					var found = _.find($macgyver.widgets, mgWidget => // Search for likely widgets
-						mgWidget.meta.id.substr(2) == widget.type // matches `mg${TYPE}`
-						|| mgWidget.meta.shorthand.includes(widget.type) // is included in shorthand alternatives
+						mgWidget.meta.id.substr(2).toLowerCase() == typeLCase // matches `mg${TYPE}`
+						|| mgWidget.meta.shorthand.includes(typeLCase) // is included in shorthand alternatives
 					);
 					if (found) { // Found either a widget of form `mg${type}` or a widget with that type as a shorthand
 						return {id, ...widget, type: found.meta.id}
 					} else { // No idea what this widget is, wrap in an mgError
 						return {type: 'mgError', text: `Unknown widget type "${widget.type}": ` + JSON.stringify(widget, null, '\t')};
 					}
+				} else if (_.isPlainObject(widget)) { // Given object but it explicitly does not have a type - assume mgText
+					return {id, ...widget, type: 'mgText'};
 				} else { // Can't determine any type to link against - error out
 					return {type: 'mgError', text: `No widget type specified: ` + JSON.stringify(widget, null, '\t')};
 				}
