@@ -72,6 +72,7 @@ MacGyver widgets follow the regular [Vue component syntax](https://vuejs.org/v2/
 | Property           | Type                   | Default                     | Description                                                                                |
 |--------------------|------------------------|-----------------------------|--------------------------------------------------------------------------------------------|
 | `meta`             | `object`               | `{}`                        | Meta information object - used by the form editor to configure the widget                  |
+| `meta.id`          | `string`               | Computed from name          | The name of the macgyver component. Always camelcased and prefixed with `mg` e.g. `mgText` |
 | `meta.title`       | `string`               | The ID via `_.startCase()`  | The human friendly title of the widget                                                     |
 | `meta.icon`        | `string`               | `"far fa-rectangle-wide"`   | The icon CSS class to use in the `mgFormEditor` UI                                         |
 | `meta.shorthand`   | `array`                | `[]`                        | Other aliases the widget answers to in shorthand mode                                      |
