@@ -134,7 +134,7 @@ export default Vue.component('mgForm', {
 		*/
 		getPrototype() {
 			if (!this.id) return {}; // Form not yet ready
-			return this.$macgyver.forms.getPrototype(this.config);
+			return this.$macgyver.forms.getPrototype(this.spec.spec);
 		},
 
 
