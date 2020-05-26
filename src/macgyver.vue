@@ -159,7 +159,7 @@ Vue.prototype.$macgyver = (()=> {
 			methods: {
 				mgSetup() {
 					// Setup event listners {{{
-					this.$on('mgIdentify', reply => reply(component));
+					this.$on('mgIdentify', reply => reply(this));
 					// }}}
 
 					// Read in initial data value {{{

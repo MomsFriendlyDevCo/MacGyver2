@@ -1,5 +1,6 @@
 <script>
 import mgFormEditorControls from './mgFormEditorControls';
+
 /**
 * mg-form-editor - Drag-and-drop form designer for MacGyver
 *
@@ -134,7 +135,7 @@ export default Vue.component('mgFormEditor', {
 			if (!this.editing) {
 				this.$macgyver.notify.warn('No widget selected to delete'); // Not editing anyway
 			} else {
-				this.removeWidget(this.editing.$props.config.$specPath);
+				this.removeWidget(this.editing.$props.$specPath);
 			}
 
 			return true; // Signal to mgForm that we have handled this action
@@ -201,7 +202,7 @@ export default Vue.component('mgFormEditor', {
 								rowClass: 'aside-actions',
 								items: [
 									{type: 'mgButton', action: 'deleteWidget', class: 'btn btn-link btn-link-danger btn-xs', icon: 'far fa-trash', tooltip: 'Delete this widget'},
-									{type: 'mgButton', action: 'setMode', text: '', icon: '', class: 'btn btn-link btn-xs far fa-times'},
+									{type: 'mgButton', action: 'setMode', text: '', class: 'btn btn-link btn-xs', icon: 'far fa-times'},
 								],
 							},
 						],
@@ -212,17 +213,18 @@ export default Vue.component('mgFormEditor', {
 						formClass: 'titles-above',
 						rowClass: 'aside-body',
 						showTitle: false,
-						items: _.map(widget.config, (v, k) => _.set(v, 'id', k)),
+						items: _.map(widget.props, (v, k) => _.set(v, 'id', k)),
 					},
 				]);
+
 				this.$set(this, 'editData',
-					_(widget.config)
-						.pickBy((v, k) => _.has(widget.config, k))
-						.mapValues((v, k) => _.get(component.$props.config, k) || _.get(widget.config, 'default'))
-						.set('id', _.get(component.$props, 'config.id', ''))
-						.set('metaIcon', widget.icon)
+					_(widget.props)
+						.mapValues((v, k) => _.get(component.$props, k) || _.get(widget.props, k).default)
+						.set('id', component.$props.$dataPath)
+						.set('metaIcon', widget.meta.icon)
 						.value()
 				);
+				console.log('Set editData', this.editData);
 			} else {
 				this.$macgyver.notify.warn(`Cannot edit unknown widget "${component.$props?.$type || 'Unknown type'}"`);
 				this.setMode();
@@ -234,6 +236,8 @@ export default Vue.component('mgFormEditor', {
 		* Change the value of a nested config path
 		* @param {string} path The dotted / array notation path to mutate
 		* @param {*} value The value to set, if undefined the key is removed
+		* @emits change Emitted with the entire deep copied config object
+		* @emits changeItem Emitted as `{path, value}` for a single item mutation
 		*/
 		mutatePath(path, value) {
 			// Only bother cloning the entire object if something is listening to 'change'
@@ -248,14 +252,37 @@ export default Vue.component('mgFormEditor', {
 
 
 		/**
+		* Splice items into a deep copy of the config object, emitting change events
+		* @param {string} path The dotted / array notation path to mutate
+		* @param {number} index The index to work from
+		* @param {number} [remove] The number of items to remove
+		* @param {*} [value...] The value(s) to set, if undefined the key is removed
+		* @emits change Emitted with the entire deep copied config object
+		* @emits changeItem Emitted as `{path, value}` for a single item mutation
+		*/
+		mutateSplice(path, index, remove, ...value) {
+			var configCopy = _.cloneDeep(this.config); // Copy entire object
+			var spliceContents = _.get(configCopy, path); // Extract path from nested object
+			if (!_.isArray(spliceContents)) throw new Error('Refusing to splice a non-array');
+			spliceContents.splice(index, remove, ...value); // Perform splice
+
+			this.$setPath(configCopy, path, spliceContents); // Place back in mutated object
+
+			this.$emit('change', configCopy);
+			this.$emit('changeItem', path, spliceContents);
+		},
+
+
+		/**
 		* Insert a widget at a given path
 		* @param {Object} widget The widget to insert, this must contain at least a `type` key
 		* @param {Object} [options] Additional options
 		* @param {string|array} [options.specPath] The lodash notation specPath to target instead of the last element on the form
-		* @param {string} [options.orientation='after'] Where to insert. ENUM: 'before', 'after'
+		* @param {string} [options.orientation='after'] Where to insert. ENUM: 'before', 'after', 'last'
 		* @param {boolean} [options.useContainer=true] If no spec path, try and fit the new widget within the last container if one exists
 		* @param {boolean} [options.allocateTitle=true] Try to allocate a title if not supplied
 		* @param {boolean} [options.allocateId=true] Try to allocate an ID if not supplied and the widget has `preferId`
+		* @param {boolean} [options.edit=true] Show the edit dialog after inserting the component
 		* @returns {Object} The inserted widget object (complete with ID if allocateId is specified)
 		*/
 		insertWidget(widget, options) {
@@ -265,18 +292,16 @@ export default Vue.component('mgFormEditor', {
 				useContainer: true,
 				allocateTitle: true,
 				allocateId: true,
+				edit: true,
 				...options,
 			};
 
 			if (!widget.type) throw new Error('Widget.type must be specified as a minimum for insertWidget()');
 
 			// options.allocateTitle / settings.alloacteId {{{
-			if (
-				widget.type // Know the type
-				&& ( // A field we want is missing
-					(settings.allocateTitle && !widget.title)
-					|| (settings.allocateId && !widget.id)
-				)
+			if ( // A field we want is missing
+				(settings.allocateTitle && !widget.title)
+				|| (settings.allocateId && !widget.id)
 			) {
 				var widgetOffset = // Compute how many of this widget are on the form
 					this.$macgyver.flatten(this.$props.config, {want: 'array'}).reduce((offset, widget) =>
@@ -284,42 +309,58 @@ export default Vue.component('mgFormEditor', {
 					, 0);
 
 				if (settings.allocateTitle && !widget.title) widget.title =
-					this.$macgyver.widgets[this.addData.addType].title
+					this.$macgyver.widgets[this.addData.addType].meta.title
 					+ String(widgetOffset == 0 ? '' : widgetOffset);
 
-				if (settings.allocateId && !widget.id) widget.id =
-					this.addData.addType
-					+ String(widgetOffset == 0 ? '' : widgetOffset);
+				if (settings.allocateId && !widget.id && this.$macgyver.widgets[this.addData.addType].meta.preferId) widget.id = // Guess at an ID
+					_.chain(this.addData.addType)
+						.replace(/^mg/, '') // Remove first `mg` bit
+						.camelCase()
+						.replace(/$/, widgetOffset == 0 ? '' : widgetOffset) // Append numeric offset (if there is more than one of this type)
+						.value()
 			}
 			// }}}
 
-			if (settings.specPath) { // Insert relative to another widget
-				var parentItems = _.isArray(settings.specPath) ? settings.specPath : settings.specPath.split('.');
-				var targetWidget = parentItems.pop();
+			switch (settings.orientation) {
+				case 'last':
+					if ( // Container -> Container:Last -> New widget
+						settings.useContainer // Insert within container?
+						&& this.config.type == 'mgContainer' // First item is a container
+						&& _.last(this.config.items).type == 'mgContainer' // Last child is also a container - use this
+					) {
+						this.mutateSplice(`items.${this.config.items.length - 1}.items`, _.last(this.config.items).items.length, 0, widget);
+					} else if ( // Container:Last -> New widget
+						settings.useContainer // Insert within container?
+						&& this.config.type == 'mgContainer' // First item is a container
+					) {
+						this.mutateSplice('items', this.config.items.length, 0, widget);
+					} else if (_.isArray(this.config)) { // Append to end of config array
+						this.mutateSplice('', this.config.items.length, 0, widget);
+					} else {
+						throw new Error('Dont know how to append widget to form config');
+					}
+					break;
+				case 'before':
+				case 'after':
+					if (!settings.specPath) throw new Error('Inserting with orientations before / after requires a specPath');
+					var parentItems = _.isArray(settings.specPath) ? settings.specPath : settings.specPath.split('.');
+					var targetWidget = parentItems.pop();
 
-				this.mutatePath(parentItems,
-					_.chain(_.get(this.$props.config, parentItems))
-						.thru(v => {
-							if (settings.orientation == 'after') {
-								v.splice(+targetWidget + 1, 0, widget);
-							} else if (settings.orientation == 'before') {
-								v.splice(targetWidget, 0, widget);
-							} else {
-								throw new Error(`Unsupported insert orientation "${settings.orientation}"`);
-							}
-							return v;
-						})
-						.value()
-				);
-			} else if ( // Insert within container?
-				settings.useContainer
-			) {
-				console.warn('FIXME: Unsupported inserting within container');
-			} else { // Blind insert as last item
-				console.log('FIXME: Unsupported - insert last', widget);
+					this.mutateSplice(
+						parentItems,
+						settings.orientation == 'after' ? +targetWidget + 1 : targetWidget,
+						0,
+						widget
+					);
+					break;
+				default:
+					throw new Error(`Dont know how to handle insert of component at with orientation "${settings.orientation}"`);
 			}
 
-			this.$emit.down('mgForm.rebuild'); // Tell the mgForm under us to rebuild itself
+			if (settings.edit) {
+				console.warn('FIXME: Unsupported post edit when editing components');
+				// this.editWidget(widget.id);
+			}
 
 			return widget;
 		},
@@ -335,10 +376,7 @@ export default Vue.component('mgFormEditor', {
 			var parentItems = _.isArray(specPath) ? specPath : specPath.split('.');
 			var targetIndex = parentItems.pop();
 
-			this.mutatePath(
-				parentItems,
-				_.get(this.config, parentItems).filter((v, i) => i != targetIndex),
-			);
+			this.mutateSplice(parentItems, targetIndex, 1);
 		},
 
 
@@ -457,7 +495,7 @@ export default Vue.component('mgFormEditor', {
 							showTitle: false,
 							rowClass: 'aside-actions',
 							items: [
-								{type: 'mgButton', action: 'setMode', text: '', icon: '', class: 'btn btn-link btn-xs far fa-times'},
+								{type: 'mgButton', action: 'setMode', text: '', class: 'btn btn-link btn-xs', icon: 'far fa-times'},
 							],
 						},
 					],
@@ -504,7 +542,7 @@ export default Vue.component('mgFormEditor', {
 							showTitle: false,
 							rowClass: 'aside-actions',
 							items: [
-								{type: 'mgButton', action: 'setMode', text: '', icon: '', class: 'btn btn-link btn-xs far fa-times'},
+								{type: 'mgButton', action: 'setMode', text: '', class: 'btn btn-link btn-xs', icon: 'far fa-times'},
 							],
 						},
 					],
@@ -586,7 +624,7 @@ export default Vue.component('mgFormEditor', {
 				:config="editConfig"
 				:data="editData"
 				:actions="{setMode, deleteWidget}"
-				@changeItem="mutatePath(`${editing.config.$specPath}.${$event.path}`, $event.value)"
+				@changeItem="mutatePath(`${editing.$specPath}.${$event.path}`, $event.value)"
 			/>
 		</aside>
 		<!-- }}} -->
