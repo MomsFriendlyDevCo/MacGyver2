@@ -81,6 +81,7 @@ MacGyver widgets follow the regular [Vue component syntax](https://vuejs.org/v2/
 | `meta.format`      | `boolean` / `function` | `true`                      | How to return the short value of the widget, see NOTES                                     |
 | `meta.formatClass` | `string`               | `""`                        | CSS classes to attach when rendering the `format` value, typically used for text alignment |
 | `props`            | `object`               | `{}`                        | Vue [props](https://vuejs.org/v2/guide/components-props.html) definition                   |
+| `props.$type`      | `string`               | Name                        | The MacGyver type (e.g. `mgText`)                                                          |
 | `props.$dataPath`  | `string`               | Computed                    | Dotted notation path within the form of the value to set when `this.data` changes          |
 | `props.$specPath`  | `string`               | Computed                    | Dotted notation path of the widget spec within the parent `$mgForm` layout                 |
 | `props{}.value`    | `*`                    | *none*                      | If using the widget as a standalone, set the initial value                                 |

@@ -9,6 +9,8 @@ var $macgyver = {};
 
 /**
 * Storage for all MacGyver registered widgets
+* Each key is the unique reference name of the component e.g. `"mgText"`
+* Each value is the original options object definition passed to `Vue.mgCompoenent(name, options)`
 * @var {Object}
 */
 $macgyver.widgets = {};

@@ -67,6 +67,7 @@ Vue.prototype.$macgyver = (()=> {
 				...(component.data ? component.data() : {}), // Import other data definitions from the object
 			}},
 			props: {
+				$type: {type: String, default: name},
 				$dataPath: {type: String},
 				$specPath: {type: String},
 				value: {},

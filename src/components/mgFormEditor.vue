@@ -151,7 +151,7 @@ export default Vue.component('mgFormEditor', {
 
 			var container = false;
 			component.$emit.up('mgIdentify', component => {
-				if (!container && component.$props.config.type == 'mgContainer') container = component;
+				if (!container && component.$props.$type == 'mgContainer') container = component;
 			});
 			if (!container) return console.warn('[mgFormEditor] setComponentHighlight component failed to find enclosing container', {component});
 
@@ -181,7 +181,7 @@ export default Vue.component('mgFormEditor', {
 
 			this.setComponentHighlight(component, ['editEditing']);
 
-			var widget = this.$macgyver.widgets[component.$props.config.type];
+			var widget = this.$macgyver.widgets[component.$props.$type];
 			if (widget) {
 				this.$set(this, 'editConfig', [
 					{ // Header area
@@ -224,7 +224,7 @@ export default Vue.component('mgFormEditor', {
 						.value()
 				);
 			} else {
-				this.$macgyver.notify.warn(`Cannot edit unknown widget "${component.$props.config.type}"`);
+				this.$macgyver.notify.warn(`Cannot edit unknown widget "${component.$props?.$type || 'Unknown type'}"`);
 				this.setMode();
 			}
 		},
