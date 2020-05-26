@@ -53,7 +53,7 @@ export default Vue.mgComponent('mgNumber', {
 	<div class="mg-number" :class="`mg-number-${$props.interface}`">
 		<div v-if="$props.interface == 'slider'">
 			<input v-model="data" type="range" class="form-control" :placeholder="$props.placeholder" :min="$props.min" :max="$props.max" :step="$props.step"/>
-			<label class="mg-number-slider-value">{{data | number}}</label>
+			<label class="mg-number-slider-value">{{(data || '?') | number}}</label>
 		</div>
 		<div v-else-if="$props.interface == 'bumpers'" class="input-group">
 			<a @click="add(-1)" class="hidden-print" :class="$props.bumperDownClass"></a>
