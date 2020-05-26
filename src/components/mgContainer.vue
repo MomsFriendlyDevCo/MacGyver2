@@ -140,6 +140,7 @@ export default Vue.mgComponent('mgContainer', {
 </script>
 
 <template>
+	<!-- Layout: form {{{ -->
 	<div
 		v-if="$props.layout == 'form' || $props.layout === undefined"
 		class="mg-container"
@@ -155,7 +156,7 @@ export default Vue.mgComponent('mgContainer', {
 			<label v-if="widget.showTitle || $props.showTitles" class="col-form-label text-left col-sm-3">
 				{{widget.title}}
 			</label>
-			<div class="col-form-value" :class="widget.showTitle || $props.showTitles ? 'col-sm-9' : 'col-sm-12'">
+			<div class="col-form-value mg-component-wrapper" :class="widget.showTitle || $props.showTitles ? 'col-sm-9' : 'col-sm-12'">
 				<mg-component
 					:ref="widgetIndex"
 					:config="widget"
@@ -164,6 +165,7 @@ export default Vue.mgComponent('mgContainer', {
 			<div class="help-block" v-if="widget.help" :class="widget.showTitle || $props.showTitles ? 'col-sm-9 col-sm-offset-3' : 'col-sm-12'">{{widget.help}}</div>
 		</div>
 	</div>
+	<!-- }}} -->
 	<!-- Layout: card {{{ -->
 	<div
 		v-else-if="$props.layout == 'card'"
@@ -202,7 +204,7 @@ export default Vue.mgComponent('mgContainer', {
 					<label v-if="widget.showTitle || $props.showTitles" class="col-form-label text-left col-sm-3">
 						{{widget.title}}
 					</label>
-					<div class="col-form-value" :class="widget.showTitle || $props.showTitles ? 'col-sm-9' : 'col-sm-12'">
+					<div class="col-form-value mg-component-wrapper" :class="widget.showTitle || $props.showTitles ? 'col-sm-9' : 'col-sm-12'">
 						<mg-component
 							:ref="widgetIndex"
 							:config="widget"
@@ -223,7 +225,7 @@ export default Vue.mgComponent('mgContainer', {
 			class="form-group mgContainer-formFloating row mg-component"
 			:class="[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])"
 		>
-			<div class="col-12">
+			<div class="col-12 mg-component-wrapper">
 				<mg-component
 					:config="widget"
 					class="control-input"
@@ -255,6 +257,7 @@ export default Vue.mgComponent('mgContainer', {
 						v-for="(widget, widgetIndex) in $props.items"
 						:key="widget.id"
 						v-if="widget.show"
+						class="mg-component-wrapper"
 						:class="[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])"
 					>
 						<mg-component
@@ -273,7 +276,7 @@ export default Vue.mgComponent('mgContainer', {
 		<div class="mg-container mg-container-query">
 			<div v-for="rowWidget in $props.items" :key="rowWidget.id">
 				<div v-if="rowWidget.type == 'mgContainer' && rowWidget.layout == 'query-row'" class="row">
-					<div v-for="colWidget in rowWidget.items" :key="colWidget.id" class="col mg-component">
+					<div v-for="colWidget in rowWidget.items" :key="colWidget.id" class="col mg-component mg-component-wrapper">
 						<mg-component
 							:ref="widgetIndex"
 							:config="colWidget"
