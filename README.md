@@ -84,6 +84,7 @@ MacGyver widgets follow the regular [Vue component syntax](https://vuejs.org/v2/
 | `props.$type`      | `string`               | Name                        | The MacGyver type (e.g. `mgText`)                                                          |
 | `props.$dataPath`  | `string`               | Computed                    | Dotted notation path within the form of the value to set when `this.data` changes          |
 | `props.$specPath`  | `string`               | Computed                    | Dotted notation path of the widget spec within the parent `$mgForm` layout                 |
+| `props.change`     | `function`             | *none*                      | Function to execute when the value changes                                                 |
 | `props{}.value`    | `*`                    | *none*                      | If using the widget as a standalone, set the initial value                                 |
 | `props{}.title`    | `string`               | Prop ID via `_.startCase()` | Human readable name for the property in the editor                                         |
 | `props{}.default`  | `*`                    | `undefined`                 | Regular property default value                                                             |

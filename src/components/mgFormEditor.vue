@@ -471,7 +471,7 @@ export default Vue.component('mgFormEditor', {
 						{
 							type: 'mgChoiceTree',
 							title: 'Layout tree',
-							onChange: item => {
+							change: item => {
 								console.log('TREE CLICK', item);
 							},
 							enum: genTreeBranch(
@@ -522,18 +522,17 @@ export default Vue.component('mgFormEditor', {
 							enum: _(this.$macgyver.widgets)
 								.map((w, k) => ({
 									id: k,
-									title: w.title,
-									icon: `${w.icon} fa-fw`,
+									title: w.meta.title,
+									icon: `${w.meta.icon} fa-fw`,
 								}))
 								.sortBy('title')
 								.value(),
-							onChange: type => {
+							change: type => {
 								var inserted = this.insertWidget({type}, {
-									specPath: this.addTarget,
-									orientation: this.addOrientation,
+									orientation: 'last',
+									useContainer: true,
+									edit: true,
 								});
-								console.log('INSERTED AS', inserted);
-								// this.editWidget(inserted.id);
 							},
 						},
 					],

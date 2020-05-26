@@ -70,6 +70,7 @@ Vue.prototype.$macgyver = (()=> {
 				$type: {type: String, default: name},
 				$dataPath: {type: String},
 				$specPath: {type: String},
+				change: {type: Function},
 				value: {},
 				..._.mapValues(component.props || {}, prop => { // Rewrite MacGyver props into Vue compatible props
 					var newProp = {
@@ -185,6 +186,9 @@ Vue.prototype.$macgyver = (()=> {
 
 						// Emit regular `change` event
 						this.$emit('change', value);
+
+						// Is there a prop attached which monitors change?
+						if (this.$props.change) this.$props.change(value);
 					});
 					// }}}
 				},
