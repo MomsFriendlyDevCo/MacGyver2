@@ -6506,31 +6506,37 @@ $macgyver.compileSpec = function (spec, options) {
         items: map_1(spec, function (widget, id) {
           var _widget$type;
 
+          if (isString_1(widget)) widget = {
+            type: widget
+          }; // Widget is a straight string (e.g. 'boolean'), then fall through to type finders
+
           if ((_widget$type = widget.type) === null || _widget$type === void 0 ? void 0 : _widget$type.startsWith('mg')) {
             // Already a defined MacGyver spec
             return widget;
           } else if (isString_1(id) && id.startsWith('mg')) {
             // ID is type, payload is widget
-            return _objectSpread2({
+            return _objectSpread2({}, widget, {
               type: id
-            }, widget);
+            });
           } else if (widget.type) {
             // We have a type - try to match it against known widgets (or error out)
-            var found = find_1($macgyver.widgets).find(function (widget) {
-              var _widget$meta;
+            var typeLCase = widget.type.toLowerCase();
 
+            var found = find_1($macgyver.widgets, function (mgWidget) {
               return (// Search for likely widgets
-                widget.meta.id.substr(2) == widget.type // matches `mg${TYPE}`
-                || ((_widget$meta = widget.meta) === null || _widget$meta === void 0 ? void 0 : _widget$meta.shorthand.includes(widget.type)) // is included in shorthand alternatives
-                ? widget.meta.id : null
+                mgWidget.meta.id.substr(2).toLowerCase() == typeLCase // matches `mg${TYPE}`
+                || mgWidget.meta.shorthand.includes(typeLCase)
               );
-            });
+            } // is included in shorthand alternatives
+            );
 
             if (found) {
               // Found either a widget of form `mg${type}` or a widget with that type as a shorthand
               return _objectSpread2({
-                type: found
-              }, widget);
+                id: id
+              }, widget, {
+                type: found.meta.id
+              });
             } else {
               // No idea what this widget is, wrap in an mgError
               return {
@@ -6538,6 +6544,13 @@ $macgyver.compileSpec = function (spec, options) {
                 text: "Unknown widget type \"".concat(widget.type, "\": ") + JSON.stringify(widget, null, '\t')
               };
             }
+          } else if (isPlainObject_1(widget)) {
+            // Given object but it explicitly does not have a type - assume mgText
+            return _objectSpread2({
+              id: id
+            }, widget, {
+              type: 'mgText'
+            });
           } else {
             // Can't determine any type to link against - error out
             return {
@@ -6586,7 +6599,7 @@ $macgyver.compileSpec = function (spec, options) {
     wantSpecPath: '$specPath'
   }).forEach(function (widget) {
     if (!widget.type || !$macgyver.widgets[widget.type]) {
-      // Remap unknown widget
+      // Remap unknown widget (we already did shorthand remapping above so this should be a 1:1 match)
       console.log("Unknown widget '".concat(widget.type, "'"), widget);
       widget = {
         type: 'mgError',
@@ -6595,6 +6608,7 @@ $macgyver.compileSpec = function (spec, options) {
     } else if (settings.widgetDefaults) {
       var _ref, _$macgyver$widgets$wi;
 
+      // Apply defaults to widget
       Object.assign(widget, (_ref = (_$macgyver$widgets$wi = $macgyver.widgets[widget.type].config, pickBy_1(_$macgyver$widgets$wi, function (v, k) {
         return !has_1(widget, k) && has_1(v, 'default');
       })), mapValues_1(_ref, function (v) {
@@ -15491,8 +15505,8 @@ Vue$1.prototype.$macgyver = function () {
   Vue$1.mgComponent = function (name, component) {
     if (macgyver.widgets[name]) throw new Error("Cannot redeclare MacGyver component \"".concat(name, "\""));
     if (!name.startsWith('mg')) throw new Error("All MacGyver components must be prefixed with \"mg\", given \"".concat(name, "\""));
-    macgyver.widgets[name] = _objectSpread2({
-      meta: {
+    macgyver.widgets[name] = _objectSpread2({}, component, {
+      meta: _objectSpread2({
         id: _.camelCase(name),
         title: _.startCase(name),
         icon: 'far fa-rectangle-wide',
@@ -15501,8 +15515,8 @@ Vue$1.prototype.$macgyver = function () {
         shorthand: [],
         format: true,
         formatClass: ''
-      }
-    }, component);
+      }, component.meta)
+    });
 
     var vueComponent = _objectSpread2({
       inject: component.inject || ['$mgForm'],
