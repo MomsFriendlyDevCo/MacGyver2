@@ -98,7 +98,7 @@ export default Vue.component('mgForm', {
 
 			if (this.$props.populateDefaults) this.assignDefaults();
 			this.refreshShowIfs();
-			this.$emit('mgRefreshForm');
+			this.$emit.down('mgRefreshForm');
 			this.$nextTick(()=> // Wait one tick for all attempts to recall this function recursively to exhaust
 				this.inRefresh = false
 			);
