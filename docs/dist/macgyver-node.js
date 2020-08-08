@@ -6203,6 +6203,8 @@ var _this = undefined;
 var $macgyver = {};
 /**
 * Storage for all MacGyver registered widgets
+* Each key is the unique reference name of the component e.g. `"mgText"`
+* Each value is the original options object definition passed to `Vue.mgCompoenent(name, options)`
 * @var {Object}
 */
 
@@ -15527,11 +15529,18 @@ Vue$1.prototype.$macgyver = function () {
         }, component.data ? component.data() : {});
       },
       props: _objectSpread2({
+        $type: {
+          type: String,
+          "default": name
+        },
         $dataPath: {
           type: String
         },
         $specPath: {
           type: String
+        },
+        change: {
+          type: Function
         },
         value: {}
       }, _.mapValues(component.props || {}, function (prop) {
@@ -15645,7 +15654,7 @@ Vue$1.prototype.$macgyver = function () {
 
           // Setup event listners {{{
           this.$on('mgIdentify', function (reply) {
-            return reply(component);
+            return reply(_this);
           }); // }}}
           // Read in initial data value {{{
 
@@ -15674,7 +15683,10 @@ Vue$1.prototype.$macgyver = function () {
               value: value
             }); // Emit regular `change` event
 
-            _this.$emit('change', value);
+            _this.$emit('change', value); // Is there a prop attached which monitors change?
+
+
+            if (_this.$props.change) _this.$props.change(value);
           }); // }}}
         }
       }, component.methods),
