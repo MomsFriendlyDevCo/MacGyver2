@@ -15539,9 +15539,8 @@ Vue$1.prototype.$macgyver = function () {
         $specPath: {
           type: String
         },
-        change: {
-          type: Function
-        },
+        // FIXME: Having a `change` property conflicts with event handlers called `change`.
+        //change: {type: Function},
         value: {}
       }, _.mapValues(component.props || {}, function (prop) {
         // Rewrite MacGyver props into Vue compatible props
@@ -15684,9 +15683,9 @@ Vue$1.prototype.$macgyver = function () {
             }); // Emit regular `change` event
 
             _this.$emit('change', value); // Is there a prop attached which monitors change?
+            // FIXME: Having a `change` property conflicts with event handlers called `change`.
+            //if (this.$props.change) this.$props.change(value);
 
-
-            if (_this.$props.change) _this.$props.change(value);
           }); // }}}
         }
       }, component.methods),
