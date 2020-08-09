@@ -55,7 +55,7 @@ export default Vue.component('mgForm', {
 		this.$watch('$props.config', ()=> {
 			// console.log('mgForm config clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
 			this.rebuild();
-		}, {immediate: true});
+		}, {immediate: true, deep: true});
 
 		this.$watch('$props.data', ()=> {
 			// console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
