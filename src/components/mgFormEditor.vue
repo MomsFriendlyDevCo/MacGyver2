@@ -311,7 +311,7 @@ export default Vue.component('mgFormEditor', {
 			) {
 				// Compute how many of this widget are on the form
 				var widgetOffset = this.$macgyver
-					.flatten(this.$props.config, {want: 'array'})
+					.flatten(this.$props.config, {want: 'array', type: 'spec'})
 					.reduce((i, w) => w.type == widget.type ? i + 1 : i, 0);
 
 				if (settings.allocateTitle && !widget.title)
@@ -328,6 +328,7 @@ export default Vue.component('mgFormEditor', {
 			}
 			// }}}
 
+			// FIXME: Support for array specs without a root mgContainer.
 			switch (settings.orientation) {
 				case 'last':
 					if ( // Container -> Container:Last -> New widget
@@ -574,7 +575,6 @@ export default Vue.component('mgFormEditor', {
 								.sortBy('title')
 								.value(),
 							change: type => {
-								console.log('change', type);
 								var inserted = this.insertWidget({type}, {
 									orientation: 'last',
 									useContainer: true,

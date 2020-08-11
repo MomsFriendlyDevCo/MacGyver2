@@ -186,7 +186,7 @@ $macgyver.flatten = (root, options) => {
 	if (settings.filter && !_.isFunction(settings.filter) && _.isObject(settings.filter)) settings.filter = _.matches(settings.filter);
 	if (settings.want != 'object' && settings.want != 'array') throw new Error('$macgyver.flatten({want}) can only be "object" or "array"');
 	if (settings.type == 'auto') {
-		if (settings.root.items) {
+		if (settings.root && settings.root.items) {
 			settings.type = 'spec';
 		} else if (_.every(settings.root, (k, v) => !v.items)) {
 			settings.type = 'data';
