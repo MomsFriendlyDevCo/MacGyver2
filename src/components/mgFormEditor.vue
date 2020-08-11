@@ -36,9 +36,6 @@ export default Vue.component('mgFormEditor', {
 
 		addTarget: undefined, // Spec path to add after, if any
 		addOrientation: 'after',
-
-		// Holding data for various form states
-		addData: {},
 	}},
 	props: {
 		// FIXME: Does not like array type specs.
@@ -312,21 +309,22 @@ export default Vue.component('mgFormEditor', {
 				(settings.allocateTitle && !widget.title)
 				|| (settings.allocateId && !widget.id)
 			) {
-				var widgetOffset = // Compute how many of this widget are on the form
-					this.$macgyver.flatten(this.$props.config, {want: 'array'}).reduce((offset, widget) =>
-						widget.type == this.addData.addType ? offset + 1 : offset
-					, 0);
+				// Compute how many of this widget are on the form
+				var widgetOffset = this.$macgyver
+					.flatten(this.$props.config, {want: 'array'})
+					.reduce((i, w) => w.type == widget.type ? i + 1 : i, 0);
 
-				if (settings.allocateTitle && !widget.title) widget.title =
-					this.$macgyver.widgets[this.addData.addType].meta.title
-					+ String(widgetOffset == 0 ? '' : widgetOffset);
+				if (settings.allocateTitle && !widget.title)
+					widget.title = this.$macgyver.widgets[widget.type].meta.title
+						+ String(widgetOffset == 0 ? '' : widgetOffset);
 
-				if (settings.allocateId && !widget.id && this.$macgyver.widgets[this.addData.addType].meta.preferId) widget.id = // Guess at an ID
-					_.chain(this.addData.addType)
+				// Guess at an ID
+				if (settings.allocateId && !widget.id && this.$macgyver.widgets[widget.type].meta.preferId)
+					widget.id = _.chain(widget.type)
 						.replace(/^mg/, '') // Remove first `mg` bit
 						.camelCase()
 						.replace(/$/, widgetOffset == 0 ? '' : widgetOffset) // Append numeric offset (if there is more than one of this type)
-						.value()
+						.value();
 			}
 			// }}}
 
@@ -576,6 +574,7 @@ export default Vue.component('mgFormEditor', {
 								.sortBy('title')
 								.value(),
 							change: type => {
+								console.log('change', type);
 								var inserted = this.insertWidget({type}, {
 									orientation: 'last',
 									useContainer: true,
@@ -620,9 +619,7 @@ export default Vue.component('mgFormEditor', {
 				v-if="mode == 'adding'"
 				ref="formAdd"
 				:config="generateConfigAdding()"
-				:data="addData"
 				:actions="{setMode}"
-				@change="addData = $event"
 			/>
 		</aside>
 		<!-- }}} -->

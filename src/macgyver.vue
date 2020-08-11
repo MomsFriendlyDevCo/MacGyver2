@@ -71,7 +71,7 @@ Vue.prototype.$macgyver = (()=> {
 				$dataPath: {type: String},
 				$specPath: {type: String},
 				// FIXME: Having a `change` property conflicts with event handlers called `change`.
-				//change: {type: Function},
+				change: {type: Function},
 				value: {},
 				..._.mapValues(component.props || {}, prop => { // Rewrite MacGyver props into Vue compatible props
 					var newProp = {
@@ -190,7 +190,8 @@ Vue.prototype.$macgyver = (()=> {
 
 						// Is there a prop attached which monitors change?
 						// FIXME: Having a `change` property conflicts with event handlers called `change`.
-						//if (this.$props.change) this.$props.change(value);
+						// FIXME: Use `call` with a context?
+						if (this.$props.change) this.$props.change(value);
 					});
 					// }}}
 				},

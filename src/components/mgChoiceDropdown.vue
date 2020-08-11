@@ -53,7 +53,7 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 		}, {immediate: true});
 	},
 	methods: {
-		change(val) {
+		changeHandler(val) {
 			this.data = val?.id;
 			this.selected = val;
 		},
@@ -91,7 +91,7 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 		:options="enumIter"
 		:placeholder="$props.placeholder"
 		:clearable="!$props.required"
-		@input="change"
+		@input="changeHandler"
 	>
 		<template #selected-option="option">
 			<i v-if="selected.icon" :class="selected.icon"/>

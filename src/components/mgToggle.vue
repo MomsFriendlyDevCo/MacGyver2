@@ -21,7 +21,7 @@ export default Vue.mgComponent('mgToggle', {
 		disabledColor: {type: 'mgColor', default: '#cccccc', advanced: true},
 	},
 	methods: {
-		change(e) {
+		changeHandler(e) {
 			this.$mgForm.$emit('mgChange', {path: this.$props.$dataPath, value: e.value});
 		},
 	},
@@ -35,7 +35,7 @@ export default Vue.mgComponent('mgToggle', {
 		:color="{checked: $props.onColor, unchecked: $props.offColor, disabled: $props.disabledColor}"
 		:labels="{checked: $props.onText, unchecked: $props.offText}"
 		:switchColor="$props.switchColor"
-		@change="change"
+		@change="changeHandler"
 	/>
 </template>
 
