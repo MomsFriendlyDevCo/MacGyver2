@@ -42,6 +42,7 @@ export default Vue.mgComponent('mgTable', {
 	},
 	watch: {
 		data: {
+			// FIXME: deep?
 			immediate: true,
 			handler() {
 				// Ensure that data is always an array

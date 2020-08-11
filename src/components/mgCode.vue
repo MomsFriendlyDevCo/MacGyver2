@@ -50,7 +50,10 @@ export default Vue.mgComponent('mgCode', {
 		this.$watch('config', ()=> {
 			if (this.$props.syntax) this.editor.getSession().setMode(`ace/mode/${this.$props.syntax}`);
 			if (this.$props.theme) this.editor.setTheme(`ace/theme/${this.$props.theme}`);
-		}, {immediate: true});
+		}, {
+			// FIXME: deep?
+			immediate: true
+		});
 	},
 	render(h) {
 		return h('div', {

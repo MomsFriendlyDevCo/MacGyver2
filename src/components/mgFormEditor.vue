@@ -4,7 +4,7 @@ import mgFormEditorControls from './mgFormEditorControls';
 /**
 * mg-form-editor - Drag-and-drop form designer for MacGyver
 *
-* @param {Object} config mgForm compatible spec to edit
+* @param {Object|Array} config mgForm compatible spec to edit
 * @param {Object} [data] Optional data bindings for the form
 * @param {array<Object>} [verbs] Verb edit mgForm to show in the small edit sidebar, defaults to selecting widgets / adding widgets buttons
 * @param {string} [asideClassActive="mgfe-aside aside-right open"] Class to set all editing sidebars to when inactive
@@ -41,8 +41,9 @@ export default Vue.component('mgFormEditor', {
 		addData: {},
 	}},
 	props: {
+		// FIXME: Does not like array type specs.
+		config: [Object, Array], // Can be a single object, array of objects or shorthand style
 		data: Object,
-		config: Object,
 		asideClassActive: {type: String, default: 'mgfe-aside aside-right open'},
 		asideClassInactive: {type: String, default: 'mgfe-aside aside-right'},
 		asideClassModeCollapsed: {type: String, default: 'aside-sm'},
@@ -59,7 +60,9 @@ export default Vue.component('mgFormEditor', {
 						class: 'btn btn-primary text-white px-2',
 						icon: 'fa fa-mouse-pointer fa-fw',
 						showTitle: false,
-						tooltip: {content: 'Select widgets to edit', placement: 'left'},
+						// FIXME: Why were tooltips failing as Object type?
+						tooltip: 'Select widgets to edit',
+						//tooltip: "{content: 'Select widgets to edit', placement: 'left'}",
 					},
 					{
 						type: 'mgButton',
@@ -67,7 +70,8 @@ export default Vue.component('mgFormEditor', {
 						class: 'btn btn-outline-light border-0 px-2',
 						icon: 'fa fa-stream fa-fw',
 						showTitle: false,
-						tooltip: {content: 'Select widgets to edit', placement: 'left'},
+						tooltip: 'Select widgets to edit',
+						//tooltip: {content: 'Select widgets to edit', placement: 'left'},
 					},
 					...(this.$prompt?.macgyver ? [{ // Include JSON editing if $prompt.macgyver() is available
 						type: 'mgButton',
@@ -75,7 +79,8 @@ export default Vue.component('mgFormEditor', {
 						class: 'btn btn-outline-light border-0 px-2',
 						icon: 'fa fa-code fa-fw',
 						showTitle: false,
-						tooltip: {content: 'Edit the form contents as JSON', placement: 'left'},
+						tooltip: 'Edit the form contents as JSON',
+						//tooltip: {content: 'Edit the form contents as JSON', placement: 'left'},
 					}] : []),
 					{
 						type: 'mgButton',
@@ -83,7 +88,8 @@ export default Vue.component('mgFormEditor', {
 						class: 'btn btn-outline-light border-0 px-2',
 						icon: 'far fa-plus fa-fw',
 						showTitle: false,
-						tooltip: {content: 'Add a new widget', placement: 'left'},
+						tooltip: 'Add a new widget',
+						//tooltip: {content: 'Add a new widget', placement: 'left'},
 					},
 				];
 			},
@@ -240,6 +246,7 @@ export default Vue.component('mgFormEditor', {
 		* @emits changeItem Emitted as `{path, value}` for a single item mutation
 		*/
 		mutatePath(path, value) {
+			console.log('mutatePath', path, value);
 			// Only bother cloning the entire object if something is listening to 'change'
 			if (this.$emit.hasListeners('change')) {
 				var configCopy = _.cloneDeep(this.config);
@@ -247,7 +254,7 @@ export default Vue.component('mgFormEditor', {
 				this.$emit('change', configCopy);
 			}
 
-			this.$emit('changeItem', path, value);
+			this.$emit('changeItem', {path: path, value: value});
 		},
 
 
@@ -261,6 +268,7 @@ export default Vue.component('mgFormEditor', {
 		* @emits changeItem Emitted as `{path, value}` for a single item mutation
 		*/
 		mutateSplice(path, index, remove, ...value) {
+			console.log('mutateSplice', path, index, remove);
 			var configCopy = _.cloneDeep(this.config); // Copy entire object
 			var spliceContents = _.get(configCopy, path); // Extract path from nested object
 			if (!_.isArray(spliceContents)) throw new Error('Refusing to splice a non-array');
@@ -269,7 +277,7 @@ export default Vue.component('mgFormEditor', {
 			this.$setPath(configCopy, path, spliceContents); // Place back in mutated object
 
 			this.$emit('change', configCopy);
-			this.$emit('changeItem', path, spliceContents);
+			this.$emit('changeItem', {path: path, value: spliceContents});
 		},
 
 
@@ -286,6 +294,7 @@ export default Vue.component('mgFormEditor', {
 		* @returns {Object} The inserted widget object (complete with ID if allocateId is specified)
 		*/
 		insertWidget(widget, options) {
+			console.log('insertWidget', widget, options);
 			var settings = {
 				specPath: undefined,
 				orientation: 'after',
@@ -373,6 +382,7 @@ export default Vue.component('mgFormEditor', {
 		removeWidget(specPath) {
 			this.setMode(); // Reset mode to close edit panel
 
+			// FIXME: Splitting non-array, condition backwards?
 			var parentItems = _.isArray(specPath) ? specPath : specPath.split('.');
 			var targetIndex = parentItems.pop();
 

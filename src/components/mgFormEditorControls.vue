@@ -8,9 +8,7 @@ export default Vue.component('mgFormEditorControls', {
 </script>
 
 <template>
-	<div
-		class="mg-form-editor-controls"
-	>
+	<div class="mg-form-editor-controls">
 		<div class="mg-form-editor-controls-title">
 			{{$props.config.type}}
 			<span v-if="$props.config.id" class="mg-form-editor-controls-id">
