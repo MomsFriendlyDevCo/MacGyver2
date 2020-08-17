@@ -93,6 +93,42 @@ export default Vue.component('mgFormEditor', {
 		},
 	},
 	mounted() {
+
+		/*
+		// Potential for highlighting components within nested mgContainer
+		this.$refs.form.$on('mgComponent.click', (component, e) => {
+			e.stopPropagation();
+			e.preventDefault();
+			this.editWidget(component.config.$specPath);
+		});
+
+		this.$refs.form.$on('mgComponent.mouseEnter', (component, e) => {
+			if (component.config.type === 'mgContainer') return;
+			e.stopPropagation();
+			//e.preventDefault();
+			var target = this.$refs.form.getComponentBySpecPath(component.config.$specPath);
+			//if (target.$type === 'mgContainer') return;
+			// FIXME: Always 2 parents up? Traverse up to next highest mgContainer?
+			var container = target.$parent.$parent;
+			if (!container) return;
+			var targetIndex = container.findChildIndex(target);
+			container.$set(container.highlights, targetIndex, (container.highlights[targetIndex] || []).concat(['editHover']));
+		});
+
+		this.$refs.form.$on('mgComponent.mouseLeave', (component, e) => {
+			if (component.config.type === 'mgContainer') return;
+			e.stopPropagation();
+			//e.preventDefault();
+			var target = this.$refs.form.getComponentBySpecPath(component.config.$specPath);
+			//if (target.$type === 'mgContainer') return;
+			// FIXME: Always 2 parents up? Traverse up to next highest mgContainer?
+			var container = target.$parent.$parent;
+			if (!container) return;
+			var targetIndex = container.findChildIndex(target);
+			container.$set(container.highlights, targetIndex, (container.highlights[targetIndex] || []).filter(c => c != 'editHover'));
+		});
+		*/
+
 		this.$refs.form.$on('mgContainer.click', (container, specPath, componentIndex, e) => {
 			e.stopPropagation();
 			e.preventDefault();
@@ -102,14 +138,12 @@ export default Vue.component('mgFormEditor', {
 		this.$refs.form.$on('mgContainer.mouseEnter', (container, specPath, componentIndex, e) => {
 			var component = this.$refs.form.getComponentBySpecPath(specPath);
 			var componentIndex = container.findChildIndex(component);
-
 			container.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).concat(['editHover']));
 		});
 
 		this.$refs.form.$on('mgContainer.mouseLeave', (container, specPath, componentIndex, e) => {
 			var component = this.$refs.form.getComponentBySpecPath(specPath);
 			var componentIndex = container.findChildIndex(component);
-
 			container.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).filter(c => c != 'editHover'));
 		});
 	},
