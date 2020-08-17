@@ -6415,7 +6415,7 @@ $macgyver.flatten = function (root, options) {
   if (settings.want != 'object' && settings.want != 'array') throw new Error('$macgyver.flatten({want}) can only be "object" or "array"');
 
   if (settings.type == 'auto') {
-    if (settings.root.items) {
+    if (settings.root && settings.root.items) {
       settings.type = 'spec';
     } else if (every_1(settings.root, function (k, v) {
       return !v.items;
