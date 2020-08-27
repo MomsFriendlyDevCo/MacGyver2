@@ -92,6 +92,9 @@ export default Vue.component('mgFormEditor', {
 			},
 		},
 	},
+	created() {
+		this.$debugging = true;
+	},
 	mounted() {
 
 		/*
@@ -253,15 +256,16 @@ export default Vue.component('mgFormEditor', {
 						items: _.map(widget.props, (v, k) => _.set(v, 'id', k)),
 					},
 				]);
+				this.$debug('Set editConfig', this.editConfig);
 
 				this.$set(this, 'editData',
 					_(widget.props)
-						.mapValues((v, k) => _.get(component.$props, k) || _.get(widget.props, k).default)
+						.mapValues((v, k) => _.get(component.$props, k, _.get(widget.props, k).default))
 						.set('id', component.$props.$dataPath)
 						.set('metaIcon', widget.meta.icon)
 						.value()
 				);
-				console.log('Set editData', this.editData);
+				this.$debug('Set editData', this.editData);
 			} else {
 				this.$macgyver.notify.warn(`Cannot edit unknown widget "${component.$props?.$type || 'Unknown type'}"`);
 				this.setMode();

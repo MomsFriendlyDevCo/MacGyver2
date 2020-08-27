@@ -18,13 +18,17 @@ export default Vue.mgComponent('mgTable', {
 			type: 'mgAlert',
 			vueType: 'array',
 			text: 'Use the editor to define child widgets',
+			default: () => [
+				{id: 'col1', type: 'mgText'},
+				{id: 'col2', title: 'mgText'},
+			],
+			/*
 			default: [
-				/* e.g.
 				{id: 'col1', type: 'mgText'},
 				{id: 'col2', title: 'mgText'},
 				{id: 'col3', title: 'mgText'},
-				*/
 			],
+			*/
 		},
 		addButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},
 		addButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},
