@@ -6,8 +6,9 @@ export default Vue.mgComponent('mgTable', {
 		category: 'Layout',
 	},
 	data() { return {
-		newRow: [],
+		newRow: {},
 		isAdding: false,
+		data: [],
 	}},
 	props: {
 		url: {type: 'mgUrl', relative: true, help: 'Data feed to populate the table'},
@@ -19,16 +20,10 @@ export default Vue.mgComponent('mgTable', {
 			vueType: 'array',
 			text: 'Use the editor to define child widgets',
 			default: () => [
-				{id: 'col1', type: 'mgText'},
-				{id: 'col2', title: 'mgText'},
+				// FIXME: Defaults are not initialised
+				{id: 'col1', title: 'Col 1', type: 'mgText', default: '1'},
+				{id: 'col2', title: 'Col 2', type: 'mgText', default: '2'},
 			],
-			/*
-			default: [
-				{id: 'col1', type: 'mgText'},
-				{id: 'col2', title: 'mgText'},
-				{id: 'col3', title: 'mgText'},
-			],
-			*/
 		},
 		addButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},
 		addButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},
@@ -36,6 +31,9 @@ export default Vue.mgComponent('mgTable', {
 	},
 	childProps: {
 		showTitle: {type: 'mgToggle', default: false, title: 'Show Title'},
+	},
+	created() {
+		this.$debugging = true;
 	},
 	mounted() {
 		this.$watch('$props.url', ()=> {
@@ -57,70 +55,109 @@ export default Vue.mgComponent('mgTable', {
 	methods: {
 		createRow(offset) { // Offset is the row to create after - i.e. array position splice
 			console.log(`FIXME: createRow(${offset})`);
+			this.$debug('newRow', this.$data.newRow, this.data);
+			this.data.push(this.$data.newRow);
+			// FIXME: Does not trigger update in UI.
+			this.$data.newRow = {};
+			//this.$setPath(this.$data, 'newRow', {});
 		},
 		deleteRow(offset) {
 			console.log(`FIXME: deleteRow(${offset})`);
 		},
+		changeHandler(e) {
+			console.log('changeHandler', e);
+		}
 	},
 });
 </script>
 
 <template>
-	<table class="table table-bordered table-striped table-hover">
-		<thead>
-			<tr>
-				<th v-if="$props.rowNumbers" class="row-number">#</th>
-				<th v-for="col in $props.items" :key="col.id" :style="(col.width ? 'width: ' + col.width + '; ' : '') + col.class">
-					{{col.title}}
-				</th>
-				<th class="btn-context"></th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr v-if="!data || !data.length">
-				<td :colspan="$props.items.length + ($props.rowNumbers ? 2 : 1)">
-					<div class="alert alert-warning m-10">{{$props.textEmpty || 'No data'}}</div>
-				</td>
-			</tr>
-			<tr v-for="(row, rowNumber) in data">
-				<td v-if="$props.rowNumbers" class="row-number">
-					{{rowNumber + 1 | number}}
-				</td>
-				<td v-for="col in $props.items" :key="col.id" :class="col.class">
-					<mg-component
-						:form="$props.form"
-						:config="col"
-					/>
-				</td>
-				<td class="btn-context">
-					<div class="btn-group">
-						<a class="btn btn-context" data-toggle="dropdown"><i class="far fa-ellipsis-v"></i></a>
-						<ul class="dropdown-menu pull-right">
-							<li><a @click="createRow(rowNumber)"><i class="far fa-arrow-circle-up"></i> Add row above</a></li>
-							<li><a @click="createRow(rowNumber)"><i class="far fa-arrow-circle-down"></i> Add row below</a></li>
-							<li v-if="$props.allowDelete" class="dropdown-divider"></li>
-							<li v-if="$props.allowDelete" class="dropdown-item-danger"><a @click="deleteRow(rowNumber)"><i class="far fa-trash"></i> Delete</a></li>
-						</ul>
-					</div>
-				</td>
-			</tr>
-			<tr class="mgTable-append" v-if="$props.allowAdd">
-				<td v-if="$props.rowNumbers" class="row-number">
-					<i class="far fa-asterisk"></i>
-				</td>
-				<td v-for="(col, colNumber) in $props.items" :key="col.id">
-					<mg-component
-						:form="$props.form"
-						:config="col"
-						:data="newRow[colNumber]"
-					/>
-				</td>
-				<td>
-					<a @click="createRow()" :class="isAdding ? $props.addButtonActiveClass : $props.addButtonInactiveClass"></a>
-				</td>
-			</tr>
-		</tbody>
-	</table>
+	<div class="mg-table">
+		<table class="table table-bordered table-striped table-hover">
+			<thead>
+				<tr>
+					<th v-if="$props.rowNumbers" class="row-number">#</th>
+					<th v-for="col in $props.items" :key="col.id" :style="(col.width ? 'width: ' + col.width + '; ' : '') + col.class">
+						{{col.title}}
+					</th>
+					<th class="btn-context"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr v-if="!data || !data.length">
+					<td :colspan="$props.items.length + ($props.rowNumbers ? 2 : 1)">
+						<div class="alert alert-warning m-10">{{$props.textEmpty || 'No data'}}</div>
+					</td>
+				</tr>
+				<tr v-for="(row, rowNumber) in data">
+					<td v-if="$props.rowNumbers" class="row-number">
+						{{rowNumber + 1 | number}}
+					</td>
+					<td v-for="col in $props.items" :key="col.id" :class="col.class">
+						<pre>{{col}}</pre>
+						<pre>{{row}}</pre>
+						<pre>{{row[col.id]}}</pre>
+						<mg-text
+							:value="row[col.id]"
+							@change="$setPath(row, col.id, $event)"
+						/>
+						<!--
+							
+							// FIXME: Support any component type
+							mg-component
+							:form="$props.form"
+							:config="col"
+							:data="row[col.id]"
+						/-->
+					</td>
+					<td class="btn-context">
+						<div class="btn-group">
+							<a class="btn btn-context" data-toggle="dropdown"><i class="far fa-ellipsis-v"></i></a>
+							<ul class="dropdown-menu pull-right">
+								<li><a @click="createRow(rowNumber)"><i class="far fa-arrow-circle-up"></i> Add row above</a></li>
+								<li><a @click="createRow(rowNumber)"><i class="far fa-arrow-circle-down"></i> Add row below</a></li>
+								<li v-if="$props.allowDelete" class="dropdown-divider"></li>
+								<li v-if="$props.allowDelete" class="dropdown-item-danger"><a @click="deleteRow(rowNumber)"><i class="far fa-trash"></i> Delete</a></li>
+							</ul>
+						</div>
+					</td>
+				</tr>
+				<tr class="mgTable-append" v-if="$props.allowAdd">
+					<td v-if="$props.rowNumbers" class="row-number">
+						<i class="far fa-asterisk"></i>
+					</td>
+					<td v-for="(col, colNumber) in $props.items" :key="col.id">
+						<pre>{{col}}</pre>
+						<mg-text
+							:value="newRow[col.id]"
+							@change="$setPath(newRow, col.id, $event)"
+						/>
+						<!--
+							// FIXME: Get changes back out again...
+							mg-component
+							:form="$props.form"
+							:config="col"
+							:data="newRow[col.id]"
+							@change="changeHandler"
+						/-->
+					</td>
+					<td>
+						<a @click="createRow()" :class="isAdding ? $props.addButtonActiveClass : $props.addButtonInactiveClass"></a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<div v-if="$debugging" class="card">
+			<div class="card-header">
+				Raw data
+				<i class="float-right fas fa-debug fa-lg" v-tooltip="'Only visible to users with the Debug permission'"/>
+			</div>
+			<div class="card-body">
+				<pre>{{$data}}</pre>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style>
