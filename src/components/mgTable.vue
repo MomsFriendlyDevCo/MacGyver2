@@ -6,8 +6,6 @@ export default Vue.mgComponent('mgTable', {
 		category: 'Layout',
 	},
 	data() { return {
-		newRow: {},
-		isAdding: false,
 		data: [],
 	}},
 	props: {
@@ -25,8 +23,6 @@ export default Vue.mgComponent('mgTable', {
 				{id: 'col2', title: 'Col 2', type: 'mgText', default: '2'},
 			],
 		},
-		addButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},
-		addButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},
 		rowNumbers: {type: 'mgToggle', help: 'Show the row number at the beginning of each row', default: true},
 	},
 	childProps: {
@@ -44,7 +40,6 @@ export default Vue.mgComponent('mgTable', {
 	},
 	watch: {
 		data: {
-			// FIXME: deep?
 			immediate: true,
 			handler() {
 				// Ensure that data is always an array
@@ -54,19 +49,18 @@ export default Vue.mgComponent('mgTable', {
 	},
 	methods: {
 		createRow(offset) { // Offset is the row to create after - i.e. array position splice
-			console.log(`FIXME: createRow(${offset})`);
-			this.$debug('newRow', this.$data.newRow, this.data);
-			this.data.push(this.$data.newRow);
-			// FIXME: Does not trigger update in UI.
-			this.$data.newRow = {};
-			//this.$setPath(this.$data, 'newRow', {});
+			this.$debug('createRow', offset);
+			if (typeof offset === 'undefined') {
+				this.data.push({});
+			} else {
+				this.data.splice(offset, 0, {});
+			}
 		},
 		deleteRow(offset) {
-			console.log(`FIXME: deleteRow(${offset})`);
+			this.$debug('deleteRow', offset);
+			//this.$delete(this.data, offset);
+			this.data.splice(offset, 1);
 		},
-		changeHandler(e) {
-			console.log('changeHandler', e);
-		}
 	},
 });
 </script>
@@ -89,13 +83,12 @@ export default Vue.mgComponent('mgTable', {
 						<div class="alert alert-warning m-10">{{$props.textEmpty || 'No data'}}</div>
 					</td>
 				</tr>
-				<tr v-for="(row, rowNumber) in data">
+				<tr v-for="(row, rowNumber) in data" :key="rowNumber">
 					<td v-if="$props.rowNumbers" class="row-number">
 						{{rowNumber + 1 | number}}
 					</td>
 					<td v-for="col in $props.items" :key="col.id" :class="col.class">
-						<pre>{{col}}</pre>
-						<pre>{{row}}</pre>
+						<!-- FIXME: Data is updated but :value binding is not -->
 						<pre>{{row[col.id]}}</pre>
 						<mg-text
 							:value="row[col.id]"
@@ -123,26 +116,9 @@ export default Vue.mgComponent('mgTable', {
 					</td>
 				</tr>
 				<tr class="mgTable-append" v-if="$props.allowAdd">
-					<td v-if="$props.rowNumbers" class="row-number">
-						<i class="far fa-asterisk"></i>
-					</td>
-					<td v-for="(col, colNumber) in $props.items" :key="col.id">
-						<pre>{{col}}</pre>
-						<mg-text
-							:value="newRow[col.id]"
-							@change="$setPath(newRow, col.id, $event)"
-						/>
-						<!--
-							// FIXME: Get changes back out again...
-							mg-component
-							:form="$props.form"
-							:config="col"
-							:data="newRow[col.id]"
-							@change="changeHandler"
-						/-->
-					</td>
+					<td :colspan="$props.items.length + 1">&nbsp;</td>
 					<td>
-						<a @click="createRow()" :class="isAdding ? $props.addButtonActiveClass : $props.addButtonInactiveClass"></a>
+						<a @click="createRow()" class="btn btn-block btn-success fa fa-plus"></a>
 					</td>
 				</tr>
 			</tbody>
@@ -155,6 +131,16 @@ export default Vue.mgComponent('mgTable', {
 			</div>
 			<div class="card-body">
 				<pre>{{$data}}</pre>
+			</div>
+		</div>
+
+		<div v-if="$debugging" class="card">
+			<div class="card-header">
+				Raw properties
+				<i class="float-right fas fa-debug fa-lg" v-tooltip="'Only visible to users with the Debug permission'"/>
+			</div>
+			<div class="card-body">
+				<pre>{{$props}}</pre>
 			</div>
 		</div>
 	</div>
