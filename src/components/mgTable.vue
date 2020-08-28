@@ -6,6 +6,9 @@ export default Vue.mgComponent('mgTable', {
 		category: 'Layout',
 	},
 	data() { return {
+		newRow: {},
+		// TODO: Is this really needed? Perhaps when `url` is specified?
+		isAdding: false,
 		data: [],
 	}},
 	props: {
@@ -23,6 +26,8 @@ export default Vue.mgComponent('mgTable', {
 				{id: 'col2', title: 'Col 2', type: 'mgText', default: '2'},
 			],
 		},
+		addButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},
+		addButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},
 		rowNumbers: {type: 'mgToggle', help: 'Show the row number at the beginning of each row', default: true},
 	},
 	childProps: {
@@ -55,16 +60,18 @@ export default Vue.mgComponent('mgTable', {
 	},
 	methods: {
 		createRow(offset) { // Offset is the row to create after - i.e. array position splice
-			this.$debug('createRow', offset);
+			this.$debug('createRow', offset, this.$data.newRow);
+			this.isAdding = true;
 			if (typeof offset === 'undefined') {
-				this.data.push({});
+				this.data.push(this.$data.newRow);
 			} else {
-				this.data.splice(offset, 0, {});
+				this.data.splice(offset, 0, this.$data.newRow);
 			}
+			this.$data.newRow = {};
+			this.isAdding = false;
 		},
 		deleteRow(offset) {
 			this.$debug('deleteRow', offset);
-			//this.$delete(this.data, offset);
 			this.data.splice(offset, 1);
 		},
 	},
@@ -119,11 +126,27 @@ export default Vue.mgComponent('mgTable', {
 						</div>
 					</td>
 				</tr>
-				<!-- TODO: Place in header row rather than new row at bottom? -->
 				<tr class="mgTable-append" v-if="$props.allowAdd">
-					<td :colspan="$props.items.length + 1">&nbsp;</td>
+					<td v-if="$props.rowNumbers" class="row-number">
+						<i class="far fa-asterisk"></i>
+					</td>
+					<td v-for="(col, colNumber) in $props.items" :key="col.id">
+						<pre>{{col}}</pre>
+						<mg-text
+							:value="newRow[col.id]"
+							@change="$setPath(newRow, col.id, $event)"
+						/>
+						<!--
+							// FIXME: Support any component type
+							mg-component
+							:form="$props.form"
+							:config="col"
+							:data="newRow[col.id]"
+							@change="$setPath(newRow, col.id, $event)"
+						/-->
+					</td>
 					<td>
-						<a @click="createRow()" class="btn btn-block btn-success fa fa-plus"></a>
+						<a @click="createRow()" :class="isAdding ? $props.addButtonActiveClass : $props.addButtonInactiveClass"></a>
 					</td>
 				</tr>
 			</tbody>
