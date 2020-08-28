@@ -11388,54 +11388,50 @@
         }
       }
     },
+    created: function created() {
+      this.$debugging = true;
+    },
     mounted: function mounted() {
       var _this = this;
 
-      this.$refs.form.$on('mgComponent.click', function (component, e) {
-        //if (component.config.type === 'mgContainer') return;
-        e.stopPropagation();
-        e.preventDefault();
-
-        _this.editWidget(component.config.$specPath);
-      });
-      this.$refs.form.$on('mgComponent.mouseEnter', function (component, e) {
-        if (component.config.type === 'mgContainer') return;
-        e.stopPropagation();
-        e.preventDefault();
-
-        var target = _this.$refs.form.getComponentBySpecPath(component.config.$specPath); //if (target.$type === 'mgContainer') return;
-        // FIXME: Always 2 parents up? Traverse up to next highest mgContainer?
-
-
-        var container = target.$parent.$parent;
-        if (!container) return;
-        var targetIndex = container.findChildIndex(target);
-        container.$set(container.highlights, targetIndex, (container.highlights[targetIndex] || []).concat(['editHover']));
-      });
-      this.$refs.form.$on('mgComponent.mouseLeave', function (component, e) {
-        if (component.config.type === 'mgContainer') return;
-        e.stopPropagation();
-        e.preventDefault();
-
-        var target = _this.$refs.form.getComponentBySpecPath(component.config.$specPath); //if (target.$type === 'mgContainer') return;
-        // FIXME: Always 2 parents up? Traverse up to next highest mgContainer?
-
-
-        var container = target.$parent.$parent;
-        if (!container) return;
-        var targetIndex = container.findChildIndex(target);
-        container.$set(container.highlights, targetIndex, (container.highlights[targetIndex] || []).filter(function (c) {
-          return c != 'editHover';
-        }));
-      });
       /*
-      this.$refs.form.$on('mgContainer.click', (container, specPath, componentIndex, e) => {
+      // Potential for highlighting components within nested mgContainer
+      this.$refs.form.$on('mgComponent.click', (component, e) => {
       	e.stopPropagation();
       	e.preventDefault();
-      	this.editWidget(specPath);
+      	this.editWidget(component.config.$specPath);
+      });
+      	this.$refs.form.$on('mgComponent.mouseEnter', (component, e) => {
+      	if (component.config.type === 'mgContainer') return;
+      	e.stopPropagation();
+      	//e.preventDefault();
+      	var target = this.$refs.form.getComponentBySpecPath(component.config.$specPath);
+      	//if (target.$type === 'mgContainer') return;
+      	// FIXME: Always 2 parents up? Traverse up to next highest mgContainer?
+      	var container = target.$parent.$parent;
+      	if (!container) return;
+      	var targetIndex = container.findChildIndex(target);
+      	container.$set(container.highlights, targetIndex, (container.highlights[targetIndex] || []).concat(['editHover']));
+      });
+      	this.$refs.form.$on('mgComponent.mouseLeave', (component, e) => {
+      	if (component.config.type === 'mgContainer') return;
+      	e.stopPropagation();
+      	//e.preventDefault();
+      	var target = this.$refs.form.getComponentBySpecPath(component.config.$specPath);
+      	//if (target.$type === 'mgContainer') return;
+      	// FIXME: Always 2 parents up? Traverse up to next highest mgContainer?
+      	var container = target.$parent.$parent;
+      	if (!container) return;
+      	var targetIndex = container.findChildIndex(target);
+      	container.$set(container.highlights, targetIndex, (container.highlights[targetIndex] || []).filter(c => c != 'editHover'));
       });
       */
+      this.$refs.form.$on('mgContainer.click', function (container, specPath, componentIndex, e) {
+        e.stopPropagation();
+        e.preventDefault();
 
+        _this.editWidget(specPath);
+      });
       this.$refs.form.$on('mgContainer.mouseEnter', function (container, specPath, componentIndex, e) {
         var component = _this.$refs.form.getComponentBySpecPath(specPath);
 
@@ -11570,10 +11566,11 @@
               return _.set(v, 'id', k);
             })
           }]);
+          this.$debug('Set editConfig', this.editConfig);
           this.$set(this, 'editData', _(widget.props).mapValues(function (v, k) {
-            return _.get(component.$props, k) || _.get(widget.props, k)["default"];
+            return _.get(component.$props, k, _.get(widget.props, k)["default"]);
           }).set('id', component.$props.$dataPath).set('metaIcon', widget.meta.icon).value());
-          console.log('Set editData', this.editData);
+          this.$debug('Set editData', this.editData);
         } else {
           var _component$$props;
 
@@ -12069,7 +12066,7 @@
     /* style */
     const __vue_inject_styles__$n = function (inject) {
       if (!inject) return
-      inject("data-v-141fc38d_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Variables {{{ */\n:root {\n\t--mg-form-editor-selected-bg: #007bff;\n\t--mg-form-editor-selected-fg: #fff;;\n\t--mg-form-editor-selected-highlight: #5dabff;\n\t--mg-form-editor-selected-danger: #dc3545;\n\t--mg-form-editor-hover-bg: #77b9ff;\n\t--mg-form-editor-hover-fg: #fff;\n}\n/* }}} */\n\n/* Aside styles - .mgfe-aside {{{ */\n.mgfe-aside {\n\ttransition: transform 0.2s ease-out;\n}\n.mgfe-aside .mg-form {\n\tmargin: 0;\n}\n.mgfe-aside.aside-right.open.open { /* Silly hack to force the transform when open (overrides .asign-sm in priority) */\n\ttransform: translateX(0px);\n}\n.mgfe-aside.aside-right {\n\tposition: fixed;\n\ttop: 0px;\n\tright: 0px;\n\tbottom: 0px;\n\tbackground: #FFF;\n\tz-index: 100;\n\tbox-shadow: 0 1px 5px rgba(0,0,0,.3);\n\twidth: 350px;\n\ttransform: translateX(380px);\n}\n\n/* .mgfe-aside-sm {{{ */\n.mgfe-aside.aside-right.aside-sm {\n\twidth: 40px;\n\ttransform: translateX(50px);\n\ttop: calc(50% - 30px); /* Approx middle of the screen */\n\tbottom: inherit;\n\tborder-radius: 5px;\n}\n.mgfe-aside.aside-right.aside-sm .form-group {\n\tmargin: 0;\n}\n\n/* Remove BS padding from sub-elements */\n.mgfe-aside.aside-right.aside-sm .form-group [class*=\"col-\"] {\n\tpadding: 0;\n}\n/* }}} */\n\n/* Headers {{{ */\n.mgfe-aside .aside-header {\n\tdisplay: flex;\n\talign-items: center;\n\tjustify-content: flex-end;\n\tborder-bottom: 1px solid #e9ecef;\n\tmargin: 0;\n}\n.mgfe-aside .aside-header h4 {\n\tflex-grow: 1;\n}\n.mgfe-aside .aside-header legend.form-control-static {\n\tborder-bottom: none;\n\tfont-size: 17pt;\n}\n.mgfe-aside .aside-header .close {\n\tcolor: #5e5e5e;\n}\n.mgfe-aside .aside-header .close:hover {\n\tcolor: #000;\n}\n.mgfe-aside .aside-header .close::after {\n\tdisplay: inline-block;\n\tfont-family: 'Font Awesome 5 Pro';\n\tfont-weight: 900;\n\tcontent: \"\\f00d\";\n}\n/* }}} */\n\n/* Actions {{{ */\n.mgfe-aside .aside-actions {\n\tjustify-self: flex-end;\n\tmargin-right: 10px;\n}\n.mgfe-aside .aside-actions .btn-group {\n\tborder: none;\n\tbox-shadow: none;\n}\n.mgfe-aside .aside-actions a {\n\tpadding: 8px;\n\tfont-size: 125%;\n}\n/* }}} */\n\n/* Body {{{ */\n.mgfe-aside .aside-body {\n\tmargin-left: 0;\n\tmargin: 10px 0 0;\n\n\t/* Body scrolling */\n\toverflow: auto;\n\theight: calc(100vh - 80px);\n}\n/* }}} */\n/* }}} */\n\n/* Component highlighting {{{\n\n/* Highlight applied to active elements inside an mgContainer */\n.mg-form-editor-target {\n\tborder: 2px solid var(--blue);\n\tborder-radius: 5px;\n\tposition: relative;\n\ttop: -4px;\n\tleft: -4px;\n\tpadding: 2px;\n}\n.mg-form-editor-drop-target {\n}\n.mg-form-editor-drop-target-before {\n\tborder-top: 4px dashed var(--blue);\n}\n.mg-form-editor-drop-target-after {\n\tborder-bottom: 4px dashed var(--blue);\n}\n/* }}} */\n\n/* Drag + Drop {{{ */\nbody.mg-form-editor-dragging * {\n\tcursor: grabbing;\n}\n#mg-form-editor-drag {\n\tdisplay: block;\n\tz-index: 1000;\n\tposition: absolute;\n\ttop: -10000px;\n\tleft: -10000px;\n\tmin-width: 160px;\n\theight: 40px;\n\tborder-radius: 5px;\n\tbackground: #2196F3;\n\tbox-shadow: 1px 1px 4px rgba(0,0,0,.3);\n\tpadding: 10px;\n\tcolor: #FFF;\n}\n#mg-form-editor-drag > i {\n\tmargin-right: 5px;\n}\n/* }}} */\n\n/* Misc fixes {{{ */\n/* Buttons that are also fixed with look weird */\n.mg-form-editor .btn.fa-fw {\n\twidth: 2.30em;\n\tpadding: 4px 2px !important;\n}\n/* }}} */\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgFormEditor.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AA2qBA,kBAAA;AACA;CACA,qCAAA;CACA,kCAAA;CACA,4CAAA;CACA,yCAAA;CACA,kCAAA;CACA,+BAAA;AACA;AACA,QAAA;;AAEA,mCAAA;AACA;CACA,mCAAA;AACA;AAEA;CACA,SAAA;AACA;AAEA,oCAAA,kFAAA;CACA,0BAAA;AACA;AAEA;CACA,eAAA;CACA,QAAA;CACA,UAAA;CACA,WAAA;CACA,gBAAA;CACA,YAAA;CACA,oCAAA;CACA,YAAA;CACA,4BAAA;AACA;;AAEA,uBAAA;AACA;CACA,WAAA;CACA,2BAAA;CACA,qBAAA,EAAA,gCAAA;CACA,eAAA;CACA,kBAAA;AACA;AAEA;CACA,SAAA;AACA;;AAEA,wCAAA;AACA;CACA,UAAA;AACA;AACA,QAAA;;AAEA,gBAAA;AACA;CACA,aAAA;CACA,mBAAA;CACA,yBAAA;CACA,gCAAA;CACA,SAAA;AACA;AAEA;CACA,YAAA;AACA;AAEA;CACA,mBAAA;CACA,eAAA;AACA;AAEA;CACA,cAAA;AACA;AAEA;CACA,WAAA;AACA;AAEA;CACA,qBAAA;CACA,iCAAA;CACA,gBAAA;CACA,gBAAA;AACA;AACA,QAAA;;AAEA,gBAAA;AACA;CACA,sBAAA;CACA,kBAAA;AACA;AAEA;CACA,YAAA;CACA,gBAAA;AACA;AAEA;CACA,YAAA;CACA,eAAA;AACA;AACA,QAAA;;AAEA,aAAA;AACA;CACA,cAAA;CACA,gBAAA;;CAEA,mBAAA;CACA,cAAA;CACA,0BAAA;AACA;AACA,QAAA;AACA,QAAA;;AAEA;;+DAEA;AACA;CACA,6BAAA;CACA,kBAAA;CACA,kBAAA;CACA,SAAA;CACA,UAAA;CACA,YAAA;AACA;AAEA;AACA;AAEA;CACA,kCAAA;AACA;AAEA;CACA,qCAAA;AACA;AACA,QAAA;;AAEA,oBAAA;AACA;CACA,gBAAA;AACA;AAEA;CACA,cAAA;CACA,aAAA;CACA,kBAAA;CACA,aAAA;CACA,cAAA;CACA,gBAAA;CACA,YAAA;CACA,kBAAA;CACA,mBAAA;CACA,sCAAA;CACA,aAAA;CACA,WAAA;AACA;AAEA;CACA,iBAAA;AACA;AACA,QAAA;;AAEA,mBAAA;AACA,gDAAA;AACA;CACA,aAAA;CACA,2BAAA;AACA;AACA,QAAA","file":"mgFormEditor.vue","sourcesContent":["<script>\nimport mgFormEditorControls from './mgFormEditorControls';\n\n/**\n* mg-form-editor - Drag-and-drop form designer for MacGyver\n*\n* @param {Object|Array} config mgForm compatible spec to edit\n* @param {Object} [data] Optional data bindings for the form\n* @param {array<Object>} [verbs] Verb edit mgForm to show in the small edit sidebar, defaults to selecting widgets / adding widgets buttons\n* @param {string} [asideClassActive=\"mgfe-aside aside-right open\"] Class to set all editing sidebars to when inactive\n* @param {string} [asideClassInactive=\"mgfe-aside aside-right\"] Class to set all editing sidebar to when inactive\n* @param {string} [asideClassModeCollapsed=\"aside-sm\"] Class to associate with the smaller toolkit display when editing\n* @param {string} [asideClassModeToc=\"aside-sm\"] Class to associate with the Table-Of-Contents sidebar\n* @param {string} [asideClassModeAdding=\"\"] Class to associate with the editing sidebar when adding\n* @param {string} [asideClassModeEditing=\"\"] Class to associate with the editing sidebar when editing\n*\n* @emits change Emitted as `(config)` on any item configuration change. WARNING, subscribing to this involves an entire deep copy of the config structure, subscribe to changeItem if possible\n* @emits changeItem Emitted as `({path, value})` when a single config item changes, inexpensive compared to `change`\n*/\nexport default Vue.component('mgFormEditor', {\n\tprovide() { return {\n\t\t$mgFormEditor: this,\n\t}},\n\tcomponents: {\n\t\tmgFormEditorControls,\n\t},\n\tdata() { return {\n\t\tmode: 'collapsed', // ENUM: collapsed, toc, editing, adding\n\t\tid: this.$macgyver.nextId(), // ID of the editing form item\n\t\tediting: undefined, // The active item we are editing\n\t\twidgetListMode: 'grid',\n\n\t\t// Asides\n\t\teditConfig: [],\n\t\teditData: {},\n\n\t\taddTarget: undefined, // Spec path to add after, if any\n\t\taddOrientation: 'after',\n\t}},\n\tprops: {\n\t\t// FIXME: Does not like array type specs.\n\t\tconfig: [Object, Array], // Can be a single object, array of objects or shorthand style\n\t\tdata: Object,\n\t\tasideClassActive: {type: String, default: 'mgfe-aside aside-right open'},\n\t\tasideClassInactive: {type: String, default: 'mgfe-aside aside-right'},\n\t\tasideClassModeCollapsed: {type: String, default: 'aside-sm'},\n\t\tasideClassModeToc: {type: String, default: ''},\n\t\tasideClassModeAdding: {type: String, default: ''},\n\t\tasideClassModeEditing: {type: String, default: ''},\n\t\tgeneralVerbs: {\n\t\t\ttype: Array,\n\t\t\tdefault() {\n\t\t\t\treturn [\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"setMode()\",\n\t\t\t\t\t\tclass: 'btn btn-primary text-white px-2',\n\t\t\t\t\t\ticon: 'fa fa-mouse-pointer fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t// FIXME: Why were tooltips failing as Object type?\n\t\t\t\t\t\ttooltip: 'Select widgets to edit',\n\t\t\t\t\t\t//tooltip: \"{content: 'Select widgets to edit', placement: 'left'}\",\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"setMode('toc')\",\n\t\t\t\t\t\tclass: 'btn btn-outline-light border-0 px-2',\n\t\t\t\t\t\ticon: 'fa fa-stream fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\ttooltip: 'Select widgets to edit',\n\t\t\t\t\t\t//tooltip: {content: 'Select widgets to edit', placement: 'left'},\n\t\t\t\t\t},\n\t\t\t\t\t...(this.$prompt?.macgyver ? [{ // Include JSON editing if $prompt.macgyver() is available\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"rawEdit()\",\n\t\t\t\t\t\tclass: 'btn btn-outline-light border-0 px-2',\n\t\t\t\t\t\ticon: 'fa fa-code fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\ttooltip: 'Edit the form contents as JSON',\n\t\t\t\t\t\t//tooltip: {content: 'Edit the form contents as JSON', placement: 'left'},\n\t\t\t\t\t}] : []),\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"setMode('adding')\",\n\t\t\t\t\t\tclass: 'btn btn-outline-light border-0 px-2',\n\t\t\t\t\t\ticon: 'far fa-plus fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\ttooltip: 'Add a new widget',\n\t\t\t\t\t\t//tooltip: {content: 'Add a new widget', placement: 'left'},\n\t\t\t\t\t},\n\t\t\t\t];\n\t\t\t},\n\t\t},\n\t},\n\tmounted() {\n\n\t\tthis.$refs.form.$on('mgComponent.click', (component, e) => {\n\t\t\t//if (component.config.type === 'mgContainer') return;\n\t\t\te.stopPropagation();\n\t\t\te.preventDefault();\n\t\t\tthis.editWidget(component.config.$specPath);\n\t\t});\n\n\t\tthis.$refs.form.$on('mgComponent.mouseEnter', (component, e) => {\n\t\t\tif (component.config.type === 'mgContainer') return;\n\t\t\te.stopPropagation();\n\t\t\te.preventDefault();\n\t\t\tvar target = this.$refs.form.getComponentBySpecPath(component.config.$specPath);\n\t\t\t//if (target.$type === 'mgContainer') return;\n\t\t\t// FIXME: Always 2 parents up? Traverse up to next highest mgContainer?\n\t\t\tvar container = target.$parent.$parent;\n\t\t\tif (!container) return;\n\t\t\tvar targetIndex = container.findChildIndex(target);\n\t\t\tcontainer.$set(container.highlights, targetIndex, (container.highlights[targetIndex] || []).concat(['editHover']));\n\t\t});\n\n\t\tthis.$refs.form.$on('mgComponent.mouseLeave', (component, e) => {\n\t\t\tif (component.config.type === 'mgContainer') return;\n\t\t\te.stopPropagation();\n\t\t\te.preventDefault();\n\t\t\tvar target = this.$refs.form.getComponentBySpecPath(component.config.$specPath);\n\t\t\t//if (target.$type === 'mgContainer') return;\n\t\t\t// FIXME: Always 2 parents up? Traverse up to next highest mgContainer?\n\t\t\tvar container = target.$parent.$parent;\n\t\t\tif (!container) return;\n\t\t\tvar targetIndex = container.findChildIndex(target);\n\t\t\tcontainer.$set(container.highlights, targetIndex, (container.highlights[targetIndex] || []).filter(c => c != 'editHover'));\n\t\t});\n\n\t\t/*\n\t\tthis.$refs.form.$on('mgContainer.click', (container, specPath, componentIndex, e) => {\n\t\t\te.stopPropagation();\n\t\t\te.preventDefault();\n\t\t\tthis.editWidget(specPath);\n\t\t});\n\t\t*/\n\n\t\tthis.$refs.form.$on('mgContainer.mouseEnter', (container, specPath, componentIndex, e) => {\n\t\t\tvar component = this.$refs.form.getComponentBySpecPath(specPath);\n\t\t\tvar componentIndex = container.findChildIndex(component);\n\t\t\tcontainer.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).concat(['editHover']));\n\t\t});\n\n\t\tthis.$refs.form.$on('mgContainer.mouseLeave', (container, specPath, componentIndex, e) => {\n\t\t\tvar component = this.$refs.form.getComponentBySpecPath(specPath);\n\t\t\tvar componentIndex = container.findChildIndex(component);\n\t\t\tcontainer.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).filter(c => c != 'editHover'));\n\t\t});\n\t},\n\tmethods: {\n\t\t/**\n\t\t* Stop editing / adding and return to regular mode\n\t\t* @param {string} [mode=\"collapsed\"] Mode to switch to\n\t\t* @param {boolean} [clearHighlight=true] Also attempt to clear out any highlight and reset the aside panes\n\t\t*/\n\t\tsetMode(mode = 'collapsed', clearHighlight = true) {\n\t\t\t// Deselect the existing item (if we have one)\n\t\t\tif (this.editing && clearHighlight) {\n\t\t\t\tthis.setComponentHighlight(this.editing, []);\n\t\t\t\tthis.editing = undefined;\n\t\t\t}\n\n\t\t\tthis.$set(this, 'mode', mode || 'collapsed');\n\t\t\treturn true; // Signal to mgForm that we have handled this action\n\t\t},\n\n\n\t\t/**\n\t\t* Delete the active widget\n\t\t*/\n\t\tdeleteWidget() {\n\t\t\tif (!this.editing) {\n\t\t\t\tthis.$macgyver.notify.warn('No widget selected to delete'); // Not editing anyway\n\t\t\t} else {\n\t\t\t\tthis.removeWidget(this.editing.$props.$specPath);\n\t\t\t}\n\n\t\t\treturn true; // Signal to mgForm that we have handled this action\n\t\t},\n\n\n\t\t/**\n\t\t* Set the component.highlight[index] to the given list of CSS classes\n\t\t* @param {VueController} component The VueController to set the highlight of within its mgContainer\n\t\t* @param {array<string>} classes Array of string classes to set\n\t\t*/\n\t\tsetComponentHighlight(component, classes) {\n\t\t\tif (!_.isArray(classes)) throw new Error('setComponentHighlight must be passed an array');\n\n\t\t\tvar container = false;\n\t\t\tcomponent.$emit.up('mgIdentify', component => {\n\t\t\t\tif (!container && component.$props.$type == 'mgContainer') container = component;\n\t\t\t});\n\t\t\tif (!container) return console.warn('[mgFormEditor] setComponentHighlight component failed to find enclosing container', {component});\n\n\t\t\tvar childOffset = container.findChildIndex(component);\n\t\t\tif (childOffset === false) return console.warn('[mgFormEditor]', 'Cannot locate component within container', {container, component});\n\n\t\t\tconsole.log('Set highlight', childOffset, classes);\n\t\t\tcontainer.$set(container.highlights, childOffset, classes);\n\t\t},\n\n\n\t\t/**\n\t\t* Edit a widget by its specPath or component\n\t\t* @param {VueComponent|string} component Either the VueComponent to edit or the specPath of the widget to edit\n\t\t*/\n\t\teditWidget(component) {\n\t\t\tvar component; // The Vue component from the widget path\n\t\t\tif (!_.isObject(component) && !_.isString(component)) throw new Error('editWidget requires either a specPath or VueComponent');\n\t\t\tif (_.isObject(component) && !component._uid) throw new Error('editWidget() requires a valid VueComponent object (or specPath string)');\n\n\t\t\tif (_.isString(component) || _.isArray(component)) component = this.$refs.form.getComponentBySpecPath(component); // Resolve specPath into actual component if eneded\n\n\t\t\tthis.setMode();\n\n\t\t\tthis.$set(this, 'editing', component);\n\t\t\tthis.$set(this, 'mode', 'editing');\n\n\t\t\tthis.setComponentHighlight(component, ['editEditing']);\n\n\t\t\tvar widget = this.$macgyver.widgets[component.$props.$type];\n\t\t\tif (widget) {\n\t\t\t\tthis.$set(this, 'editConfig', [\n\t\t\t\t\t{ // Header area\n\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\trowClass: 'aside-header',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t{id: 'metaIcon', type: 'mgIcon'},\n\t\t\t\t\t\t\t{id: 'id', type: 'mgText', placeholder: 'No ID'},\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t\t\trowClass: 'aside-actions',\n\t\t\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'deleteWidget', class: 'btn btn-link btn-link-danger btn-xs', icon: 'far fa-trash', tooltip: 'Delete this widget'},\n\t\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'setMode', text: '', class: 'btn btn-link btn-xs', icon: 'far fa-times'},\n\t\t\t\t\t\t\t\t],\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t],\n\t\t\t\t\t},\n\t\t\t\t\t{ // Body area\n\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\tlayout: 'form',\n\t\t\t\t\t\tformClass: 'titles-above',\n\t\t\t\t\t\trowClass: 'aside-body',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\titems: _.map(widget.props, (v, k) => _.set(v, 'id', k)),\n\t\t\t\t\t},\n\t\t\t\t]);\n\n\t\t\t\tthis.$set(this, 'editData',\n\t\t\t\t\t_(widget.props)\n\t\t\t\t\t\t.mapValues((v, k) => _.get(component.$props, k) || _.get(widget.props, k).default)\n\t\t\t\t\t\t.set('id', component.$props.$dataPath)\n\t\t\t\t\t\t.set('metaIcon', widget.meta.icon)\n\t\t\t\t\t\t.value()\n\t\t\t\t);\n\t\t\t\tconsole.log('Set editData', this.editData);\n\t\t\t} else {\n\t\t\t\tthis.$macgyver.notify.warn(`Cannot edit unknown widget \"${component.$props?.$type || 'Unknown type'}\"`);\n\t\t\t\tthis.setMode();\n\t\t\t}\n\t\t},\n\n\n\t\t/**\n\t\t* Change the value of a nested config path\n\t\t* @param {string} path The dotted / array notation path to mutate\n\t\t* @param {*} value The value to set, if undefined the key is removed\n\t\t* @emits change Emitted with the entire deep copied config object\n\t\t* @emits changeItem Emitted as `{path, value}` for a single item mutation\n\t\t*/\n\t\tmutatePath(path, value) {\n\t\t\tconsole.log('mutatePath', path, value);\n\t\t\t// Only bother cloning the entire object if something is listening to 'change'\n\t\t\tif (this.$emit.hasListeners('change')) {\n\t\t\t\tvar configCopy = _.cloneDeep(this.config);\n\t\t\t\tthis.$setPath(configCopy, path, value);\n\t\t\t\tthis.$emit('change', configCopy);\n\t\t\t}\n\n\t\t\tthis.$emit('changeItem', {path: path, value: value});\n\t\t},\n\n\n\t\t/**\n\t\t* Splice items into a deep copy of the config object, emitting change events\n\t\t* @param {string} path The dotted / array notation path to mutate\n\t\t* @param {number} index The index to work from\n\t\t* @param {number} [remove] The number of items to remove\n\t\t* @param {*} [value...] The value(s) to set, if undefined the key is removed\n\t\t* @emits change Emitted with the entire deep copied config object\n\t\t* @emits changeItem Emitted as `{path, value}` for a single item mutation\n\t\t*/\n\t\tmutateSplice(path, index, remove, ...value) {\n\t\t\tconsole.log('mutateSplice', path, index, remove);\n\t\t\tvar configCopy = _.cloneDeep(this.config); // Copy entire object\n\t\t\tvar spliceContents = _.get(configCopy, path); // Extract path from nested object\n\t\t\tif (!_.isArray(spliceContents)) throw new Error('Refusing to splice a non-array');\n\t\t\tspliceContents.splice(index, remove, ...value); // Perform splice\n\n\t\t\tthis.$setPath(configCopy, path, spliceContents); // Place back in mutated object\n\n\t\t\tthis.$emit('change', configCopy);\n\t\t\tthis.$emit('changeItem', {path: path, value: spliceContents});\n\t\t},\n\n\n\t\t/**\n\t\t* Insert a widget at a given path\n\t\t* @param {Object} widget The widget to insert, this must contain at least a `type` key\n\t\t* @param {Object} [options] Additional options\n\t\t* @param {string|array} [options.specPath] The lodash notation specPath to target instead of the last element on the form\n\t\t* @param {string} [options.orientation='after'] Where to insert. ENUM: 'before', 'after', 'last'\n\t\t* @param {boolean} [options.useContainer=true] If no spec path, try and fit the new widget within the last container if one exists\n\t\t* @param {boolean} [options.allocateTitle=true] Try to allocate a title if not supplied\n\t\t* @param {boolean} [options.allocateId=true] Try to allocate an ID if not supplied and the widget has `preferId`\n\t\t* @param {boolean} [options.edit=true] Show the edit dialog after inserting the component\n\t\t* @returns {Object} The inserted widget object (complete with ID if allocateId is specified)\n\t\t*/\n\t\tinsertWidget(widget, options) {\n\t\t\tconsole.log('insertWidget', widget, options);\n\t\t\tvar settings = {\n\t\t\t\tspecPath: undefined,\n\t\t\t\torientation: 'after',\n\t\t\t\tuseContainer: true,\n\t\t\t\tallocateTitle: true,\n\t\t\t\tallocateId: true,\n\t\t\t\tedit: true,\n\t\t\t\t...options,\n\t\t\t};\n\n\t\t\tif (!widget.type) throw new Error('Widget.type must be specified as a minimum for insertWidget()');\n\n\t\t\t// options.allocateTitle / settings.alloacteId {{{\n\t\t\tif ( // A field we want is missing\n\t\t\t\t(settings.allocateTitle && !widget.title)\n\t\t\t\t|| (settings.allocateId && !widget.id)\n\t\t\t) {\n\t\t\t\t// Compute how many of this widget are on the form\n\t\t\t\tvar widgetOffset = this.$macgyver\n\t\t\t\t\t.flatten(this.$props.config, {want: 'array', type: 'spec'})\n\t\t\t\t\t.reduce((i, w) => w.type == widget.type ? i + 1 : i, 0);\n\n\t\t\t\tif (settings.allocateTitle && !widget.title)\n\t\t\t\t\twidget.title = this.$macgyver.widgets[widget.type].meta.title\n\t\t\t\t\t\t+ String(widgetOffset == 0 ? '' : widgetOffset);\n\n\t\t\t\t// Guess at an ID\n\t\t\t\tif (settings.allocateId && !widget.id && this.$macgyver.widgets[widget.type].meta.preferId)\n\t\t\t\t\twidget.id = _.chain(widget.type)\n\t\t\t\t\t\t.replace(/^mg/, '') // Remove first `mg` bit\n\t\t\t\t\t\t.camelCase()\n\t\t\t\t\t\t.replace(/$/, widgetOffset == 0 ? '' : widgetOffset) // Append numeric offset (if there is more than one of this type)\n\t\t\t\t\t\t.value();\n\t\t\t}\n\t\t\t// }}}\n\n\t\t\t// FIXME: Support for array specs without a root mgContainer.\n\t\t\tswitch (settings.orientation) {\n\t\t\t\tcase 'last':\n\t\t\t\t\tif ( // Container -> Container:Last -> New widget\n\t\t\t\t\t\tsettings.useContainer // Insert within container?\n\t\t\t\t\t\t&& this.config.type == 'mgContainer' // First item is a container\n\t\t\t\t\t\t&& _.last(this.config.items).type == 'mgContainer' // Last child is also a container - use this\n\t\t\t\t\t) {\n\t\t\t\t\t\tthis.mutateSplice(`items.${this.config.items.length - 1}.items`, _.last(this.config.items).items.length, 0, widget);\n\t\t\t\t\t} else if ( // Container:Last -> New widget\n\t\t\t\t\t\tsettings.useContainer // Insert within container?\n\t\t\t\t\t\t&& this.config.type == 'mgContainer' // First item is a container\n\t\t\t\t\t) {\n\t\t\t\t\t\tthis.mutateSplice('items', this.config.items.length, 0, widget);\n\t\t\t\t\t} else if (_.isArray(this.config)) { // Append to end of config array\n\t\t\t\t\t\tthis.mutateSplice('', this.config.items.length, 0, widget);\n\t\t\t\t\t} else {\n\t\t\t\t\t\tthrow new Error('Dont know how to append widget to form config');\n\t\t\t\t\t}\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'before':\n\t\t\t\tcase 'after':\n\t\t\t\t\tif (!settings.specPath) throw new Error('Inserting with orientations before / after requires a specPath');\n\t\t\t\t\tvar parentItems = _.isArray(settings.specPath) ? settings.specPath : settings.specPath.split('.');\n\t\t\t\t\tvar targetWidget = parentItems.pop();\n\n\t\t\t\t\tthis.mutateSplice(\n\t\t\t\t\t\tparentItems,\n\t\t\t\t\t\tsettings.orientation == 'after' ? +targetWidget + 1 : targetWidget,\n\t\t\t\t\t\t0,\n\t\t\t\t\t\twidget\n\t\t\t\t\t);\n\t\t\t\t\tbreak;\n\t\t\t\tdefault:\n\t\t\t\t\tthrow new Error(`Dont know how to handle insert of component at with orientation \"${settings.orientation}\"`);\n\t\t\t}\n\n\t\t\tif (settings.edit) {\n\t\t\t\tconsole.warn('FIXME: Unsupported post edit when editing components');\n\t\t\t\t// this.editWidget(widget.id);\n\t\t\t}\n\n\t\t\treturn widget;\n\t\t},\n\n\n\t\t/**\n\t\t* Remove a widget by its specPath\n\t\t* @param {string|array} specPath The lodash notation specPath to remove\n\t\t*/\n\t\tremoveWidget(specPath) {\n\t\t\tthis.setMode(); // Reset mode to close edit panel\n\n\t\t\t// FIXME: Splitting non-array, condition backwards?\n\t\t\tvar parentItems = _.isArray(specPath) ? specPath : specPath.split('.');\n\t\t\tvar targetIndex = parentItems.pop();\n\n\t\t\tthis.mutateSplice(parentItems, targetIndex, 1);\n\t\t},\n\n\n\t\t/**\n\t\t* Duplicate a widget by its specPath\n\t\t* @param {string|array} specPath The lodash notation specPath to remove\n\t\t*/\n\t\tduplicateWidget(specPath) {\n\t\t\tvar parentItems = _.isArray(specPath) ? specPath : specPath.split('.');\n\t\t\tvar targetIndex = parentItems.pop();\n\n\t\t\tthis.setMode(); // Reset mode to close edit panel\n\t\t\tthis.mutatePath(\n\t\t\t\tparentItems,\n\t\t\t\t_(_.get(this.config, parentItems))\n\t\t\t\t\t.map((v, i) => i == targetIndex // Duplicate this item when we find its index\n\t\t\t\t\t\t? [\n\t\t\t\t\t\t\tv, // Original object\n\t\t\t\t\t\t\t_.chain(v)\n\t\t\t\t\t\t\t\t.cloneDeep()\n\t\t\t\t\t\t\t\t.pickBy((v, k) => !k.startsWith('$'))\n\t\t\t\t\t\t\t\t.set('id', this.$macgyver.utils.incrementId(v.id)) // Also increment its ID\n\t\t\t\t\t\t\t\t.value(),\n\t\t\t\t\t\t]\n\t\t\t\t\t\t: v\n\t\t\t\t\t)\n\t\t\t\t\t.flatten()\n\t\t\t\t\t.value()\n\t\t\t);\n\t\t},\n\n\n\t\t/**\n\t\t* Move a widget in a given direction\n\t\t* @param {string|array} specPath The lodash notation SpecPath to move\n\t\t* @param {string} direction The direction to move. ENUM: 'up', 'down'\n\t\t*/\n\t\tmoveWidget(specPath, direction) {\n\t\t\tif (!['up', 'down'].includes(direction)) throw new Error('Unsupported direction');\n\n\t\t\tvar parentItems = _.isArray(specPath) ? specPath : specPath.split('.');\n\t\t\tvar targetIndex = parentItems.pop();\n\n\t\t\tthis.setMode(); // Reset mode to close edit panel\n\t\t\tthis.mutatePath(\n\t\t\t\tparentItems,\n\t\t\t\t_.chain(_.get(this.config, parentItems))\n\t\t\t\t\t.clone()\n\t\t\t\t\t.thru(v => {\n\t\t\t\t\t\ttargetIndex = +targetIndex; // Splat into number\n\t\t\t\t\t\tif (direction == 'up' && targetIndex > 0) {\n\t\t\t\t\t\t\t[v[targetIndex], v[targetIndex-1]]\n\t\t\t\t\t\t\t=\n\t\t\t\t\t\t\t[v[targetIndex-1], v[targetIndex]]\n\t\t\t\t\t\t} else if (direction == 'down' && targetIndex < v.length) {\n\t\t\t\t\t\t\tconsole.log('SWAP', targetIndex, targetIndex + 1);\n\t\t\t\t\t\t\t[v[targetIndex], v[targetIndex+1]]\n\t\t\t\t\t\t\t=\n\t\t\t\t\t\t\t[v[targetIndex+1], v[targetIndex]]\n\t\t\t\t\t\t}\n\t\t\t\t\t\treturn v;\n\t\t\t\t\t})\n\t\t\t\t\t.value()\n\t\t\t);\n\t\t},\n\n\n\t\t/**\n\t\t* Begin drag sequence for a widget\n\t\t* @param {string|array} specPath The lodash notation SpecPath to drag\n\t\t*/\n\t\tdragWidget(specPath) {\n\t\t\tconsole.warn('FIXME: dragWidget() not yet supported');\n\t\t},\n\n\n\t\trawEdit() {\n\t\t\tthis.$prompt.macgyver({\n\t\t\t\ttitle: 'Template JSON',\n\t\t\t\tmacgyver: {\n\t\t\t\t\tid: 'code',\n\t\t\t\t\ttype: 'mgCode',\n\t\t\t\t\tsyntax: 'json',\n\t\t\t\t\tconvert: true,\n\t\t\t\t\tdefault: this.$props.config,\n\t\t\t\t},\n\t\t\t}).then(form => this.$set(this, 'config', form.code))\n\t\t},\n\n\n\t\t// Form layouts {{{\n\t\t/**\n\t\t* Generate the config layout for the Table-Of-Contents sidebar\n\t\t*/\n\t\tgenerateConfigToc() {\n\t\t\tvar genTreeBranch = root =>\n\t\t\t\troot.map(widget => ({\n\t\t\t\t\ttitle: `${widget.type} #${widget.id}`,\n\t\t\t\t\ticon: this.$macgyver.widgets[widget.type].icon,\n\t\t\t\t\tenum: widget.items ? genTreeBranch(widget.items) : undefined,\n\t\t\t\t}));\n\n\t\t\treturn [\n\t\t\t\t{ // Header area\n\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\tborder: false,\n\t\t\t\t\trowClass: 'aside-header',\n\t\t\t\t\tshowTitle: false,\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{type: 'mgHeading', text: 'Form layout'},\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t\trowClass: 'aside-actions',\n\t\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'setMode', text: '', class: 'btn btn-link btn-xs', icon: 'far fa-times'},\n\t\t\t\t\t\t\t],\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t\t{ // Body area\n\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\tlayout: 'form',\n\t\t\t\t\trowClass: 'aside-body',\n\t\t\t\t\tshowTitles: false,\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\ttype: 'mgChoiceTree',\n\t\t\t\t\t\t\ttitle: 'Layout tree',\n\t\t\t\t\t\t\tchange: item => {\n\t\t\t\t\t\t\t\tconsole.log('TREE CLICK', item);\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tenum: genTreeBranch(\n\t\t\t\t\t\t\t\t[ this.$macgyver.compileSpec(this.$props.config, {clone: false}).spec ]\n\t\t\t\t\t\t\t),\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t];\n\t\t},\n\n\n\t\t/**\n\t\t* Generate the config layout for the \"add widget\" sidebar\n\t\t*/\n\t\tgenerateConfigAdding() {\n\t\t\treturn [\n\t\t\t\t{ // Header area\n\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\tborder: false,\n\t\t\t\t\trowClass: 'aside-header',\n\t\t\t\t\tshowTitle: false,\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{type: 'mgHeading', text: 'Add widget'},\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t\trowClass: 'aside-actions',\n\t\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'setMode', text: '', class: 'btn btn-link btn-xs', icon: 'far fa-times'},\n\t\t\t\t\t\t\t],\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t\t{ // Body area\n\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\tlayout: 'form',\n\t\t\t\t\trowClass: 'aside-body',\n\t\t\t\t\tshowTitles: false,\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tid: 'addType',\n\t\t\t\t\t\t\ttype: 'mgChoiceList',\n\t\t\t\t\t\t\ttitle: 'Widget type to add',\n\t\t\t\t\t\t\tenum: _(this.$macgyver.widgets)\n\t\t\t\t\t\t\t\t.map((w, k) => ({\n\t\t\t\t\t\t\t\t\tid: k,\n\t\t\t\t\t\t\t\t\ttitle: w.meta.title,\n\t\t\t\t\t\t\t\t\ticon: `${w.meta.icon} fa-fw`,\n\t\t\t\t\t\t\t\t}))\n\t\t\t\t\t\t\t\t.sortBy('title')\n\t\t\t\t\t\t\t\t.value(),\n\t\t\t\t\t\t\tchange: type => {\n\t\t\t\t\t\t\t\tvar inserted = this.insertWidget({type}, {\n\t\t\t\t\t\t\t\t\torientation: 'last',\n\t\t\t\t\t\t\t\t\tuseContainer: true,\n\t\t\t\t\t\t\t\t\tedit: true,\n\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t];\n\t\t},\n\t\t// }}}\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-form-editor\">\n\t\t<!-- Aside collapsed mode {{{ -->\n\t\t<aside :class=\"[mode == 'collapsed' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeCollapsed]\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"mode == 'collapsed'\"\n\t\t\t\t:form=\"`${id}-collapsed`\"\n\t\t\t\t:config=\"$props.generalVerbs\"\n\t\t\t\t:actions=\"{setMode, rawEdit}\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\t\t<!-- Aside toc (table-of-contents) mode {{{ -->\n\t\t<aside :class=\"[mode == 'toc' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeToc]\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"mode == 'toc'\"\n\t\t\t\t:form=\"`${id}-toc`\"\n\t\t\t\t:config=\"generateConfigToc()\"\n\t\t\t\t:actions=\"{setMode}\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\t\t<!-- Aside widget library (add widget) {{{ -->\n\t\t<aside :class=\"[mode == 'adding' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeAdding]\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"mode == 'adding'\"\n\t\t\t\tref=\"formAdd\"\n\t\t\t\t:config=\"generateConfigAdding()\"\n\t\t\t\t:actions=\"{setMode}\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\t\t<!-- Aside item editor (edit widget) {{{ -->\n\t\t<aside :class=\"[mode == 'editing' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeEditing]\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"mode == 'editing'\"\n\t\t\t\t:form=\"`${id}-edit`\"\n\t\t\t\t:config=\"editConfig\"\n\t\t\t\t:data=\"editData\"\n\t\t\t\t:actions=\"{setMode, deleteWidget}\"\n\t\t\t\t@changeItem=\"mutatePath(`${editing.$specPath}.${$event.path}`, $event.value)\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\n\t\t<!-- Display form {{{ -->\n\t\t<mg-form\n\t\t\tref=\"form\"\n\t\t\t:config=\"$props.config\"\n\t\t\t:data=\"$props.data\"\n\t\t/>\n\t\t<!-- }}} -->\n\t</div>\n</template>\n\n<style>\n/* Variables {{{ */\n:root {\n\t--mg-form-editor-selected-bg: #007bff;\n\t--mg-form-editor-selected-fg: #fff;;\n\t--mg-form-editor-selected-highlight: #5dabff;\n\t--mg-form-editor-selected-danger: #dc3545;\n\t--mg-form-editor-hover-bg: #77b9ff;\n\t--mg-form-editor-hover-fg: #fff;\n}\n/* }}} */\n\n/* Aside styles - .mgfe-aside {{{ */\n.mgfe-aside {\n\ttransition: transform 0.2s ease-out;\n}\n\n.mgfe-aside .mg-form {\n\tmargin: 0;\n}\n\n.mgfe-aside.aside-right.open.open { /* Silly hack to force the transform when open (overrides .asign-sm in priority) */\n\ttransform: translateX(0px);\n}\n\n.mgfe-aside.aside-right {\n\tposition: fixed;\n\ttop: 0px;\n\tright: 0px;\n\tbottom: 0px;\n\tbackground: #FFF;\n\tz-index: 100;\n\tbox-shadow: 0 1px 5px rgba(0,0,0,.3);\n\twidth: 350px;\n\ttransform: translateX(380px);\n}\n\n/* .mgfe-aside-sm {{{ */\n.mgfe-aside.aside-right.aside-sm {\n\twidth: 40px;\n\ttransform: translateX(50px);\n\ttop: calc(50% - 30px); /* Approx middle of the screen */\n\tbottom: inherit;\n\tborder-radius: 5px;\n}\n\n.mgfe-aside.aside-right.aside-sm .form-group {\n\tmargin: 0;\n}\n\n/* Remove BS padding from sub-elements */\n.mgfe-aside.aside-right.aside-sm .form-group [class*=\"col-\"] {\n\tpadding: 0;\n}\n/* }}} */\n\n/* Headers {{{ */\n.mgfe-aside .aside-header {\n\tdisplay: flex;\n\talign-items: center;\n\tjustify-content: flex-end;\n\tborder-bottom: 1px solid #e9ecef;\n\tmargin: 0;\n}\n\n.mgfe-aside .aside-header h4 {\n\tflex-grow: 1;\n}\n\n.mgfe-aside .aside-header legend.form-control-static {\n\tborder-bottom: none;\n\tfont-size: 17pt;\n}\n\n.mgfe-aside .aside-header .close {\n\tcolor: #5e5e5e;\n}\n\n.mgfe-aside .aside-header .close:hover {\n\tcolor: #000;\n}\n\n.mgfe-aside .aside-header .close::after {\n\tdisplay: inline-block;\n\tfont-family: 'Font Awesome 5 Pro';\n\tfont-weight: 900;\n\tcontent: \"\\f00d\";\n}\n/* }}} */\n\n/* Actions {{{ */\n.mgfe-aside .aside-actions {\n\tjustify-self: flex-end;\n\tmargin-right: 10px;\n}\n\n.mgfe-aside .aside-actions .btn-group {\n\tborder: none;\n\tbox-shadow: none;\n}\n\n.mgfe-aside .aside-actions a {\n\tpadding: 8px;\n\tfont-size: 125%;\n}\n/* }}} */\n\n/* Body {{{ */\n.mgfe-aside .aside-body {\n\tmargin-left: 0;\n\tmargin: 10px 0 0;\n\n\t/* Body scrolling */\n\toverflow: auto;\n\theight: calc(100vh - 80px);\n}\n/* }}} */\n/* }}} */\n\n/* Component highlighting {{{\n\n/* Highlight applied to active elements inside an mgContainer */\n.mg-form-editor-target {\n\tborder: 2px solid var(--blue);\n\tborder-radius: 5px;\n\tposition: relative;\n\ttop: -4px;\n\tleft: -4px;\n\tpadding: 2px;\n}\n\n.mg-form-editor-drop-target {\n}\n\n.mg-form-editor-drop-target-before {\n\tborder-top: 4px dashed var(--blue);\n}\n\n.mg-form-editor-drop-target-after {\n\tborder-bottom: 4px dashed var(--blue);\n}\n/* }}} */\n\n/* Drag + Drop {{{ */\nbody.mg-form-editor-dragging * {\n\tcursor: grabbing;\n}\n\n#mg-form-editor-drag {\n\tdisplay: block;\n\tz-index: 1000;\n\tposition: absolute;\n\ttop: -10000px;\n\tleft: -10000px;\n\tmin-width: 160px;\n\theight: 40px;\n\tborder-radius: 5px;\n\tbackground: #2196F3;\n\tbox-shadow: 1px 1px 4px rgba(0,0,0,.3);\n\tpadding: 10px;\n\tcolor: #FFF;\n}\n\n#mg-form-editor-drag > i {\n\tmargin-right: 5px;\n}\n/* }}} */\n\n/* Misc fixes {{{ */\n/* Buttons that are also fixed with look weird */\n.mg-form-editor .btn.fa-fw {\n\twidth: 2.30em;\n\tpadding: 4px 2px !important;\n}\n/* }}} */\n</style>\n"]}, media: undefined });
+      inject("data-v-2a611bc8_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Variables {{{ */\n:root {\n\t--mg-form-editor-selected-bg: #007bff;\n\t--mg-form-editor-selected-fg: #fff;;\n\t--mg-form-editor-selected-highlight: #5dabff;\n\t--mg-form-editor-selected-danger: #dc3545;\n\t--mg-form-editor-hover-bg: #77b9ff;\n\t--mg-form-editor-hover-fg: #fff;\n}\n/* }}} */\n\n/* Aside styles - .mgfe-aside {{{ */\n.mgfe-aside {\n\ttransition: transform 0.2s ease-out;\n}\n.mgfe-aside .mg-form {\n\tmargin: 0;\n}\n.mgfe-aside.aside-right.open.open { /* Silly hack to force the transform when open (overrides .asign-sm in priority) */\n\ttransform: translateX(0px);\n}\n.mgfe-aside.aside-right {\n\tposition: fixed;\n\ttop: 0px;\n\tright: 0px;\n\tbottom: 0px;\n\tbackground: #FFF;\n\tz-index: 100;\n\tbox-shadow: 0 1px 5px rgba(0,0,0,.3);\n\twidth: 350px;\n\ttransform: translateX(380px);\n}\n\n/* .mgfe-aside-sm {{{ */\n.mgfe-aside.aside-right.aside-sm {\n\twidth: 40px;\n\ttransform: translateX(50px);\n\ttop: calc(50% - 30px); /* Approx middle of the screen */\n\tbottom: inherit;\n\tborder-radius: 5px;\n}\n.mgfe-aside.aside-right.aside-sm .form-group {\n\tmargin: 0;\n}\n\n/* Remove BS padding from sub-elements */\n.mgfe-aside.aside-right.aside-sm .form-group [class*=\"col-\"] {\n\tpadding: 0;\n}\n/* }}} */\n\n/* Headers {{{ */\n.mgfe-aside .aside-header {\n\tdisplay: flex;\n\talign-items: center;\n\tjustify-content: flex-end;\n\tborder-bottom: 1px solid #e9ecef;\n\tmargin: 0;\n}\n.mgfe-aside .aside-header h4 {\n\tflex-grow: 1;\n}\n.mgfe-aside .aside-header legend.form-control-static {\n\tborder-bottom: none;\n\tfont-size: 17pt;\n}\n.mgfe-aside .aside-header .close {\n\tcolor: #5e5e5e;\n}\n.mgfe-aside .aside-header .close:hover {\n\tcolor: #000;\n}\n.mgfe-aside .aside-header .close::after {\n\tdisplay: inline-block;\n\tfont-family: 'Font Awesome 5 Pro';\n\tfont-weight: 900;\n\tcontent: \"\\f00d\";\n}\n/* }}} */\n\n/* Actions {{{ */\n.mgfe-aside .aside-actions {\n\tjustify-self: flex-end;\n\tmargin-right: 10px;\n}\n.mgfe-aside .aside-actions .btn-group {\n\tborder: none;\n\tbox-shadow: none;\n}\n.mgfe-aside .aside-actions a {\n\tpadding: 8px;\n\tfont-size: 125%;\n}\n/* }}} */\n\n/* Body {{{ */\n.mgfe-aside .aside-body {\n\tmargin-left: 0;\n\tmargin: 10px 0 0;\n\n\t/* Body scrolling */\n\toverflow: auto;\n\theight: calc(100vh - 80px);\n}\n/* }}} */\n/* }}} */\n\n/* Component highlighting {{{\n\n/* Highlight applied to active elements inside an mgContainer */\n.mg-form-editor-target {\n\tborder: 2px solid var(--blue);\n\tborder-radius: 5px;\n\tposition: relative;\n\ttop: -4px;\n\tleft: -4px;\n\tpadding: 2px;\n}\n.mg-form-editor-drop-target {\n}\n.mg-form-editor-drop-target-before {\n\tborder-top: 4px dashed var(--blue);\n}\n.mg-form-editor-drop-target-after {\n\tborder-bottom: 4px dashed var(--blue);\n}\n/* }}} */\n\n/* Drag + Drop {{{ */\nbody.mg-form-editor-dragging * {\n\tcursor: grabbing;\n}\n#mg-form-editor-drag {\n\tdisplay: block;\n\tz-index: 1000;\n\tposition: absolute;\n\ttop: -10000px;\n\tleft: -10000px;\n\tmin-width: 160px;\n\theight: 40px;\n\tborder-radius: 5px;\n\tbackground: #2196F3;\n\tbox-shadow: 1px 1px 4px rgba(0,0,0,.3);\n\tpadding: 10px;\n\tcolor: #FFF;\n}\n#mg-form-editor-drag > i {\n\tmargin-right: 5px;\n}\n/* }}} */\n\n/* Misc fixes {{{ */\n/* Buttons that are also fixed with look weird */\n.mg-form-editor .btn.fa-fw {\n\twidth: 2.30em;\n\tpadding: 4px 2px !important;\n}\n/* }}} */\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgFormEditor.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AA+qBA,kBAAA;AACA;CACA,qCAAA;CACA,kCAAA;CACA,4CAAA;CACA,yCAAA;CACA,kCAAA;CACA,+BAAA;AACA;AACA,QAAA;;AAEA,mCAAA;AACA;CACA,mCAAA;AACA;AAEA;CACA,SAAA;AACA;AAEA,oCAAA,kFAAA;CACA,0BAAA;AACA;AAEA;CACA,eAAA;CACA,QAAA;CACA,UAAA;CACA,WAAA;CACA,gBAAA;CACA,YAAA;CACA,oCAAA;CACA,YAAA;CACA,4BAAA;AACA;;AAEA,uBAAA;AACA;CACA,WAAA;CACA,2BAAA;CACA,qBAAA,EAAA,gCAAA;CACA,eAAA;CACA,kBAAA;AACA;AAEA;CACA,SAAA;AACA;;AAEA,wCAAA;AACA;CACA,UAAA;AACA;AACA,QAAA;;AAEA,gBAAA;AACA;CACA,aAAA;CACA,mBAAA;CACA,yBAAA;CACA,gCAAA;CACA,SAAA;AACA;AAEA;CACA,YAAA;AACA;AAEA;CACA,mBAAA;CACA,eAAA;AACA;AAEA;CACA,cAAA;AACA;AAEA;CACA,WAAA;AACA;AAEA;CACA,qBAAA;CACA,iCAAA;CACA,gBAAA;CACA,gBAAA;AACA;AACA,QAAA;;AAEA,gBAAA;AACA;CACA,sBAAA;CACA,kBAAA;AACA;AAEA;CACA,YAAA;CACA,gBAAA;AACA;AAEA;CACA,YAAA;CACA,eAAA;AACA;AACA,QAAA;;AAEA,aAAA;AACA;CACA,cAAA;CACA,gBAAA;;CAEA,mBAAA;CACA,cAAA;CACA,0BAAA;AACA;AACA,QAAA;AACA,QAAA;;AAEA;;+DAEA;AACA;CACA,6BAAA;CACA,kBAAA;CACA,kBAAA;CACA,SAAA;CACA,UAAA;CACA,YAAA;AACA;AAEA;AACA;AAEA;CACA,kCAAA;AACA;AAEA;CACA,qCAAA;AACA;AACA,QAAA;;AAEA,oBAAA;AACA;CACA,gBAAA;AACA;AAEA;CACA,cAAA;CACA,aAAA;CACA,kBAAA;CACA,aAAA;CACA,cAAA;CACA,gBAAA;CACA,YAAA;CACA,kBAAA;CACA,mBAAA;CACA,sCAAA;CACA,aAAA;CACA,WAAA;AACA;AAEA;CACA,iBAAA;AACA;AACA,QAAA;;AAEA,mBAAA;AACA,gDAAA;AACA;CACA,aAAA;CACA,2BAAA;AACA;AACA,QAAA","file":"mgFormEditor.vue","sourcesContent":["<script>\nimport mgFormEditorControls from './mgFormEditorControls';\n\n/**\n* mg-form-editor - Drag-and-drop form designer for MacGyver\n*\n* @param {Object|Array} config mgForm compatible spec to edit\n* @param {Object} [data] Optional data bindings for the form\n* @param {array<Object>} [verbs] Verb edit mgForm to show in the small edit sidebar, defaults to selecting widgets / adding widgets buttons\n* @param {string} [asideClassActive=\"mgfe-aside aside-right open\"] Class to set all editing sidebars to when inactive\n* @param {string} [asideClassInactive=\"mgfe-aside aside-right\"] Class to set all editing sidebar to when inactive\n* @param {string} [asideClassModeCollapsed=\"aside-sm\"] Class to associate with the smaller toolkit display when editing\n* @param {string} [asideClassModeToc=\"aside-sm\"] Class to associate with the Table-Of-Contents sidebar\n* @param {string} [asideClassModeAdding=\"\"] Class to associate with the editing sidebar when adding\n* @param {string} [asideClassModeEditing=\"\"] Class to associate with the editing sidebar when editing\n*\n* @emits change Emitted as `(config)` on any item configuration change. WARNING, subscribing to this involves an entire deep copy of the config structure, subscribe to changeItem if possible\n* @emits changeItem Emitted as `({path, value})` when a single config item changes, inexpensive compared to `change`\n*/\nexport default Vue.component('mgFormEditor', {\n\tprovide() { return {\n\t\t$mgFormEditor: this,\n\t}},\n\tcomponents: {\n\t\tmgFormEditorControls,\n\t},\n\tdata() { return {\n\t\tmode: 'collapsed', // ENUM: collapsed, toc, editing, adding\n\t\tid: this.$macgyver.nextId(), // ID of the editing form item\n\t\tediting: undefined, // The active item we are editing\n\t\twidgetListMode: 'grid',\n\n\t\t// Asides\n\t\teditConfig: [],\n\t\teditData: {},\n\n\t\taddTarget: undefined, // Spec path to add after, if any\n\t\taddOrientation: 'after',\n\t}},\n\tprops: {\n\t\t// FIXME: Does not like array type specs.\n\t\tconfig: [Object, Array], // Can be a single object, array of objects or shorthand style\n\t\tdata: Object,\n\t\tasideClassActive: {type: String, default: 'mgfe-aside aside-right open'},\n\t\tasideClassInactive: {type: String, default: 'mgfe-aside aside-right'},\n\t\tasideClassModeCollapsed: {type: String, default: 'aside-sm'},\n\t\tasideClassModeToc: {type: String, default: ''},\n\t\tasideClassModeAdding: {type: String, default: ''},\n\t\tasideClassModeEditing: {type: String, default: ''},\n\t\tgeneralVerbs: {\n\t\t\ttype: Array,\n\t\t\tdefault() {\n\t\t\t\treturn [\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"setMode()\",\n\t\t\t\t\t\tclass: 'btn btn-primary text-white px-2',\n\t\t\t\t\t\ticon: 'fa fa-mouse-pointer fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t// FIXME: Why were tooltips failing as Object type?\n\t\t\t\t\t\ttooltip: 'Select widgets to edit',\n\t\t\t\t\t\t//tooltip: \"{content: 'Select widgets to edit', placement: 'left'}\",\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"setMode('toc')\",\n\t\t\t\t\t\tclass: 'btn btn-outline-light border-0 px-2',\n\t\t\t\t\t\ticon: 'fa fa-stream fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\ttooltip: 'Select widgets to edit',\n\t\t\t\t\t\t//tooltip: {content: 'Select widgets to edit', placement: 'left'},\n\t\t\t\t\t},\n\t\t\t\t\t...(this.$prompt?.macgyver ? [{ // Include JSON editing if $prompt.macgyver() is available\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"rawEdit()\",\n\t\t\t\t\t\tclass: 'btn btn-outline-light border-0 px-2',\n\t\t\t\t\t\ticon: 'fa fa-code fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\ttooltip: 'Edit the form contents as JSON',\n\t\t\t\t\t\t//tooltip: {content: 'Edit the form contents as JSON', placement: 'left'},\n\t\t\t\t\t}] : []),\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"setMode('adding')\",\n\t\t\t\t\t\tclass: 'btn btn-outline-light border-0 px-2',\n\t\t\t\t\t\ticon: 'far fa-plus fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\ttooltip: 'Add a new widget',\n\t\t\t\t\t\t//tooltip: {content: 'Add a new widget', placement: 'left'},\n\t\t\t\t\t},\n\t\t\t\t];\n\t\t\t},\n\t\t},\n\t},\n\tcreated() {\n\t\tthis.$debugging = true;\n\t},\n\tmounted() {\n\n\t\t/*\n\t\t// Potential for highlighting components within nested mgContainer\n\t\tthis.$refs.form.$on('mgComponent.click', (component, e) => {\n\t\t\te.stopPropagation();\n\t\t\te.preventDefault();\n\t\t\tthis.editWidget(component.config.$specPath);\n\t\t});\n\n\t\tthis.$refs.form.$on('mgComponent.mouseEnter', (component, e) => {\n\t\t\tif (component.config.type === 'mgContainer') return;\n\t\t\te.stopPropagation();\n\t\t\t//e.preventDefault();\n\t\t\tvar target = this.$refs.form.getComponentBySpecPath(component.config.$specPath);\n\t\t\t//if (target.$type === 'mgContainer') return;\n\t\t\t// FIXME: Always 2 parents up? Traverse up to next highest mgContainer?\n\t\t\tvar container = target.$parent.$parent;\n\t\t\tif (!container) return;\n\t\t\tvar targetIndex = container.findChildIndex(target);\n\t\t\tcontainer.$set(container.highlights, targetIndex, (container.highlights[targetIndex] || []).concat(['editHover']));\n\t\t});\n\n\t\tthis.$refs.form.$on('mgComponent.mouseLeave', (component, e) => {\n\t\t\tif (component.config.type === 'mgContainer') return;\n\t\t\te.stopPropagation();\n\t\t\t//e.preventDefault();\n\t\t\tvar target = this.$refs.form.getComponentBySpecPath(component.config.$specPath);\n\t\t\t//if (target.$type === 'mgContainer') return;\n\t\t\t// FIXME: Always 2 parents up? Traverse up to next highest mgContainer?\n\t\t\tvar container = target.$parent.$parent;\n\t\t\tif (!container) return;\n\t\t\tvar targetIndex = container.findChildIndex(target);\n\t\t\tcontainer.$set(container.highlights, targetIndex, (container.highlights[targetIndex] || []).filter(c => c != 'editHover'));\n\t\t});\n\t\t*/\n\n\t\tthis.$refs.form.$on('mgContainer.click', (container, specPath, componentIndex, e) => {\n\t\t\te.stopPropagation();\n\t\t\te.preventDefault();\n\t\t\tthis.editWidget(specPath);\n\t\t});\n\n\t\tthis.$refs.form.$on('mgContainer.mouseEnter', (container, specPath, componentIndex, e) => {\n\t\t\tvar component = this.$refs.form.getComponentBySpecPath(specPath);\n\t\t\tvar componentIndex = container.findChildIndex(component);\n\t\t\tcontainer.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).concat(['editHover']));\n\t\t});\n\n\t\tthis.$refs.form.$on('mgContainer.mouseLeave', (container, specPath, componentIndex, e) => {\n\t\t\tvar component = this.$refs.form.getComponentBySpecPath(specPath);\n\t\t\tvar componentIndex = container.findChildIndex(component);\n\t\t\tcontainer.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).filter(c => c != 'editHover'));\n\t\t});\n\t},\n\tmethods: {\n\t\t/**\n\t\t* Stop editing / adding and return to regular mode\n\t\t* @param {string} [mode=\"collapsed\"] Mode to switch to\n\t\t* @param {boolean} [clearHighlight=true] Also attempt to clear out any highlight and reset the aside panes\n\t\t*/\n\t\tsetMode(mode = 'collapsed', clearHighlight = true) {\n\t\t\t// Deselect the existing item (if we have one)\n\t\t\tif (this.editing && clearHighlight) {\n\t\t\t\tthis.setComponentHighlight(this.editing, []);\n\t\t\t\tthis.editing = undefined;\n\t\t\t}\n\n\t\t\tthis.$set(this, 'mode', mode || 'collapsed');\n\t\t\treturn true; // Signal to mgForm that we have handled this action\n\t\t},\n\n\n\t\t/**\n\t\t* Delete the active widget\n\t\t*/\n\t\tdeleteWidget() {\n\t\t\tif (!this.editing) {\n\t\t\t\tthis.$macgyver.notify.warn('No widget selected to delete'); // Not editing anyway\n\t\t\t} else {\n\t\t\t\tthis.removeWidget(this.editing.$props.$specPath);\n\t\t\t}\n\n\t\t\treturn true; // Signal to mgForm that we have handled this action\n\t\t},\n\n\n\t\t/**\n\t\t* Set the component.highlight[index] to the given list of CSS classes\n\t\t* @param {VueController} component The VueController to set the highlight of within its mgContainer\n\t\t* @param {array<string>} classes Array of string classes to set\n\t\t*/\n\t\tsetComponentHighlight(component, classes) {\n\t\t\tif (!_.isArray(classes)) throw new Error('setComponentHighlight must be passed an array');\n\n\t\t\tvar container = false;\n\t\t\tcomponent.$emit.up('mgIdentify', component => {\n\t\t\t\tif (!container && component.$props.$type == 'mgContainer') container = component;\n\t\t\t});\n\t\t\tif (!container) return console.warn('[mgFormEditor] setComponentHighlight component failed to find enclosing container', {component});\n\n\t\t\tvar childOffset = container.findChildIndex(component);\n\t\t\tif (childOffset === false) return console.warn('[mgFormEditor]', 'Cannot locate component within container', {container, component});\n\n\t\t\tconsole.log('Set highlight', childOffset, classes);\n\t\t\tcontainer.$set(container.highlights, childOffset, classes);\n\t\t},\n\n\n\t\t/**\n\t\t* Edit a widget by its specPath or component\n\t\t* @param {VueComponent|string} component Either the VueComponent to edit or the specPath of the widget to edit\n\t\t*/\n\t\teditWidget(component) {\n\t\t\tvar component; // The Vue component from the widget path\n\t\t\tif (!_.isObject(component) && !_.isString(component)) throw new Error('editWidget requires either a specPath or VueComponent');\n\t\t\tif (_.isObject(component) && !component._uid) throw new Error('editWidget() requires a valid VueComponent object (or specPath string)');\n\n\t\t\tif (_.isString(component) || _.isArray(component)) component = this.$refs.form.getComponentBySpecPath(component); // Resolve specPath into actual component if eneded\n\n\t\t\tthis.setMode();\n\n\t\t\tthis.$set(this, 'editing', component);\n\t\t\tthis.$set(this, 'mode', 'editing');\n\n\t\t\tthis.setComponentHighlight(component, ['editEditing']);\n\n\t\t\tvar widget = this.$macgyver.widgets[component.$props.$type];\n\t\t\tif (widget) {\n\t\t\t\tthis.$set(this, 'editConfig', [\n\t\t\t\t\t{ // Header area\n\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\trowClass: 'aside-header',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t{id: 'metaIcon', type: 'mgIcon'},\n\t\t\t\t\t\t\t{id: 'id', type: 'mgText', placeholder: 'No ID'},\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t\t\trowClass: 'aside-actions',\n\t\t\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'deleteWidget', class: 'btn btn-link btn-link-danger btn-xs', icon: 'far fa-trash', tooltip: 'Delete this widget'},\n\t\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'setMode', text: '', class: 'btn btn-link btn-xs', icon: 'far fa-times'},\n\t\t\t\t\t\t\t\t],\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t],\n\t\t\t\t\t},\n\t\t\t\t\t{ // Body area\n\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\tlayout: 'form',\n\t\t\t\t\t\tformClass: 'titles-above',\n\t\t\t\t\t\trowClass: 'aside-body',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\titems: _.map(widget.props, (v, k) => _.set(v, 'id', k)),\n\t\t\t\t\t},\n\t\t\t\t]);\n\t\t\t\tthis.$debug('Set editConfig', this.editConfig);\n\n\t\t\t\tthis.$set(this, 'editData',\n\t\t\t\t\t_(widget.props)\n\t\t\t\t\t\t.mapValues((v, k) => _.get(component.$props, k, _.get(widget.props, k).default))\n\t\t\t\t\t\t.set('id', component.$props.$dataPath)\n\t\t\t\t\t\t.set('metaIcon', widget.meta.icon)\n\t\t\t\t\t\t.value()\n\t\t\t\t);\n\t\t\t\tthis.$debug('Set editData', this.editData);\n\t\t\t} else {\n\t\t\t\tthis.$macgyver.notify.warn(`Cannot edit unknown widget \"${component.$props?.$type || 'Unknown type'}\"`);\n\t\t\t\tthis.setMode();\n\t\t\t}\n\t\t},\n\n\n\t\t/**\n\t\t* Change the value of a nested config path\n\t\t* @param {string} path The dotted / array notation path to mutate\n\t\t* @param {*} value The value to set, if undefined the key is removed\n\t\t* @emits change Emitted with the entire deep copied config object\n\t\t* @emits changeItem Emitted as `{path, value}` for a single item mutation\n\t\t*/\n\t\tmutatePath(path, value) {\n\t\t\tconsole.log('mutatePath', path, value);\n\t\t\t// Only bother cloning the entire object if something is listening to 'change'\n\t\t\tif (this.$emit.hasListeners('change')) {\n\t\t\t\tvar configCopy = _.cloneDeep(this.config);\n\t\t\t\tthis.$setPath(configCopy, path, value);\n\t\t\t\tthis.$emit('change', configCopy);\n\t\t\t}\n\n\t\t\tthis.$emit('changeItem', {path: path, value: value});\n\t\t},\n\n\n\t\t/**\n\t\t* Splice items into a deep copy of the config object, emitting change events\n\t\t* @param {string} path The dotted / array notation path to mutate\n\t\t* @param {number} index The index to work from\n\t\t* @param {number} [remove] The number of items to remove\n\t\t* @param {*} [value...] The value(s) to set, if undefined the key is removed\n\t\t* @emits change Emitted with the entire deep copied config object\n\t\t* @emits changeItem Emitted as `{path, value}` for a single item mutation\n\t\t*/\n\t\tmutateSplice(path, index, remove, ...value) {\n\t\t\tconsole.log('mutateSplice', path, index, remove);\n\t\t\tvar configCopy = _.cloneDeep(this.config); // Copy entire object\n\t\t\tvar spliceContents = _.get(configCopy, path); // Extract path from nested object\n\t\t\tif (!_.isArray(spliceContents)) throw new Error('Refusing to splice a non-array');\n\t\t\tspliceContents.splice(index, remove, ...value); // Perform splice\n\n\t\t\tthis.$setPath(configCopy, path, spliceContents); // Place back in mutated object\n\n\t\t\tthis.$emit('change', configCopy);\n\t\t\tthis.$emit('changeItem', {path: path, value: spliceContents});\n\t\t},\n\n\n\t\t/**\n\t\t* Insert a widget at a given path\n\t\t* @param {Object} widget The widget to insert, this must contain at least a `type` key\n\t\t* @param {Object} [options] Additional options\n\t\t* @param {string|array} [options.specPath] The lodash notation specPath to target instead of the last element on the form\n\t\t* @param {string} [options.orientation='after'] Where to insert. ENUM: 'before', 'after', 'last'\n\t\t* @param {boolean} [options.useContainer=true] If no spec path, try and fit the new widget within the last container if one exists\n\t\t* @param {boolean} [options.allocateTitle=true] Try to allocate a title if not supplied\n\t\t* @param {boolean} [options.allocateId=true] Try to allocate an ID if not supplied and the widget has `preferId`\n\t\t* @param {boolean} [options.edit=true] Show the edit dialog after inserting the component\n\t\t* @returns {Object} The inserted widget object (complete with ID if allocateId is specified)\n\t\t*/\n\t\tinsertWidget(widget, options) {\n\t\t\tconsole.log('insertWidget', widget, options);\n\t\t\tvar settings = {\n\t\t\t\tspecPath: undefined,\n\t\t\t\torientation: 'after',\n\t\t\t\tuseContainer: true,\n\t\t\t\tallocateTitle: true,\n\t\t\t\tallocateId: true,\n\t\t\t\tedit: true,\n\t\t\t\t...options,\n\t\t\t};\n\n\t\t\tif (!widget.type) throw new Error('Widget.type must be specified as a minimum for insertWidget()');\n\n\t\t\t// options.allocateTitle / settings.alloacteId {{{\n\t\t\tif ( // A field we want is missing\n\t\t\t\t(settings.allocateTitle && !widget.title)\n\t\t\t\t|| (settings.allocateId && !widget.id)\n\t\t\t) {\n\t\t\t\t// Compute how many of this widget are on the form\n\t\t\t\tvar widgetOffset = this.$macgyver\n\t\t\t\t\t.flatten(this.$props.config, {want: 'array', type: 'spec'})\n\t\t\t\t\t.reduce((i, w) => w.type == widget.type ? i + 1 : i, 0);\n\n\t\t\t\tif (settings.allocateTitle && !widget.title)\n\t\t\t\t\twidget.title = this.$macgyver.widgets[widget.type].meta.title\n\t\t\t\t\t\t+ String(widgetOffset == 0 ? '' : widgetOffset);\n\n\t\t\t\t// Guess at an ID\n\t\t\t\tif (settings.allocateId && !widget.id && this.$macgyver.widgets[widget.type].meta.preferId)\n\t\t\t\t\twidget.id = _.chain(widget.type)\n\t\t\t\t\t\t.replace(/^mg/, '') // Remove first `mg` bit\n\t\t\t\t\t\t.camelCase()\n\t\t\t\t\t\t.replace(/$/, widgetOffset == 0 ? '' : widgetOffset) // Append numeric offset (if there is more than one of this type)\n\t\t\t\t\t\t.value();\n\t\t\t}\n\t\t\t// }}}\n\n\t\t\t// FIXME: Support for array specs without a root mgContainer.\n\t\t\tswitch (settings.orientation) {\n\t\t\t\tcase 'last':\n\t\t\t\t\tif ( // Container -> Container:Last -> New widget\n\t\t\t\t\t\tsettings.useContainer // Insert within container?\n\t\t\t\t\t\t&& this.config.type == 'mgContainer' // First item is a container\n\t\t\t\t\t\t&& _.last(this.config.items).type == 'mgContainer' // Last child is also a container - use this\n\t\t\t\t\t) {\n\t\t\t\t\t\tthis.mutateSplice(`items.${this.config.items.length - 1}.items`, _.last(this.config.items).items.length, 0, widget);\n\t\t\t\t\t} else if ( // Container:Last -> New widget\n\t\t\t\t\t\tsettings.useContainer // Insert within container?\n\t\t\t\t\t\t&& this.config.type == 'mgContainer' // First item is a container\n\t\t\t\t\t) {\n\t\t\t\t\t\tthis.mutateSplice('items', this.config.items.length, 0, widget);\n\t\t\t\t\t} else if (_.isArray(this.config)) { // Append to end of config array\n\t\t\t\t\t\tthis.mutateSplice('', this.config.items.length, 0, widget);\n\t\t\t\t\t} else {\n\t\t\t\t\t\tthrow new Error('Dont know how to append widget to form config');\n\t\t\t\t\t}\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'before':\n\t\t\t\tcase 'after':\n\t\t\t\t\tif (!settings.specPath) throw new Error('Inserting with orientations before / after requires a specPath');\n\t\t\t\t\tvar parentItems = _.isArray(settings.specPath) ? settings.specPath : settings.specPath.split('.');\n\t\t\t\t\tvar targetWidget = parentItems.pop();\n\n\t\t\t\t\tthis.mutateSplice(\n\t\t\t\t\t\tparentItems,\n\t\t\t\t\t\tsettings.orientation == 'after' ? +targetWidget + 1 : targetWidget,\n\t\t\t\t\t\t0,\n\t\t\t\t\t\twidget\n\t\t\t\t\t);\n\t\t\t\t\tbreak;\n\t\t\t\tdefault:\n\t\t\t\t\tthrow new Error(`Dont know how to handle insert of component at with orientation \"${settings.orientation}\"`);\n\t\t\t}\n\n\t\t\tif (settings.edit) {\n\t\t\t\tconsole.warn('FIXME: Unsupported post edit when editing components');\n\t\t\t\t// this.editWidget(widget.id);\n\t\t\t}\n\n\t\t\treturn widget;\n\t\t},\n\n\n\t\t/**\n\t\t* Remove a widget by its specPath\n\t\t* @param {string|array} specPath The lodash notation specPath to remove\n\t\t*/\n\t\tremoveWidget(specPath) {\n\t\t\tthis.setMode(); // Reset mode to close edit panel\n\n\t\t\t// FIXME: Splitting non-array, condition backwards?\n\t\t\tvar parentItems = _.isArray(specPath) ? specPath : specPath.split('.');\n\t\t\tvar targetIndex = parentItems.pop();\n\n\t\t\tthis.mutateSplice(parentItems, targetIndex, 1);\n\t\t},\n\n\n\t\t/**\n\t\t* Duplicate a widget by its specPath\n\t\t* @param {string|array} specPath The lodash notation specPath to remove\n\t\t*/\n\t\tduplicateWidget(specPath) {\n\t\t\tvar parentItems = _.isArray(specPath) ? specPath : specPath.split('.');\n\t\t\tvar targetIndex = parentItems.pop();\n\n\t\t\tthis.setMode(); // Reset mode to close edit panel\n\t\t\tthis.mutatePath(\n\t\t\t\tparentItems,\n\t\t\t\t_(_.get(this.config, parentItems))\n\t\t\t\t\t.map((v, i) => i == targetIndex // Duplicate this item when we find its index\n\t\t\t\t\t\t? [\n\t\t\t\t\t\t\tv, // Original object\n\t\t\t\t\t\t\t_.chain(v)\n\t\t\t\t\t\t\t\t.cloneDeep()\n\t\t\t\t\t\t\t\t.pickBy((v, k) => !k.startsWith('$'))\n\t\t\t\t\t\t\t\t.set('id', this.$macgyver.utils.incrementId(v.id)) // Also increment its ID\n\t\t\t\t\t\t\t\t.value(),\n\t\t\t\t\t\t]\n\t\t\t\t\t\t: v\n\t\t\t\t\t)\n\t\t\t\t\t.flatten()\n\t\t\t\t\t.value()\n\t\t\t);\n\t\t},\n\n\n\t\t/**\n\t\t* Move a widget in a given direction\n\t\t* @param {string|array} specPath The lodash notation SpecPath to move\n\t\t* @param {string} direction The direction to move. ENUM: 'up', 'down'\n\t\t*/\n\t\tmoveWidget(specPath, direction) {\n\t\t\tif (!['up', 'down'].includes(direction)) throw new Error('Unsupported direction');\n\n\t\t\tvar parentItems = _.isArray(specPath) ? specPath : specPath.split('.');\n\t\t\tvar targetIndex = parentItems.pop();\n\n\t\t\tthis.setMode(); // Reset mode to close edit panel\n\t\t\tthis.mutatePath(\n\t\t\t\tparentItems,\n\t\t\t\t_.chain(_.get(this.config, parentItems))\n\t\t\t\t\t.clone()\n\t\t\t\t\t.thru(v => {\n\t\t\t\t\t\ttargetIndex = +targetIndex; // Splat into number\n\t\t\t\t\t\tif (direction == 'up' && targetIndex > 0) {\n\t\t\t\t\t\t\t[v[targetIndex], v[targetIndex-1]]\n\t\t\t\t\t\t\t=\n\t\t\t\t\t\t\t[v[targetIndex-1], v[targetIndex]]\n\t\t\t\t\t\t} else if (direction == 'down' && targetIndex < v.length) {\n\t\t\t\t\t\t\tconsole.log('SWAP', targetIndex, targetIndex + 1);\n\t\t\t\t\t\t\t[v[targetIndex], v[targetIndex+1]]\n\t\t\t\t\t\t\t=\n\t\t\t\t\t\t\t[v[targetIndex+1], v[targetIndex]]\n\t\t\t\t\t\t}\n\t\t\t\t\t\treturn v;\n\t\t\t\t\t})\n\t\t\t\t\t.value()\n\t\t\t);\n\t\t},\n\n\n\t\t/**\n\t\t* Begin drag sequence for a widget\n\t\t* @param {string|array} specPath The lodash notation SpecPath to drag\n\t\t*/\n\t\tdragWidget(specPath) {\n\t\t\tconsole.warn('FIXME: dragWidget() not yet supported');\n\t\t},\n\n\n\t\trawEdit() {\n\t\t\tthis.$prompt.macgyver({\n\t\t\t\ttitle: 'Template JSON',\n\t\t\t\tmacgyver: {\n\t\t\t\t\tid: 'code',\n\t\t\t\t\ttype: 'mgCode',\n\t\t\t\t\tsyntax: 'json',\n\t\t\t\t\tconvert: true,\n\t\t\t\t\tdefault: this.$props.config,\n\t\t\t\t},\n\t\t\t}).then(form => this.$set(this, 'config', form.code))\n\t\t},\n\n\n\t\t// Form layouts {{{\n\t\t/**\n\t\t* Generate the config layout for the Table-Of-Contents sidebar\n\t\t*/\n\t\tgenerateConfigToc() {\n\t\t\tvar genTreeBranch = root =>\n\t\t\t\troot.map(widget => ({\n\t\t\t\t\ttitle: `${widget.type} #${widget.id}`,\n\t\t\t\t\ticon: this.$macgyver.widgets[widget.type].icon,\n\t\t\t\t\tenum: widget.items ? genTreeBranch(widget.items) : undefined,\n\t\t\t\t}));\n\n\t\t\treturn [\n\t\t\t\t{ // Header area\n\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\tborder: false,\n\t\t\t\t\trowClass: 'aside-header',\n\t\t\t\t\tshowTitle: false,\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{type: 'mgHeading', text: 'Form layout'},\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t\trowClass: 'aside-actions',\n\t\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'setMode', text: '', class: 'btn btn-link btn-xs', icon: 'far fa-times'},\n\t\t\t\t\t\t\t],\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t\t{ // Body area\n\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\tlayout: 'form',\n\t\t\t\t\trowClass: 'aside-body',\n\t\t\t\t\tshowTitles: false,\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\ttype: 'mgChoiceTree',\n\t\t\t\t\t\t\ttitle: 'Layout tree',\n\t\t\t\t\t\t\tchange: item => {\n\t\t\t\t\t\t\t\tconsole.log('TREE CLICK', item);\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tenum: genTreeBranch(\n\t\t\t\t\t\t\t\t[ this.$macgyver.compileSpec(this.$props.config, {clone: false}).spec ]\n\t\t\t\t\t\t\t),\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t];\n\t\t},\n\n\n\t\t/**\n\t\t* Generate the config layout for the \"add widget\" sidebar\n\t\t*/\n\t\tgenerateConfigAdding() {\n\t\t\treturn [\n\t\t\t\t{ // Header area\n\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\tborder: false,\n\t\t\t\t\trowClass: 'aside-header',\n\t\t\t\t\tshowTitle: false,\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{type: 'mgHeading', text: 'Add widget'},\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t\trowClass: 'aside-actions',\n\t\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'setMode', text: '', class: 'btn btn-link btn-xs', icon: 'far fa-times'},\n\t\t\t\t\t\t\t],\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t\t{ // Body area\n\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\tlayout: 'form',\n\t\t\t\t\trowClass: 'aside-body',\n\t\t\t\t\tshowTitles: false,\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tid: 'addType',\n\t\t\t\t\t\t\ttype: 'mgChoiceList',\n\t\t\t\t\t\t\ttitle: 'Widget type to add',\n\t\t\t\t\t\t\tenum: _(this.$macgyver.widgets)\n\t\t\t\t\t\t\t\t.map((w, k) => ({\n\t\t\t\t\t\t\t\t\tid: k,\n\t\t\t\t\t\t\t\t\ttitle: w.meta.title,\n\t\t\t\t\t\t\t\t\ticon: `${w.meta.icon} fa-fw`,\n\t\t\t\t\t\t\t\t}))\n\t\t\t\t\t\t\t\t.sortBy('title')\n\t\t\t\t\t\t\t\t.value(),\n\t\t\t\t\t\t\tchange: type => {\n\t\t\t\t\t\t\t\tvar inserted = this.insertWidget({type}, {\n\t\t\t\t\t\t\t\t\torientation: 'last',\n\t\t\t\t\t\t\t\t\tuseContainer: true,\n\t\t\t\t\t\t\t\t\tedit: true,\n\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t];\n\t\t},\n\t\t// }}}\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-form-editor\">\n\t\t<!-- Aside collapsed mode {{{ -->\n\t\t<aside :class=\"[mode == 'collapsed' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeCollapsed]\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"mode == 'collapsed'\"\n\t\t\t\t:form=\"`${id}-collapsed`\"\n\t\t\t\t:config=\"$props.generalVerbs\"\n\t\t\t\t:actions=\"{setMode, rawEdit}\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\t\t<!-- Aside toc (table-of-contents) mode {{{ -->\n\t\t<aside :class=\"[mode == 'toc' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeToc]\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"mode == 'toc'\"\n\t\t\t\t:form=\"`${id}-toc`\"\n\t\t\t\t:config=\"generateConfigToc()\"\n\t\t\t\t:actions=\"{setMode}\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\t\t<!-- Aside widget library (add widget) {{{ -->\n\t\t<aside :class=\"[mode == 'adding' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeAdding]\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"mode == 'adding'\"\n\t\t\t\tref=\"formAdd\"\n\t\t\t\t:config=\"generateConfigAdding()\"\n\t\t\t\t:actions=\"{setMode}\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\t\t<!-- Aside item editor (edit widget) {{{ -->\n\t\t<aside :class=\"[mode == 'editing' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeEditing]\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"mode == 'editing'\"\n\t\t\t\t:form=\"`${id}-edit`\"\n\t\t\t\t:config=\"editConfig\"\n\t\t\t\t:data=\"editData\"\n\t\t\t\t:actions=\"{setMode, deleteWidget}\"\n\t\t\t\t@changeItem=\"mutatePath(`${editing.$specPath}.${$event.path}`, $event.value)\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\n\t\t<!-- Display form {{{ -->\n\t\t<mg-form\n\t\t\tref=\"form\"\n\t\t\t:config=\"$props.config\"\n\t\t\t:data=\"$props.data\"\n\t\t/>\n\t\t<!-- }}} -->\n\t</div>\n</template>\n\n<style>\n/* Variables {{{ */\n:root {\n\t--mg-form-editor-selected-bg: #007bff;\n\t--mg-form-editor-selected-fg: #fff;;\n\t--mg-form-editor-selected-highlight: #5dabff;\n\t--mg-form-editor-selected-danger: #dc3545;\n\t--mg-form-editor-hover-bg: #77b9ff;\n\t--mg-form-editor-hover-fg: #fff;\n}\n/* }}} */\n\n/* Aside styles - .mgfe-aside {{{ */\n.mgfe-aside {\n\ttransition: transform 0.2s ease-out;\n}\n\n.mgfe-aside .mg-form {\n\tmargin: 0;\n}\n\n.mgfe-aside.aside-right.open.open { /* Silly hack to force the transform when open (overrides .asign-sm in priority) */\n\ttransform: translateX(0px);\n}\n\n.mgfe-aside.aside-right {\n\tposition: fixed;\n\ttop: 0px;\n\tright: 0px;\n\tbottom: 0px;\n\tbackground: #FFF;\n\tz-index: 100;\n\tbox-shadow: 0 1px 5px rgba(0,0,0,.3);\n\twidth: 350px;\n\ttransform: translateX(380px);\n}\n\n/* .mgfe-aside-sm {{{ */\n.mgfe-aside.aside-right.aside-sm {\n\twidth: 40px;\n\ttransform: translateX(50px);\n\ttop: calc(50% - 30px); /* Approx middle of the screen */\n\tbottom: inherit;\n\tborder-radius: 5px;\n}\n\n.mgfe-aside.aside-right.aside-sm .form-group {\n\tmargin: 0;\n}\n\n/* Remove BS padding from sub-elements */\n.mgfe-aside.aside-right.aside-sm .form-group [class*=\"col-\"] {\n\tpadding: 0;\n}\n/* }}} */\n\n/* Headers {{{ */\n.mgfe-aside .aside-header {\n\tdisplay: flex;\n\talign-items: center;\n\tjustify-content: flex-end;\n\tborder-bottom: 1px solid #e9ecef;\n\tmargin: 0;\n}\n\n.mgfe-aside .aside-header h4 {\n\tflex-grow: 1;\n}\n\n.mgfe-aside .aside-header legend.form-control-static {\n\tborder-bottom: none;\n\tfont-size: 17pt;\n}\n\n.mgfe-aside .aside-header .close {\n\tcolor: #5e5e5e;\n}\n\n.mgfe-aside .aside-header .close:hover {\n\tcolor: #000;\n}\n\n.mgfe-aside .aside-header .close::after {\n\tdisplay: inline-block;\n\tfont-family: 'Font Awesome 5 Pro';\n\tfont-weight: 900;\n\tcontent: \"\\f00d\";\n}\n/* }}} */\n\n/* Actions {{{ */\n.mgfe-aside .aside-actions {\n\tjustify-self: flex-end;\n\tmargin-right: 10px;\n}\n\n.mgfe-aside .aside-actions .btn-group {\n\tborder: none;\n\tbox-shadow: none;\n}\n\n.mgfe-aside .aside-actions a {\n\tpadding: 8px;\n\tfont-size: 125%;\n}\n/* }}} */\n\n/* Body {{{ */\n.mgfe-aside .aside-body {\n\tmargin-left: 0;\n\tmargin: 10px 0 0;\n\n\t/* Body scrolling */\n\toverflow: auto;\n\theight: calc(100vh - 80px);\n}\n/* }}} */\n/* }}} */\n\n/* Component highlighting {{{\n\n/* Highlight applied to active elements inside an mgContainer */\n.mg-form-editor-target {\n\tborder: 2px solid var(--blue);\n\tborder-radius: 5px;\n\tposition: relative;\n\ttop: -4px;\n\tleft: -4px;\n\tpadding: 2px;\n}\n\n.mg-form-editor-drop-target {\n}\n\n.mg-form-editor-drop-target-before {\n\tborder-top: 4px dashed var(--blue);\n}\n\n.mg-form-editor-drop-target-after {\n\tborder-bottom: 4px dashed var(--blue);\n}\n/* }}} */\n\n/* Drag + Drop {{{ */\nbody.mg-form-editor-dragging * {\n\tcursor: grabbing;\n}\n\n#mg-form-editor-drag {\n\tdisplay: block;\n\tz-index: 1000;\n\tposition: absolute;\n\ttop: -10000px;\n\tleft: -10000px;\n\tmin-width: 160px;\n\theight: 40px;\n\tborder-radius: 5px;\n\tbackground: #2196F3;\n\tbox-shadow: 1px 1px 4px rgba(0,0,0,.3);\n\tpadding: 10px;\n\tcolor: #FFF;\n}\n\n#mg-form-editor-drag > i {\n\tmargin-right: 5px;\n}\n/* }}} */\n\n/* Misc fixes {{{ */\n/* Buttons that are also fixed with look weird */\n.mg-form-editor .btn.fa-fw {\n\twidth: 2.30em;\n\tpadding: 4px 2px !important;\n}\n/* }}} */\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
@@ -14466,8 +14463,9 @@
     },
     data: function data() {
       return {
-        newRow: [],
-        isAdding: false
+        newRow: {},
+        isAdding: false,
+        data: []
       };
     },
     props: {
@@ -14495,13 +14493,20 @@
         type: 'mgAlert',
         vueType: 'array',
         text: 'Use the editor to define child widgets',
-        "default": [
-          /* e.g.
-          {id: 'col1', type: 'mgText'},
-          {id: 'col2', title: 'mgText'},
-          {id: 'col3', title: 'mgText'},
-          */
-        ]
+        "default": function _default() {
+          return [// FIXME: Defaults are not initialised
+          {
+            id: 'col1',
+            title: 'Col 1',
+            type: 'mgText',
+            "default": '1'
+          }, {
+            id: 'col2',
+            title: 'Col 2',
+            type: 'mgText',
+            "default": '2'
+          }];
+        }
       },
       addButtonActiveClass: {
         type: 'mgText',
@@ -14526,6 +14531,9 @@
         title: 'Show Title'
       }
     },
+    created: function created() {
+      this.$debugging = true;
+    },
     mounted: function mounted() {
       var _this = this;
 
@@ -14543,7 +14551,6 @@
     },
     watch: {
       data: {
-        // FIXME: deep?
         immediate: true,
         handler: function handler() {
           // Ensure that data is always an array
@@ -14551,13 +14558,39 @@
         }
       }
     },
+    // To ensure reactivity to array of objects https://stackoverflow.com/a/56793403/2438830
+    computed: {
+      outerKey: function outerKey() {
+        return this.data && this.data.length;
+      }
+    },
     methods: {
       createRow: function createRow(offset) {
         // Offset is the row to create after - i.e. array position splice
-        console.log("FIXME: createRow(".concat(offset, ")"));
+        this.$debug('createRow', offset);
+        this.$debug('newRow', this.$data.newRow);
+        this.isAdding = true;
+
+        if (typeof offset === 'undefined') {
+          this.data.push(this.$data.newRow);
+        } else {
+          this.data.splice(offset, 0, this.$data.newRow);
+        }
+
+        this.$data.newRow = {};
+        this.isAdding = false;
+        /*
+        if (typeof offset === 'undefined') {
+        	this.data.push({});
+        } else {
+        	this.data.splice(offset, 0, {});
+        }
+        */
       },
       deleteRow: function deleteRow(offset) {
-        console.log("FIXME: deleteRow(".concat(offset, ")"));
+        this.$debug('deleteRow', offset); //this.$delete(this.data, offset);
+
+        this.data.splice(offset, 1);
       }
     }
   });
@@ -14570,178 +14603,88 @@
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
-    return _c(
-      "table",
-      { staticClass: "table table-bordered table-striped table-hover" },
-      [
-        _c("thead", [
+    return _c("div", { staticClass: "mg-table" }, [
+      _c(
+        "table",
+        { staticClass: "table table-bordered table-striped table-hover" },
+        [
+          _c("thead", [
+            _c(
+              "tr",
+              [
+                _vm.$props.rowNumbers
+                  ? _c("th", { staticClass: "row-number" }, [_vm._v("#")])
+                  : _vm._e(),
+                _vm._v(" "),
+                _vm._l(_vm.$props.items, function(col) {
+                  return _c(
+                    "th",
+                    {
+                      key: col.id,
+                      style:
+                        (col.width ? "width: " + col.width + "; " : "") +
+                        col.class
+                    },
+                    [_vm._v("\n\t\t\t\t\t" + _vm._s(col.title) + "\n\t\t\t\t")]
+                  )
+                }),
+                _vm._v(" "),
+                _c("th", { staticClass: "btn-context" })
+              ],
+              2
+            )
+          ]),
+          _vm._v(" "),
           _c(
-            "tr",
+            "tbody",
+            { key: _vm.outerKey },
             [
-              _vm.$props.rowNumbers
-                ? _c("th", { staticClass: "row-number" }, [_vm._v("#")])
+              !_vm.data || !_vm.data.length
+                ? _c("tr", [
+                    _c(
+                      "td",
+                      {
+                        attrs: {
+                          colspan:
+                            _vm.$props.items.length +
+                            (_vm.$props.rowNumbers ? 2 : 1)
+                        }
+                      },
+                      [
+                        _c("div", { staticClass: "alert alert-warning m-10" }, [
+                          _vm._v(_vm._s(_vm.$props.textEmpty || "No data"))
+                        ])
+                      ]
+                    )
+                  ])
                 : _vm._e(),
               _vm._v(" "),
-              _vm._l(_vm.$props.items, function(col) {
+              _vm._l(_vm.data, function(row, rowNumber) {
                 return _c(
-                  "th",
-                  {
-                    key: col.id,
-                    style:
-                      (col.width ? "width: " + col.width + "; " : "") + col.class
-                  },
-                  [_vm._v("\n\t\t\t\t" + _vm._s(col.title) + "\n\t\t\t")]
-                )
-              }),
-              _vm._v(" "),
-              _c("th", { staticClass: "btn-context" })
-            ],
-            2
-          )
-        ]),
-        _vm._v(" "),
-        _c(
-          "tbody",
-          [
-            !_vm.data || !_vm.data.length
-              ? _c("tr", [
-                  _c(
-                    "td",
-                    {
-                      attrs: {
-                        colspan:
-                          _vm.$props.items.length +
-                          (_vm.$props.rowNumbers ? 2 : 1)
-                      }
-                    },
-                    [
-                      _c("div", { staticClass: "alert alert-warning m-10" }, [
-                        _vm._v(_vm._s(_vm.$props.textEmpty || "No data"))
-                      ])
-                    ]
-                  )
-                ])
-              : _vm._e(),
-            _vm._v(" "),
-            _vm._l(_vm.data, function(row, rowNumber) {
-              return _c(
-                "tr",
-                [
-                  _vm.$props.rowNumbers
-                    ? _c("td", { staticClass: "row-number" }, [
-                        _vm._v(
-                          "\n\t\t\t\t" +
-                            _vm._s(_vm._f("number")(rowNumber + 1)) +
-                            "\n\t\t\t"
-                        )
-                      ])
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm._l(_vm.$props.items, function(col) {
-                    return _c(
-                      "td",
-                      { key: col.id, class: col.class },
-                      [
-                        _c("mg-component", {
-                          attrs: { form: _vm.$props.form, config: col }
-                        })
-                      ],
-                      1
-                    )
-                  }),
-                  _vm._v(" "),
-                  _c("td", { staticClass: "btn-context" }, [
-                    _c("div", { staticClass: "btn-group" }, [
-                      _vm._m(0, true),
-                      _vm._v(" "),
-                      _c("ul", { staticClass: "dropdown-menu pull-right" }, [
-                        _c("li", [
-                          _c(
-                            "a",
-                            {
-                              on: {
-                                click: function($event) {
-                                  return _vm.createRow(rowNumber)
-                                }
-                              }
-                            },
-                            [
-                              _c("i", { staticClass: "far fa-arrow-circle-up" }),
-                              _vm._v(" Add row above")
-                            ]
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _c("li", [
-                          _c(
-                            "a",
-                            {
-                              on: {
-                                click: function($event) {
-                                  return _vm.createRow(rowNumber)
-                                }
-                              }
-                            },
-                            [
-                              _c("i", {
-                                staticClass: "far fa-arrow-circle-down"
-                              }),
-                              _vm._v(" Add row below")
-                            ]
-                          )
-                        ]),
-                        _vm._v(" "),
-                        _vm.$props.allowDelete
-                          ? _c("li", { staticClass: "dropdown-divider" })
-                          : _vm._e(),
-                        _vm._v(" "),
-                        _vm.$props.allowDelete
-                          ? _c("li", { staticClass: "dropdown-item-danger" }, [
-                              _c(
-                                "a",
-                                {
-                                  on: {
-                                    click: function($event) {
-                                      return _vm.deleteRow(rowNumber)
-                                    }
-                                  }
-                                },
-                                [
-                                  _c("i", { staticClass: "far fa-trash" }),
-                                  _vm._v(" Delete")
-                                ]
-                              )
-                            ])
-                          : _vm._e()
-                      ])
-                    ])
-                  ])
-                ],
-                2
-              )
-            }),
-            _vm._v(" "),
-            _vm.$props.allowAdd
-              ? _c(
                   "tr",
-                  { staticClass: "mgTable-append" },
+                  { key: rowNumber },
                   [
                     _vm.$props.rowNumbers
                       ? _c("td", { staticClass: "row-number" }, [
-                          _c("i", { staticClass: "far fa-asterisk" })
+                          _vm._v(
+                            "\n\t\t\t\t\t" +
+                              _vm._s(_vm._f("number")(rowNumber + 1)) +
+                              "\n\t\t\t\t"
+                          )
                         ])
                       : _vm._e(),
                     _vm._v(" "),
-                    _vm._l(_vm.$props.items, function(col, colNumber) {
+                    _vm._l(_vm.$props.items, function(col) {
                       return _c(
                         "td",
-                        { key: col.id },
+                        { key: col.id, class: col.class },
                         [
-                          _c("mg-component", {
-                            attrs: {
-                              form: _vm.$props.form,
-                              config: col,
-                              data: _vm.newRow[colNumber]
+                          _c("mg-text", {
+                            attrs: { value: row[col.id] },
+                            on: {
+                              change: function($event) {
+                                return _vm.$setPath(row, col.id, $event)
+                              }
                             }
                           })
                         ],
@@ -14749,27 +14692,180 @@
                       )
                     }),
                     _vm._v(" "),
-                    _c("td", [
-                      _c("a", {
-                        class: _vm.isAdding
-                          ? _vm.$props.addButtonActiveClass
-                          : _vm.$props.addButtonInactiveClass,
-                        on: {
-                          click: function($event) {
-                            return _vm.createRow()
-                          }
-                        }
-                      })
+                    _c("td", { staticClass: "btn-context" }, [
+                      _c("div", { staticClass: "btn-group" }, [
+                        _vm._m(0, true),
+                        _vm._v(" "),
+                        _c("ul", { staticClass: "dropdown-menu pull-right" }, [
+                          _c("li", [
+                            _c(
+                              "a",
+                              {
+                                on: {
+                                  click: function($event) {
+                                    return _vm.createRow(rowNumber)
+                                  }
+                                }
+                              },
+                              [
+                                _c("i", {
+                                  staticClass: "far fa-arrow-circle-up"
+                                }),
+                                _vm._v(" Add row above")
+                              ]
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("li", [
+                            _c(
+                              "a",
+                              {
+                                on: {
+                                  click: function($event) {
+                                    return _vm.createRow(rowNumber)
+                                  }
+                                }
+                              },
+                              [
+                                _c("i", {
+                                  staticClass: "far fa-arrow-circle-down"
+                                }),
+                                _vm._v(" Add row below")
+                              ]
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _vm.$props.allowDelete
+                            ? _c("li", { staticClass: "dropdown-divider" })
+                            : _vm._e(),
+                          _vm._v(" "),
+                          _vm.$props.allowDelete
+                            ? _c("li", { staticClass: "dropdown-item-danger" }, [
+                                _c(
+                                  "a",
+                                  {
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.deleteRow(rowNumber)
+                                      }
+                                    }
+                                  },
+                                  [
+                                    _c("i", { staticClass: "far fa-trash" }),
+                                    _vm._v(" Delete")
+                                  ]
+                                )
+                              ])
+                            : _vm._e()
+                        ])
+                      ])
                     ])
                   ],
                   2
                 )
-              : _vm._e()
-          ],
-          2
-        )
-      ]
-    )
+              }),
+              _vm._v(" "),
+              _vm.$props.allowAdd
+                ? _c(
+                    "tr",
+                    { staticClass: "mgTable-append" },
+                    [
+                      _vm.$props.rowNumbers
+                        ? _c("td", { staticClass: "row-number" }, [
+                            _c("i", { staticClass: "far fa-asterisk" })
+                          ])
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm._l(_vm.$props.items, function(col, colNumber) {
+                        return _c(
+                          "td",
+                          { key: col.id },
+                          [
+                            _c("pre", [_vm._v(_vm._s(col))]),
+                            _vm._v(" "),
+                            _c("mg-text", {
+                              attrs: { value: _vm.newRow[col.id] },
+                              on: {
+                                change: function($event) {
+                                  return _vm.$setPath(_vm.newRow, col.id, $event)
+                                }
+                              }
+                            })
+                          ],
+                          1
+                        )
+                      }),
+                      _vm._v(" "),
+                      _c("td", [
+                        _c("a", {
+                          class: _vm.isAdding
+                            ? _vm.$props.addButtonActiveClass
+                            : _vm.$props.addButtonInactiveClass,
+                          on: {
+                            click: function($event) {
+                              return _vm.createRow()
+                            }
+                          }
+                        })
+                      ])
+                    ],
+                    2
+                  )
+                : _vm._e()
+            ],
+            2
+          )
+        ]
+      ),
+      _vm._v(" "),
+      _vm.$debugging
+        ? _c("div", { staticClass: "card" }, [
+            _c("div", { staticClass: "card-header" }, [
+              _vm._v("\n\t\t\tRaw data\n\t\t\t"),
+              _c("i", {
+                directives: [
+                  {
+                    name: "tooltip",
+                    rawName: "v-tooltip",
+                    value: "Only visible to users with the Debug permission",
+                    expression:
+                      "'Only visible to users with the Debug permission'"
+                  }
+                ],
+                staticClass: "float-right fas fa-debug fa-lg"
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "card-body" }, [
+              _c("pre", [_vm._v(_vm._s(_vm.$data))])
+            ])
+          ])
+        : _vm._e(),
+      _vm._v(" "),
+      _vm.$debugging
+        ? _c("div", { staticClass: "card" }, [
+            _c("div", { staticClass: "card-header" }, [
+              _vm._v("\n\t\t\tRaw properties\n\t\t\t"),
+              _c("i", {
+                directives: [
+                  {
+                    name: "tooltip",
+                    rawName: "v-tooltip",
+                    value: "Only visible to users with the Debug permission",
+                    expression:
+                      "'Only visible to users with the Debug permission'"
+                  }
+                ],
+                staticClass: "float-right fas fa-debug fa-lg"
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "card-body" }, [
+              _c("pre", [_vm._v(_vm._s(_vm.$props))])
+            ])
+          ])
+        : _vm._e()
+    ])
   };
   var __vue_staticRenderFns__$v = [
     function() {
@@ -14788,7 +14884,7 @@
     /* style */
     const __vue_inject_styles__$C = function (inject) {
       if (!inject) return
-      inject("data-v-94732048_0", { source: "\n.mg-table .row-number {\n\tfont-size: 16px;\n\ttext-align: middle;\n}\n.mg-table td.row-number {\n\tmargin-top: 14px;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgTable.vue"],"names":[],"mappings":";AA0HA;CACA,eAAA;CACA,kBAAA;AACA;AAEA;CACA,gBAAA;AACA","file":"mgTable.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgTable', {\n\tmeta: {\n\t\ttitle: 'Table layout',\n\t\ticon: 'far fa-table',\n\t\tcategory: 'Layout',\n\t},\n\tdata() { return {\n\t\tnewRow: [],\n\t\tisAdding: false,\n\t}},\n\tprops: {\n\t\turl: {type: 'mgUrl', relative: true, help: 'Data feed to populate the table'},\n\t\tallowAdd: {type: 'mgToggle', title: 'Allow Row Addition', default: true},\n\t\tallowDelete: {type: 'mgToggle', title: 'Allow Row Deletion', default: true},\n\t\ttextEmpty: {type: 'mgText', title: 'No data message', default: 'No data'},\n\t\titems: {\n\t\t\ttype: 'mgAlert',\n\t\t\tvueType: 'array',\n\t\t\ttext: 'Use the editor to define child widgets',\n\t\t\tdefault: [\n\t\t\t\t/* e.g.\n\t\t\t\t{id: 'col1', type: 'mgText'},\n\t\t\t\t{id: 'col2', title: 'mgText'},\n\t\t\t\t{id: 'col3', title: 'mgText'},\n\t\t\t\t*/\n\t\t\t],\n\t\t},\n\t\taddButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},\n\t\taddButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},\n\t\trowNumbers: {type: 'mgToggle', help: 'Show the row number at the beginning of each row', default: true},\n\t},\n\tchildProps: {\n\t\tshowTitle: {type: 'mgToggle', default: false, title: 'Show Title'},\n\t},\n\tmounted() {\n\t\tthis.$watch('$props.url', ()=> {\n\t\t\tif (!this.$props.url) return;\n\t\t\tthis.$macgyver.utils.fetch(this.$props.url, {type: 'array'})\n\t\t\t\t.then(data => this.$set(this.$props, 'data', data))\n\t\t}, {immediate: true});\n\t},\n\twatch: {\n\t\tdata: {\n\t\t\t// FIXME: deep?\n\t\t\timmediate: true,\n\t\t\thandler() {\n\t\t\t\t// Ensure that data is always an array\n\t\t\t\tif (!_.isArray(this.data)) this.data = [];\n\t\t\t},\n\t\t},\n\t},\n\tmethods: {\n\t\tcreateRow(offset) { // Offset is the row to create after - i.e. array position splice\n\t\t\tconsole.log(`FIXME: createRow(${offset})`);\n\t\t},\n\t\tdeleteRow(offset) {\n\t\t\tconsole.log(`FIXME: deleteRow(${offset})`);\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<table class=\"table table-bordered table-striped table-hover\">\n\t\t<thead>\n\t\t\t<tr>\n\t\t\t\t<th v-if=\"$props.rowNumbers\" class=\"row-number\">#</th>\n\t\t\t\t<th v-for=\"col in $props.items\" :key=\"col.id\" :style=\"(col.width ? 'width: ' + col.width + '; ' : '') + col.class\">\n\t\t\t\t\t{{col.title}}\n\t\t\t\t</th>\n\t\t\t\t<th class=\"btn-context\"></th>\n\t\t\t</tr>\n\t\t</thead>\n\t\t<tbody>\n\t\t\t<tr v-if=\"!data || !data.length\">\n\t\t\t\t<td :colspan=\"$props.items.length + ($props.rowNumbers ? 2 : 1)\">\n\t\t\t\t\t<div class=\"alert alert-warning m-10\">{{$props.textEmpty || 'No data'}}</div>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t\t<tr v-for=\"(row, rowNumber) in data\">\n\t\t\t\t<td v-if=\"$props.rowNumbers\" class=\"row-number\">\n\t\t\t\t\t{{rowNumber + 1 | number}}\n\t\t\t\t</td>\n\t\t\t\t<td v-for=\"col in $props.items\" :key=\"col.id\" :class=\"col.class\">\n\t\t\t\t\t<mg-component\n\t\t\t\t\t\t:form=\"$props.form\"\n\t\t\t\t\t\t:config=\"col\"\n\t\t\t\t\t/>\n\t\t\t\t</td>\n\t\t\t\t<td class=\"btn-context\">\n\t\t\t\t\t<div class=\"btn-group\">\n\t\t\t\t\t\t<a class=\"btn btn-context\" data-toggle=\"dropdown\"><i class=\"far fa-ellipsis-v\"></i></a>\n\t\t\t\t\t\t<ul class=\"dropdown-menu pull-right\">\n\t\t\t\t\t\t\t<li><a @click=\"createRow(rowNumber)\"><i class=\"far fa-arrow-circle-up\"></i> Add row above</a></li>\n\t\t\t\t\t\t\t<li><a @click=\"createRow(rowNumber)\"><i class=\"far fa-arrow-circle-down\"></i> Add row below</a></li>\n\t\t\t\t\t\t\t<li v-if=\"$props.allowDelete\" class=\"dropdown-divider\"></li>\n\t\t\t\t\t\t\t<li v-if=\"$props.allowDelete\" class=\"dropdown-item-danger\"><a @click=\"deleteRow(rowNumber)\"><i class=\"far fa-trash\"></i> Delete</a></li>\n\t\t\t\t\t\t</ul>\n\t\t\t\t\t</div>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t\t<tr class=\"mgTable-append\" v-if=\"$props.allowAdd\">\n\t\t\t\t<td v-if=\"$props.rowNumbers\" class=\"row-number\">\n\t\t\t\t\t<i class=\"far fa-asterisk\"></i>\n\t\t\t\t</td>\n\t\t\t\t<td v-for=\"(col, colNumber) in $props.items\" :key=\"col.id\">\n\t\t\t\t\t<mg-component\n\t\t\t\t\t\t:form=\"$props.form\"\n\t\t\t\t\t\t:config=\"col\"\n\t\t\t\t\t\t:data=\"newRow[colNumber]\"\n\t\t\t\t\t/>\n\t\t\t\t</td>\n\t\t\t\t<td>\n\t\t\t\t\t<a @click=\"createRow()\" :class=\"isAdding ? $props.addButtonActiveClass : $props.addButtonInactiveClass\"></a>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody>\n\t</table>\n</template>\n\n<style>\n.mg-table .row-number {\n\tfont-size: 16px;\n\ttext-align: middle;\n}\n\n.mg-table td.row-number {\n\tmargin-top: 14px;\n}\n</style>\n"]}, media: undefined });
+      inject("data-v-13c55472_0", { source: "\n.mg-table .row-number {\n\tfont-size: 16px;\n\ttext-align: middle;\n}\n.mg-table td.row-number {\n\tmargin-top: 14px;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgTable.vue"],"names":[],"mappings":";AAgMA;CACA,eAAA;CACA,kBAAA;AACA;AAEA;CACA,gBAAA;AACA","file":"mgTable.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgTable', {\n\tmeta: {\n\t\ttitle: 'Table layout',\n\t\ticon: 'far fa-table',\n\t\tcategory: 'Layout',\n\t},\n\tdata() { return {\n\t\tnewRow: {},\n\t\tisAdding: false,\n\t\tdata: [],\n\t}},\n\tprops: {\n\t\turl: {type: 'mgUrl', relative: true, help: 'Data feed to populate the table'},\n\t\tallowAdd: {type: 'mgToggle', title: 'Allow Row Addition', default: true},\n\t\tallowDelete: {type: 'mgToggle', title: 'Allow Row Deletion', default: true},\n\t\ttextEmpty: {type: 'mgText', title: 'No data message', default: 'No data'},\n\t\titems: {\n\t\t\ttype: 'mgAlert',\n\t\t\tvueType: 'array',\n\t\t\ttext: 'Use the editor to define child widgets',\n\t\t\tdefault: () => [\n\t\t\t\t// FIXME: Defaults are not initialised\n\t\t\t\t{id: 'col1', title: 'Col 1', type: 'mgText', default: '1'},\n\t\t\t\t{id: 'col2', title: 'Col 2', type: 'mgText', default: '2'},\n\t\t\t],\n\t\t},\n\t\taddButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},\n\t\taddButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},\n\t\trowNumbers: {type: 'mgToggle', help: 'Show the row number at the beginning of each row', default: true},\n\t},\n\tchildProps: {\n\t\tshowTitle: {type: 'mgToggle', default: false, title: 'Show Title'},\n\t},\n\tcreated() {\n\t\tthis.$debugging = true;\n\t},\n\tmounted() {\n\t\tthis.$watch('$props.url', ()=> {\n\t\t\tif (!this.$props.url) return;\n\t\t\tthis.$macgyver.utils.fetch(this.$props.url, {type: 'array'})\n\t\t\t\t.then(data => this.$set(this.$props, 'data', data))\n\t\t}, {immediate: true});\n\t},\n\twatch: {\n\t\tdata: {\n\t\t\timmediate: true,\n\t\t\thandler() {\n\t\t\t\t// Ensure that data is always an array\n\t\t\t\tif (!_.isArray(this.data)) this.data = [];\n\t\t\t},\n\t\t},\n\t},\n\t// To ensure reactivity to array of objects https://stackoverflow.com/a/56793403/2438830\n\tcomputed: {\n\t\touterKey() {\n\t\t\treturn this.data && this.data.length;\n\t\t}\n\t},\n\tmethods: {\n\t\tcreateRow(offset) { // Offset is the row to create after - i.e. array position splice\n\t\t\tthis.$debug('createRow', offset);\n\t\t\tthis.$debug('newRow', this.$data.newRow);\n\t\t\tthis.isAdding = true;\n\t\t\tif (typeof offset === 'undefined') {\n\t\t\t\tthis.data.push(this.$data.newRow);\n\t\t\t} else {\n\t\t\t\tthis.data.splice(offset, 0, this.$data.newRow);\n\t\t\t}\n\t\t\tthis.$data.newRow = {};\n\t\t\tthis.isAdding = false;\n\t\t\t/*\n\t\t\tif (typeof offset === 'undefined') {\n\t\t\t\tthis.data.push({});\n\t\t\t} else {\n\t\t\t\tthis.data.splice(offset, 0, {});\n\t\t\t}\n\t\t\t*/\n\t\t},\n\t\tdeleteRow(offset) {\n\t\t\tthis.$debug('deleteRow', offset);\n\t\t\t//this.$delete(this.data, offset);\n\t\t\tthis.data.splice(offset, 1);\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-table\">\n\t\t<table class=\"table table-bordered table-striped table-hover\">\n\t\t\t<thead>\n\t\t\t\t<tr>\n\t\t\t\t\t<th v-if=\"$props.rowNumbers\" class=\"row-number\">#</th>\n\t\t\t\t\t<th v-for=\"col in $props.items\" :key=\"col.id\" :style=\"(col.width ? 'width: ' + col.width + '; ' : '') + col.class\">\n\t\t\t\t\t\t{{col.title}}\n\t\t\t\t\t</th>\n\t\t\t\t\t<th class=\"btn-context\"></th>\n\t\t\t\t</tr>\n\t\t\t</thead>\n\t\t\t<tbody :key=\"outerKey\">\n\t\t\t\t<tr v-if=\"!data || !data.length\">\n\t\t\t\t\t<td :colspan=\"$props.items.length + ($props.rowNumbers ? 2 : 1)\">\n\t\t\t\t\t\t<div class=\"alert alert-warning m-10\">{{$props.textEmpty || 'No data'}}</div>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr v-for=\"(row, rowNumber) in data\" :key=\"rowNumber\">\n\t\t\t\t\t<td v-if=\"$props.rowNumbers\" class=\"row-number\">\n\t\t\t\t\t\t{{rowNumber + 1 | number}}\n\t\t\t\t\t</td>\n\t\t\t\t\t<td v-for=\"col in $props.items\" :key=\"col.id\" :class=\"col.class\">\n\t\t\t\t\t\t<mg-text\n\t\t\t\t\t\t\t:value=\"row[col.id]\"\n\t\t\t\t\t\t\t@change=\"$setPath(row, col.id, $event)\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<!--\n\t\t\t\t\t\t\t// FIXME: Support any component type\n\t\t\t\t\t\t\tmg-component\n\t\t\t\t\t\t\t:form=\"$props.form\"\n\t\t\t\t\t\t\t:config=\"col\"\n\t\t\t\t\t\t\t:data=\"row[col.id]\"\n\t\t\t\t\t\t\t@change=\"$setPath(row, col.id, $event)\"\n\t\t\t\t\t\t/-->\n\t\t\t\t\t</td>\n\t\t\t\t\t<td class=\"btn-context\">\n\t\t\t\t\t\t<div class=\"btn-group\">\n\t\t\t\t\t\t\t<a class=\"btn btn-context\" data-toggle=\"dropdown\"><i class=\"far fa-ellipsis-v\"></i></a>\n\t\t\t\t\t\t\t<ul class=\"dropdown-menu pull-right\">\n\t\t\t\t\t\t\t\t<li><a @click=\"createRow(rowNumber)\"><i class=\"far fa-arrow-circle-up\"></i> Add row above</a></li>\n\t\t\t\t\t\t\t\t<li><a @click=\"createRow(rowNumber)\"><i class=\"far fa-arrow-circle-down\"></i> Add row below</a></li>\n\t\t\t\t\t\t\t\t<li v-if=\"$props.allowDelete\" class=\"dropdown-divider\"></li>\n\t\t\t\t\t\t\t\t<li v-if=\"$props.allowDelete\" class=\"dropdown-item-danger\"><a @click=\"deleteRow(rowNumber)\"><i class=\"far fa-trash\"></i> Delete</a></li>\n\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr class=\"mgTable-append\" v-if=\"$props.allowAdd\">\n\t\t\t\t\t<td v-if=\"$props.rowNumbers\" class=\"row-number\">\n\t\t\t\t\t\t<i class=\"far fa-asterisk\"></i>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td v-for=\"(col, colNumber) in $props.items\" :key=\"col.id\">\n\t\t\t\t\t\t<pre>{{col}}</pre>\n\t\t\t\t\t\t<mg-text\n\t\t\t\t\t\t\t:value=\"newRow[col.id]\"\n\t\t\t\t\t\t\t@change=\"$setPath(newRow, col.id, $event)\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<!--\n\t\t\t\t\t\t\t// FIXME: Get changes back out again...\n\t\t\t\t\t\t\tmg-component\n\t\t\t\t\t\t\t:form=\"$props.form\"\n\t\t\t\t\t\t\t:config=\"col\"\n\t\t\t\t\t\t\t:data=\"newRow[col.id]\"\n\t\t\t\t\t\t\t@change=\"changeHandler\"\n\t\t\t\t\t\t/-->\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<a @click=\"createRow()\" :class=\"isAdding ? $props.addButtonActiveClass : $props.addButtonInactiveClass\"></a>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<!-- TODO: Place in header row rather than new row at bottom? -->\n\t\t\t\t<!--tr class=\"mgTable-append\" v-if=\"$props.allowAdd\">\n\t\t\t\t\t<td :colspan=\"$props.items.length + 1\">&nbsp;</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<a @click=\"createRow()\" class=\"btn btn-block btn-success fa fa-plus\"></a>\n\t\t\t\t\t</td>\n\t\t\t\t</tr-->\n\t\t\t</tbody>\n\t\t</table>\n\n\t\t<div v-if=\"$debugging\" class=\"card\">\n\t\t\t<div class=\"card-header\">\n\t\t\t\tRaw data\n\t\t\t\t<i class=\"float-right fas fa-debug fa-lg\" v-tooltip=\"'Only visible to users with the Debug permission'\"/>\n\t\t\t</div>\n\t\t\t<div class=\"card-body\">\n\t\t\t\t<pre>{{$data}}</pre>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<div v-if=\"$debugging\" class=\"card\">\n\t\t\t<div class=\"card-header\">\n\t\t\t\tRaw properties\n\t\t\t\t<i class=\"float-right fas fa-debug fa-lg\" v-tooltip=\"'Only visible to users with the Debug permission'\"/>\n\t\t\t</div>\n\t\t\t<div class=\"card-body\">\n\t\t\t\t<pre>{{$props}}</pre>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n\n<style>\n.mg-table .row-number {\n\tfont-size: 16px;\n\ttext-align: middle;\n}\n\n.mg-table td.row-number {\n\tmargin-top: 14px;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
