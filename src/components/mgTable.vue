@@ -47,6 +47,12 @@ export default Vue.mgComponent('mgTable', {
 			},
 		},
 	},
+	// To ensure reactivity to array of objects https://stackoverflow.com/a/56793403/2438830
+	computed: {
+		outerKey() {
+			return this.data && this.data.length;
+		}
+	},
 	methods: {
 		createRow(offset) { // Offset is the row to create after - i.e. array position splice
 			this.$debug('createRow', offset);
@@ -77,7 +83,7 @@ export default Vue.mgComponent('mgTable', {
 					<th class="btn-context"></th>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody :key="outerKey">
 				<tr v-if="!data || !data.length">
 					<td :colspan="$props.items.length + ($props.rowNumbers ? 2 : 1)">
 						<div class="alert alert-warning m-10">{{$props.textEmpty || 'No data'}}</div>
@@ -88,19 +94,17 @@ export default Vue.mgComponent('mgTable', {
 						{{rowNumber + 1 | number}}
 					</td>
 					<td v-for="col in $props.items" :key="col.id" :class="col.class">
-						<!-- FIXME: Data is updated but :value binding is not -->
-						<pre>{{row[col.id]}}</pre>
 						<mg-text
 							:value="row[col.id]"
 							@change="$setPath(row, col.id, $event)"
 						/>
 						<!--
-							
 							// FIXME: Support any component type
 							mg-component
 							:form="$props.form"
 							:config="col"
 							:data="row[col.id]"
+							@change="$setPath(row, col.id, $event)"
 						/-->
 					</td>
 					<td class="btn-context">
@@ -115,6 +119,7 @@ export default Vue.mgComponent('mgTable', {
 						</div>
 					</td>
 				</tr>
+				<!-- TODO: Place in header row rather than new row at bottom? -->
 				<tr class="mgTable-append" v-if="$props.allowAdd">
 					<td :colspan="$props.items.length + 1">&nbsp;</td>
 					<td>
