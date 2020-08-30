@@ -192,7 +192,7 @@ Vue.prototype.$macgyver = (()=> {
 						// FIXME: Having a `change` property conflicts with event handlers called `change`.
 						// FIXME: Use `call` with a context?
 						if (this.$props.change) this.$props.change(value);
-					});
+					}, {deep: true});
 					// }}}
 				},
 

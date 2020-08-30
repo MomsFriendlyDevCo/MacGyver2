@@ -131,12 +131,12 @@ export default Vue.mgComponent('mgTable', {
 						<i class="far fa-asterisk"></i>
 					</td>
 					<td v-for="(col, colNumber) in $props.items" :key="col.id">
-						<pre>{{col}}</pre>
 						<mg-text
 							:value="newRow[col.id]"
 							@change="$setPath(newRow, col.id, $event)"
 						/>
 						<!--
+							<pre>{{col}}</pre>
 							// FIXME: Support any component type
 							mg-component
 							:form="$props.form"
