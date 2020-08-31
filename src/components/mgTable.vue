@@ -171,7 +171,7 @@ export default Vue.mgComponent('mgTable', {
 			</div>
 		</div>
 
-		<div v-if="$debugging" class="card">
+		<!--div v-if="$debugging" class="card">
 			<div class="card-header">
 				Raw properties
 				<i class="float-right fas fa-debug fa-lg" v-tooltip="'Only visible to users with the Debug permission'"/>
@@ -179,7 +179,7 @@ export default Vue.mgComponent('mgTable', {
 			<div class="card-body">
 				<pre>{{$props}}</pre>
 			</div>
-		</div>
+		</div-->
 	</div>
 </template>
 
