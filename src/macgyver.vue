@@ -165,6 +165,7 @@ Vue.prototype.$macgyver = (()=> {
 
 					// Read in initial data value {{{
 					var refresher = ()=> {
+						// FIXME: Match empty strings also?
 						if (this.$props.value) { // Standalone value
 							this.data = _.clone(this.$props.value);
 						} else if (this.$props.$dataPath) { // Has a data path
@@ -183,7 +184,9 @@ Vue.prototype.$macgyver = (()=> {
 					// Data watcher which transforms change operations into emitters to the nearest parent form {{{
 					this.$watch('data', value => {
 						// Emit `mgChange` to form element (if there is a parent form)
-						if (this.$mgForm && this.$props.$dataPath) this.$mgForm.$emit('mgChange', {path: this.$props.$dataPath, value});
+						// FIXME: Skip when this.$props.value is defined?
+						if (this.$mgForm && this.$props.$dataPath)
+							this.$mgForm.$emit('mgChange', {path: this.$props.$dataPath, value});
 
 						// Emit regular `change` event
 						this.$emit('change', value);

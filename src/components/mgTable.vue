@@ -101,17 +101,27 @@ export default Vue.mgComponent('mgTable', {
 						{{rowNumber + 1 | number}}
 					</td>
 					<td v-for="col in $props.items" :key="col.id" :class="col.class">
-						<mg-text
-							:value="row[col.id]"
-							@change="$setPath(row, col.id, $event)"
-						/>
-						<!--
-							// FIXME: Support any component type
-							mg-component
-							:form="$props.form"
+						<!-- Works -->
+						<!--mg-text
+							:value="row[col.$dataPath]"
+							@change="$setPath(row, col.$dataPath, $event)"
+						/-->
+
+						<!-- Works -->
+						<mg-form
 							:config="col"
-							:data="row[col.id]"
-							@change="$setPath(row, col.id, $event)"
+							:data="row"
+							@changeItem="$setPath(row, $event.path, $event.value)"
+						/>
+
+						<!-- // FIXME: Should pass through value and change events properties? -->
+						<!--mg-component
+							:config="{
+								id: col.id,
+								type: col.type,
+							}"
+							:value="row[col.$dataPath]"
+							@change="$setPath(row, col.$dataPath, $event)"
 						/-->
 					</td>
 					<td class="btn-context">
@@ -131,19 +141,18 @@ export default Vue.mgComponent('mgTable', {
 						<i class="far fa-asterisk"></i>
 					</td>
 					<td v-for="(col, colNumber) in $props.items" :key="col.id">
-						<mg-text
-							:value="newRow[col.id]"
-							@change="$setPath(newRow, col.id, $event)"
-						/>
-						<!--
-							<pre>{{col}}</pre>
-							// FIXME: Support any component type
-							mg-component
-							:form="$props.form"
-							:config="col"
-							:data="newRow[col.id]"
-							@change="$setPath(newRow, col.id, $event)"
+						<!-- Works -->
+						<!--mg-text
+							:value="newRow[col.$dataPath]"
+							@change="$setPath(newRow, col.$dataPath, $event)"
 						/-->
+
+						<!-- Works -->
+						<mg-form
+							:config="col"
+							:data="newRow"
+							@changeItem="$setPath(newRow, $event.path, $event.value)"
+						/>
 					</td>
 					<td>
 						<a @click="createRow()" :class="isAdding ? $props.addButtonActiveClass : $props.addButtonInactiveClass"></a>

@@ -13,6 +13,7 @@ export default Vue.component('mgComponent', {
 	props: {
 		config: {type: Object, required: true},
 	},
+	// TODO: Functional? Proxy?
 	render(h) {
 		if (!this.$macgyver.widgets[this.$props.config.type]) return h('mg-error', {props: {text: `Unknown widget type "${this.$props.config.type}"`}});
 
