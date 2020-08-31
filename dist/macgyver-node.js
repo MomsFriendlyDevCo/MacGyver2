@@ -15660,6 +15660,7 @@ Vue$1.prototype.$macgyver = function () {
           // Read in initial data value {{{
 
           var refresher = function refresher() {
+            // FIXME: Match empty strings also?
             if (_this.$props.value) {
               // Standalone value
               _this.data = _.clone(_this.$props.value);
@@ -15679,6 +15680,7 @@ Vue$1.prototype.$macgyver = function () {
 
           this.$watch('data', function (value) {
             // Emit `mgChange` to form element (if there is a parent form)
+            // FIXME: Skip when this.$props.value is defined?
             if (_this.$mgForm && _this.$props.$dataPath) _this.$mgForm.$emit('mgChange', {
               path: _this.$props.$dataPath,
               value: value
@@ -15690,6 +15692,8 @@ Vue$1.prototype.$macgyver = function () {
 
 
             if (_this.$props.change) _this.$props.change(value);
+          }, {
+            deep: true
           }); // }}}
         }
       }, component.methods),
