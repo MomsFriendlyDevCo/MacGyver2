@@ -114,7 +114,6 @@ Vue.prototype.$macgyver = (()=> {
 							case 'mgColor':
 							case 'mgEmail':
 							case 'mgIcon':
-							case 'mgQuery':
 							case 'mgRestQuery':
 							case 'mgTextArea':
 							case 'mgUnknown':
