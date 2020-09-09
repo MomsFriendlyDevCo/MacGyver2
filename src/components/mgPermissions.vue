@@ -12,6 +12,7 @@ export default Vue.mgComponent('mgPermissions', {
 	},
 	created() {
 		this.$watch('data', ()=> {
+			// TODO: Handle like SIFT is handled.
 			if (_.isString(this.data)) this.$set(this, 'data',
 				/\|\|/.test(this.data) ? this.data.split(/\s*\|\|\s*/) // `foo || bar` -> ['foo', 'bar']
 				: [this.data]

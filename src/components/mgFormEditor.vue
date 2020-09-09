@@ -96,7 +96,6 @@ export default Vue.component('mgFormEditor', {
 		this.$debugging = true;
 	},
 	mounted() {
-
 		/*
 		// Potential for highlighting components within nested mgContainer
 		this.$refs.form.$on('mgComponent.click', (component, e) => {
@@ -132,6 +131,7 @@ export default Vue.component('mgFormEditor', {
 		});
 		*/
 
+		// FIXME: (e.target).closest... mg-container CSS class...
 		this.$refs.form.$on('mgContainer.click', (container, specPath, componentIndex, e) => {
 			e.stopPropagation();
 			e.preventDefault();
