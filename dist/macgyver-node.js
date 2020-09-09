@@ -15601,7 +15601,7 @@ Vue$1.prototype.$macgyver = function () {
             case 'mgColor':
             case 'mgEmail':
             case 'mgIcon':
-            case 'mgQuery':
+            case 'mgPassword':
             case 'mgRestQuery':
             case 'mgTextArea':
             case 'mgUnknown':
@@ -15626,6 +15626,9 @@ Vue$1.prototype.$macgyver = function () {
               newProp.type = Array;
               break;
 
+            case 'mgQuery':
+              newProp.type = Object;
+
             case 'mgDate':
             case 'mgTime':
               newProp.type = Date;
@@ -15634,6 +15637,7 @@ Vue$1.prototype.$macgyver = function () {
             case Number:
             case String:
             case Array:
+            case Object:
             case Date:
               console.warn('Used native binding in component prop (e.g. `{type: Array}`). Always use mg* component types so these components are editable in the mgFormEditor');
               newProp.type = prop.type; // Native Vue types
