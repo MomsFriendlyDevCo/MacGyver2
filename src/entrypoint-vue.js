@@ -41,6 +41,7 @@ import('./components/mgInfoBlock'); // Not in showcase
 import('./components/mgLabel');
 import('./components/mgList');
 import('./components/mgNumber');
+import('./components/mgPassword');
 import('./components/mgPermissions');
 import('./components/mgPlaceholder');
 import('./components/mgQuery');
