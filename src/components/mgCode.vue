@@ -20,18 +20,12 @@ export default Vue.mgComponent('mgCode', {
 		this.editor = ace.edit(this.$el);
 		this.editor.$blockScrolling = Infinity;
 
-		this.editor.setValue(
-			_.isObject(this.data) ? JSON.stringify(this.data, null, '\t') // Parse raw objects into JSON
-			: this.data ? this.data
-			: ''
-		, 1);
-
 		this.editor.setOptions({
 			showPrintMargin: false,
 		});
 
 		this.editor.on('change', ()=> {
-			var value = this.editor.getvalueue();
+			var value = this.editor.getValue();
 			if (this.$props.convert && this.$props.syntax == 'json') {
 				try {
 					value = JSON.parse(value);
@@ -48,12 +42,21 @@ export default Vue.mgComponent('mgCode', {
 		this.$nextTick(()=> this.editor.resize());
 
 		this.$watch('config', ()=> {
-			if (this.$props.syntax) this.editor.getSession().setMode(`ace/mode/${this.$props.syntax}`);
-			if (this.$props.theme) this.editor.setTheme(`ace/theme/${this.$props.theme}`);
+			// TODO: Make compatible with Parcel
+			//if (this.$props.syntax) this.editor.getSession().setMode(`ace/mode/${this.$props.syntax}`);
+			//if (this.$props.theme) this.editor.setTheme(`ace/theme/${this.$props.theme}`);
 		}, {
 			// FIXME: deep?
 			immediate: true
 		});
+
+		this.$watch('data', ()=> {
+			this.editor.setValue(
+				_.isArray(this.data) || _.isObject(this.data) ? JSON.stringify(this.data, null, '\t') // Parse raw objects into JSON
+				: this.data ? this.data
+				: ''
+			, 1);
+		}, {immediate: true});
 	},
 	render(h) {
 		return h('div', {
