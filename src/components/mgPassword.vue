@@ -18,6 +18,18 @@ export default Vue.mgComponent('mgPassword', {
 		required: {type: 'mgToggle', default: false},
 		mask: {type: 'mgText', help: 'Text input mask to restrict to, #=Number, S=Letter, X=Alpha-numeric, A=Alpha Uppercase, a=Alpha lowercase, \=Escape'},
 		focus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},
+		autoComplete: {
+			type: 'mgChoiceDropdown',
+			help: 'Allow auto-complete value propagation',
+			default: 'off',
+			advanced: true,
+			enum: [
+				{id: 'off', title: 'Disabled'},
+				{id: 'on', title: 'Automatic'},
+				{id: 'new-password', title: 'New password'},
+				{id: 'current-password', title: 'Current password'},
+			],
+		},
 	},
 	created() {
 		this.$on('mgValidate', reply => {
@@ -48,6 +60,7 @@ export default Vue.mgComponent('mgPassword', {
 			v-model="data"
 			type="password"
 			class="form-control"
+			:autocomplete="$props.autoComplete"
 			:placeholder="$props.placeholder"
 			v-facade="$props.mask"
 		/>

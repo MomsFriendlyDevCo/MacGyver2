@@ -24,6 +24,7 @@ export default Vue.mgComponent('mgText', {
 			default: 'off',
 			advanced: true,
 			enum: [
+				{id: 'off', title: 'Disabled'},
 				{id: 'on', title: 'Automatic'},
 				{id: 'name', title: 'Name'},
 				{id: 'email', title: 'Email'},
