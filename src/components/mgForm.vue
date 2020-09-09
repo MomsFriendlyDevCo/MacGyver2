@@ -216,7 +216,7 @@ export default Vue.component('mgForm', {
 </script>
 
 <template>
-	<form @submit.prevent="submit()" class="form-horizontal mg-form">
+	<div class="mg-form">
 		<div v-if="errors.length" class="alert alert-warning">
 			<ul>
 				<li v-for="err in errors">{{err.error}}</li>
@@ -227,7 +227,7 @@ export default Vue.component('mgForm', {
 			v-if="spec"
 			:config="spec.spec"
 		/>
-	</form>
+	</div>
 </template>
 
 <style>
