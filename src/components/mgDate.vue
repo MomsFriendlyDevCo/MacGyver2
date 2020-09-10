@@ -29,5 +29,5 @@ export default Vue.mgComponent('mgDate', {
 </script>
 
 <template>
-	<input v-model="data" type="date" class="form-control"/>
+	<input v-model="data" type="date" :max="$props.max" :min="$props.min" class="form-control"/>
 </template>
