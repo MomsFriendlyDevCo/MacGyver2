@@ -1,4 +1,6 @@
 <script>
+import moment from 'moment';
+
 export default Vue.mgComponent('mgDate', {
 	meta: {
 		title: 'Date selection',
@@ -7,27 +9,60 @@ export default Vue.mgComponent('mgDate', {
 		preferId: true,
 		format: v => {
 			if (!v) return '';
-			var d = v instanceof Date ? v : new Date(v);
-			console.log('mgDate SHOULD BE DATE', d);
-			return d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
+			return moment(v).format(moment.HTML5_FMT.DATE);
 		},
 		formatClass: 'text-center',
 	},
+	data() { return {
+		formData: undefined,
+	}},
 	props: {
 		min: {type: 'mgDate', title: 'Earliest date'},
 		max: {type: 'mgDate', title: 'Latest date'},
 		required: {type: 'mgToggle', default: false},
 	},
 	created() {
+		this.$debugging = false;
+
 		this.$on('mgValidate', reply => {
 			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
-			if (this.$props.min && _.isString(this.data) && this.data < this.$props.min) return reply(`${$props.title} is too early (earliest date is ${this.$props.min})`);
-			if (this.$props.max && _.isString(this.data) && this.data > $props.max) return reply(`${$props.title} is too late (latest date is ${this.$props.max})`);
+			if (_.isString(this.data)) {
+				var d = moment(this.data);
+				if (!d.isValid()) return reply(`${this.$props.title} must be a date`);
+				if (this.$props.min && d.isBefore(this.$props.min)) return reply(`${$props.title} is too early (earliest date is ${this.$props.min})`);
+				if (this.$props.max && d.isAfter($props.max)) return reply(`${$props.title} is too late (latest date is ${this.$props.max})`);
+			}
+		});
+
+		this.$watch('data', ()=> {
+			this.formData = moment(this.data).format(moment.HTML5_FMT.DATE);
+		}, { immediate: true });
+
+		this.$watch('formData', ()=> {
+			this.data = moment(this.formData, moment.HTML5_FMT.DATE).toISOString();
 		});
 	},
 });
 </script>
 
 <template>
-	<input v-model="data" type="date" :max="$props.max" :min="$props.min" class="form-control"/>
+	<div class="mg-datetime">
+		<!-- TODO: Allow for read-only displays -->
+		<input
+			v-model="formData"
+			type="date"
+			class="form-control"
+			:max="$props.max"
+			:min="$props.min"
+		/>
+
+		<div v-if="this.$debugging" class="card">
+			<div class="card-header">
+				Raw data
+			</div>
+			<div class="card-body">
+				<pre>{{$data}}</pre>
+			</div>
+		</div>
+	</div>
 </template>
