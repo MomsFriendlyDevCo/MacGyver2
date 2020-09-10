@@ -83,16 +83,16 @@ export default Vue.mgComponent('mgTable', {
 		<table class="table table-bordered table-striped table-hover">
 			<thead>
 				<tr>
-					<th v-if="$props.rowNumbers" class="row-number">#</th>
+					<th v-if="$props.rowNumbers" class="row-number">&#35;</th>
 					<th v-for="col in $props.items" :key="col.id" :style="(col.width ? 'width: ' + col.width + '; ' : '') + col.class">
 						{{col.title}}
 					</th>
-					<th class="btn-context"></th>
+					<th v-if="$props.allowAdd || $props.allowDelete" class="btn-context">&nbsp;</th>
 				</tr>
 			</thead>
 			<tbody :key="outerKey">
 				<tr v-if="!data || !data.length">
-					<td :colspan="$props.items.length + ($props.rowNumbers ? 2 : 1)">
+					<td :colspan="$props.items.length + ($props.rowNumbers ? 1 : 0) + (($props.allowAdd || $props.allowDelete) ? 1 : 0) + 1">
 						<div class="alert alert-warning m-10">{{$props.textEmpty || 'No data'}}</div>
 					</td>
 				</tr>
@@ -124,7 +124,7 @@ export default Vue.mgComponent('mgTable', {
 							@change="$setPath(row, col.$dataPath, $event)"
 						/-->
 					</td>
-					<td class="btn-context">
+					<td v-if="$props.allowAdd || $props.allowDelete" class="btn-context">
 						<div class="btn-group">
 							<a class="btn btn-context" data-toggle="dropdown"><i class="far fa-ellipsis-v"></i></a>
 							<ul class="dropdown-menu pull-right">
