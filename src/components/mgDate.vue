@@ -46,7 +46,7 @@ export default Vue.mgComponent('mgDate', {
 </script>
 
 <template>
-	<div class="mg-datetime">
+	<div class="mg-date">
 		<!-- TODO: Allow for read-only displays -->
 		<input
 			v-model="formData"
