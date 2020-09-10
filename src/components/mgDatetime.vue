@@ -1,4 +1,6 @@
 <script>
+import moment from 'moment';
+
 export default Vue.mgComponent('mgDatetime', {
 	meta: {
 		title: 'Datetime selection',
@@ -31,13 +33,12 @@ export default Vue.mgComponent('mgDatetime', {
 			if (this.$props.max && _.isString(this.data) && this.data > $props.max) return reply(`${$props.title} is too late (latest date is ${this.$props.max})`);
 		});
 
-		// Convert to local format https://developer.mozilla.org/en-US/docs/Web/HTML/Date_and_time_formats#Local_date_and_time_strings
-		var d = new Date(this.data);
-		this.formData = d.getFullYear() + '-' + `${d.getMonth() + 1}`.padStart(2, '0') + '-' + d.getDate() + 'T' + d.getHours() + ':' + d.getMinutes();
+		this.$watch('data', ()=> {
+			this.formData = moment(this.data).format(moment.HTML5_FMT.DATETIME_LOCAL);
+		}, { immediate: true });
 
 		this.$watch('formData', ()=> {
-			this.$debug('watch', this.formData);
-			this.data = new Date(this.formData).toISOString();
+			this.data = moment(this.formData, moment.HTML5_FMT.DATETIME_LOCAL).toISOString();
 		});
 	},
 });
@@ -45,6 +46,7 @@ export default Vue.mgComponent('mgDatetime', {
 
 <template>
 	<div class="mg-datetime">
+		<!-- TODO: Allow for read-only displays -->
 		<input
 			v-model="formData"
 			type="datetime-local"
