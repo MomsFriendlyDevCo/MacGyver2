@@ -5,6 +5,8 @@
   $ = $ && $.hasOwnProperty('default') ? $['default'] : $;
 
   function _typeof(obj) {
+    "@babel/helpers - typeof";
+
     if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
       _typeof = function (obj) {
         return typeof obj;
@@ -98,7 +100,7 @@
     return _setPrototypeOf(o, p);
   }
 
-  function isNativeReflectConstruct() {
+  function _isNativeReflectConstruct() {
     if (typeof Reflect === "undefined" || !Reflect.construct) return false;
     if (Reflect.construct.sham) return false;
     if (typeof Proxy === "function") return true;
@@ -112,7 +114,7 @@
   }
 
   function _construct(Parent, args, Class) {
-    if (isNativeReflectConstruct()) {
+    if (_isNativeReflectConstruct()) {
       _construct = Reflect.construct;
     } else {
       _construct = function _construct(Parent, args, Class) {
@@ -167,19 +169,15 @@
   }
 
   function _slicedToArray(arr, i) {
-    return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
+    return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
   }
 
   function _toConsumableArray(arr) {
-    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread();
   }
 
   function _arrayWithoutHoles(arr) {
-    if (Array.isArray(arr)) {
-      for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-      return arr2;
-    }
+    if (Array.isArray(arr)) return _arrayLikeToArray(arr);
   }
 
   function _arrayWithHoles(arr) {
@@ -187,14 +185,11 @@
   }
 
   function _iterableToArray(iter) {
-    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+    if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
   }
 
   function _iterableToArrayLimit(arr, i) {
-    if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) {
-      return;
-    }
-
+    if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
     var _arr = [];
     var _n = true;
     var _d = false;
@@ -220,12 +215,29 @@
     return _arr;
   }
 
+  function _unsupportedIterableToArray(o, minLen) {
+    if (!o) return;
+    if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+    var n = Object.prototype.toString.call(o).slice(8, -1);
+    if (n === "Object" && o.constructor) n = o.constructor.name;
+    if (n === "Map" || n === "Set") return Array.from(o);
+    if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+  }
+
+  function _arrayLikeToArray(arr, len) {
+    if (len == null || len > arr.length) len = arr.length;
+
+    for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+    return arr2;
+  }
+
   function _nonIterableSpread() {
-    throw new TypeError("Invalid attempt to spread non-iterable instance");
+    throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
 
   function _nonIterableRest() {
-    throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
   }
 
   function _wrapRegExp(re, groups) {
@@ -325,6 +337,10 @@
   var isArray_1 = isArray;
 
   var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+  function commonjsRequire () {
+  	throw new Error('Dynamic requires are not currently supported by rollup-plugin-commonjs');
+  }
 
   function unwrapExports (x) {
   	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
@@ -6570,7 +6586,7 @@
               return widget;
             } else if (isString_1(id) && id.startsWith('mg')) {
               // ID is type, payload is widget
-              return _objectSpread2({}, widget, {
+              return _objectSpread2(_objectSpread2({}, widget), {}, {
                 type: id
               });
             } else if (widget.type) {
@@ -6587,9 +6603,9 @@
 
               if (found) {
                 // Found either a widget of form `mg${type}` or a widget with that type as a shorthand
-                return _objectSpread2({
+                return _objectSpread2(_objectSpread2({
                   id: id
-                }, widget, {
+                }, widget), {}, {
                   type: found.meta.id
                 });
               } else {
@@ -6601,9 +6617,9 @@
               }
             } else if (isPlainObject_1(widget)) {
               // Given object but it explicitly does not have a type - assume mgText
-              return _objectSpread2({
+              return _objectSpread2(_objectSpread2({
                 id: id
-              }, widget, {
+              }, widget), {}, {
                 type: 'mgText'
               });
             } else {
@@ -6896,7 +6912,7 @@
     } else if (isPlainObject_1(expression)) {
       // An object but not as Sift function
       return asFunc ? createDefaultQueryTester(expression) : expression;
-    } else if (isString_1(expression) && (match = _wrapRegExp(/^[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*([\.0-9A-Z_a-z]+)([\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*==?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*!=[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*<=?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*>=?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+\$lte?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+\$gte?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+)(.+)[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*$/, {
+    } else if (isString_1(expression) && (match = /*#__PURE__*/_wrapRegExp(/^[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*([\.0-9A-Z_a-z]+)([\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*==?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*!=[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*<=?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*>=?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+\$lte?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+\$gte?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+)(.+)[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*$/, {
       left: 1,
       operand: 2,
       right: 3
@@ -7065,7 +7081,7 @@
       return str;
     } else if (/[0-9]$/.test(str)) {
       // Ends in a number
-      var extracted = _wrapRegExp(/^(.*)([0-9]+)$/, {
+      var extracted = /*#__PURE__*/_wrapRegExp(/^(.*)([0-9]+)$/, {
         prefix: 1,
         numeric: 2
       }).exec(str); // Extract numeric suffix
@@ -7112,7 +7128,7 @@
     Vue$1.mgComponent = function (name, component) {
       if (macgyver.widgets[name]) throw new Error("Cannot redeclare MacGyver component \"".concat(name, "\""));
       if (!name.startsWith('mg')) throw new Error("All MacGyver components must be prefixed with \"mg\", given \"".concat(name, "\""));
-      macgyver.widgets[name] = _objectSpread2({}, component, {
+      macgyver.widgets[name] = _objectSpread2(_objectSpread2({}, component), {}, {
         meta: _objectSpread2({
           id: _.camelCase(name),
           title: _.startCase(name),
@@ -7235,6 +7251,7 @@
                 newProp.type = Object;
 
               case 'mgDate':
+              case 'mgDatetime':
               case 'mgTime':
                 newProp.type = Date;
                 break;
@@ -7456,6 +7473,7 @@
   Promise.resolve().then(function () { return mgComponent; });
   Promise.resolve().then(function () { return mgContainer; });
   Promise.resolve().then(function () { return mgDate; });
+  Promise.resolve().then(function () { return mgDatetime; });
   Promise.resolve().then(function () { return mgEmail; });
   Promise.resolve().then(function () { return mgError; });
   Promise.resolve().then(function () { return mgFormEditor; });
@@ -10385,17 +10403,17 @@
             return t;
           } else if (v._uid == child._uid) {
             // Found by direct UID
-            return _objectSpread2({}, t, {
+            return _objectSpread2(_objectSpread2({}, t), {}, {
               found: true
             });
           } else if (v.$children && v.$children.length == 1 && v.$children[0]._uid == child._uid) {
             // Check into mgComponent wrappers
-            return _objectSpread2({}, t, {
+            return _objectSpread2(_objectSpread2({}, t), {}, {
               found: true
             });
           } else if (v.$mgForm) {
             // Is an mgComponent {
-            return _objectSpread2({}, t, {
+            return _objectSpread2(_objectSpread2({}, t), {}, {
               mgIndex: t.mgIndex + 1
             });
           } else {
@@ -10870,6 +10888,5668 @@
     'default': __vue_component__$i
   });
 
+  var moment = createCommonjsModule(function (module, exports) {
+  (function (global, factory) {
+       module.exports = factory() ;
+  }(commonjsGlobal, (function () {
+      var hookCallback;
+
+      function hooks() {
+          return hookCallback.apply(null, arguments);
+      }
+
+      // This is done to register the method called with moment()
+      // without creating circular dependencies.
+      function setHookCallback(callback) {
+          hookCallback = callback;
+      }
+
+      function isArray(input) {
+          return (
+              input instanceof Array ||
+              Object.prototype.toString.call(input) === '[object Array]'
+          );
+      }
+
+      function isObject(input) {
+          // IE8 will treat undefined and null as object if it wasn't for
+          // input != null
+          return (
+              input != null &&
+              Object.prototype.toString.call(input) === '[object Object]'
+          );
+      }
+
+      function hasOwnProp(a, b) {
+          return Object.prototype.hasOwnProperty.call(a, b);
+      }
+
+      function isObjectEmpty(obj) {
+          if (Object.getOwnPropertyNames) {
+              return Object.getOwnPropertyNames(obj).length === 0;
+          } else {
+              var k;
+              for (k in obj) {
+                  if (hasOwnProp(obj, k)) {
+                      return false;
+                  }
+              }
+              return true;
+          }
+      }
+
+      function isUndefined(input) {
+          return input === void 0;
+      }
+
+      function isNumber(input) {
+          return (
+              typeof input === 'number' ||
+              Object.prototype.toString.call(input) === '[object Number]'
+          );
+      }
+
+      function isDate(input) {
+          return (
+              input instanceof Date ||
+              Object.prototype.toString.call(input) === '[object Date]'
+          );
+      }
+
+      function map(arr, fn) {
+          var res = [],
+              i;
+          for (i = 0; i < arr.length; ++i) {
+              res.push(fn(arr[i], i));
+          }
+          return res;
+      }
+
+      function extend(a, b) {
+          for (var i in b) {
+              if (hasOwnProp(b, i)) {
+                  a[i] = b[i];
+              }
+          }
+
+          if (hasOwnProp(b, 'toString')) {
+              a.toString = b.toString;
+          }
+
+          if (hasOwnProp(b, 'valueOf')) {
+              a.valueOf = b.valueOf;
+          }
+
+          return a;
+      }
+
+      function createUTC(input, format, locale, strict) {
+          return createLocalOrUTC(input, format, locale, strict, true).utc();
+      }
+
+      function defaultParsingFlags() {
+          // We need to deep clone this object.
+          return {
+              empty: false,
+              unusedTokens: [],
+              unusedInput: [],
+              overflow: -2,
+              charsLeftOver: 0,
+              nullInput: false,
+              invalidEra: null,
+              invalidMonth: null,
+              invalidFormat: false,
+              userInvalidated: false,
+              iso: false,
+              parsedDateParts: [],
+              era: null,
+              meridiem: null,
+              rfc2822: false,
+              weekdayMismatch: false,
+          };
+      }
+
+      function getParsingFlags(m) {
+          if (m._pf == null) {
+              m._pf = defaultParsingFlags();
+          }
+          return m._pf;
+      }
+
+      var some;
+      if (Array.prototype.some) {
+          some = Array.prototype.some;
+      } else {
+          some = function (fun) {
+              var t = Object(this),
+                  len = t.length >>> 0,
+                  i;
+
+              for (i = 0; i < len; i++) {
+                  if (i in t && fun.call(this, t[i], i, t)) {
+                      return true;
+                  }
+              }
+
+              return false;
+          };
+      }
+
+      function isValid(m) {
+          if (m._isValid == null) {
+              var flags = getParsingFlags(m),
+                  parsedParts = some.call(flags.parsedDateParts, function (i) {
+                      return i != null;
+                  }),
+                  isNowValid =
+                      !isNaN(m._d.getTime()) &&
+                      flags.overflow < 0 &&
+                      !flags.empty &&
+                      !flags.invalidEra &&
+                      !flags.invalidMonth &&
+                      !flags.invalidWeekday &&
+                      !flags.weekdayMismatch &&
+                      !flags.nullInput &&
+                      !flags.invalidFormat &&
+                      !flags.userInvalidated &&
+                      (!flags.meridiem || (flags.meridiem && parsedParts));
+
+              if (m._strict) {
+                  isNowValid =
+                      isNowValid &&
+                      flags.charsLeftOver === 0 &&
+                      flags.unusedTokens.length === 0 &&
+                      flags.bigHour === undefined;
+              }
+
+              if (Object.isFrozen == null || !Object.isFrozen(m)) {
+                  m._isValid = isNowValid;
+              } else {
+                  return isNowValid;
+              }
+          }
+          return m._isValid;
+      }
+
+      function createInvalid(flags) {
+          var m = createUTC(NaN);
+          if (flags != null) {
+              extend(getParsingFlags(m), flags);
+          } else {
+              getParsingFlags(m).userInvalidated = true;
+          }
+
+          return m;
+      }
+
+      // Plugins that add properties should also add the key here (null value),
+      // so we can properly clone ourselves.
+      var momentProperties = (hooks.momentProperties = []),
+          updateInProgress = false;
+
+      function copyConfig(to, from) {
+          var i, prop, val;
+
+          if (!isUndefined(from._isAMomentObject)) {
+              to._isAMomentObject = from._isAMomentObject;
+          }
+          if (!isUndefined(from._i)) {
+              to._i = from._i;
+          }
+          if (!isUndefined(from._f)) {
+              to._f = from._f;
+          }
+          if (!isUndefined(from._l)) {
+              to._l = from._l;
+          }
+          if (!isUndefined(from._strict)) {
+              to._strict = from._strict;
+          }
+          if (!isUndefined(from._tzm)) {
+              to._tzm = from._tzm;
+          }
+          if (!isUndefined(from._isUTC)) {
+              to._isUTC = from._isUTC;
+          }
+          if (!isUndefined(from._offset)) {
+              to._offset = from._offset;
+          }
+          if (!isUndefined(from._pf)) {
+              to._pf = getParsingFlags(from);
+          }
+          if (!isUndefined(from._locale)) {
+              to._locale = from._locale;
+          }
+
+          if (momentProperties.length > 0) {
+              for (i = 0; i < momentProperties.length; i++) {
+                  prop = momentProperties[i];
+                  val = from[prop];
+                  if (!isUndefined(val)) {
+                      to[prop] = val;
+                  }
+              }
+          }
+
+          return to;
+      }
+
+      // Moment prototype object
+      function Moment(config) {
+          copyConfig(this, config);
+          this._d = new Date(config._d != null ? config._d.getTime() : NaN);
+          if (!this.isValid()) {
+              this._d = new Date(NaN);
+          }
+          // Prevent infinite loop in case updateOffset creates new moment
+          // objects.
+          if (updateInProgress === false) {
+              updateInProgress = true;
+              hooks.updateOffset(this);
+              updateInProgress = false;
+          }
+      }
+
+      function isMoment(obj) {
+          return (
+              obj instanceof Moment || (obj != null && obj._isAMomentObject != null)
+          );
+      }
+
+      function warn(msg) {
+          if (
+              hooks.suppressDeprecationWarnings === false &&
+              typeof console !== 'undefined' &&
+              console.warn
+          ) {
+              console.warn('Deprecation warning: ' + msg);
+          }
+      }
+
+      function deprecate(msg, fn) {
+          var firstTime = true;
+
+          return extend(function () {
+              if (hooks.deprecationHandler != null) {
+                  hooks.deprecationHandler(null, msg);
+              }
+              if (firstTime) {
+                  var args = [],
+                      arg,
+                      i,
+                      key;
+                  for (i = 0; i < arguments.length; i++) {
+                      arg = '';
+                      if (typeof arguments[i] === 'object') {
+                          arg += '\n[' + i + '] ';
+                          for (key in arguments[0]) {
+                              if (hasOwnProp(arguments[0], key)) {
+                                  arg += key + ': ' + arguments[0][key] + ', ';
+                              }
+                          }
+                          arg = arg.slice(0, -2); // Remove trailing comma and space
+                      } else {
+                          arg = arguments[i];
+                      }
+                      args.push(arg);
+                  }
+                  warn(
+                      msg +
+                          '\nArguments: ' +
+                          Array.prototype.slice.call(args).join('') +
+                          '\n' +
+                          new Error().stack
+                  );
+                  firstTime = false;
+              }
+              return fn.apply(this, arguments);
+          }, fn);
+      }
+
+      var deprecations = {};
+
+      function deprecateSimple(name, msg) {
+          if (hooks.deprecationHandler != null) {
+              hooks.deprecationHandler(name, msg);
+          }
+          if (!deprecations[name]) {
+              warn(msg);
+              deprecations[name] = true;
+          }
+      }
+
+      hooks.suppressDeprecationWarnings = false;
+      hooks.deprecationHandler = null;
+
+      function isFunction(input) {
+          return (
+              (typeof Function !== 'undefined' && input instanceof Function) ||
+              Object.prototype.toString.call(input) === '[object Function]'
+          );
+      }
+
+      function set(config) {
+          var prop, i;
+          for (i in config) {
+              if (hasOwnProp(config, i)) {
+                  prop = config[i];
+                  if (isFunction(prop)) {
+                      this[i] = prop;
+                  } else {
+                      this['_' + i] = prop;
+                  }
+              }
+          }
+          this._config = config;
+          // Lenient ordinal parsing accepts just a number in addition to
+          // number + (possibly) stuff coming from _dayOfMonthOrdinalParse.
+          // TODO: Remove "ordinalParse" fallback in next major release.
+          this._dayOfMonthOrdinalParseLenient = new RegExp(
+              (this._dayOfMonthOrdinalParse.source || this._ordinalParse.source) +
+                  '|' +
+                  /\d{1,2}/.source
+          );
+      }
+
+      function mergeConfigs(parentConfig, childConfig) {
+          var res = extend({}, parentConfig),
+              prop;
+          for (prop in childConfig) {
+              if (hasOwnProp(childConfig, prop)) {
+                  if (isObject(parentConfig[prop]) && isObject(childConfig[prop])) {
+                      res[prop] = {};
+                      extend(res[prop], parentConfig[prop]);
+                      extend(res[prop], childConfig[prop]);
+                  } else if (childConfig[prop] != null) {
+                      res[prop] = childConfig[prop];
+                  } else {
+                      delete res[prop];
+                  }
+              }
+          }
+          for (prop in parentConfig) {
+              if (
+                  hasOwnProp(parentConfig, prop) &&
+                  !hasOwnProp(childConfig, prop) &&
+                  isObject(parentConfig[prop])
+              ) {
+                  // make sure changes to properties don't modify parent config
+                  res[prop] = extend({}, res[prop]);
+              }
+          }
+          return res;
+      }
+
+      function Locale(config) {
+          if (config != null) {
+              this.set(config);
+          }
+      }
+
+      var keys;
+
+      if (Object.keys) {
+          keys = Object.keys;
+      } else {
+          keys = function (obj) {
+              var i,
+                  res = [];
+              for (i in obj) {
+                  if (hasOwnProp(obj, i)) {
+                      res.push(i);
+                  }
+              }
+              return res;
+          };
+      }
+
+      var defaultCalendar = {
+          sameDay: '[Today at] LT',
+          nextDay: '[Tomorrow at] LT',
+          nextWeek: 'dddd [at] LT',
+          lastDay: '[Yesterday at] LT',
+          lastWeek: '[Last] dddd [at] LT',
+          sameElse: 'L',
+      };
+
+      function calendar(key, mom, now) {
+          var output = this._calendar[key] || this._calendar['sameElse'];
+          return isFunction(output) ? output.call(mom, now) : output;
+      }
+
+      function zeroFill(number, targetLength, forceSign) {
+          var absNumber = '' + Math.abs(number),
+              zerosToFill = targetLength - absNumber.length,
+              sign = number >= 0;
+          return (
+              (sign ? (forceSign ? '+' : '') : '-') +
+              Math.pow(10, Math.max(0, zerosToFill)).toString().substr(1) +
+              absNumber
+          );
+      }
+
+      var formattingTokens = /(\[[^\[]*\])|(\\)?([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|N{1,5}|YYYYYY|YYYYY|YYYY|YY|y{2,4}|yo?|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|.)/g,
+          localFormattingTokens = /(\[[^\[]*\])|(\\)?(LTS|LT|LL?L?L?|l{1,4})/g,
+          formatFunctions = {},
+          formatTokenFunctions = {};
+
+      // token:    'M'
+      // padded:   ['MM', 2]
+      // ordinal:  'Mo'
+      // callback: function () { this.month() + 1 }
+      function addFormatToken(token, padded, ordinal, callback) {
+          var func = callback;
+          if (typeof callback === 'string') {
+              func = function () {
+                  return this[callback]();
+              };
+          }
+          if (token) {
+              formatTokenFunctions[token] = func;
+          }
+          if (padded) {
+              formatTokenFunctions[padded[0]] = function () {
+                  return zeroFill(func.apply(this, arguments), padded[1], padded[2]);
+              };
+          }
+          if (ordinal) {
+              formatTokenFunctions[ordinal] = function () {
+                  return this.localeData().ordinal(
+                      func.apply(this, arguments),
+                      token
+                  );
+              };
+          }
+      }
+
+      function removeFormattingTokens(input) {
+          if (input.match(/\[[\s\S]/)) {
+              return input.replace(/^\[|\]$/g, '');
+          }
+          return input.replace(/\\/g, '');
+      }
+
+      function makeFormatFunction(format) {
+          var array = format.match(formattingTokens),
+              i,
+              length;
+
+          for (i = 0, length = array.length; i < length; i++) {
+              if (formatTokenFunctions[array[i]]) {
+                  array[i] = formatTokenFunctions[array[i]];
+              } else {
+                  array[i] = removeFormattingTokens(array[i]);
+              }
+          }
+
+          return function (mom) {
+              var output = '',
+                  i;
+              for (i = 0; i < length; i++) {
+                  output += isFunction(array[i])
+                      ? array[i].call(mom, format)
+                      : array[i];
+              }
+              return output;
+          };
+      }
+
+      // format date using native date object
+      function formatMoment(m, format) {
+          if (!m.isValid()) {
+              return m.localeData().invalidDate();
+          }
+
+          format = expandFormat(format, m.localeData());
+          formatFunctions[format] =
+              formatFunctions[format] || makeFormatFunction(format);
+
+          return formatFunctions[format](m);
+      }
+
+      function expandFormat(format, locale) {
+          var i = 5;
+
+          function replaceLongDateFormatTokens(input) {
+              return locale.longDateFormat(input) || input;
+          }
+
+          localFormattingTokens.lastIndex = 0;
+          while (i >= 0 && localFormattingTokens.test(format)) {
+              format = format.replace(
+                  localFormattingTokens,
+                  replaceLongDateFormatTokens
+              );
+              localFormattingTokens.lastIndex = 0;
+              i -= 1;
+          }
+
+          return format;
+      }
+
+      var defaultLongDateFormat = {
+          LTS: 'h:mm:ss A',
+          LT: 'h:mm A',
+          L: 'MM/DD/YYYY',
+          LL: 'MMMM D, YYYY',
+          LLL: 'MMMM D, YYYY h:mm A',
+          LLLL: 'dddd, MMMM D, YYYY h:mm A',
+      };
+
+      function longDateFormat(key) {
+          var format = this._longDateFormat[key],
+              formatUpper = this._longDateFormat[key.toUpperCase()];
+
+          if (format || !formatUpper) {
+              return format;
+          }
+
+          this._longDateFormat[key] = formatUpper
+              .match(formattingTokens)
+              .map(function (tok) {
+                  if (
+                      tok === 'MMMM' ||
+                      tok === 'MM' ||
+                      tok === 'DD' ||
+                      tok === 'dddd'
+                  ) {
+                      return tok.slice(1);
+                  }
+                  return tok;
+              })
+              .join('');
+
+          return this._longDateFormat[key];
+      }
+
+      var defaultInvalidDate = 'Invalid date';
+
+      function invalidDate() {
+          return this._invalidDate;
+      }
+
+      var defaultOrdinal = '%d',
+          defaultDayOfMonthOrdinalParse = /\d{1,2}/;
+
+      function ordinal(number) {
+          return this._ordinal.replace('%d', number);
+      }
+
+      var defaultRelativeTime = {
+          future: 'in %s',
+          past: '%s ago',
+          s: 'a few seconds',
+          ss: '%d seconds',
+          m: 'a minute',
+          mm: '%d minutes',
+          h: 'an hour',
+          hh: '%d hours',
+          d: 'a day',
+          dd: '%d days',
+          w: 'a week',
+          ww: '%d weeks',
+          M: 'a month',
+          MM: '%d months',
+          y: 'a year',
+          yy: '%d years',
+      };
+
+      function relativeTime(number, withoutSuffix, string, isFuture) {
+          var output = this._relativeTime[string];
+          return isFunction(output)
+              ? output(number, withoutSuffix, string, isFuture)
+              : output.replace(/%d/i, number);
+      }
+
+      function pastFuture(diff, output) {
+          var format = this._relativeTime[diff > 0 ? 'future' : 'past'];
+          return isFunction(format) ? format(output) : format.replace(/%s/i, output);
+      }
+
+      var aliases = {};
+
+      function addUnitAlias(unit, shorthand) {
+          var lowerCase = unit.toLowerCase();
+          aliases[lowerCase] = aliases[lowerCase + 's'] = aliases[shorthand] = unit;
+      }
+
+      function normalizeUnits(units) {
+          return typeof units === 'string'
+              ? aliases[units] || aliases[units.toLowerCase()]
+              : undefined;
+      }
+
+      function normalizeObjectUnits(inputObject) {
+          var normalizedInput = {},
+              normalizedProp,
+              prop;
+
+          for (prop in inputObject) {
+              if (hasOwnProp(inputObject, prop)) {
+                  normalizedProp = normalizeUnits(prop);
+                  if (normalizedProp) {
+                      normalizedInput[normalizedProp] = inputObject[prop];
+                  }
+              }
+          }
+
+          return normalizedInput;
+      }
+
+      var priorities = {};
+
+      function addUnitPriority(unit, priority) {
+          priorities[unit] = priority;
+      }
+
+      function getPrioritizedUnits(unitsObj) {
+          var units = [],
+              u;
+          for (u in unitsObj) {
+              if (hasOwnProp(unitsObj, u)) {
+                  units.push({ unit: u, priority: priorities[u] });
+              }
+          }
+          units.sort(function (a, b) {
+              return a.priority - b.priority;
+          });
+          return units;
+      }
+
+      function isLeapYear(year) {
+          return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+      }
+
+      function absFloor(number) {
+          if (number < 0) {
+              // -0 -> 0
+              return Math.ceil(number) || 0;
+          } else {
+              return Math.floor(number);
+          }
+      }
+
+      function toInt(argumentForCoercion) {
+          var coercedNumber = +argumentForCoercion,
+              value = 0;
+
+          if (coercedNumber !== 0 && isFinite(coercedNumber)) {
+              value = absFloor(coercedNumber);
+          }
+
+          return value;
+      }
+
+      function makeGetSet(unit, keepTime) {
+          return function (value) {
+              if (value != null) {
+                  set$1(this, unit, value);
+                  hooks.updateOffset(this, keepTime);
+                  return this;
+              } else {
+                  return get(this, unit);
+              }
+          };
+      }
+
+      function get(mom, unit) {
+          return mom.isValid()
+              ? mom._d['get' + (mom._isUTC ? 'UTC' : '') + unit]()
+              : NaN;
+      }
+
+      function set$1(mom, unit, value) {
+          if (mom.isValid() && !isNaN(value)) {
+              if (
+                  unit === 'FullYear' &&
+                  isLeapYear(mom.year()) &&
+                  mom.month() === 1 &&
+                  mom.date() === 29
+              ) {
+                  value = toInt(value);
+                  mom._d['set' + (mom._isUTC ? 'UTC' : '') + unit](
+                      value,
+                      mom.month(),
+                      daysInMonth(value, mom.month())
+                  );
+              } else {
+                  mom._d['set' + (mom._isUTC ? 'UTC' : '') + unit](value);
+              }
+          }
+      }
+
+      // MOMENTS
+
+      function stringGet(units) {
+          units = normalizeUnits(units);
+          if (isFunction(this[units])) {
+              return this[units]();
+          }
+          return this;
+      }
+
+      function stringSet(units, value) {
+          if (typeof units === 'object') {
+              units = normalizeObjectUnits(units);
+              var prioritized = getPrioritizedUnits(units),
+                  i;
+              for (i = 0; i < prioritized.length; i++) {
+                  this[prioritized[i].unit](units[prioritized[i].unit]);
+              }
+          } else {
+              units = normalizeUnits(units);
+              if (isFunction(this[units])) {
+                  return this[units](value);
+              }
+          }
+          return this;
+      }
+
+      var match1 = /\d/, //       0 - 9
+          match2 = /\d\d/, //      00 - 99
+          match3 = /\d{3}/, //     000 - 999
+          match4 = /\d{4}/, //    0000 - 9999
+          match6 = /[+-]?\d{6}/, // -999999 - 999999
+          match1to2 = /\d\d?/, //       0 - 99
+          match3to4 = /\d\d\d\d?/, //     999 - 9999
+          match5to6 = /\d\d\d\d\d\d?/, //   99999 - 999999
+          match1to3 = /\d{1,3}/, //       0 - 999
+          match1to4 = /\d{1,4}/, //       0 - 9999
+          match1to6 = /[+-]?\d{1,6}/, // -999999 - 999999
+          matchUnsigned = /\d+/, //       0 - inf
+          matchSigned = /[+-]?\d+/, //    -inf - inf
+          matchOffset = /Z|[+-]\d\d:?\d\d/gi, // +00:00 -00:00 +0000 -0000 or Z
+          matchShortOffset = /Z|[+-]\d\d(?::?\d\d)?/gi, // +00 -00 +00:00 -00:00 +0000 -0000 or Z
+          matchTimestamp = /[+-]?\d+(\.\d{1,3})?/, // 123456789 123456789.123
+          // any word (or two) characters or numbers including two/three word month in arabic.
+          // includes scottish gaelic two word and hyphenated months
+          matchWord = /[0-9]{0,256}['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFF07\uFF10-\uFFEF]{1,256}|[\u0600-\u06FF\/]{1,256}(\s*?[\u0600-\u06FF]{1,256}){1,2}/i,
+          regexes;
+
+      regexes = {};
+
+      function addRegexToken(token, regex, strictRegex) {
+          regexes[token] = isFunction(regex)
+              ? regex
+              : function (isStrict, localeData) {
+                    return isStrict && strictRegex ? strictRegex : regex;
+                };
+      }
+
+      function getParseRegexForToken(token, config) {
+          if (!hasOwnProp(regexes, token)) {
+              return new RegExp(unescapeFormat(token));
+          }
+
+          return regexes[token](config._strict, config._locale);
+      }
+
+      // Code from http://stackoverflow.com/questions/3561493/is-there-a-regexp-escape-function-in-javascript
+      function unescapeFormat(s) {
+          return regexEscape(
+              s
+                  .replace('\\', '')
+                  .replace(/\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g, function (
+                      matched,
+                      p1,
+                      p2,
+                      p3,
+                      p4
+                  ) {
+                      return p1 || p2 || p3 || p4;
+                  })
+          );
+      }
+
+      function regexEscape(s) {
+          return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+      }
+
+      var tokens = {};
+
+      function addParseToken(token, callback) {
+          var i,
+              func = callback;
+          if (typeof token === 'string') {
+              token = [token];
+          }
+          if (isNumber(callback)) {
+              func = function (input, array) {
+                  array[callback] = toInt(input);
+              };
+          }
+          for (i = 0; i < token.length; i++) {
+              tokens[token[i]] = func;
+          }
+      }
+
+      function addWeekParseToken(token, callback) {
+          addParseToken(token, function (input, array, config, token) {
+              config._w = config._w || {};
+              callback(input, config._w, config, token);
+          });
+      }
+
+      function addTimeToArrayFromToken(token, input, config) {
+          if (input != null && hasOwnProp(tokens, token)) {
+              tokens[token](input, config._a, config, token);
+          }
+      }
+
+      var YEAR = 0,
+          MONTH = 1,
+          DATE = 2,
+          HOUR = 3,
+          MINUTE = 4,
+          SECOND = 5,
+          MILLISECOND = 6,
+          WEEK = 7,
+          WEEKDAY = 8;
+
+      function mod(n, x) {
+          return ((n % x) + x) % x;
+      }
+
+      var indexOf;
+
+      if (Array.prototype.indexOf) {
+          indexOf = Array.prototype.indexOf;
+      } else {
+          indexOf = function (o) {
+              // I know
+              var i;
+              for (i = 0; i < this.length; ++i) {
+                  if (this[i] === o) {
+                      return i;
+                  }
+              }
+              return -1;
+          };
+      }
+
+      function daysInMonth(year, month) {
+          if (isNaN(year) || isNaN(month)) {
+              return NaN;
+          }
+          var modMonth = mod(month, 12);
+          year += (month - modMonth) / 12;
+          return modMonth === 1
+              ? isLeapYear(year)
+                  ? 29
+                  : 28
+              : 31 - ((modMonth % 7) % 2);
+      }
+
+      // FORMATTING
+
+      addFormatToken('M', ['MM', 2], 'Mo', function () {
+          return this.month() + 1;
+      });
+
+      addFormatToken('MMM', 0, 0, function (format) {
+          return this.localeData().monthsShort(this, format);
+      });
+
+      addFormatToken('MMMM', 0, 0, function (format) {
+          return this.localeData().months(this, format);
+      });
+
+      // ALIASES
+
+      addUnitAlias('month', 'M');
+
+      // PRIORITY
+
+      addUnitPriority('month', 8);
+
+      // PARSING
+
+      addRegexToken('M', match1to2);
+      addRegexToken('MM', match1to2, match2);
+      addRegexToken('MMM', function (isStrict, locale) {
+          return locale.monthsShortRegex(isStrict);
+      });
+      addRegexToken('MMMM', function (isStrict, locale) {
+          return locale.monthsRegex(isStrict);
+      });
+
+      addParseToken(['M', 'MM'], function (input, array) {
+          array[MONTH] = toInt(input) - 1;
+      });
+
+      addParseToken(['MMM', 'MMMM'], function (input, array, config, token) {
+          var month = config._locale.monthsParse(input, token, config._strict);
+          // if we didn't find a month name, mark the date as invalid.
+          if (month != null) {
+              array[MONTH] = month;
+          } else {
+              getParsingFlags(config).invalidMonth = input;
+          }
+      });
+
+      // LOCALES
+
+      var defaultLocaleMonths = 'January_February_March_April_May_June_July_August_September_October_November_December'.split(
+              '_'
+          ),
+          defaultLocaleMonthsShort = 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split(
+              '_'
+          ),
+          MONTHS_IN_FORMAT = /D[oD]?(\[[^\[\]]*\]|\s)+MMMM?/,
+          defaultMonthsShortRegex = matchWord,
+          defaultMonthsRegex = matchWord;
+
+      function localeMonths(m, format) {
+          if (!m) {
+              return isArray(this._months)
+                  ? this._months
+                  : this._months['standalone'];
+          }
+          return isArray(this._months)
+              ? this._months[m.month()]
+              : this._months[
+                    (this._months.isFormat || MONTHS_IN_FORMAT).test(format)
+                        ? 'format'
+                        : 'standalone'
+                ][m.month()];
+      }
+
+      function localeMonthsShort(m, format) {
+          if (!m) {
+              return isArray(this._monthsShort)
+                  ? this._monthsShort
+                  : this._monthsShort['standalone'];
+          }
+          return isArray(this._monthsShort)
+              ? this._monthsShort[m.month()]
+              : this._monthsShort[
+                    MONTHS_IN_FORMAT.test(format) ? 'format' : 'standalone'
+                ][m.month()];
+      }
+
+      function handleStrictParse(monthName, format, strict) {
+          var i,
+              ii,
+              mom,
+              llc = monthName.toLocaleLowerCase();
+          if (!this._monthsParse) {
+              // this is not used
+              this._monthsParse = [];
+              this._longMonthsParse = [];
+              this._shortMonthsParse = [];
+              for (i = 0; i < 12; ++i) {
+                  mom = createUTC([2000, i]);
+                  this._shortMonthsParse[i] = this.monthsShort(
+                      mom,
+                      ''
+                  ).toLocaleLowerCase();
+                  this._longMonthsParse[i] = this.months(mom, '').toLocaleLowerCase();
+              }
+          }
+
+          if (strict) {
+              if (format === 'MMM') {
+                  ii = indexOf.call(this._shortMonthsParse, llc);
+                  return ii !== -1 ? ii : null;
+              } else {
+                  ii = indexOf.call(this._longMonthsParse, llc);
+                  return ii !== -1 ? ii : null;
+              }
+          } else {
+              if (format === 'MMM') {
+                  ii = indexOf.call(this._shortMonthsParse, llc);
+                  if (ii !== -1) {
+                      return ii;
+                  }
+                  ii = indexOf.call(this._longMonthsParse, llc);
+                  return ii !== -1 ? ii : null;
+              } else {
+                  ii = indexOf.call(this._longMonthsParse, llc);
+                  if (ii !== -1) {
+                      return ii;
+                  }
+                  ii = indexOf.call(this._shortMonthsParse, llc);
+                  return ii !== -1 ? ii : null;
+              }
+          }
+      }
+
+      function localeMonthsParse(monthName, format, strict) {
+          var i, mom, regex;
+
+          if (this._monthsParseExact) {
+              return handleStrictParse.call(this, monthName, format, strict);
+          }
+
+          if (!this._monthsParse) {
+              this._monthsParse = [];
+              this._longMonthsParse = [];
+              this._shortMonthsParse = [];
+          }
+
+          // TODO: add sorting
+          // Sorting makes sure if one month (or abbr) is a prefix of another
+          // see sorting in computeMonthsParse
+          for (i = 0; i < 12; i++) {
+              // make the regex if we don't have it already
+              mom = createUTC([2000, i]);
+              if (strict && !this._longMonthsParse[i]) {
+                  this._longMonthsParse[i] = new RegExp(
+                      '^' + this.months(mom, '').replace('.', '') + '$',
+                      'i'
+                  );
+                  this._shortMonthsParse[i] = new RegExp(
+                      '^' + this.monthsShort(mom, '').replace('.', '') + '$',
+                      'i'
+                  );
+              }
+              if (!strict && !this._monthsParse[i]) {
+                  regex =
+                      '^' + this.months(mom, '') + '|^' + this.monthsShort(mom, '');
+                  this._monthsParse[i] = new RegExp(regex.replace('.', ''), 'i');
+              }
+              // test the regex
+              if (
+                  strict &&
+                  format === 'MMMM' &&
+                  this._longMonthsParse[i].test(monthName)
+              ) {
+                  return i;
+              } else if (
+                  strict &&
+                  format === 'MMM' &&
+                  this._shortMonthsParse[i].test(monthName)
+              ) {
+                  return i;
+              } else if (!strict && this._monthsParse[i].test(monthName)) {
+                  return i;
+              }
+          }
+      }
+
+      // MOMENTS
+
+      function setMonth(mom, value) {
+          var dayOfMonth;
+
+          if (!mom.isValid()) {
+              // No op
+              return mom;
+          }
+
+          if (typeof value === 'string') {
+              if (/^\d+$/.test(value)) {
+                  value = toInt(value);
+              } else {
+                  value = mom.localeData().monthsParse(value);
+                  // TODO: Another silent failure?
+                  if (!isNumber(value)) {
+                      return mom;
+                  }
+              }
+          }
+
+          dayOfMonth = Math.min(mom.date(), daysInMonth(mom.year(), value));
+          mom._d['set' + (mom._isUTC ? 'UTC' : '') + 'Month'](value, dayOfMonth);
+          return mom;
+      }
+
+      function getSetMonth(value) {
+          if (value != null) {
+              setMonth(this, value);
+              hooks.updateOffset(this, true);
+              return this;
+          } else {
+              return get(this, 'Month');
+          }
+      }
+
+      function getDaysInMonth() {
+          return daysInMonth(this.year(), this.month());
+      }
+
+      function monthsShortRegex(isStrict) {
+          if (this._monthsParseExact) {
+              if (!hasOwnProp(this, '_monthsRegex')) {
+                  computeMonthsParse.call(this);
+              }
+              if (isStrict) {
+                  return this._monthsShortStrictRegex;
+              } else {
+                  return this._monthsShortRegex;
+              }
+          } else {
+              if (!hasOwnProp(this, '_monthsShortRegex')) {
+                  this._monthsShortRegex = defaultMonthsShortRegex;
+              }
+              return this._monthsShortStrictRegex && isStrict
+                  ? this._monthsShortStrictRegex
+                  : this._monthsShortRegex;
+          }
+      }
+
+      function monthsRegex(isStrict) {
+          if (this._monthsParseExact) {
+              if (!hasOwnProp(this, '_monthsRegex')) {
+                  computeMonthsParse.call(this);
+              }
+              if (isStrict) {
+                  return this._monthsStrictRegex;
+              } else {
+                  return this._monthsRegex;
+              }
+          } else {
+              if (!hasOwnProp(this, '_monthsRegex')) {
+                  this._monthsRegex = defaultMonthsRegex;
+              }
+              return this._monthsStrictRegex && isStrict
+                  ? this._monthsStrictRegex
+                  : this._monthsRegex;
+          }
+      }
+
+      function computeMonthsParse() {
+          function cmpLenRev(a, b) {
+              return b.length - a.length;
+          }
+
+          var shortPieces = [],
+              longPieces = [],
+              mixedPieces = [],
+              i,
+              mom;
+          for (i = 0; i < 12; i++) {
+              // make the regex if we don't have it already
+              mom = createUTC([2000, i]);
+              shortPieces.push(this.monthsShort(mom, ''));
+              longPieces.push(this.months(mom, ''));
+              mixedPieces.push(this.months(mom, ''));
+              mixedPieces.push(this.monthsShort(mom, ''));
+          }
+          // Sorting makes sure if one month (or abbr) is a prefix of another it
+          // will match the longer piece.
+          shortPieces.sort(cmpLenRev);
+          longPieces.sort(cmpLenRev);
+          mixedPieces.sort(cmpLenRev);
+          for (i = 0; i < 12; i++) {
+              shortPieces[i] = regexEscape(shortPieces[i]);
+              longPieces[i] = regexEscape(longPieces[i]);
+          }
+          for (i = 0; i < 24; i++) {
+              mixedPieces[i] = regexEscape(mixedPieces[i]);
+          }
+
+          this._monthsRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
+          this._monthsShortRegex = this._monthsRegex;
+          this._monthsStrictRegex = new RegExp(
+              '^(' + longPieces.join('|') + ')',
+              'i'
+          );
+          this._monthsShortStrictRegex = new RegExp(
+              '^(' + shortPieces.join('|') + ')',
+              'i'
+          );
+      }
+
+      // FORMATTING
+
+      addFormatToken('Y', 0, 0, function () {
+          var y = this.year();
+          return y <= 9999 ? zeroFill(y, 4) : '+' + y;
+      });
+
+      addFormatToken(0, ['YY', 2], 0, function () {
+          return this.year() % 100;
+      });
+
+      addFormatToken(0, ['YYYY', 4], 0, 'year');
+      addFormatToken(0, ['YYYYY', 5], 0, 'year');
+      addFormatToken(0, ['YYYYYY', 6, true], 0, 'year');
+
+      // ALIASES
+
+      addUnitAlias('year', 'y');
+
+      // PRIORITIES
+
+      addUnitPriority('year', 1);
+
+      // PARSING
+
+      addRegexToken('Y', matchSigned);
+      addRegexToken('YY', match1to2, match2);
+      addRegexToken('YYYY', match1to4, match4);
+      addRegexToken('YYYYY', match1to6, match6);
+      addRegexToken('YYYYYY', match1to6, match6);
+
+      addParseToken(['YYYYY', 'YYYYYY'], YEAR);
+      addParseToken('YYYY', function (input, array) {
+          array[YEAR] =
+              input.length === 2 ? hooks.parseTwoDigitYear(input) : toInt(input);
+      });
+      addParseToken('YY', function (input, array) {
+          array[YEAR] = hooks.parseTwoDigitYear(input);
+      });
+      addParseToken('Y', function (input, array) {
+          array[YEAR] = parseInt(input, 10);
+      });
+
+      // HELPERS
+
+      function daysInYear(year) {
+          return isLeapYear(year) ? 366 : 365;
+      }
+
+      // HOOKS
+
+      hooks.parseTwoDigitYear = function (input) {
+          return toInt(input) + (toInt(input) > 68 ? 1900 : 2000);
+      };
+
+      // MOMENTS
+
+      var getSetYear = makeGetSet('FullYear', true);
+
+      function getIsLeapYear() {
+          return isLeapYear(this.year());
+      }
+
+      function createDate(y, m, d, h, M, s, ms) {
+          // can't just apply() to create a date:
+          // https://stackoverflow.com/q/181348
+          var date;
+          // the date constructor remaps years 0-99 to 1900-1999
+          if (y < 100 && y >= 0) {
+              // preserve leap years using a full 400 year cycle, then reset
+              date = new Date(y + 400, m, d, h, M, s, ms);
+              if (isFinite(date.getFullYear())) {
+                  date.setFullYear(y);
+              }
+          } else {
+              date = new Date(y, m, d, h, M, s, ms);
+          }
+
+          return date;
+      }
+
+      function createUTCDate(y) {
+          var date, args;
+          // the Date.UTC function remaps years 0-99 to 1900-1999
+          if (y < 100 && y >= 0) {
+              args = Array.prototype.slice.call(arguments);
+              // preserve leap years using a full 400 year cycle, then reset
+              args[0] = y + 400;
+              date = new Date(Date.UTC.apply(null, args));
+              if (isFinite(date.getUTCFullYear())) {
+                  date.setUTCFullYear(y);
+              }
+          } else {
+              date = new Date(Date.UTC.apply(null, arguments));
+          }
+
+          return date;
+      }
+
+      // start-of-first-week - start-of-year
+      function firstWeekOffset(year, dow, doy) {
+          var // first-week day -- which january is always in the first week (4 for iso, 1 for other)
+              fwd = 7 + dow - doy,
+              // first-week day local weekday -- which local weekday is fwd
+              fwdlw = (7 + createUTCDate(year, 0, fwd).getUTCDay() - dow) % 7;
+
+          return -fwdlw + fwd - 1;
+      }
+
+      // https://en.wikipedia.org/wiki/ISO_week_date#Calculating_a_date_given_the_year.2C_week_number_and_weekday
+      function dayOfYearFromWeeks(year, week, weekday, dow, doy) {
+          var localWeekday = (7 + weekday - dow) % 7,
+              weekOffset = firstWeekOffset(year, dow, doy),
+              dayOfYear = 1 + 7 * (week - 1) + localWeekday + weekOffset,
+              resYear,
+              resDayOfYear;
+
+          if (dayOfYear <= 0) {
+              resYear = year - 1;
+              resDayOfYear = daysInYear(resYear) + dayOfYear;
+          } else if (dayOfYear > daysInYear(year)) {
+              resYear = year + 1;
+              resDayOfYear = dayOfYear - daysInYear(year);
+          } else {
+              resYear = year;
+              resDayOfYear = dayOfYear;
+          }
+
+          return {
+              year: resYear,
+              dayOfYear: resDayOfYear,
+          };
+      }
+
+      function weekOfYear(mom, dow, doy) {
+          var weekOffset = firstWeekOffset(mom.year(), dow, doy),
+              week = Math.floor((mom.dayOfYear() - weekOffset - 1) / 7) + 1,
+              resWeek,
+              resYear;
+
+          if (week < 1) {
+              resYear = mom.year() - 1;
+              resWeek = week + weeksInYear(resYear, dow, doy);
+          } else if (week > weeksInYear(mom.year(), dow, doy)) {
+              resWeek = week - weeksInYear(mom.year(), dow, doy);
+              resYear = mom.year() + 1;
+          } else {
+              resYear = mom.year();
+              resWeek = week;
+          }
+
+          return {
+              week: resWeek,
+              year: resYear,
+          };
+      }
+
+      function weeksInYear(year, dow, doy) {
+          var weekOffset = firstWeekOffset(year, dow, doy),
+              weekOffsetNext = firstWeekOffset(year + 1, dow, doy);
+          return (daysInYear(year) - weekOffset + weekOffsetNext) / 7;
+      }
+
+      // FORMATTING
+
+      addFormatToken('w', ['ww', 2], 'wo', 'week');
+      addFormatToken('W', ['WW', 2], 'Wo', 'isoWeek');
+
+      // ALIASES
+
+      addUnitAlias('week', 'w');
+      addUnitAlias('isoWeek', 'W');
+
+      // PRIORITIES
+
+      addUnitPriority('week', 5);
+      addUnitPriority('isoWeek', 5);
+
+      // PARSING
+
+      addRegexToken('w', match1to2);
+      addRegexToken('ww', match1to2, match2);
+      addRegexToken('W', match1to2);
+      addRegexToken('WW', match1to2, match2);
+
+      addWeekParseToken(['w', 'ww', 'W', 'WW'], function (
+          input,
+          week,
+          config,
+          token
+      ) {
+          week[token.substr(0, 1)] = toInt(input);
+      });
+
+      // HELPERS
+
+      // LOCALES
+
+      function localeWeek(mom) {
+          return weekOfYear(mom, this._week.dow, this._week.doy).week;
+      }
+
+      var defaultLocaleWeek = {
+          dow: 0, // Sunday is the first day of the week.
+          doy: 6, // The week that contains Jan 6th is the first week of the year.
+      };
+
+      function localeFirstDayOfWeek() {
+          return this._week.dow;
+      }
+
+      function localeFirstDayOfYear() {
+          return this._week.doy;
+      }
+
+      // MOMENTS
+
+      function getSetWeek(input) {
+          var week = this.localeData().week(this);
+          return input == null ? week : this.add((input - week) * 7, 'd');
+      }
+
+      function getSetISOWeek(input) {
+          var week = weekOfYear(this, 1, 4).week;
+          return input == null ? week : this.add((input - week) * 7, 'd');
+      }
+
+      // FORMATTING
+
+      addFormatToken('d', 0, 'do', 'day');
+
+      addFormatToken('dd', 0, 0, function (format) {
+          return this.localeData().weekdaysMin(this, format);
+      });
+
+      addFormatToken('ddd', 0, 0, function (format) {
+          return this.localeData().weekdaysShort(this, format);
+      });
+
+      addFormatToken('dddd', 0, 0, function (format) {
+          return this.localeData().weekdays(this, format);
+      });
+
+      addFormatToken('e', 0, 0, 'weekday');
+      addFormatToken('E', 0, 0, 'isoWeekday');
+
+      // ALIASES
+
+      addUnitAlias('day', 'd');
+      addUnitAlias('weekday', 'e');
+      addUnitAlias('isoWeekday', 'E');
+
+      // PRIORITY
+      addUnitPriority('day', 11);
+      addUnitPriority('weekday', 11);
+      addUnitPriority('isoWeekday', 11);
+
+      // PARSING
+
+      addRegexToken('d', match1to2);
+      addRegexToken('e', match1to2);
+      addRegexToken('E', match1to2);
+      addRegexToken('dd', function (isStrict, locale) {
+          return locale.weekdaysMinRegex(isStrict);
+      });
+      addRegexToken('ddd', function (isStrict, locale) {
+          return locale.weekdaysShortRegex(isStrict);
+      });
+      addRegexToken('dddd', function (isStrict, locale) {
+          return locale.weekdaysRegex(isStrict);
+      });
+
+      addWeekParseToken(['dd', 'ddd', 'dddd'], function (input, week, config, token) {
+          var weekday = config._locale.weekdaysParse(input, token, config._strict);
+          // if we didn't get a weekday name, mark the date as invalid
+          if (weekday != null) {
+              week.d = weekday;
+          } else {
+              getParsingFlags(config).invalidWeekday = input;
+          }
+      });
+
+      addWeekParseToken(['d', 'e', 'E'], function (input, week, config, token) {
+          week[token] = toInt(input);
+      });
+
+      // HELPERS
+
+      function parseWeekday(input, locale) {
+          if (typeof input !== 'string') {
+              return input;
+          }
+
+          if (!isNaN(input)) {
+              return parseInt(input, 10);
+          }
+
+          input = locale.weekdaysParse(input);
+          if (typeof input === 'number') {
+              return input;
+          }
+
+          return null;
+      }
+
+      function parseIsoWeekday(input, locale) {
+          if (typeof input === 'string') {
+              return locale.weekdaysParse(input) % 7 || 7;
+          }
+          return isNaN(input) ? null : input;
+      }
+
+      // LOCALES
+      function shiftWeekdays(ws, n) {
+          return ws.slice(n, 7).concat(ws.slice(0, n));
+      }
+
+      var defaultLocaleWeekdays = 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split(
+              '_'
+          ),
+          defaultLocaleWeekdaysShort = 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_'),
+          defaultLocaleWeekdaysMin = 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_'),
+          defaultWeekdaysRegex = matchWord,
+          defaultWeekdaysShortRegex = matchWord,
+          defaultWeekdaysMinRegex = matchWord;
+
+      function localeWeekdays(m, format) {
+          var weekdays = isArray(this._weekdays)
+              ? this._weekdays
+              : this._weekdays[
+                    m && m !== true && this._weekdays.isFormat.test(format)
+                        ? 'format'
+                        : 'standalone'
+                ];
+          return m === true
+              ? shiftWeekdays(weekdays, this._week.dow)
+              : m
+              ? weekdays[m.day()]
+              : weekdays;
+      }
+
+      function localeWeekdaysShort(m) {
+          return m === true
+              ? shiftWeekdays(this._weekdaysShort, this._week.dow)
+              : m
+              ? this._weekdaysShort[m.day()]
+              : this._weekdaysShort;
+      }
+
+      function localeWeekdaysMin(m) {
+          return m === true
+              ? shiftWeekdays(this._weekdaysMin, this._week.dow)
+              : m
+              ? this._weekdaysMin[m.day()]
+              : this._weekdaysMin;
+      }
+
+      function handleStrictParse$1(weekdayName, format, strict) {
+          var i,
+              ii,
+              mom,
+              llc = weekdayName.toLocaleLowerCase();
+          if (!this._weekdaysParse) {
+              this._weekdaysParse = [];
+              this._shortWeekdaysParse = [];
+              this._minWeekdaysParse = [];
+
+              for (i = 0; i < 7; ++i) {
+                  mom = createUTC([2000, 1]).day(i);
+                  this._minWeekdaysParse[i] = this.weekdaysMin(
+                      mom,
+                      ''
+                  ).toLocaleLowerCase();
+                  this._shortWeekdaysParse[i] = this.weekdaysShort(
+                      mom,
+                      ''
+                  ).toLocaleLowerCase();
+                  this._weekdaysParse[i] = this.weekdays(mom, '').toLocaleLowerCase();
+              }
+          }
+
+          if (strict) {
+              if (format === 'dddd') {
+                  ii = indexOf.call(this._weekdaysParse, llc);
+                  return ii !== -1 ? ii : null;
+              } else if (format === 'ddd') {
+                  ii = indexOf.call(this._shortWeekdaysParse, llc);
+                  return ii !== -1 ? ii : null;
+              } else {
+                  ii = indexOf.call(this._minWeekdaysParse, llc);
+                  return ii !== -1 ? ii : null;
+              }
+          } else {
+              if (format === 'dddd') {
+                  ii = indexOf.call(this._weekdaysParse, llc);
+                  if (ii !== -1) {
+                      return ii;
+                  }
+                  ii = indexOf.call(this._shortWeekdaysParse, llc);
+                  if (ii !== -1) {
+                      return ii;
+                  }
+                  ii = indexOf.call(this._minWeekdaysParse, llc);
+                  return ii !== -1 ? ii : null;
+              } else if (format === 'ddd') {
+                  ii = indexOf.call(this._shortWeekdaysParse, llc);
+                  if (ii !== -1) {
+                      return ii;
+                  }
+                  ii = indexOf.call(this._weekdaysParse, llc);
+                  if (ii !== -1) {
+                      return ii;
+                  }
+                  ii = indexOf.call(this._minWeekdaysParse, llc);
+                  return ii !== -1 ? ii : null;
+              } else {
+                  ii = indexOf.call(this._minWeekdaysParse, llc);
+                  if (ii !== -1) {
+                      return ii;
+                  }
+                  ii = indexOf.call(this._weekdaysParse, llc);
+                  if (ii !== -1) {
+                      return ii;
+                  }
+                  ii = indexOf.call(this._shortWeekdaysParse, llc);
+                  return ii !== -1 ? ii : null;
+              }
+          }
+      }
+
+      function localeWeekdaysParse(weekdayName, format, strict) {
+          var i, mom, regex;
+
+          if (this._weekdaysParseExact) {
+              return handleStrictParse$1.call(this, weekdayName, format, strict);
+          }
+
+          if (!this._weekdaysParse) {
+              this._weekdaysParse = [];
+              this._minWeekdaysParse = [];
+              this._shortWeekdaysParse = [];
+              this._fullWeekdaysParse = [];
+          }
+
+          for (i = 0; i < 7; i++) {
+              // make the regex if we don't have it already
+
+              mom = createUTC([2000, 1]).day(i);
+              if (strict && !this._fullWeekdaysParse[i]) {
+                  this._fullWeekdaysParse[i] = new RegExp(
+                      '^' + this.weekdays(mom, '').replace('.', '\\.?') + '$',
+                      'i'
+                  );
+                  this._shortWeekdaysParse[i] = new RegExp(
+                      '^' + this.weekdaysShort(mom, '').replace('.', '\\.?') + '$',
+                      'i'
+                  );
+                  this._minWeekdaysParse[i] = new RegExp(
+                      '^' + this.weekdaysMin(mom, '').replace('.', '\\.?') + '$',
+                      'i'
+                  );
+              }
+              if (!this._weekdaysParse[i]) {
+                  regex =
+                      '^' +
+                      this.weekdays(mom, '') +
+                      '|^' +
+                      this.weekdaysShort(mom, '') +
+                      '|^' +
+                      this.weekdaysMin(mom, '');
+                  this._weekdaysParse[i] = new RegExp(regex.replace('.', ''), 'i');
+              }
+              // test the regex
+              if (
+                  strict &&
+                  format === 'dddd' &&
+                  this._fullWeekdaysParse[i].test(weekdayName)
+              ) {
+                  return i;
+              } else if (
+                  strict &&
+                  format === 'ddd' &&
+                  this._shortWeekdaysParse[i].test(weekdayName)
+              ) {
+                  return i;
+              } else if (
+                  strict &&
+                  format === 'dd' &&
+                  this._minWeekdaysParse[i].test(weekdayName)
+              ) {
+                  return i;
+              } else if (!strict && this._weekdaysParse[i].test(weekdayName)) {
+                  return i;
+              }
+          }
+      }
+
+      // MOMENTS
+
+      function getSetDayOfWeek(input) {
+          if (!this.isValid()) {
+              return input != null ? this : NaN;
+          }
+          var day = this._isUTC ? this._d.getUTCDay() : this._d.getDay();
+          if (input != null) {
+              input = parseWeekday(input, this.localeData());
+              return this.add(input - day, 'd');
+          } else {
+              return day;
+          }
+      }
+
+      function getSetLocaleDayOfWeek(input) {
+          if (!this.isValid()) {
+              return input != null ? this : NaN;
+          }
+          var weekday = (this.day() + 7 - this.localeData()._week.dow) % 7;
+          return input == null ? weekday : this.add(input - weekday, 'd');
+      }
+
+      function getSetISODayOfWeek(input) {
+          if (!this.isValid()) {
+              return input != null ? this : NaN;
+          }
+
+          // behaves the same as moment#day except
+          // as a getter, returns 7 instead of 0 (1-7 range instead of 0-6)
+          // as a setter, sunday should belong to the previous week.
+
+          if (input != null) {
+              var weekday = parseIsoWeekday(input, this.localeData());
+              return this.day(this.day() % 7 ? weekday : weekday - 7);
+          } else {
+              return this.day() || 7;
+          }
+      }
+
+      function weekdaysRegex(isStrict) {
+          if (this._weekdaysParseExact) {
+              if (!hasOwnProp(this, '_weekdaysRegex')) {
+                  computeWeekdaysParse.call(this);
+              }
+              if (isStrict) {
+                  return this._weekdaysStrictRegex;
+              } else {
+                  return this._weekdaysRegex;
+              }
+          } else {
+              if (!hasOwnProp(this, '_weekdaysRegex')) {
+                  this._weekdaysRegex = defaultWeekdaysRegex;
+              }
+              return this._weekdaysStrictRegex && isStrict
+                  ? this._weekdaysStrictRegex
+                  : this._weekdaysRegex;
+          }
+      }
+
+      function weekdaysShortRegex(isStrict) {
+          if (this._weekdaysParseExact) {
+              if (!hasOwnProp(this, '_weekdaysRegex')) {
+                  computeWeekdaysParse.call(this);
+              }
+              if (isStrict) {
+                  return this._weekdaysShortStrictRegex;
+              } else {
+                  return this._weekdaysShortRegex;
+              }
+          } else {
+              if (!hasOwnProp(this, '_weekdaysShortRegex')) {
+                  this._weekdaysShortRegex = defaultWeekdaysShortRegex;
+              }
+              return this._weekdaysShortStrictRegex && isStrict
+                  ? this._weekdaysShortStrictRegex
+                  : this._weekdaysShortRegex;
+          }
+      }
+
+      function weekdaysMinRegex(isStrict) {
+          if (this._weekdaysParseExact) {
+              if (!hasOwnProp(this, '_weekdaysRegex')) {
+                  computeWeekdaysParse.call(this);
+              }
+              if (isStrict) {
+                  return this._weekdaysMinStrictRegex;
+              } else {
+                  return this._weekdaysMinRegex;
+              }
+          } else {
+              if (!hasOwnProp(this, '_weekdaysMinRegex')) {
+                  this._weekdaysMinRegex = defaultWeekdaysMinRegex;
+              }
+              return this._weekdaysMinStrictRegex && isStrict
+                  ? this._weekdaysMinStrictRegex
+                  : this._weekdaysMinRegex;
+          }
+      }
+
+      function computeWeekdaysParse() {
+          function cmpLenRev(a, b) {
+              return b.length - a.length;
+          }
+
+          var minPieces = [],
+              shortPieces = [],
+              longPieces = [],
+              mixedPieces = [],
+              i,
+              mom,
+              minp,
+              shortp,
+              longp;
+          for (i = 0; i < 7; i++) {
+              // make the regex if we don't have it already
+              mom = createUTC([2000, 1]).day(i);
+              minp = regexEscape(this.weekdaysMin(mom, ''));
+              shortp = regexEscape(this.weekdaysShort(mom, ''));
+              longp = regexEscape(this.weekdays(mom, ''));
+              minPieces.push(minp);
+              shortPieces.push(shortp);
+              longPieces.push(longp);
+              mixedPieces.push(minp);
+              mixedPieces.push(shortp);
+              mixedPieces.push(longp);
+          }
+          // Sorting makes sure if one weekday (or abbr) is a prefix of another it
+          // will match the longer piece.
+          minPieces.sort(cmpLenRev);
+          shortPieces.sort(cmpLenRev);
+          longPieces.sort(cmpLenRev);
+          mixedPieces.sort(cmpLenRev);
+
+          this._weekdaysRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
+          this._weekdaysShortRegex = this._weekdaysRegex;
+          this._weekdaysMinRegex = this._weekdaysRegex;
+
+          this._weekdaysStrictRegex = new RegExp(
+              '^(' + longPieces.join('|') + ')',
+              'i'
+          );
+          this._weekdaysShortStrictRegex = new RegExp(
+              '^(' + shortPieces.join('|') + ')',
+              'i'
+          );
+          this._weekdaysMinStrictRegex = new RegExp(
+              '^(' + minPieces.join('|') + ')',
+              'i'
+          );
+      }
+
+      // FORMATTING
+
+      function hFormat() {
+          return this.hours() % 12 || 12;
+      }
+
+      function kFormat() {
+          return this.hours() || 24;
+      }
+
+      addFormatToken('H', ['HH', 2], 0, 'hour');
+      addFormatToken('h', ['hh', 2], 0, hFormat);
+      addFormatToken('k', ['kk', 2], 0, kFormat);
+
+      addFormatToken('hmm', 0, 0, function () {
+          return '' + hFormat.apply(this) + zeroFill(this.minutes(), 2);
+      });
+
+      addFormatToken('hmmss', 0, 0, function () {
+          return (
+              '' +
+              hFormat.apply(this) +
+              zeroFill(this.minutes(), 2) +
+              zeroFill(this.seconds(), 2)
+          );
+      });
+
+      addFormatToken('Hmm', 0, 0, function () {
+          return '' + this.hours() + zeroFill(this.minutes(), 2);
+      });
+
+      addFormatToken('Hmmss', 0, 0, function () {
+          return (
+              '' +
+              this.hours() +
+              zeroFill(this.minutes(), 2) +
+              zeroFill(this.seconds(), 2)
+          );
+      });
+
+      function meridiem(token, lowercase) {
+          addFormatToken(token, 0, 0, function () {
+              return this.localeData().meridiem(
+                  this.hours(),
+                  this.minutes(),
+                  lowercase
+              );
+          });
+      }
+
+      meridiem('a', true);
+      meridiem('A', false);
+
+      // ALIASES
+
+      addUnitAlias('hour', 'h');
+
+      // PRIORITY
+      addUnitPriority('hour', 13);
+
+      // PARSING
+
+      function matchMeridiem(isStrict, locale) {
+          return locale._meridiemParse;
+      }
+
+      addRegexToken('a', matchMeridiem);
+      addRegexToken('A', matchMeridiem);
+      addRegexToken('H', match1to2);
+      addRegexToken('h', match1to2);
+      addRegexToken('k', match1to2);
+      addRegexToken('HH', match1to2, match2);
+      addRegexToken('hh', match1to2, match2);
+      addRegexToken('kk', match1to2, match2);
+
+      addRegexToken('hmm', match3to4);
+      addRegexToken('hmmss', match5to6);
+      addRegexToken('Hmm', match3to4);
+      addRegexToken('Hmmss', match5to6);
+
+      addParseToken(['H', 'HH'], HOUR);
+      addParseToken(['k', 'kk'], function (input, array, config) {
+          var kInput = toInt(input);
+          array[HOUR] = kInput === 24 ? 0 : kInput;
+      });
+      addParseToken(['a', 'A'], function (input, array, config) {
+          config._isPm = config._locale.isPM(input);
+          config._meridiem = input;
+      });
+      addParseToken(['h', 'hh'], function (input, array, config) {
+          array[HOUR] = toInt(input);
+          getParsingFlags(config).bigHour = true;
+      });
+      addParseToken('hmm', function (input, array, config) {
+          var pos = input.length - 2;
+          array[HOUR] = toInt(input.substr(0, pos));
+          array[MINUTE] = toInt(input.substr(pos));
+          getParsingFlags(config).bigHour = true;
+      });
+      addParseToken('hmmss', function (input, array, config) {
+          var pos1 = input.length - 4,
+              pos2 = input.length - 2;
+          array[HOUR] = toInt(input.substr(0, pos1));
+          array[MINUTE] = toInt(input.substr(pos1, 2));
+          array[SECOND] = toInt(input.substr(pos2));
+          getParsingFlags(config).bigHour = true;
+      });
+      addParseToken('Hmm', function (input, array, config) {
+          var pos = input.length - 2;
+          array[HOUR] = toInt(input.substr(0, pos));
+          array[MINUTE] = toInt(input.substr(pos));
+      });
+      addParseToken('Hmmss', function (input, array, config) {
+          var pos1 = input.length - 4,
+              pos2 = input.length - 2;
+          array[HOUR] = toInt(input.substr(0, pos1));
+          array[MINUTE] = toInt(input.substr(pos1, 2));
+          array[SECOND] = toInt(input.substr(pos2));
+      });
+
+      // LOCALES
+
+      function localeIsPM(input) {
+          // IE8 Quirks Mode & IE7 Standards Mode do not allow accessing strings like arrays
+          // Using charAt should be more compatible.
+          return (input + '').toLowerCase().charAt(0) === 'p';
+      }
+
+      var defaultLocaleMeridiemParse = /[ap]\.?m?\.?/i,
+          // Setting the hour should keep the time, because the user explicitly
+          // specified which hour they want. So trying to maintain the same hour (in
+          // a new timezone) makes sense. Adding/subtracting hours does not follow
+          // this rule.
+          getSetHour = makeGetSet('Hours', true);
+
+      function localeMeridiem(hours, minutes, isLower) {
+          if (hours > 11) {
+              return isLower ? 'pm' : 'PM';
+          } else {
+              return isLower ? 'am' : 'AM';
+          }
+      }
+
+      var baseConfig = {
+          calendar: defaultCalendar,
+          longDateFormat: defaultLongDateFormat,
+          invalidDate: defaultInvalidDate,
+          ordinal: defaultOrdinal,
+          dayOfMonthOrdinalParse: defaultDayOfMonthOrdinalParse,
+          relativeTime: defaultRelativeTime,
+
+          months: defaultLocaleMonths,
+          monthsShort: defaultLocaleMonthsShort,
+
+          week: defaultLocaleWeek,
+
+          weekdays: defaultLocaleWeekdays,
+          weekdaysMin: defaultLocaleWeekdaysMin,
+          weekdaysShort: defaultLocaleWeekdaysShort,
+
+          meridiemParse: defaultLocaleMeridiemParse,
+      };
+
+      // internal storage for locale config files
+      var locales = {},
+          localeFamilies = {},
+          globalLocale;
+
+      function commonPrefix(arr1, arr2) {
+          var i,
+              minl = Math.min(arr1.length, arr2.length);
+          for (i = 0; i < minl; i += 1) {
+              if (arr1[i] !== arr2[i]) {
+                  return i;
+              }
+          }
+          return minl;
+      }
+
+      function normalizeLocale(key) {
+          return key ? key.toLowerCase().replace('_', '-') : key;
+      }
+
+      // pick the locale from the array
+      // try ['en-au', 'en-gb'] as 'en-au', 'en-gb', 'en', as in move through the list trying each
+      // substring from most specific to least, but move to the next array item if it's a more specific variant than the current root
+      function chooseLocale(names) {
+          var i = 0,
+              j,
+              next,
+              locale,
+              split;
+
+          while (i < names.length) {
+              split = normalizeLocale(names[i]).split('-');
+              j = split.length;
+              next = normalizeLocale(names[i + 1]);
+              next = next ? next.split('-') : null;
+              while (j > 0) {
+                  locale = loadLocale(split.slice(0, j).join('-'));
+                  if (locale) {
+                      return locale;
+                  }
+                  if (
+                      next &&
+                      next.length >= j &&
+                      commonPrefix(split, next) >= j - 1
+                  ) {
+                      //the next array item is better than a shallower substring of this one
+                      break;
+                  }
+                  j--;
+              }
+              i++;
+          }
+          return globalLocale;
+      }
+
+      function loadLocale(name) {
+          var oldLocale = null,
+              aliasedRequire;
+          // TODO: Find a better way to register and load all the locales in Node
+          if (
+              locales[name] === undefined &&
+              'object' !== 'undefined' &&
+              module &&
+              module.exports
+          ) {
+              try {
+                  oldLocale = globalLocale._abbr;
+                  aliasedRequire = commonjsRequire;
+                  aliasedRequire('./locale/' + name);
+                  getSetGlobalLocale(oldLocale);
+              } catch (e) {
+                  // mark as not found to avoid repeating expensive file require call causing high CPU
+                  // when trying to find en-US, en_US, en-us for every format call
+                  locales[name] = null; // null means not found
+              }
+          }
+          return locales[name];
+      }
+
+      // This function will load locale and then set the global locale.  If
+      // no arguments are passed in, it will simply return the current global
+      // locale key.
+      function getSetGlobalLocale(key, values) {
+          var data;
+          if (key) {
+              if (isUndefined(values)) {
+                  data = getLocale(key);
+              } else {
+                  data = defineLocale(key, values);
+              }
+
+              if (data) {
+                  // moment.duration._locale = moment._locale = data;
+                  globalLocale = data;
+              } else {
+                  if (typeof console !== 'undefined' && console.warn) {
+                      //warn user if arguments are passed but the locale could not be set
+                      console.warn(
+                          'Locale ' + key + ' not found. Did you forget to load it?'
+                      );
+                  }
+              }
+          }
+
+          return globalLocale._abbr;
+      }
+
+      function defineLocale(name, config) {
+          if (config !== null) {
+              var locale,
+                  parentConfig = baseConfig;
+              config.abbr = name;
+              if (locales[name] != null) {
+                  deprecateSimple(
+                      'defineLocaleOverride',
+                      'use moment.updateLocale(localeName, config) to change ' +
+                          'an existing locale. moment.defineLocale(localeName, ' +
+                          'config) should only be used for creating a new locale ' +
+                          'See http://momentjs.com/guides/#/warnings/define-locale/ for more info.'
+                  );
+                  parentConfig = locales[name]._config;
+              } else if (config.parentLocale != null) {
+                  if (locales[config.parentLocale] != null) {
+                      parentConfig = locales[config.parentLocale]._config;
+                  } else {
+                      locale = loadLocale(config.parentLocale);
+                      if (locale != null) {
+                          parentConfig = locale._config;
+                      } else {
+                          if (!localeFamilies[config.parentLocale]) {
+                              localeFamilies[config.parentLocale] = [];
+                          }
+                          localeFamilies[config.parentLocale].push({
+                              name: name,
+                              config: config,
+                          });
+                          return null;
+                      }
+                  }
+              }
+              locales[name] = new Locale(mergeConfigs(parentConfig, config));
+
+              if (localeFamilies[name]) {
+                  localeFamilies[name].forEach(function (x) {
+                      defineLocale(x.name, x.config);
+                  });
+              }
+
+              // backwards compat for now: also set the locale
+              // make sure we set the locale AFTER all child locales have been
+              // created, so we won't end up with the child locale set.
+              getSetGlobalLocale(name);
+
+              return locales[name];
+          } else {
+              // useful for testing
+              delete locales[name];
+              return null;
+          }
+      }
+
+      function updateLocale(name, config) {
+          if (config != null) {
+              var locale,
+                  tmpLocale,
+                  parentConfig = baseConfig;
+
+              if (locales[name] != null && locales[name].parentLocale != null) {
+                  // Update existing child locale in-place to avoid memory-leaks
+                  locales[name].set(mergeConfigs(locales[name]._config, config));
+              } else {
+                  // MERGE
+                  tmpLocale = loadLocale(name);
+                  if (tmpLocale != null) {
+                      parentConfig = tmpLocale._config;
+                  }
+                  config = mergeConfigs(parentConfig, config);
+                  if (tmpLocale == null) {
+                      // updateLocale is called for creating a new locale
+                      // Set abbr so it will have a name (getters return
+                      // undefined otherwise).
+                      config.abbr = name;
+                  }
+                  locale = new Locale(config);
+                  locale.parentLocale = locales[name];
+                  locales[name] = locale;
+              }
+
+              // backwards compat for now: also set the locale
+              getSetGlobalLocale(name);
+          } else {
+              // pass null for config to unupdate, useful for tests
+              if (locales[name] != null) {
+                  if (locales[name].parentLocale != null) {
+                      locales[name] = locales[name].parentLocale;
+                      if (name === getSetGlobalLocale()) {
+                          getSetGlobalLocale(name);
+                      }
+                  } else if (locales[name] != null) {
+                      delete locales[name];
+                  }
+              }
+          }
+          return locales[name];
+      }
+
+      // returns locale data
+      function getLocale(key) {
+          var locale;
+
+          if (key && key._locale && key._locale._abbr) {
+              key = key._locale._abbr;
+          }
+
+          if (!key) {
+              return globalLocale;
+          }
+
+          if (!isArray(key)) {
+              //short-circuit everything else
+              locale = loadLocale(key);
+              if (locale) {
+                  return locale;
+              }
+              key = [key];
+          }
+
+          return chooseLocale(key);
+      }
+
+      function listLocales() {
+          return keys(locales);
+      }
+
+      function checkOverflow(m) {
+          var overflow,
+              a = m._a;
+
+          if (a && getParsingFlags(m).overflow === -2) {
+              overflow =
+                  a[MONTH] < 0 || a[MONTH] > 11
+                      ? MONTH
+                      : a[DATE] < 1 || a[DATE] > daysInMonth(a[YEAR], a[MONTH])
+                      ? DATE
+                      : a[HOUR] < 0 ||
+                        a[HOUR] > 24 ||
+                        (a[HOUR] === 24 &&
+                            (a[MINUTE] !== 0 ||
+                                a[SECOND] !== 0 ||
+                                a[MILLISECOND] !== 0))
+                      ? HOUR
+                      : a[MINUTE] < 0 || a[MINUTE] > 59
+                      ? MINUTE
+                      : a[SECOND] < 0 || a[SECOND] > 59
+                      ? SECOND
+                      : a[MILLISECOND] < 0 || a[MILLISECOND] > 999
+                      ? MILLISECOND
+                      : -1;
+
+              if (
+                  getParsingFlags(m)._overflowDayOfYear &&
+                  (overflow < YEAR || overflow > DATE)
+              ) {
+                  overflow = DATE;
+              }
+              if (getParsingFlags(m)._overflowWeeks && overflow === -1) {
+                  overflow = WEEK;
+              }
+              if (getParsingFlags(m)._overflowWeekday && overflow === -1) {
+                  overflow = WEEKDAY;
+              }
+
+              getParsingFlags(m).overflow = overflow;
+          }
+
+          return m;
+      }
+
+      // iso 8601 regex
+      // 0000-00-00 0000-W00 or 0000-W00-0 + T + 00 or 00:00 or 00:00:00 or 00:00:00.000 + +00:00 or +0000 or +00)
+      var extendedIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})-(?:\d\d-\d\d|W\d\d-\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:[.,]\d+)?)?)?)([+-]\d\d(?::?\d\d)?|\s*Z)?)?$/,
+          basicIsoRegex = /^\s*((?:[+-]\d{6}|\d{4})(?:\d\d\d\d|W\d\d\d|W\d\d|\d\d\d|\d\d|))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:[.,]\d+)?)?)?)([+-]\d\d(?::?\d\d)?|\s*Z)?)?$/,
+          tzRegex = /Z|[+-]\d\d(?::?\d\d)?/,
+          isoDates = [
+              ['YYYYYY-MM-DD', /[+-]\d{6}-\d\d-\d\d/],
+              ['YYYY-MM-DD', /\d{4}-\d\d-\d\d/],
+              ['GGGG-[W]WW-E', /\d{4}-W\d\d-\d/],
+              ['GGGG-[W]WW', /\d{4}-W\d\d/, false],
+              ['YYYY-DDD', /\d{4}-\d{3}/],
+              ['YYYY-MM', /\d{4}-\d\d/, false],
+              ['YYYYYYMMDD', /[+-]\d{10}/],
+              ['YYYYMMDD', /\d{8}/],
+              ['GGGG[W]WWE', /\d{4}W\d{3}/],
+              ['GGGG[W]WW', /\d{4}W\d{2}/, false],
+              ['YYYYDDD', /\d{7}/],
+              ['YYYYMM', /\d{6}/, false],
+              ['YYYY', /\d{4}/, false],
+          ],
+          // iso time formats and regexes
+          isoTimes = [
+              ['HH:mm:ss.SSSS', /\d\d:\d\d:\d\d\.\d+/],
+              ['HH:mm:ss,SSSS', /\d\d:\d\d:\d\d,\d+/],
+              ['HH:mm:ss', /\d\d:\d\d:\d\d/],
+              ['HH:mm', /\d\d:\d\d/],
+              ['HHmmss.SSSS', /\d\d\d\d\d\d\.\d+/],
+              ['HHmmss,SSSS', /\d\d\d\d\d\d,\d+/],
+              ['HHmmss', /\d\d\d\d\d\d/],
+              ['HHmm', /\d\d\d\d/],
+              ['HH', /\d\d/],
+          ],
+          aspNetJsonRegex = /^\/?Date\((-?\d+)/i,
+          // RFC 2822 regex: For details see https://tools.ietf.org/html/rfc2822#section-3.3
+          rfc2822 = /^(?:(Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s)?(\d{1,2})\s(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s(\d{2,4})\s(\d\d):(\d\d)(?::(\d\d))?\s(?:(UT|GMT|[ECMP][SD]T)|([Zz])|([+-]\d{4}))$/,
+          obsOffsets = {
+              UT: 0,
+              GMT: 0,
+              EDT: -4 * 60,
+              EST: -5 * 60,
+              CDT: -5 * 60,
+              CST: -6 * 60,
+              MDT: -6 * 60,
+              MST: -7 * 60,
+              PDT: -7 * 60,
+              PST: -8 * 60,
+          };
+
+      // date from iso format
+      function configFromISO(config) {
+          var i,
+              l,
+              string = config._i,
+              match = extendedIsoRegex.exec(string) || basicIsoRegex.exec(string),
+              allowTime,
+              dateFormat,
+              timeFormat,
+              tzFormat;
+
+          if (match) {
+              getParsingFlags(config).iso = true;
+
+              for (i = 0, l = isoDates.length; i < l; i++) {
+                  if (isoDates[i][1].exec(match[1])) {
+                      dateFormat = isoDates[i][0];
+                      allowTime = isoDates[i][2] !== false;
+                      break;
+                  }
+              }
+              if (dateFormat == null) {
+                  config._isValid = false;
+                  return;
+              }
+              if (match[3]) {
+                  for (i = 0, l = isoTimes.length; i < l; i++) {
+                      if (isoTimes[i][1].exec(match[3])) {
+                          // match[2] should be 'T' or space
+                          timeFormat = (match[2] || ' ') + isoTimes[i][0];
+                          break;
+                      }
+                  }
+                  if (timeFormat == null) {
+                      config._isValid = false;
+                      return;
+                  }
+              }
+              if (!allowTime && timeFormat != null) {
+                  config._isValid = false;
+                  return;
+              }
+              if (match[4]) {
+                  if (tzRegex.exec(match[4])) {
+                      tzFormat = 'Z';
+                  } else {
+                      config._isValid = false;
+                      return;
+                  }
+              }
+              config._f = dateFormat + (timeFormat || '') + (tzFormat || '');
+              configFromStringAndFormat(config);
+          } else {
+              config._isValid = false;
+          }
+      }
+
+      function extractFromRFC2822Strings(
+          yearStr,
+          monthStr,
+          dayStr,
+          hourStr,
+          minuteStr,
+          secondStr
+      ) {
+          var result = [
+              untruncateYear(yearStr),
+              defaultLocaleMonthsShort.indexOf(monthStr),
+              parseInt(dayStr, 10),
+              parseInt(hourStr, 10),
+              parseInt(minuteStr, 10),
+          ];
+
+          if (secondStr) {
+              result.push(parseInt(secondStr, 10));
+          }
+
+          return result;
+      }
+
+      function untruncateYear(yearStr) {
+          var year = parseInt(yearStr, 10);
+          if (year <= 49) {
+              return 2000 + year;
+          } else if (year <= 999) {
+              return 1900 + year;
+          }
+          return year;
+      }
+
+      function preprocessRFC2822(s) {
+          // Remove comments and folding whitespace and replace multiple-spaces with a single space
+          return s
+              .replace(/\([^)]*\)|[\n\t]/g, ' ')
+              .replace(/(\s\s+)/g, ' ')
+              .replace(/^\s\s*/, '')
+              .replace(/\s\s*$/, '');
+      }
+
+      function checkWeekday(weekdayStr, parsedInput, config) {
+          if (weekdayStr) {
+              // TODO: Replace the vanilla JS Date object with an independent day-of-week check.
+              var weekdayProvided = defaultLocaleWeekdaysShort.indexOf(weekdayStr),
+                  weekdayActual = new Date(
+                      parsedInput[0],
+                      parsedInput[1],
+                      parsedInput[2]
+                  ).getDay();
+              if (weekdayProvided !== weekdayActual) {
+                  getParsingFlags(config).weekdayMismatch = true;
+                  config._isValid = false;
+                  return false;
+              }
+          }
+          return true;
+      }
+
+      function calculateOffset(obsOffset, militaryOffset, numOffset) {
+          if (obsOffset) {
+              return obsOffsets[obsOffset];
+          } else if (militaryOffset) {
+              // the only allowed military tz is Z
+              return 0;
+          } else {
+              var hm = parseInt(numOffset, 10),
+                  m = hm % 100,
+                  h = (hm - m) / 100;
+              return h * 60 + m;
+          }
+      }
+
+      // date and time from ref 2822 format
+      function configFromRFC2822(config) {
+          var match = rfc2822.exec(preprocessRFC2822(config._i)),
+              parsedArray;
+          if (match) {
+              parsedArray = extractFromRFC2822Strings(
+                  match[4],
+                  match[3],
+                  match[2],
+                  match[5],
+                  match[6],
+                  match[7]
+              );
+              if (!checkWeekday(match[1], parsedArray, config)) {
+                  return;
+              }
+
+              config._a = parsedArray;
+              config._tzm = calculateOffset(match[8], match[9], match[10]);
+
+              config._d = createUTCDate.apply(null, config._a);
+              config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm);
+
+              getParsingFlags(config).rfc2822 = true;
+          } else {
+              config._isValid = false;
+          }
+      }
+
+      // date from 1) ASP.NET, 2) ISO, 3) RFC 2822 formats, or 4) optional fallback if parsing isn't strict
+      function configFromString(config) {
+          var matched = aspNetJsonRegex.exec(config._i);
+          if (matched !== null) {
+              config._d = new Date(+matched[1]);
+              return;
+          }
+
+          configFromISO(config);
+          if (config._isValid === false) {
+              delete config._isValid;
+          } else {
+              return;
+          }
+
+          configFromRFC2822(config);
+          if (config._isValid === false) {
+              delete config._isValid;
+          } else {
+              return;
+          }
+
+          if (config._strict) {
+              config._isValid = false;
+          } else {
+              // Final attempt, use Input Fallback
+              hooks.createFromInputFallback(config);
+          }
+      }
+
+      hooks.createFromInputFallback = deprecate(
+          'value provided is not in a recognized RFC2822 or ISO format. moment construction falls back to js Date(), ' +
+              'which is not reliable across all browsers and versions. Non RFC2822/ISO date formats are ' +
+              'discouraged and will be removed in an upcoming major release. Please refer to ' +
+              'http://momentjs.com/guides/#/warnings/js-date/ for more info.',
+          function (config) {
+              config._d = new Date(config._i + (config._useUTC ? ' UTC' : ''));
+          }
+      );
+
+      // Pick the first defined of two or three arguments.
+      function defaults(a, b, c) {
+          if (a != null) {
+              return a;
+          }
+          if (b != null) {
+              return b;
+          }
+          return c;
+      }
+
+      function currentDateArray(config) {
+          // hooks is actually the exported moment object
+          var nowValue = new Date(hooks.now());
+          if (config._useUTC) {
+              return [
+                  nowValue.getUTCFullYear(),
+                  nowValue.getUTCMonth(),
+                  nowValue.getUTCDate(),
+              ];
+          }
+          return [nowValue.getFullYear(), nowValue.getMonth(), nowValue.getDate()];
+      }
+
+      // convert an array to a date.
+      // the array should mirror the parameters below
+      // note: all values past the year are optional and will default to the lowest possible value.
+      // [year, month, day , hour, minute, second, millisecond]
+      function configFromArray(config) {
+          var i,
+              date,
+              input = [],
+              currentDate,
+              expectedWeekday,
+              yearToUse;
+
+          if (config._d) {
+              return;
+          }
+
+          currentDate = currentDateArray(config);
+
+          //compute day of the year from weeks and weekdays
+          if (config._w && config._a[DATE] == null && config._a[MONTH] == null) {
+              dayOfYearFromWeekInfo(config);
+          }
+
+          //if the day of the year is set, figure out what it is
+          if (config._dayOfYear != null) {
+              yearToUse = defaults(config._a[YEAR], currentDate[YEAR]);
+
+              if (
+                  config._dayOfYear > daysInYear(yearToUse) ||
+                  config._dayOfYear === 0
+              ) {
+                  getParsingFlags(config)._overflowDayOfYear = true;
+              }
+
+              date = createUTCDate(yearToUse, 0, config._dayOfYear);
+              config._a[MONTH] = date.getUTCMonth();
+              config._a[DATE] = date.getUTCDate();
+          }
+
+          // Default to current date.
+          // * if no year, month, day of month are given, default to today
+          // * if day of month is given, default month and year
+          // * if month is given, default only year
+          // * if year is given, don't default anything
+          for (i = 0; i < 3 && config._a[i] == null; ++i) {
+              config._a[i] = input[i] = currentDate[i];
+          }
+
+          // Zero out whatever was not defaulted, including time
+          for (; i < 7; i++) {
+              config._a[i] = input[i] =
+                  config._a[i] == null ? (i === 2 ? 1 : 0) : config._a[i];
+          }
+
+          // Check for 24:00:00.000
+          if (
+              config._a[HOUR] === 24 &&
+              config._a[MINUTE] === 0 &&
+              config._a[SECOND] === 0 &&
+              config._a[MILLISECOND] === 0
+          ) {
+              config._nextDay = true;
+              config._a[HOUR] = 0;
+          }
+
+          config._d = (config._useUTC ? createUTCDate : createDate).apply(
+              null,
+              input
+          );
+          expectedWeekday = config._useUTC
+              ? config._d.getUTCDay()
+              : config._d.getDay();
+
+          // Apply timezone offset from input. The actual utcOffset can be changed
+          // with parseZone.
+          if (config._tzm != null) {
+              config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm);
+          }
+
+          if (config._nextDay) {
+              config._a[HOUR] = 24;
+          }
+
+          // check for mismatching day of week
+          if (
+              config._w &&
+              typeof config._w.d !== 'undefined' &&
+              config._w.d !== expectedWeekday
+          ) {
+              getParsingFlags(config).weekdayMismatch = true;
+          }
+      }
+
+      function dayOfYearFromWeekInfo(config) {
+          var w, weekYear, week, weekday, dow, doy, temp, weekdayOverflow, curWeek;
+
+          w = config._w;
+          if (w.GG != null || w.W != null || w.E != null) {
+              dow = 1;
+              doy = 4;
+
+              // TODO: We need to take the current isoWeekYear, but that depends on
+              // how we interpret now (local, utc, fixed offset). So create
+              // a now version of current config (take local/utc/offset flags, and
+              // create now).
+              weekYear = defaults(
+                  w.GG,
+                  config._a[YEAR],
+                  weekOfYear(createLocal(), 1, 4).year
+              );
+              week = defaults(w.W, 1);
+              weekday = defaults(w.E, 1);
+              if (weekday < 1 || weekday > 7) {
+                  weekdayOverflow = true;
+              }
+          } else {
+              dow = config._locale._week.dow;
+              doy = config._locale._week.doy;
+
+              curWeek = weekOfYear(createLocal(), dow, doy);
+
+              weekYear = defaults(w.gg, config._a[YEAR], curWeek.year);
+
+              // Default to current week.
+              week = defaults(w.w, curWeek.week);
+
+              if (w.d != null) {
+                  // weekday -- low day numbers are considered next week
+                  weekday = w.d;
+                  if (weekday < 0 || weekday > 6) {
+                      weekdayOverflow = true;
+                  }
+              } else if (w.e != null) {
+                  // local weekday -- counting starts from beginning of week
+                  weekday = w.e + dow;
+                  if (w.e < 0 || w.e > 6) {
+                      weekdayOverflow = true;
+                  }
+              } else {
+                  // default to beginning of week
+                  weekday = dow;
+              }
+          }
+          if (week < 1 || week > weeksInYear(weekYear, dow, doy)) {
+              getParsingFlags(config)._overflowWeeks = true;
+          } else if (weekdayOverflow != null) {
+              getParsingFlags(config)._overflowWeekday = true;
+          } else {
+              temp = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy);
+              config._a[YEAR] = temp.year;
+              config._dayOfYear = temp.dayOfYear;
+          }
+      }
+
+      // constant that refers to the ISO standard
+      hooks.ISO_8601 = function () {};
+
+      // constant that refers to the RFC 2822 form
+      hooks.RFC_2822 = function () {};
+
+      // date from string and format string
+      function configFromStringAndFormat(config) {
+          // TODO: Move this to another part of the creation flow to prevent circular deps
+          if (config._f === hooks.ISO_8601) {
+              configFromISO(config);
+              return;
+          }
+          if (config._f === hooks.RFC_2822) {
+              configFromRFC2822(config);
+              return;
+          }
+          config._a = [];
+          getParsingFlags(config).empty = true;
+
+          // This array is used to make a Date, either with `new Date` or `Date.UTC`
+          var string = '' + config._i,
+              i,
+              parsedInput,
+              tokens,
+              token,
+              skipped,
+              stringLength = string.length,
+              totalParsedInputLength = 0,
+              era;
+
+          tokens =
+              expandFormat(config._f, config._locale).match(formattingTokens) || [];
+
+          for (i = 0; i < tokens.length; i++) {
+              token = tokens[i];
+              parsedInput = (string.match(getParseRegexForToken(token, config)) ||
+                  [])[0];
+              if (parsedInput) {
+                  skipped = string.substr(0, string.indexOf(parsedInput));
+                  if (skipped.length > 0) {
+                      getParsingFlags(config).unusedInput.push(skipped);
+                  }
+                  string = string.slice(
+                      string.indexOf(parsedInput) + parsedInput.length
+                  );
+                  totalParsedInputLength += parsedInput.length;
+              }
+              // don't parse if it's not a known token
+              if (formatTokenFunctions[token]) {
+                  if (parsedInput) {
+                      getParsingFlags(config).empty = false;
+                  } else {
+                      getParsingFlags(config).unusedTokens.push(token);
+                  }
+                  addTimeToArrayFromToken(token, parsedInput, config);
+              } else if (config._strict && !parsedInput) {
+                  getParsingFlags(config).unusedTokens.push(token);
+              }
+          }
+
+          // add remaining unparsed input length to the string
+          getParsingFlags(config).charsLeftOver =
+              stringLength - totalParsedInputLength;
+          if (string.length > 0) {
+              getParsingFlags(config).unusedInput.push(string);
+          }
+
+          // clear _12h flag if hour is <= 12
+          if (
+              config._a[HOUR] <= 12 &&
+              getParsingFlags(config).bigHour === true &&
+              config._a[HOUR] > 0
+          ) {
+              getParsingFlags(config).bigHour = undefined;
+          }
+
+          getParsingFlags(config).parsedDateParts = config._a.slice(0);
+          getParsingFlags(config).meridiem = config._meridiem;
+          // handle meridiem
+          config._a[HOUR] = meridiemFixWrap(
+              config._locale,
+              config._a[HOUR],
+              config._meridiem
+          );
+
+          // handle era
+          era = getParsingFlags(config).era;
+          if (era !== null) {
+              config._a[YEAR] = config._locale.erasConvertYear(era, config._a[YEAR]);
+          }
+
+          configFromArray(config);
+          checkOverflow(config);
+      }
+
+      function meridiemFixWrap(locale, hour, meridiem) {
+          var isPm;
+
+          if (meridiem == null) {
+              // nothing to do
+              return hour;
+          }
+          if (locale.meridiemHour != null) {
+              return locale.meridiemHour(hour, meridiem);
+          } else if (locale.isPM != null) {
+              // Fallback
+              isPm = locale.isPM(meridiem);
+              if (isPm && hour < 12) {
+                  hour += 12;
+              }
+              if (!isPm && hour === 12) {
+                  hour = 0;
+              }
+              return hour;
+          } else {
+              // this is not supposed to happen
+              return hour;
+          }
+      }
+
+      // date from string and array of format strings
+      function configFromStringAndArray(config) {
+          var tempConfig,
+              bestMoment,
+              scoreToBeat,
+              i,
+              currentScore,
+              validFormatFound,
+              bestFormatIsValid = false;
+
+          if (config._f.length === 0) {
+              getParsingFlags(config).invalidFormat = true;
+              config._d = new Date(NaN);
+              return;
+          }
+
+          for (i = 0; i < config._f.length; i++) {
+              currentScore = 0;
+              validFormatFound = false;
+              tempConfig = copyConfig({}, config);
+              if (config._useUTC != null) {
+                  tempConfig._useUTC = config._useUTC;
+              }
+              tempConfig._f = config._f[i];
+              configFromStringAndFormat(tempConfig);
+
+              if (isValid(tempConfig)) {
+                  validFormatFound = true;
+              }
+
+              // if there is any input that was not parsed add a penalty for that format
+              currentScore += getParsingFlags(tempConfig).charsLeftOver;
+
+              //or tokens
+              currentScore += getParsingFlags(tempConfig).unusedTokens.length * 10;
+
+              getParsingFlags(tempConfig).score = currentScore;
+
+              if (!bestFormatIsValid) {
+                  if (
+                      scoreToBeat == null ||
+                      currentScore < scoreToBeat ||
+                      validFormatFound
+                  ) {
+                      scoreToBeat = currentScore;
+                      bestMoment = tempConfig;
+                      if (validFormatFound) {
+                          bestFormatIsValid = true;
+                      }
+                  }
+              } else {
+                  if (currentScore < scoreToBeat) {
+                      scoreToBeat = currentScore;
+                      bestMoment = tempConfig;
+                  }
+              }
+          }
+
+          extend(config, bestMoment || tempConfig);
+      }
+
+      function configFromObject(config) {
+          if (config._d) {
+              return;
+          }
+
+          var i = normalizeObjectUnits(config._i),
+              dayOrDate = i.day === undefined ? i.date : i.day;
+          config._a = map(
+              [i.year, i.month, dayOrDate, i.hour, i.minute, i.second, i.millisecond],
+              function (obj) {
+                  return obj && parseInt(obj, 10);
+              }
+          );
+
+          configFromArray(config);
+      }
+
+      function createFromConfig(config) {
+          var res = new Moment(checkOverflow(prepareConfig(config)));
+          if (res._nextDay) {
+              // Adding is smart enough around DST
+              res.add(1, 'd');
+              res._nextDay = undefined;
+          }
+
+          return res;
+      }
+
+      function prepareConfig(config) {
+          var input = config._i,
+              format = config._f;
+
+          config._locale = config._locale || getLocale(config._l);
+
+          if (input === null || (format === undefined && input === '')) {
+              return createInvalid({ nullInput: true });
+          }
+
+          if (typeof input === 'string') {
+              config._i = input = config._locale.preparse(input);
+          }
+
+          if (isMoment(input)) {
+              return new Moment(checkOverflow(input));
+          } else if (isDate(input)) {
+              config._d = input;
+          } else if (isArray(format)) {
+              configFromStringAndArray(config);
+          } else if (format) {
+              configFromStringAndFormat(config);
+          } else {
+              configFromInput(config);
+          }
+
+          if (!isValid(config)) {
+              config._d = null;
+          }
+
+          return config;
+      }
+
+      function configFromInput(config) {
+          var input = config._i;
+          if (isUndefined(input)) {
+              config._d = new Date(hooks.now());
+          } else if (isDate(input)) {
+              config._d = new Date(input.valueOf());
+          } else if (typeof input === 'string') {
+              configFromString(config);
+          } else if (isArray(input)) {
+              config._a = map(input.slice(0), function (obj) {
+                  return parseInt(obj, 10);
+              });
+              configFromArray(config);
+          } else if (isObject(input)) {
+              configFromObject(config);
+          } else if (isNumber(input)) {
+              // from milliseconds
+              config._d = new Date(input);
+          } else {
+              hooks.createFromInputFallback(config);
+          }
+      }
+
+      function createLocalOrUTC(input, format, locale, strict, isUTC) {
+          var c = {};
+
+          if (format === true || format === false) {
+              strict = format;
+              format = undefined;
+          }
+
+          if (locale === true || locale === false) {
+              strict = locale;
+              locale = undefined;
+          }
+
+          if (
+              (isObject(input) && isObjectEmpty(input)) ||
+              (isArray(input) && input.length === 0)
+          ) {
+              input = undefined;
+          }
+          // object construction must be done this way.
+          // https://github.com/moment/moment/issues/1423
+          c._isAMomentObject = true;
+          c._useUTC = c._isUTC = isUTC;
+          c._l = locale;
+          c._i = input;
+          c._f = format;
+          c._strict = strict;
+
+          return createFromConfig(c);
+      }
+
+      function createLocal(input, format, locale, strict) {
+          return createLocalOrUTC(input, format, locale, strict, false);
+      }
+
+      var prototypeMin = deprecate(
+              'moment().min is deprecated, use moment.max instead. http://momentjs.com/guides/#/warnings/min-max/',
+              function () {
+                  var other = createLocal.apply(null, arguments);
+                  if (this.isValid() && other.isValid()) {
+                      return other < this ? this : other;
+                  } else {
+                      return createInvalid();
+                  }
+              }
+          ),
+          prototypeMax = deprecate(
+              'moment().max is deprecated, use moment.min instead. http://momentjs.com/guides/#/warnings/min-max/',
+              function () {
+                  var other = createLocal.apply(null, arguments);
+                  if (this.isValid() && other.isValid()) {
+                      return other > this ? this : other;
+                  } else {
+                      return createInvalid();
+                  }
+              }
+          );
+
+      // Pick a moment m from moments so that m[fn](other) is true for all
+      // other. This relies on the function fn to be transitive.
+      //
+      // moments should either be an array of moment objects or an array, whose
+      // first element is an array of moment objects.
+      function pickBy(fn, moments) {
+          var res, i;
+          if (moments.length === 1 && isArray(moments[0])) {
+              moments = moments[0];
+          }
+          if (!moments.length) {
+              return createLocal();
+          }
+          res = moments[0];
+          for (i = 1; i < moments.length; ++i) {
+              if (!moments[i].isValid() || moments[i][fn](res)) {
+                  res = moments[i];
+              }
+          }
+          return res;
+      }
+
+      // TODO: Use [].sort instead?
+      function min() {
+          var args = [].slice.call(arguments, 0);
+
+          return pickBy('isBefore', args);
+      }
+
+      function max() {
+          var args = [].slice.call(arguments, 0);
+
+          return pickBy('isAfter', args);
+      }
+
+      var now = function () {
+          return Date.now ? Date.now() : +new Date();
+      };
+
+      var ordering = [
+          'year',
+          'quarter',
+          'month',
+          'week',
+          'day',
+          'hour',
+          'minute',
+          'second',
+          'millisecond',
+      ];
+
+      function isDurationValid(m) {
+          var key,
+              unitHasDecimal = false,
+              i;
+          for (key in m) {
+              if (
+                  hasOwnProp(m, key) &&
+                  !(
+                      indexOf.call(ordering, key) !== -1 &&
+                      (m[key] == null || !isNaN(m[key]))
+                  )
+              ) {
+                  return false;
+              }
+          }
+
+          for (i = 0; i < ordering.length; ++i) {
+              if (m[ordering[i]]) {
+                  if (unitHasDecimal) {
+                      return false; // only allow non-integers for smallest unit
+                  }
+                  if (parseFloat(m[ordering[i]]) !== toInt(m[ordering[i]])) {
+                      unitHasDecimal = true;
+                  }
+              }
+          }
+
+          return true;
+      }
+
+      function isValid$1() {
+          return this._isValid;
+      }
+
+      function createInvalid$1() {
+          return createDuration(NaN);
+      }
+
+      function Duration(duration) {
+          var normalizedInput = normalizeObjectUnits(duration),
+              years = normalizedInput.year || 0,
+              quarters = normalizedInput.quarter || 0,
+              months = normalizedInput.month || 0,
+              weeks = normalizedInput.week || normalizedInput.isoWeek || 0,
+              days = normalizedInput.day || 0,
+              hours = normalizedInput.hour || 0,
+              minutes = normalizedInput.minute || 0,
+              seconds = normalizedInput.second || 0,
+              milliseconds = normalizedInput.millisecond || 0;
+
+          this._isValid = isDurationValid(normalizedInput);
+
+          // representation for dateAddRemove
+          this._milliseconds =
+              +milliseconds +
+              seconds * 1e3 + // 1000
+              minutes * 6e4 + // 1000 * 60
+              hours * 1000 * 60 * 60; //using 1000 * 60 * 60 instead of 36e5 to avoid floating point rounding errors https://github.com/moment/moment/issues/2978
+          // Because of dateAddRemove treats 24 hours as different from a
+          // day when working around DST, we need to store them separately
+          this._days = +days + weeks * 7;
+          // It is impossible to translate months into days without knowing
+          // which months you are are talking about, so we have to store
+          // it separately.
+          this._months = +months + quarters * 3 + years * 12;
+
+          this._data = {};
+
+          this._locale = getLocale();
+
+          this._bubble();
+      }
+
+      function isDuration(obj) {
+          return obj instanceof Duration;
+      }
+
+      function absRound(number) {
+          if (number < 0) {
+              return Math.round(-1 * number) * -1;
+          } else {
+              return Math.round(number);
+          }
+      }
+
+      // compare two arrays, return the number of differences
+      function compareArrays(array1, array2, dontConvert) {
+          var len = Math.min(array1.length, array2.length),
+              lengthDiff = Math.abs(array1.length - array2.length),
+              diffs = 0,
+              i;
+          for (i = 0; i < len; i++) {
+              if (
+                  (dontConvert && array1[i] !== array2[i]) ||
+                  (!dontConvert && toInt(array1[i]) !== toInt(array2[i]))
+              ) {
+                  diffs++;
+              }
+          }
+          return diffs + lengthDiff;
+      }
+
+      // FORMATTING
+
+      function offset(token, separator) {
+          addFormatToken(token, 0, 0, function () {
+              var offset = this.utcOffset(),
+                  sign = '+';
+              if (offset < 0) {
+                  offset = -offset;
+                  sign = '-';
+              }
+              return (
+                  sign +
+                  zeroFill(~~(offset / 60), 2) +
+                  separator +
+                  zeroFill(~~offset % 60, 2)
+              );
+          });
+      }
+
+      offset('Z', ':');
+      offset('ZZ', '');
+
+      // PARSING
+
+      addRegexToken('Z', matchShortOffset);
+      addRegexToken('ZZ', matchShortOffset);
+      addParseToken(['Z', 'ZZ'], function (input, array, config) {
+          config._useUTC = true;
+          config._tzm = offsetFromString(matchShortOffset, input);
+      });
+
+      // HELPERS
+
+      // timezone chunker
+      // '+10:00' > ['10',  '00']
+      // '-1530'  > ['-15', '30']
+      var chunkOffset = /([\+\-]|\d\d)/gi;
+
+      function offsetFromString(matcher, string) {
+          var matches = (string || '').match(matcher),
+              chunk,
+              parts,
+              minutes;
+
+          if (matches === null) {
+              return null;
+          }
+
+          chunk = matches[matches.length - 1] || [];
+          parts = (chunk + '').match(chunkOffset) || ['-', 0, 0];
+          minutes = +(parts[1] * 60) + toInt(parts[2]);
+
+          return minutes === 0 ? 0 : parts[0] === '+' ? minutes : -minutes;
+      }
+
+      // Return a moment from input, that is local/utc/zone equivalent to model.
+      function cloneWithOffset(input, model) {
+          var res, diff;
+          if (model._isUTC) {
+              res = model.clone();
+              diff =
+                  (isMoment(input) || isDate(input)
+                      ? input.valueOf()
+                      : createLocal(input).valueOf()) - res.valueOf();
+              // Use low-level api, because this fn is low-level api.
+              res._d.setTime(res._d.valueOf() + diff);
+              hooks.updateOffset(res, false);
+              return res;
+          } else {
+              return createLocal(input).local();
+          }
+      }
+
+      function getDateOffset(m) {
+          // On Firefox.24 Date#getTimezoneOffset returns a floating point.
+          // https://github.com/moment/moment/pull/1871
+          return -Math.round(m._d.getTimezoneOffset());
+      }
+
+      // HOOKS
+
+      // This function will be called whenever a moment is mutated.
+      // It is intended to keep the offset in sync with the timezone.
+      hooks.updateOffset = function () {};
+
+      // MOMENTS
+
+      // keepLocalTime = true means only change the timezone, without
+      // affecting the local hour. So 5:31:26 +0300 --[utcOffset(2, true)]-->
+      // 5:31:26 +0200 It is possible that 5:31:26 doesn't exist with offset
+      // +0200, so we adjust the time as needed, to be valid.
+      //
+      // Keeping the time actually adds/subtracts (one hour)
+      // from the actual represented time. That is why we call updateOffset
+      // a second time. In case it wants us to change the offset again
+      // _changeInProgress == true case, then we have to adjust, because
+      // there is no such time in the given timezone.
+      function getSetOffset(input, keepLocalTime, keepMinutes) {
+          var offset = this._offset || 0,
+              localAdjust;
+          if (!this.isValid()) {
+              return input != null ? this : NaN;
+          }
+          if (input != null) {
+              if (typeof input === 'string') {
+                  input = offsetFromString(matchShortOffset, input);
+                  if (input === null) {
+                      return this;
+                  }
+              } else if (Math.abs(input) < 16 && !keepMinutes) {
+                  input = input * 60;
+              }
+              if (!this._isUTC && keepLocalTime) {
+                  localAdjust = getDateOffset(this);
+              }
+              this._offset = input;
+              this._isUTC = true;
+              if (localAdjust != null) {
+                  this.add(localAdjust, 'm');
+              }
+              if (offset !== input) {
+                  if (!keepLocalTime || this._changeInProgress) {
+                      addSubtract(
+                          this,
+                          createDuration(input - offset, 'm'),
+                          1,
+                          false
+                      );
+                  } else if (!this._changeInProgress) {
+                      this._changeInProgress = true;
+                      hooks.updateOffset(this, true);
+                      this._changeInProgress = null;
+                  }
+              }
+              return this;
+          } else {
+              return this._isUTC ? offset : getDateOffset(this);
+          }
+      }
+
+      function getSetZone(input, keepLocalTime) {
+          if (input != null) {
+              if (typeof input !== 'string') {
+                  input = -input;
+              }
+
+              this.utcOffset(input, keepLocalTime);
+
+              return this;
+          } else {
+              return -this.utcOffset();
+          }
+      }
+
+      function setOffsetToUTC(keepLocalTime) {
+          return this.utcOffset(0, keepLocalTime);
+      }
+
+      function setOffsetToLocal(keepLocalTime) {
+          if (this._isUTC) {
+              this.utcOffset(0, keepLocalTime);
+              this._isUTC = false;
+
+              if (keepLocalTime) {
+                  this.subtract(getDateOffset(this), 'm');
+              }
+          }
+          return this;
+      }
+
+      function setOffsetToParsedOffset() {
+          if (this._tzm != null) {
+              this.utcOffset(this._tzm, false, true);
+          } else if (typeof this._i === 'string') {
+              var tZone = offsetFromString(matchOffset, this._i);
+              if (tZone != null) {
+                  this.utcOffset(tZone);
+              } else {
+                  this.utcOffset(0, true);
+              }
+          }
+          return this;
+      }
+
+      function hasAlignedHourOffset(input) {
+          if (!this.isValid()) {
+              return false;
+          }
+          input = input ? createLocal(input).utcOffset() : 0;
+
+          return (this.utcOffset() - input) % 60 === 0;
+      }
+
+      function isDaylightSavingTime() {
+          return (
+              this.utcOffset() > this.clone().month(0).utcOffset() ||
+              this.utcOffset() > this.clone().month(5).utcOffset()
+          );
+      }
+
+      function isDaylightSavingTimeShifted() {
+          if (!isUndefined(this._isDSTShifted)) {
+              return this._isDSTShifted;
+          }
+
+          var c = {},
+              other;
+
+          copyConfig(c, this);
+          c = prepareConfig(c);
+
+          if (c._a) {
+              other = c._isUTC ? createUTC(c._a) : createLocal(c._a);
+              this._isDSTShifted =
+                  this.isValid() && compareArrays(c._a, other.toArray()) > 0;
+          } else {
+              this._isDSTShifted = false;
+          }
+
+          return this._isDSTShifted;
+      }
+
+      function isLocal() {
+          return this.isValid() ? !this._isUTC : false;
+      }
+
+      function isUtcOffset() {
+          return this.isValid() ? this._isUTC : false;
+      }
+
+      function isUtc() {
+          return this.isValid() ? this._isUTC && this._offset === 0 : false;
+      }
+
+      // ASP.NET json date format regex
+      var aspNetRegex = /^(-|\+)?(?:(\d*)[. ])?(\d+):(\d+)(?::(\d+)(\.\d*)?)?$/,
+          // from http://docs.closure-library.googlecode.com/git/closure_goog_date_date.js.source.html
+          // somewhat more in line with 4.4.3.2 2004 spec, but allows decimal anywhere
+          // and further modified to allow for strings containing both week and day
+          isoRegex = /^(-|\+)?P(?:([-+]?[0-9,.]*)Y)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)W)?(?:([-+]?[0-9,.]*)D)?(?:T(?:([-+]?[0-9,.]*)H)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)S)?)?$/;
+
+      function createDuration(input, key) {
+          var duration = input,
+              // matching against regexp is expensive, do it on demand
+              match = null,
+              sign,
+              ret,
+              diffRes;
+
+          if (isDuration(input)) {
+              duration = {
+                  ms: input._milliseconds,
+                  d: input._days,
+                  M: input._months,
+              };
+          } else if (isNumber(input) || !isNaN(+input)) {
+              duration = {};
+              if (key) {
+                  duration[key] = +input;
+              } else {
+                  duration.milliseconds = +input;
+              }
+          } else if ((match = aspNetRegex.exec(input))) {
+              sign = match[1] === '-' ? -1 : 1;
+              duration = {
+                  y: 0,
+                  d: toInt(match[DATE]) * sign,
+                  h: toInt(match[HOUR]) * sign,
+                  m: toInt(match[MINUTE]) * sign,
+                  s: toInt(match[SECOND]) * sign,
+                  ms: toInt(absRound(match[MILLISECOND] * 1000)) * sign, // the millisecond decimal point is included in the match
+              };
+          } else if ((match = isoRegex.exec(input))) {
+              sign = match[1] === '-' ? -1 : 1;
+              duration = {
+                  y: parseIso(match[2], sign),
+                  M: parseIso(match[3], sign),
+                  w: parseIso(match[4], sign),
+                  d: parseIso(match[5], sign),
+                  h: parseIso(match[6], sign),
+                  m: parseIso(match[7], sign),
+                  s: parseIso(match[8], sign),
+              };
+          } else if (duration == null) {
+              // checks for null or undefined
+              duration = {};
+          } else if (
+              typeof duration === 'object' &&
+              ('from' in duration || 'to' in duration)
+          ) {
+              diffRes = momentsDifference(
+                  createLocal(duration.from),
+                  createLocal(duration.to)
+              );
+
+              duration = {};
+              duration.ms = diffRes.milliseconds;
+              duration.M = diffRes.months;
+          }
+
+          ret = new Duration(duration);
+
+          if (isDuration(input) && hasOwnProp(input, '_locale')) {
+              ret._locale = input._locale;
+          }
+
+          if (isDuration(input) && hasOwnProp(input, '_isValid')) {
+              ret._isValid = input._isValid;
+          }
+
+          return ret;
+      }
+
+      createDuration.fn = Duration.prototype;
+      createDuration.invalid = createInvalid$1;
+
+      function parseIso(inp, sign) {
+          // We'd normally use ~~inp for this, but unfortunately it also
+          // converts floats to ints.
+          // inp may be undefined, so careful calling replace on it.
+          var res = inp && parseFloat(inp.replace(',', '.'));
+          // apply sign while we're at it
+          return (isNaN(res) ? 0 : res) * sign;
+      }
+
+      function positiveMomentsDifference(base, other) {
+          var res = {};
+
+          res.months =
+              other.month() - base.month() + (other.year() - base.year()) * 12;
+          if (base.clone().add(res.months, 'M').isAfter(other)) {
+              --res.months;
+          }
+
+          res.milliseconds = +other - +base.clone().add(res.months, 'M');
+
+          return res;
+      }
+
+      function momentsDifference(base, other) {
+          var res;
+          if (!(base.isValid() && other.isValid())) {
+              return { milliseconds: 0, months: 0 };
+          }
+
+          other = cloneWithOffset(other, base);
+          if (base.isBefore(other)) {
+              res = positiveMomentsDifference(base, other);
+          } else {
+              res = positiveMomentsDifference(other, base);
+              res.milliseconds = -res.milliseconds;
+              res.months = -res.months;
+          }
+
+          return res;
+      }
+
+      // TODO: remove 'name' arg after deprecation is removed
+      function createAdder(direction, name) {
+          return function (val, period) {
+              var dur, tmp;
+              //invert the arguments, but complain about it
+              if (period !== null && !isNaN(+period)) {
+                  deprecateSimple(
+                      name,
+                      'moment().' +
+                          name +
+                          '(period, number) is deprecated. Please use moment().' +
+                          name +
+                          '(number, period). ' +
+                          'See http://momentjs.com/guides/#/warnings/add-inverted-param/ for more info.'
+                  );
+                  tmp = val;
+                  val = period;
+                  period = tmp;
+              }
+
+              dur = createDuration(val, period);
+              addSubtract(this, dur, direction);
+              return this;
+          };
+      }
+
+      function addSubtract(mom, duration, isAdding, updateOffset) {
+          var milliseconds = duration._milliseconds,
+              days = absRound(duration._days),
+              months = absRound(duration._months);
+
+          if (!mom.isValid()) {
+              // No op
+              return;
+          }
+
+          updateOffset = updateOffset == null ? true : updateOffset;
+
+          if (months) {
+              setMonth(mom, get(mom, 'Month') + months * isAdding);
+          }
+          if (days) {
+              set$1(mom, 'Date', get(mom, 'Date') + days * isAdding);
+          }
+          if (milliseconds) {
+              mom._d.setTime(mom._d.valueOf() + milliseconds * isAdding);
+          }
+          if (updateOffset) {
+              hooks.updateOffset(mom, days || months);
+          }
+      }
+
+      var add = createAdder(1, 'add'),
+          subtract = createAdder(-1, 'subtract');
+
+      function isString(input) {
+          return typeof input === 'string' || input instanceof String;
+      }
+
+      // type MomentInput = Moment | Date | string | number | (number | string)[] | MomentInputObject | void; // null | undefined
+      function isMomentInput(input) {
+          return (
+              isMoment(input) ||
+              isDate(input) ||
+              isString(input) ||
+              isNumber(input) ||
+              isNumberOrStringArray(input) ||
+              isMomentInputObject(input) ||
+              input === null ||
+              input === undefined
+          );
+      }
+
+      function isMomentInputObject(input) {
+          var objectTest = isObject(input) && !isObjectEmpty(input),
+              propertyTest = false,
+              properties = [
+                  'years',
+                  'year',
+                  'y',
+                  'months',
+                  'month',
+                  'M',
+                  'days',
+                  'day',
+                  'd',
+                  'dates',
+                  'date',
+                  'D',
+                  'hours',
+                  'hour',
+                  'h',
+                  'minutes',
+                  'minute',
+                  'm',
+                  'seconds',
+                  'second',
+                  's',
+                  'milliseconds',
+                  'millisecond',
+                  'ms',
+              ],
+              i,
+              property;
+
+          for (i = 0; i < properties.length; i += 1) {
+              property = properties[i];
+              propertyTest = propertyTest || hasOwnProp(input, property);
+          }
+
+          return objectTest && propertyTest;
+      }
+
+      function isNumberOrStringArray(input) {
+          var arrayTest = isArray(input),
+              dataTypeTest = false;
+          if (arrayTest) {
+              dataTypeTest =
+                  input.filter(function (item) {
+                      return !isNumber(item) && isString(input);
+                  }).length === 0;
+          }
+          return arrayTest && dataTypeTest;
+      }
+
+      function isCalendarSpec(input) {
+          var objectTest = isObject(input) && !isObjectEmpty(input),
+              propertyTest = false,
+              properties = [
+                  'sameDay',
+                  'nextDay',
+                  'lastDay',
+                  'nextWeek',
+                  'lastWeek',
+                  'sameElse',
+              ],
+              i,
+              property;
+
+          for (i = 0; i < properties.length; i += 1) {
+              property = properties[i];
+              propertyTest = propertyTest || hasOwnProp(input, property);
+          }
+
+          return objectTest && propertyTest;
+      }
+
+      function getCalendarFormat(myMoment, now) {
+          var diff = myMoment.diff(now, 'days', true);
+          return diff < -6
+              ? 'sameElse'
+              : diff < -1
+              ? 'lastWeek'
+              : diff < 0
+              ? 'lastDay'
+              : diff < 1
+              ? 'sameDay'
+              : diff < 2
+              ? 'nextDay'
+              : diff < 7
+              ? 'nextWeek'
+              : 'sameElse';
+      }
+
+      function calendar$1(time, formats) {
+          // Support for single parameter, formats only overload to the calendar function
+          if (arguments.length === 1) {
+              if (isMomentInput(arguments[0])) {
+                  time = arguments[0];
+                  formats = undefined;
+              } else if (isCalendarSpec(arguments[0])) {
+                  formats = arguments[0];
+                  time = undefined;
+              }
+          }
+          // We want to compare the start of today, vs this.
+          // Getting start-of-today depends on whether we're local/utc/offset or not.
+          var now = time || createLocal(),
+              sod = cloneWithOffset(now, this).startOf('day'),
+              format = hooks.calendarFormat(this, sod) || 'sameElse',
+              output =
+                  formats &&
+                  (isFunction(formats[format])
+                      ? formats[format].call(this, now)
+                      : formats[format]);
+
+          return this.format(
+              output || this.localeData().calendar(format, this, createLocal(now))
+          );
+      }
+
+      function clone() {
+          return new Moment(this);
+      }
+
+      function isAfter(input, units) {
+          var localInput = isMoment(input) ? input : createLocal(input);
+          if (!(this.isValid() && localInput.isValid())) {
+              return false;
+          }
+          units = normalizeUnits(units) || 'millisecond';
+          if (units === 'millisecond') {
+              return this.valueOf() > localInput.valueOf();
+          } else {
+              return localInput.valueOf() < this.clone().startOf(units).valueOf();
+          }
+      }
+
+      function isBefore(input, units) {
+          var localInput = isMoment(input) ? input : createLocal(input);
+          if (!(this.isValid() && localInput.isValid())) {
+              return false;
+          }
+          units = normalizeUnits(units) || 'millisecond';
+          if (units === 'millisecond') {
+              return this.valueOf() < localInput.valueOf();
+          } else {
+              return this.clone().endOf(units).valueOf() < localInput.valueOf();
+          }
+      }
+
+      function isBetween(from, to, units, inclusivity) {
+          var localFrom = isMoment(from) ? from : createLocal(from),
+              localTo = isMoment(to) ? to : createLocal(to);
+          if (!(this.isValid() && localFrom.isValid() && localTo.isValid())) {
+              return false;
+          }
+          inclusivity = inclusivity || '()';
+          return (
+              (inclusivity[0] === '('
+                  ? this.isAfter(localFrom, units)
+                  : !this.isBefore(localFrom, units)) &&
+              (inclusivity[1] === ')'
+                  ? this.isBefore(localTo, units)
+                  : !this.isAfter(localTo, units))
+          );
+      }
+
+      function isSame(input, units) {
+          var localInput = isMoment(input) ? input : createLocal(input),
+              inputMs;
+          if (!(this.isValid() && localInput.isValid())) {
+              return false;
+          }
+          units = normalizeUnits(units) || 'millisecond';
+          if (units === 'millisecond') {
+              return this.valueOf() === localInput.valueOf();
+          } else {
+              inputMs = localInput.valueOf();
+              return (
+                  this.clone().startOf(units).valueOf() <= inputMs &&
+                  inputMs <= this.clone().endOf(units).valueOf()
+              );
+          }
+      }
+
+      function isSameOrAfter(input, units) {
+          return this.isSame(input, units) || this.isAfter(input, units);
+      }
+
+      function isSameOrBefore(input, units) {
+          return this.isSame(input, units) || this.isBefore(input, units);
+      }
+
+      function diff(input, units, asFloat) {
+          var that, zoneDelta, output;
+
+          if (!this.isValid()) {
+              return NaN;
+          }
+
+          that = cloneWithOffset(input, this);
+
+          if (!that.isValid()) {
+              return NaN;
+          }
+
+          zoneDelta = (that.utcOffset() - this.utcOffset()) * 6e4;
+
+          units = normalizeUnits(units);
+
+          switch (units) {
+              case 'year':
+                  output = monthDiff(this, that) / 12;
+                  break;
+              case 'month':
+                  output = monthDiff(this, that);
+                  break;
+              case 'quarter':
+                  output = monthDiff(this, that) / 3;
+                  break;
+              case 'second':
+                  output = (this - that) / 1e3;
+                  break; // 1000
+              case 'minute':
+                  output = (this - that) / 6e4;
+                  break; // 1000 * 60
+              case 'hour':
+                  output = (this - that) / 36e5;
+                  break; // 1000 * 60 * 60
+              case 'day':
+                  output = (this - that - zoneDelta) / 864e5;
+                  break; // 1000 * 60 * 60 * 24, negate dst
+              case 'week':
+                  output = (this - that - zoneDelta) / 6048e5;
+                  break; // 1000 * 60 * 60 * 24 * 7, negate dst
+              default:
+                  output = this - that;
+          }
+
+          return asFloat ? output : absFloor(output);
+      }
+
+      function monthDiff(a, b) {
+          if (a.date() < b.date()) {
+              // end-of-month calculations work correct when the start month has more
+              // days than the end month.
+              return -monthDiff(b, a);
+          }
+          // difference in months
+          var wholeMonthDiff = (b.year() - a.year()) * 12 + (b.month() - a.month()),
+              // b is in (anchor - 1 month, anchor + 1 month)
+              anchor = a.clone().add(wholeMonthDiff, 'months'),
+              anchor2,
+              adjust;
+
+          if (b - anchor < 0) {
+              anchor2 = a.clone().add(wholeMonthDiff - 1, 'months');
+              // linear across the month
+              adjust = (b - anchor) / (anchor - anchor2);
+          } else {
+              anchor2 = a.clone().add(wholeMonthDiff + 1, 'months');
+              // linear across the month
+              adjust = (b - anchor) / (anchor2 - anchor);
+          }
+
+          //check for negative zero, return zero if negative zero
+          return -(wholeMonthDiff + adjust) || 0;
+      }
+
+      hooks.defaultFormat = 'YYYY-MM-DDTHH:mm:ssZ';
+      hooks.defaultFormatUtc = 'YYYY-MM-DDTHH:mm:ss[Z]';
+
+      function toString() {
+          return this.clone().locale('en').format('ddd MMM DD YYYY HH:mm:ss [GMT]ZZ');
+      }
+
+      function toISOString(keepOffset) {
+          if (!this.isValid()) {
+              return null;
+          }
+          var utc = keepOffset !== true,
+              m = utc ? this.clone().utc() : this;
+          if (m.year() < 0 || m.year() > 9999) {
+              return formatMoment(
+                  m,
+                  utc
+                      ? 'YYYYYY-MM-DD[T]HH:mm:ss.SSS[Z]'
+                      : 'YYYYYY-MM-DD[T]HH:mm:ss.SSSZ'
+              );
+          }
+          if (isFunction(Date.prototype.toISOString)) {
+              // native implementation is ~50x faster, use it when we can
+              if (utc) {
+                  return this.toDate().toISOString();
+              } else {
+                  return new Date(this.valueOf() + this.utcOffset() * 60 * 1000)
+                      .toISOString()
+                      .replace('Z', formatMoment(m, 'Z'));
+              }
+          }
+          return formatMoment(
+              m,
+              utc ? 'YYYY-MM-DD[T]HH:mm:ss.SSS[Z]' : 'YYYY-MM-DD[T]HH:mm:ss.SSSZ'
+          );
+      }
+
+      /**
+       * Return a human readable representation of a moment that can
+       * also be evaluated to get a new moment which is the same
+       *
+       * @link https://nodejs.org/dist/latest/docs/api/util.html#util_custom_inspect_function_on_objects
+       */
+      function inspect() {
+          if (!this.isValid()) {
+              return 'moment.invalid(/* ' + this._i + ' */)';
+          }
+          var func = 'moment',
+              zone = '',
+              prefix,
+              year,
+              datetime,
+              suffix;
+          if (!this.isLocal()) {
+              func = this.utcOffset() === 0 ? 'moment.utc' : 'moment.parseZone';
+              zone = 'Z';
+          }
+          prefix = '[' + func + '("]';
+          year = 0 <= this.year() && this.year() <= 9999 ? 'YYYY' : 'YYYYYY';
+          datetime = '-MM-DD[T]HH:mm:ss.SSS';
+          suffix = zone + '[")]';
+
+          return this.format(prefix + year + datetime + suffix);
+      }
+
+      function format(inputString) {
+          if (!inputString) {
+              inputString = this.isUtc()
+                  ? hooks.defaultFormatUtc
+                  : hooks.defaultFormat;
+          }
+          var output = formatMoment(this, inputString);
+          return this.localeData().postformat(output);
+      }
+
+      function from(time, withoutSuffix) {
+          if (
+              this.isValid() &&
+              ((isMoment(time) && time.isValid()) || createLocal(time).isValid())
+          ) {
+              return createDuration({ to: this, from: time })
+                  .locale(this.locale())
+                  .humanize(!withoutSuffix);
+          } else {
+              return this.localeData().invalidDate();
+          }
+      }
+
+      function fromNow(withoutSuffix) {
+          return this.from(createLocal(), withoutSuffix);
+      }
+
+      function to(time, withoutSuffix) {
+          if (
+              this.isValid() &&
+              ((isMoment(time) && time.isValid()) || createLocal(time).isValid())
+          ) {
+              return createDuration({ from: this, to: time })
+                  .locale(this.locale())
+                  .humanize(!withoutSuffix);
+          } else {
+              return this.localeData().invalidDate();
+          }
+      }
+
+      function toNow(withoutSuffix) {
+          return this.to(createLocal(), withoutSuffix);
+      }
+
+      // If passed a locale key, it will set the locale for this
+      // instance.  Otherwise, it will return the locale configuration
+      // variables for this instance.
+      function locale(key) {
+          var newLocaleData;
+
+          if (key === undefined) {
+              return this._locale._abbr;
+          } else {
+              newLocaleData = getLocale(key);
+              if (newLocaleData != null) {
+                  this._locale = newLocaleData;
+              }
+              return this;
+          }
+      }
+
+      var lang = deprecate(
+          'moment().lang() is deprecated. Instead, use moment().localeData() to get the language configuration. Use moment().locale() to change languages.',
+          function (key) {
+              if (key === undefined) {
+                  return this.localeData();
+              } else {
+                  return this.locale(key);
+              }
+          }
+      );
+
+      function localeData() {
+          return this._locale;
+      }
+
+      var MS_PER_SECOND = 1000,
+          MS_PER_MINUTE = 60 * MS_PER_SECOND,
+          MS_PER_HOUR = 60 * MS_PER_MINUTE,
+          MS_PER_400_YEARS = (365 * 400 + 97) * 24 * MS_PER_HOUR;
+
+      // actual modulo - handles negative numbers (for dates before 1970):
+      function mod$1(dividend, divisor) {
+          return ((dividend % divisor) + divisor) % divisor;
+      }
+
+      function localStartOfDate(y, m, d) {
+          // the date constructor remaps years 0-99 to 1900-1999
+          if (y < 100 && y >= 0) {
+              // preserve leap years using a full 400 year cycle, then reset
+              return new Date(y + 400, m, d) - MS_PER_400_YEARS;
+          } else {
+              return new Date(y, m, d).valueOf();
+          }
+      }
+
+      function utcStartOfDate(y, m, d) {
+          // Date.UTC remaps years 0-99 to 1900-1999
+          if (y < 100 && y >= 0) {
+              // preserve leap years using a full 400 year cycle, then reset
+              return Date.UTC(y + 400, m, d) - MS_PER_400_YEARS;
+          } else {
+              return Date.UTC(y, m, d);
+          }
+      }
+
+      function startOf(units) {
+          var time, startOfDate;
+          units = normalizeUnits(units);
+          if (units === undefined || units === 'millisecond' || !this.isValid()) {
+              return this;
+          }
+
+          startOfDate = this._isUTC ? utcStartOfDate : localStartOfDate;
+
+          switch (units) {
+              case 'year':
+                  time = startOfDate(this.year(), 0, 1);
+                  break;
+              case 'quarter':
+                  time = startOfDate(
+                      this.year(),
+                      this.month() - (this.month() % 3),
+                      1
+                  );
+                  break;
+              case 'month':
+                  time = startOfDate(this.year(), this.month(), 1);
+                  break;
+              case 'week':
+                  time = startOfDate(
+                      this.year(),
+                      this.month(),
+                      this.date() - this.weekday()
+                  );
+                  break;
+              case 'isoWeek':
+                  time = startOfDate(
+                      this.year(),
+                      this.month(),
+                      this.date() - (this.isoWeekday() - 1)
+                  );
+                  break;
+              case 'day':
+              case 'date':
+                  time = startOfDate(this.year(), this.month(), this.date());
+                  break;
+              case 'hour':
+                  time = this._d.valueOf();
+                  time -= mod$1(
+                      time + (this._isUTC ? 0 : this.utcOffset() * MS_PER_MINUTE),
+                      MS_PER_HOUR
+                  );
+                  break;
+              case 'minute':
+                  time = this._d.valueOf();
+                  time -= mod$1(time, MS_PER_MINUTE);
+                  break;
+              case 'second':
+                  time = this._d.valueOf();
+                  time -= mod$1(time, MS_PER_SECOND);
+                  break;
+          }
+
+          this._d.setTime(time);
+          hooks.updateOffset(this, true);
+          return this;
+      }
+
+      function endOf(units) {
+          var time, startOfDate;
+          units = normalizeUnits(units);
+          if (units === undefined || units === 'millisecond' || !this.isValid()) {
+              return this;
+          }
+
+          startOfDate = this._isUTC ? utcStartOfDate : localStartOfDate;
+
+          switch (units) {
+              case 'year':
+                  time = startOfDate(this.year() + 1, 0, 1) - 1;
+                  break;
+              case 'quarter':
+                  time =
+                      startOfDate(
+                          this.year(),
+                          this.month() - (this.month() % 3) + 3,
+                          1
+                      ) - 1;
+                  break;
+              case 'month':
+                  time = startOfDate(this.year(), this.month() + 1, 1) - 1;
+                  break;
+              case 'week':
+                  time =
+                      startOfDate(
+                          this.year(),
+                          this.month(),
+                          this.date() - this.weekday() + 7
+                      ) - 1;
+                  break;
+              case 'isoWeek':
+                  time =
+                      startOfDate(
+                          this.year(),
+                          this.month(),
+                          this.date() - (this.isoWeekday() - 1) + 7
+                      ) - 1;
+                  break;
+              case 'day':
+              case 'date':
+                  time = startOfDate(this.year(), this.month(), this.date() + 1) - 1;
+                  break;
+              case 'hour':
+                  time = this._d.valueOf();
+                  time +=
+                      MS_PER_HOUR -
+                      mod$1(
+                          time + (this._isUTC ? 0 : this.utcOffset() * MS_PER_MINUTE),
+                          MS_PER_HOUR
+                      ) -
+                      1;
+                  break;
+              case 'minute':
+                  time = this._d.valueOf();
+                  time += MS_PER_MINUTE - mod$1(time, MS_PER_MINUTE) - 1;
+                  break;
+              case 'second':
+                  time = this._d.valueOf();
+                  time += MS_PER_SECOND - mod$1(time, MS_PER_SECOND) - 1;
+                  break;
+          }
+
+          this._d.setTime(time);
+          hooks.updateOffset(this, true);
+          return this;
+      }
+
+      function valueOf() {
+          return this._d.valueOf() - (this._offset || 0) * 60000;
+      }
+
+      function unix() {
+          return Math.floor(this.valueOf() / 1000);
+      }
+
+      function toDate() {
+          return new Date(this.valueOf());
+      }
+
+      function toArray() {
+          var m = this;
+          return [
+              m.year(),
+              m.month(),
+              m.date(),
+              m.hour(),
+              m.minute(),
+              m.second(),
+              m.millisecond(),
+          ];
+      }
+
+      function toObject() {
+          var m = this;
+          return {
+              years: m.year(),
+              months: m.month(),
+              date: m.date(),
+              hours: m.hours(),
+              minutes: m.minutes(),
+              seconds: m.seconds(),
+              milliseconds: m.milliseconds(),
+          };
+      }
+
+      function toJSON() {
+          // new Date(NaN).toJSON() === null
+          return this.isValid() ? this.toISOString() : null;
+      }
+
+      function isValid$2() {
+          return isValid(this);
+      }
+
+      function parsingFlags() {
+          return extend({}, getParsingFlags(this));
+      }
+
+      function invalidAt() {
+          return getParsingFlags(this).overflow;
+      }
+
+      function creationData() {
+          return {
+              input: this._i,
+              format: this._f,
+              locale: this._locale,
+              isUTC: this._isUTC,
+              strict: this._strict,
+          };
+      }
+
+      addFormatToken('N', 0, 0, 'eraAbbr');
+      addFormatToken('NN', 0, 0, 'eraAbbr');
+      addFormatToken('NNN', 0, 0, 'eraAbbr');
+      addFormatToken('NNNN', 0, 0, 'eraName');
+      addFormatToken('NNNNN', 0, 0, 'eraNarrow');
+
+      addFormatToken('y', ['y', 1], 'yo', 'eraYear');
+      addFormatToken('y', ['yy', 2], 0, 'eraYear');
+      addFormatToken('y', ['yyy', 3], 0, 'eraYear');
+      addFormatToken('y', ['yyyy', 4], 0, 'eraYear');
+
+      addRegexToken('N', matchEraAbbr);
+      addRegexToken('NN', matchEraAbbr);
+      addRegexToken('NNN', matchEraAbbr);
+      addRegexToken('NNNN', matchEraName);
+      addRegexToken('NNNNN', matchEraNarrow);
+
+      addParseToken(['N', 'NN', 'NNN', 'NNNN', 'NNNNN'], function (
+          input,
+          array,
+          config,
+          token
+      ) {
+          var era = config._locale.erasParse(input, token, config._strict);
+          if (era) {
+              getParsingFlags(config).era = era;
+          } else {
+              getParsingFlags(config).invalidEra = input;
+          }
+      });
+
+      addRegexToken('y', matchUnsigned);
+      addRegexToken('yy', matchUnsigned);
+      addRegexToken('yyy', matchUnsigned);
+      addRegexToken('yyyy', matchUnsigned);
+      addRegexToken('yo', matchEraYearOrdinal);
+
+      addParseToken(['y', 'yy', 'yyy', 'yyyy'], YEAR);
+      addParseToken(['yo'], function (input, array, config, token) {
+          var match;
+          if (config._locale._eraYearOrdinalRegex) {
+              match = input.match(config._locale._eraYearOrdinalRegex);
+          }
+
+          if (config._locale.eraYearOrdinalParse) {
+              array[YEAR] = config._locale.eraYearOrdinalParse(input, match);
+          } else {
+              array[YEAR] = parseInt(input, 10);
+          }
+      });
+
+      function localeEras(m, format) {
+          var i,
+              l,
+              date,
+              eras = this._eras || getLocale('en')._eras;
+          for (i = 0, l = eras.length; i < l; ++i) {
+              switch (typeof eras[i].since) {
+                  case 'string':
+                      // truncate time
+                      date = hooks(eras[i].since).startOf('day');
+                      eras[i].since = date.valueOf();
+                      break;
+              }
+
+              switch (typeof eras[i].until) {
+                  case 'undefined':
+                      eras[i].until = +Infinity;
+                      break;
+                  case 'string':
+                      // truncate time
+                      date = hooks(eras[i].until).startOf('day').valueOf();
+                      eras[i].until = date.valueOf();
+                      break;
+              }
+          }
+          return eras;
+      }
+
+      function localeErasParse(eraName, format, strict) {
+          var i,
+              l,
+              eras = this.eras(),
+              name,
+              abbr,
+              narrow;
+          eraName = eraName.toUpperCase();
+
+          for (i = 0, l = eras.length; i < l; ++i) {
+              name = eras[i].name.toUpperCase();
+              abbr = eras[i].abbr.toUpperCase();
+              narrow = eras[i].narrow.toUpperCase();
+
+              if (strict) {
+                  switch (format) {
+                      case 'N':
+                      case 'NN':
+                      case 'NNN':
+                          if (abbr === eraName) {
+                              return eras[i];
+                          }
+                          break;
+
+                      case 'NNNN':
+                          if (name === eraName) {
+                              return eras[i];
+                          }
+                          break;
+
+                      case 'NNNNN':
+                          if (narrow === eraName) {
+                              return eras[i];
+                          }
+                          break;
+                  }
+              } else if ([name, abbr, narrow].indexOf(eraName) >= 0) {
+                  return eras[i];
+              }
+          }
+      }
+
+      function localeErasConvertYear(era, year) {
+          var dir = era.since <= era.until ? +1 : -1;
+          if (year === undefined) {
+              return hooks(era.since).year();
+          } else {
+              return hooks(era.since).year() + (year - era.offset) * dir;
+          }
+      }
+
+      function getEraName() {
+          var i,
+              l,
+              val,
+              eras = this.localeData().eras();
+          for (i = 0, l = eras.length; i < l; ++i) {
+              // truncate time
+              val = this.startOf('day').valueOf();
+
+              if (eras[i].since <= val && val <= eras[i].until) {
+                  return eras[i].name;
+              }
+              if (eras[i].until <= val && val <= eras[i].since) {
+                  return eras[i].name;
+              }
+          }
+
+          return '';
+      }
+
+      function getEraNarrow() {
+          var i,
+              l,
+              val,
+              eras = this.localeData().eras();
+          for (i = 0, l = eras.length; i < l; ++i) {
+              // truncate time
+              val = this.startOf('day').valueOf();
+
+              if (eras[i].since <= val && val <= eras[i].until) {
+                  return eras[i].narrow;
+              }
+              if (eras[i].until <= val && val <= eras[i].since) {
+                  return eras[i].narrow;
+              }
+          }
+
+          return '';
+      }
+
+      function getEraAbbr() {
+          var i,
+              l,
+              val,
+              eras = this.localeData().eras();
+          for (i = 0, l = eras.length; i < l; ++i) {
+              // truncate time
+              val = this.startOf('day').valueOf();
+
+              if (eras[i].since <= val && val <= eras[i].until) {
+                  return eras[i].abbr;
+              }
+              if (eras[i].until <= val && val <= eras[i].since) {
+                  return eras[i].abbr;
+              }
+          }
+
+          return '';
+      }
+
+      function getEraYear() {
+          var i,
+              l,
+              dir,
+              val,
+              eras = this.localeData().eras();
+          for (i = 0, l = eras.length; i < l; ++i) {
+              dir = eras[i].since <= eras[i].until ? +1 : -1;
+
+              // truncate time
+              val = this.startOf('day').valueOf();
+
+              if (
+                  (eras[i].since <= val && val <= eras[i].until) ||
+                  (eras[i].until <= val && val <= eras[i].since)
+              ) {
+                  return (
+                      (this.year() - hooks(eras[i].since).year()) * dir +
+                      eras[i].offset
+                  );
+              }
+          }
+
+          return this.year();
+      }
+
+      function erasNameRegex(isStrict) {
+          if (!hasOwnProp(this, '_erasNameRegex')) {
+              computeErasParse.call(this);
+          }
+          return isStrict ? this._erasNameRegex : this._erasRegex;
+      }
+
+      function erasAbbrRegex(isStrict) {
+          if (!hasOwnProp(this, '_erasAbbrRegex')) {
+              computeErasParse.call(this);
+          }
+          return isStrict ? this._erasAbbrRegex : this._erasRegex;
+      }
+
+      function erasNarrowRegex(isStrict) {
+          if (!hasOwnProp(this, '_erasNarrowRegex')) {
+              computeErasParse.call(this);
+          }
+          return isStrict ? this._erasNarrowRegex : this._erasRegex;
+      }
+
+      function matchEraAbbr(isStrict, locale) {
+          return locale.erasAbbrRegex(isStrict);
+      }
+
+      function matchEraName(isStrict, locale) {
+          return locale.erasNameRegex(isStrict);
+      }
+
+      function matchEraNarrow(isStrict, locale) {
+          return locale.erasNarrowRegex(isStrict);
+      }
+
+      function matchEraYearOrdinal(isStrict, locale) {
+          return locale._eraYearOrdinalRegex || matchUnsigned;
+      }
+
+      function computeErasParse() {
+          var abbrPieces = [],
+              namePieces = [],
+              narrowPieces = [],
+              mixedPieces = [],
+              i,
+              l,
+              eras = this.eras();
+
+          for (i = 0, l = eras.length; i < l; ++i) {
+              namePieces.push(regexEscape(eras[i].name));
+              abbrPieces.push(regexEscape(eras[i].abbr));
+              narrowPieces.push(regexEscape(eras[i].narrow));
+
+              mixedPieces.push(regexEscape(eras[i].name));
+              mixedPieces.push(regexEscape(eras[i].abbr));
+              mixedPieces.push(regexEscape(eras[i].narrow));
+          }
+
+          this._erasRegex = new RegExp('^(' + mixedPieces.join('|') + ')', 'i');
+          this._erasNameRegex = new RegExp('^(' + namePieces.join('|') + ')', 'i');
+          this._erasAbbrRegex = new RegExp('^(' + abbrPieces.join('|') + ')', 'i');
+          this._erasNarrowRegex = new RegExp(
+              '^(' + narrowPieces.join('|') + ')',
+              'i'
+          );
+      }
+
+      // FORMATTING
+
+      addFormatToken(0, ['gg', 2], 0, function () {
+          return this.weekYear() % 100;
+      });
+
+      addFormatToken(0, ['GG', 2], 0, function () {
+          return this.isoWeekYear() % 100;
+      });
+
+      function addWeekYearFormatToken(token, getter) {
+          addFormatToken(0, [token, token.length], 0, getter);
+      }
+
+      addWeekYearFormatToken('gggg', 'weekYear');
+      addWeekYearFormatToken('ggggg', 'weekYear');
+      addWeekYearFormatToken('GGGG', 'isoWeekYear');
+      addWeekYearFormatToken('GGGGG', 'isoWeekYear');
+
+      // ALIASES
+
+      addUnitAlias('weekYear', 'gg');
+      addUnitAlias('isoWeekYear', 'GG');
+
+      // PRIORITY
+
+      addUnitPriority('weekYear', 1);
+      addUnitPriority('isoWeekYear', 1);
+
+      // PARSING
+
+      addRegexToken('G', matchSigned);
+      addRegexToken('g', matchSigned);
+      addRegexToken('GG', match1to2, match2);
+      addRegexToken('gg', match1to2, match2);
+      addRegexToken('GGGG', match1to4, match4);
+      addRegexToken('gggg', match1to4, match4);
+      addRegexToken('GGGGG', match1to6, match6);
+      addRegexToken('ggggg', match1to6, match6);
+
+      addWeekParseToken(['gggg', 'ggggg', 'GGGG', 'GGGGG'], function (
+          input,
+          week,
+          config,
+          token
+      ) {
+          week[token.substr(0, 2)] = toInt(input);
+      });
+
+      addWeekParseToken(['gg', 'GG'], function (input, week, config, token) {
+          week[token] = hooks.parseTwoDigitYear(input);
+      });
+
+      // MOMENTS
+
+      function getSetWeekYear(input) {
+          return getSetWeekYearHelper.call(
+              this,
+              input,
+              this.week(),
+              this.weekday(),
+              this.localeData()._week.dow,
+              this.localeData()._week.doy
+          );
+      }
+
+      function getSetISOWeekYear(input) {
+          return getSetWeekYearHelper.call(
+              this,
+              input,
+              this.isoWeek(),
+              this.isoWeekday(),
+              1,
+              4
+          );
+      }
+
+      function getISOWeeksInYear() {
+          return weeksInYear(this.year(), 1, 4);
+      }
+
+      function getISOWeeksInISOWeekYear() {
+          return weeksInYear(this.isoWeekYear(), 1, 4);
+      }
+
+      function getWeeksInYear() {
+          var weekInfo = this.localeData()._week;
+          return weeksInYear(this.year(), weekInfo.dow, weekInfo.doy);
+      }
+
+      function getWeeksInWeekYear() {
+          var weekInfo = this.localeData()._week;
+          return weeksInYear(this.weekYear(), weekInfo.dow, weekInfo.doy);
+      }
+
+      function getSetWeekYearHelper(input, week, weekday, dow, doy) {
+          var weeksTarget;
+          if (input == null) {
+              return weekOfYear(this, dow, doy).year;
+          } else {
+              weeksTarget = weeksInYear(input, dow, doy);
+              if (week > weeksTarget) {
+                  week = weeksTarget;
+              }
+              return setWeekAll.call(this, input, week, weekday, dow, doy);
+          }
+      }
+
+      function setWeekAll(weekYear, week, weekday, dow, doy) {
+          var dayOfYearData = dayOfYearFromWeeks(weekYear, week, weekday, dow, doy),
+              date = createUTCDate(dayOfYearData.year, 0, dayOfYearData.dayOfYear);
+
+          this.year(date.getUTCFullYear());
+          this.month(date.getUTCMonth());
+          this.date(date.getUTCDate());
+          return this;
+      }
+
+      // FORMATTING
+
+      addFormatToken('Q', 0, 'Qo', 'quarter');
+
+      // ALIASES
+
+      addUnitAlias('quarter', 'Q');
+
+      // PRIORITY
+
+      addUnitPriority('quarter', 7);
+
+      // PARSING
+
+      addRegexToken('Q', match1);
+      addParseToken('Q', function (input, array) {
+          array[MONTH] = (toInt(input) - 1) * 3;
+      });
+
+      // MOMENTS
+
+      function getSetQuarter(input) {
+          return input == null
+              ? Math.ceil((this.month() + 1) / 3)
+              : this.month((input - 1) * 3 + (this.month() % 3));
+      }
+
+      // FORMATTING
+
+      addFormatToken('D', ['DD', 2], 'Do', 'date');
+
+      // ALIASES
+
+      addUnitAlias('date', 'D');
+
+      // PRIORITY
+      addUnitPriority('date', 9);
+
+      // PARSING
+
+      addRegexToken('D', match1to2);
+      addRegexToken('DD', match1to2, match2);
+      addRegexToken('Do', function (isStrict, locale) {
+          // TODO: Remove "ordinalParse" fallback in next major release.
+          return isStrict
+              ? locale._dayOfMonthOrdinalParse || locale._ordinalParse
+              : locale._dayOfMonthOrdinalParseLenient;
+      });
+
+      addParseToken(['D', 'DD'], DATE);
+      addParseToken('Do', function (input, array) {
+          array[DATE] = toInt(input.match(match1to2)[0]);
+      });
+
+      // MOMENTS
+
+      var getSetDayOfMonth = makeGetSet('Date', true);
+
+      // FORMATTING
+
+      addFormatToken('DDD', ['DDDD', 3], 'DDDo', 'dayOfYear');
+
+      // ALIASES
+
+      addUnitAlias('dayOfYear', 'DDD');
+
+      // PRIORITY
+      addUnitPriority('dayOfYear', 4);
+
+      // PARSING
+
+      addRegexToken('DDD', match1to3);
+      addRegexToken('DDDD', match3);
+      addParseToken(['DDD', 'DDDD'], function (input, array, config) {
+          config._dayOfYear = toInt(input);
+      });
+
+      // HELPERS
+
+      // MOMENTS
+
+      function getSetDayOfYear(input) {
+          var dayOfYear =
+              Math.round(
+                  (this.clone().startOf('day') - this.clone().startOf('year')) / 864e5
+              ) + 1;
+          return input == null ? dayOfYear : this.add(input - dayOfYear, 'd');
+      }
+
+      // FORMATTING
+
+      addFormatToken('m', ['mm', 2], 0, 'minute');
+
+      // ALIASES
+
+      addUnitAlias('minute', 'm');
+
+      // PRIORITY
+
+      addUnitPriority('minute', 14);
+
+      // PARSING
+
+      addRegexToken('m', match1to2);
+      addRegexToken('mm', match1to2, match2);
+      addParseToken(['m', 'mm'], MINUTE);
+
+      // MOMENTS
+
+      var getSetMinute = makeGetSet('Minutes', false);
+
+      // FORMATTING
+
+      addFormatToken('s', ['ss', 2], 0, 'second');
+
+      // ALIASES
+
+      addUnitAlias('second', 's');
+
+      // PRIORITY
+
+      addUnitPriority('second', 15);
+
+      // PARSING
+
+      addRegexToken('s', match1to2);
+      addRegexToken('ss', match1to2, match2);
+      addParseToken(['s', 'ss'], SECOND);
+
+      // MOMENTS
+
+      var getSetSecond = makeGetSet('Seconds', false);
+
+      // FORMATTING
+
+      addFormatToken('S', 0, 0, function () {
+          return ~~(this.millisecond() / 100);
+      });
+
+      addFormatToken(0, ['SS', 2], 0, function () {
+          return ~~(this.millisecond() / 10);
+      });
+
+      addFormatToken(0, ['SSS', 3], 0, 'millisecond');
+      addFormatToken(0, ['SSSS', 4], 0, function () {
+          return this.millisecond() * 10;
+      });
+      addFormatToken(0, ['SSSSS', 5], 0, function () {
+          return this.millisecond() * 100;
+      });
+      addFormatToken(0, ['SSSSSS', 6], 0, function () {
+          return this.millisecond() * 1000;
+      });
+      addFormatToken(0, ['SSSSSSS', 7], 0, function () {
+          return this.millisecond() * 10000;
+      });
+      addFormatToken(0, ['SSSSSSSS', 8], 0, function () {
+          return this.millisecond() * 100000;
+      });
+      addFormatToken(0, ['SSSSSSSSS', 9], 0, function () {
+          return this.millisecond() * 1000000;
+      });
+
+      // ALIASES
+
+      addUnitAlias('millisecond', 'ms');
+
+      // PRIORITY
+
+      addUnitPriority('millisecond', 16);
+
+      // PARSING
+
+      addRegexToken('S', match1to3, match1);
+      addRegexToken('SS', match1to3, match2);
+      addRegexToken('SSS', match1to3, match3);
+
+      var token, getSetMillisecond;
+      for (token = 'SSSS'; token.length <= 9; token += 'S') {
+          addRegexToken(token, matchUnsigned);
+      }
+
+      function parseMs(input, array) {
+          array[MILLISECOND] = toInt(('0.' + input) * 1000);
+      }
+
+      for (token = 'S'; token.length <= 9; token += 'S') {
+          addParseToken(token, parseMs);
+      }
+
+      getSetMillisecond = makeGetSet('Milliseconds', false);
+
+      // FORMATTING
+
+      addFormatToken('z', 0, 0, 'zoneAbbr');
+      addFormatToken('zz', 0, 0, 'zoneName');
+
+      // MOMENTS
+
+      function getZoneAbbr() {
+          return this._isUTC ? 'UTC' : '';
+      }
+
+      function getZoneName() {
+          return this._isUTC ? 'Coordinated Universal Time' : '';
+      }
+
+      var proto = Moment.prototype;
+
+      proto.add = add;
+      proto.calendar = calendar$1;
+      proto.clone = clone;
+      proto.diff = diff;
+      proto.endOf = endOf;
+      proto.format = format;
+      proto.from = from;
+      proto.fromNow = fromNow;
+      proto.to = to;
+      proto.toNow = toNow;
+      proto.get = stringGet;
+      proto.invalidAt = invalidAt;
+      proto.isAfter = isAfter;
+      proto.isBefore = isBefore;
+      proto.isBetween = isBetween;
+      proto.isSame = isSame;
+      proto.isSameOrAfter = isSameOrAfter;
+      proto.isSameOrBefore = isSameOrBefore;
+      proto.isValid = isValid$2;
+      proto.lang = lang;
+      proto.locale = locale;
+      proto.localeData = localeData;
+      proto.max = prototypeMax;
+      proto.min = prototypeMin;
+      proto.parsingFlags = parsingFlags;
+      proto.set = stringSet;
+      proto.startOf = startOf;
+      proto.subtract = subtract;
+      proto.toArray = toArray;
+      proto.toObject = toObject;
+      proto.toDate = toDate;
+      proto.toISOString = toISOString;
+      proto.inspect = inspect;
+      if (typeof Symbol !== 'undefined' && Symbol.for != null) {
+          proto[Symbol.for('nodejs.util.inspect.custom')] = function () {
+              return 'Moment<' + this.format() + '>';
+          };
+      }
+      proto.toJSON = toJSON;
+      proto.toString = toString;
+      proto.unix = unix;
+      proto.valueOf = valueOf;
+      proto.creationData = creationData;
+      proto.eraName = getEraName;
+      proto.eraNarrow = getEraNarrow;
+      proto.eraAbbr = getEraAbbr;
+      proto.eraYear = getEraYear;
+      proto.year = getSetYear;
+      proto.isLeapYear = getIsLeapYear;
+      proto.weekYear = getSetWeekYear;
+      proto.isoWeekYear = getSetISOWeekYear;
+      proto.quarter = proto.quarters = getSetQuarter;
+      proto.month = getSetMonth;
+      proto.daysInMonth = getDaysInMonth;
+      proto.week = proto.weeks = getSetWeek;
+      proto.isoWeek = proto.isoWeeks = getSetISOWeek;
+      proto.weeksInYear = getWeeksInYear;
+      proto.weeksInWeekYear = getWeeksInWeekYear;
+      proto.isoWeeksInYear = getISOWeeksInYear;
+      proto.isoWeeksInISOWeekYear = getISOWeeksInISOWeekYear;
+      proto.date = getSetDayOfMonth;
+      proto.day = proto.days = getSetDayOfWeek;
+      proto.weekday = getSetLocaleDayOfWeek;
+      proto.isoWeekday = getSetISODayOfWeek;
+      proto.dayOfYear = getSetDayOfYear;
+      proto.hour = proto.hours = getSetHour;
+      proto.minute = proto.minutes = getSetMinute;
+      proto.second = proto.seconds = getSetSecond;
+      proto.millisecond = proto.milliseconds = getSetMillisecond;
+      proto.utcOffset = getSetOffset;
+      proto.utc = setOffsetToUTC;
+      proto.local = setOffsetToLocal;
+      proto.parseZone = setOffsetToParsedOffset;
+      proto.hasAlignedHourOffset = hasAlignedHourOffset;
+      proto.isDST = isDaylightSavingTime;
+      proto.isLocal = isLocal;
+      proto.isUtcOffset = isUtcOffset;
+      proto.isUtc = isUtc;
+      proto.isUTC = isUtc;
+      proto.zoneAbbr = getZoneAbbr;
+      proto.zoneName = getZoneName;
+      proto.dates = deprecate(
+          'dates accessor is deprecated. Use date instead.',
+          getSetDayOfMonth
+      );
+      proto.months = deprecate(
+          'months accessor is deprecated. Use month instead',
+          getSetMonth
+      );
+      proto.years = deprecate(
+          'years accessor is deprecated. Use year instead',
+          getSetYear
+      );
+      proto.zone = deprecate(
+          'moment().zone is deprecated, use moment().utcOffset instead. http://momentjs.com/guides/#/warnings/zone/',
+          getSetZone
+      );
+      proto.isDSTShifted = deprecate(
+          'isDSTShifted is deprecated. See http://momentjs.com/guides/#/warnings/dst-shifted/ for more information',
+          isDaylightSavingTimeShifted
+      );
+
+      function createUnix(input) {
+          return createLocal(input * 1000);
+      }
+
+      function createInZone() {
+          return createLocal.apply(null, arguments).parseZone();
+      }
+
+      function preParsePostFormat(string) {
+          return string;
+      }
+
+      var proto$1 = Locale.prototype;
+
+      proto$1.calendar = calendar;
+      proto$1.longDateFormat = longDateFormat;
+      proto$1.invalidDate = invalidDate;
+      proto$1.ordinal = ordinal;
+      proto$1.preparse = preParsePostFormat;
+      proto$1.postformat = preParsePostFormat;
+      proto$1.relativeTime = relativeTime;
+      proto$1.pastFuture = pastFuture;
+      proto$1.set = set;
+      proto$1.eras = localeEras;
+      proto$1.erasParse = localeErasParse;
+      proto$1.erasConvertYear = localeErasConvertYear;
+      proto$1.erasAbbrRegex = erasAbbrRegex;
+      proto$1.erasNameRegex = erasNameRegex;
+      proto$1.erasNarrowRegex = erasNarrowRegex;
+
+      proto$1.months = localeMonths;
+      proto$1.monthsShort = localeMonthsShort;
+      proto$1.monthsParse = localeMonthsParse;
+      proto$1.monthsRegex = monthsRegex;
+      proto$1.monthsShortRegex = monthsShortRegex;
+      proto$1.week = localeWeek;
+      proto$1.firstDayOfYear = localeFirstDayOfYear;
+      proto$1.firstDayOfWeek = localeFirstDayOfWeek;
+
+      proto$1.weekdays = localeWeekdays;
+      proto$1.weekdaysMin = localeWeekdaysMin;
+      proto$1.weekdaysShort = localeWeekdaysShort;
+      proto$1.weekdaysParse = localeWeekdaysParse;
+
+      proto$1.weekdaysRegex = weekdaysRegex;
+      proto$1.weekdaysShortRegex = weekdaysShortRegex;
+      proto$1.weekdaysMinRegex = weekdaysMinRegex;
+
+      proto$1.isPM = localeIsPM;
+      proto$1.meridiem = localeMeridiem;
+
+      function get$1(format, index, field, setter) {
+          var locale = getLocale(),
+              utc = createUTC().set(setter, index);
+          return locale[field](utc, format);
+      }
+
+      function listMonthsImpl(format, index, field) {
+          if (isNumber(format)) {
+              index = format;
+              format = undefined;
+          }
+
+          format = format || '';
+
+          if (index != null) {
+              return get$1(format, index, field, 'month');
+          }
+
+          var i,
+              out = [];
+          for (i = 0; i < 12; i++) {
+              out[i] = get$1(format, i, field, 'month');
+          }
+          return out;
+      }
+
+      // ()
+      // (5)
+      // (fmt, 5)
+      // (fmt)
+      // (true)
+      // (true, 5)
+      // (true, fmt, 5)
+      // (true, fmt)
+      function listWeekdaysImpl(localeSorted, format, index, field) {
+          if (typeof localeSorted === 'boolean') {
+              if (isNumber(format)) {
+                  index = format;
+                  format = undefined;
+              }
+
+              format = format || '';
+          } else {
+              format = localeSorted;
+              index = format;
+              localeSorted = false;
+
+              if (isNumber(format)) {
+                  index = format;
+                  format = undefined;
+              }
+
+              format = format || '';
+          }
+
+          var locale = getLocale(),
+              shift = localeSorted ? locale._week.dow : 0,
+              i,
+              out = [];
+
+          if (index != null) {
+              return get$1(format, (index + shift) % 7, field, 'day');
+          }
+
+          for (i = 0; i < 7; i++) {
+              out[i] = get$1(format, (i + shift) % 7, field, 'day');
+          }
+          return out;
+      }
+
+      function listMonths(format, index) {
+          return listMonthsImpl(format, index, 'months');
+      }
+
+      function listMonthsShort(format, index) {
+          return listMonthsImpl(format, index, 'monthsShort');
+      }
+
+      function listWeekdays(localeSorted, format, index) {
+          return listWeekdaysImpl(localeSorted, format, index, 'weekdays');
+      }
+
+      function listWeekdaysShort(localeSorted, format, index) {
+          return listWeekdaysImpl(localeSorted, format, index, 'weekdaysShort');
+      }
+
+      function listWeekdaysMin(localeSorted, format, index) {
+          return listWeekdaysImpl(localeSorted, format, index, 'weekdaysMin');
+      }
+
+      getSetGlobalLocale('en', {
+          eras: [
+              {
+                  since: '0001-01-01',
+                  until: +Infinity,
+                  offset: 1,
+                  name: 'Anno Domini',
+                  narrow: 'AD',
+                  abbr: 'AD',
+              },
+              {
+                  since: '0000-12-31',
+                  until: -Infinity,
+                  offset: 1,
+                  name: 'Before Christ',
+                  narrow: 'BC',
+                  abbr: 'BC',
+              },
+          ],
+          dayOfMonthOrdinalParse: /\d{1,2}(th|st|nd|rd)/,
+          ordinal: function (number) {
+              var b = number % 10,
+                  output =
+                      toInt((number % 100) / 10) === 1
+                          ? 'th'
+                          : b === 1
+                          ? 'st'
+                          : b === 2
+                          ? 'nd'
+                          : b === 3
+                          ? 'rd'
+                          : 'th';
+              return number + output;
+          },
+      });
+
+      // Side effect imports
+
+      hooks.lang = deprecate(
+          'moment.lang is deprecated. Use moment.locale instead.',
+          getSetGlobalLocale
+      );
+      hooks.langData = deprecate(
+          'moment.langData is deprecated. Use moment.localeData instead.',
+          getLocale
+      );
+
+      var mathAbs = Math.abs;
+
+      function abs() {
+          var data = this._data;
+
+          this._milliseconds = mathAbs(this._milliseconds);
+          this._days = mathAbs(this._days);
+          this._months = mathAbs(this._months);
+
+          data.milliseconds = mathAbs(data.milliseconds);
+          data.seconds = mathAbs(data.seconds);
+          data.minutes = mathAbs(data.minutes);
+          data.hours = mathAbs(data.hours);
+          data.months = mathAbs(data.months);
+          data.years = mathAbs(data.years);
+
+          return this;
+      }
+
+      function addSubtract$1(duration, input, value, direction) {
+          var other = createDuration(input, value);
+
+          duration._milliseconds += direction * other._milliseconds;
+          duration._days += direction * other._days;
+          duration._months += direction * other._months;
+
+          return duration._bubble();
+      }
+
+      // supports only 2.0-style add(1, 's') or add(duration)
+      function add$1(input, value) {
+          return addSubtract$1(this, input, value, 1);
+      }
+
+      // supports only 2.0-style subtract(1, 's') or subtract(duration)
+      function subtract$1(input, value) {
+          return addSubtract$1(this, input, value, -1);
+      }
+
+      function absCeil(number) {
+          if (number < 0) {
+              return Math.floor(number);
+          } else {
+              return Math.ceil(number);
+          }
+      }
+
+      function bubble() {
+          var milliseconds = this._milliseconds,
+              days = this._days,
+              months = this._months,
+              data = this._data,
+              seconds,
+              minutes,
+              hours,
+              years,
+              monthsFromDays;
+
+          // if we have a mix of positive and negative values, bubble down first
+          // check: https://github.com/moment/moment/issues/2166
+          if (
+              !(
+                  (milliseconds >= 0 && days >= 0 && months >= 0) ||
+                  (milliseconds <= 0 && days <= 0 && months <= 0)
+              )
+          ) {
+              milliseconds += absCeil(monthsToDays(months) + days) * 864e5;
+              days = 0;
+              months = 0;
+          }
+
+          // The following code bubbles up values, see the tests for
+          // examples of what that means.
+          data.milliseconds = milliseconds % 1000;
+
+          seconds = absFloor(milliseconds / 1000);
+          data.seconds = seconds % 60;
+
+          minutes = absFloor(seconds / 60);
+          data.minutes = minutes % 60;
+
+          hours = absFloor(minutes / 60);
+          data.hours = hours % 24;
+
+          days += absFloor(hours / 24);
+
+          // convert days to months
+          monthsFromDays = absFloor(daysToMonths(days));
+          months += monthsFromDays;
+          days -= absCeil(monthsToDays(monthsFromDays));
+
+          // 12 months -> 1 year
+          years = absFloor(months / 12);
+          months %= 12;
+
+          data.days = days;
+          data.months = months;
+          data.years = years;
+
+          return this;
+      }
+
+      function daysToMonths(days) {
+          // 400 years have 146097 days (taking into account leap year rules)
+          // 400 years have 12 months === 4800
+          return (days * 4800) / 146097;
+      }
+
+      function monthsToDays(months) {
+          // the reverse of daysToMonths
+          return (months * 146097) / 4800;
+      }
+
+      function as(units) {
+          if (!this.isValid()) {
+              return NaN;
+          }
+          var days,
+              months,
+              milliseconds = this._milliseconds;
+
+          units = normalizeUnits(units);
+
+          if (units === 'month' || units === 'quarter' || units === 'year') {
+              days = this._days + milliseconds / 864e5;
+              months = this._months + daysToMonths(days);
+              switch (units) {
+                  case 'month':
+                      return months;
+                  case 'quarter':
+                      return months / 3;
+                  case 'year':
+                      return months / 12;
+              }
+          } else {
+              // handle milliseconds separately because of floating point math errors (issue #1867)
+              days = this._days + Math.round(monthsToDays(this._months));
+              switch (units) {
+                  case 'week':
+                      return days / 7 + milliseconds / 6048e5;
+                  case 'day':
+                      return days + milliseconds / 864e5;
+                  case 'hour':
+                      return days * 24 + milliseconds / 36e5;
+                  case 'minute':
+                      return days * 1440 + milliseconds / 6e4;
+                  case 'second':
+                      return days * 86400 + milliseconds / 1000;
+                  // Math.floor prevents floating point math errors here
+                  case 'millisecond':
+                      return Math.floor(days * 864e5) + milliseconds;
+                  default:
+                      throw new Error('Unknown unit ' + units);
+              }
+          }
+      }
+
+      // TODO: Use this.as('ms')?
+      function valueOf$1() {
+          if (!this.isValid()) {
+              return NaN;
+          }
+          return (
+              this._milliseconds +
+              this._days * 864e5 +
+              (this._months % 12) * 2592e6 +
+              toInt(this._months / 12) * 31536e6
+          );
+      }
+
+      function makeAs(alias) {
+          return function () {
+              return this.as(alias);
+          };
+      }
+
+      var asMilliseconds = makeAs('ms'),
+          asSeconds = makeAs('s'),
+          asMinutes = makeAs('m'),
+          asHours = makeAs('h'),
+          asDays = makeAs('d'),
+          asWeeks = makeAs('w'),
+          asMonths = makeAs('M'),
+          asQuarters = makeAs('Q'),
+          asYears = makeAs('y');
+
+      function clone$1() {
+          return createDuration(this);
+      }
+
+      function get$2(units) {
+          units = normalizeUnits(units);
+          return this.isValid() ? this[units + 's']() : NaN;
+      }
+
+      function makeGetter(name) {
+          return function () {
+              return this.isValid() ? this._data[name] : NaN;
+          };
+      }
+
+      var milliseconds = makeGetter('milliseconds'),
+          seconds = makeGetter('seconds'),
+          minutes = makeGetter('minutes'),
+          hours = makeGetter('hours'),
+          days = makeGetter('days'),
+          months = makeGetter('months'),
+          years = makeGetter('years');
+
+      function weeks() {
+          return absFloor(this.days() / 7);
+      }
+
+      var round = Math.round,
+          thresholds = {
+              ss: 44, // a few seconds to seconds
+              s: 45, // seconds to minute
+              m: 45, // minutes to hour
+              h: 22, // hours to day
+              d: 26, // days to month/week
+              w: null, // weeks to month
+              M: 11, // months to year
+          };
+
+      // helper function for moment.fn.from, moment.fn.fromNow, and moment.duration.fn.humanize
+      function substituteTimeAgo(string, number, withoutSuffix, isFuture, locale) {
+          return locale.relativeTime(number || 1, !!withoutSuffix, string, isFuture);
+      }
+
+      function relativeTime$1(posNegDuration, withoutSuffix, thresholds, locale) {
+          var duration = createDuration(posNegDuration).abs(),
+              seconds = round(duration.as('s')),
+              minutes = round(duration.as('m')),
+              hours = round(duration.as('h')),
+              days = round(duration.as('d')),
+              months = round(duration.as('M')),
+              weeks = round(duration.as('w')),
+              years = round(duration.as('y')),
+              a =
+                  (seconds <= thresholds.ss && ['s', seconds]) ||
+                  (seconds < thresholds.s && ['ss', seconds]) ||
+                  (minutes <= 1 && ['m']) ||
+                  (minutes < thresholds.m && ['mm', minutes]) ||
+                  (hours <= 1 && ['h']) ||
+                  (hours < thresholds.h && ['hh', hours]) ||
+                  (days <= 1 && ['d']) ||
+                  (days < thresholds.d && ['dd', days]);
+
+          if (thresholds.w != null) {
+              a =
+                  a ||
+                  (weeks <= 1 && ['w']) ||
+                  (weeks < thresholds.w && ['ww', weeks]);
+          }
+          a = a ||
+              (months <= 1 && ['M']) ||
+              (months < thresholds.M && ['MM', months]) ||
+              (years <= 1 && ['y']) || ['yy', years];
+
+          a[2] = withoutSuffix;
+          a[3] = +posNegDuration > 0;
+          a[4] = locale;
+          return substituteTimeAgo.apply(null, a);
+      }
+
+      // This function allows you to set the rounding function for relative time strings
+      function getSetRelativeTimeRounding(roundingFunction) {
+          if (roundingFunction === undefined) {
+              return round;
+          }
+          if (typeof roundingFunction === 'function') {
+              round = roundingFunction;
+              return true;
+          }
+          return false;
+      }
+
+      // This function allows you to set a threshold for relative time strings
+      function getSetRelativeTimeThreshold(threshold, limit) {
+          if (thresholds[threshold] === undefined) {
+              return false;
+          }
+          if (limit === undefined) {
+              return thresholds[threshold];
+          }
+          thresholds[threshold] = limit;
+          if (threshold === 's') {
+              thresholds.ss = limit - 1;
+          }
+          return true;
+      }
+
+      function humanize(argWithSuffix, argThresholds) {
+          if (!this.isValid()) {
+              return this.localeData().invalidDate();
+          }
+
+          var withSuffix = false,
+              th = thresholds,
+              locale,
+              output;
+
+          if (typeof argWithSuffix === 'object') {
+              argThresholds = argWithSuffix;
+              argWithSuffix = false;
+          }
+          if (typeof argWithSuffix === 'boolean') {
+              withSuffix = argWithSuffix;
+          }
+          if (typeof argThresholds === 'object') {
+              th = Object.assign({}, thresholds, argThresholds);
+              if (argThresholds.s != null && argThresholds.ss == null) {
+                  th.ss = argThresholds.s - 1;
+              }
+          }
+
+          locale = this.localeData();
+          output = relativeTime$1(this, !withSuffix, th, locale);
+
+          if (withSuffix) {
+              output = locale.pastFuture(+this, output);
+          }
+
+          return locale.postformat(output);
+      }
+
+      var abs$1 = Math.abs;
+
+      function sign(x) {
+          return (x > 0) - (x < 0) || +x;
+      }
+
+      function toISOString$1() {
+          // for ISO strings we do not use the normal bubbling rules:
+          //  * milliseconds bubble up until they become hours
+          //  * days do not bubble at all
+          //  * months bubble up until they become years
+          // This is because there is no context-free conversion between hours and days
+          // (think of clock changes)
+          // and also not between days and months (28-31 days per month)
+          if (!this.isValid()) {
+              return this.localeData().invalidDate();
+          }
+
+          var seconds = abs$1(this._milliseconds) / 1000,
+              days = abs$1(this._days),
+              months = abs$1(this._months),
+              minutes,
+              hours,
+              years,
+              s,
+              total = this.asSeconds(),
+              totalSign,
+              ymSign,
+              daysSign,
+              hmsSign;
+
+          if (!total) {
+              // this is the same as C#'s (Noda) and python (isodate)...
+              // but not other JS (goog.date)
+              return 'P0D';
+          }
+
+          // 3600 seconds -> 60 minutes -> 1 hour
+          minutes = absFloor(seconds / 60);
+          hours = absFloor(minutes / 60);
+          seconds %= 60;
+          minutes %= 60;
+
+          // 12 months -> 1 year
+          years = absFloor(months / 12);
+          months %= 12;
+
+          // inspired by https://github.com/dordille/moment-isoduration/blob/master/moment.isoduration.js
+          s = seconds ? seconds.toFixed(3).replace(/\.?0+$/, '') : '';
+
+          totalSign = total < 0 ? '-' : '';
+          ymSign = sign(this._months) !== sign(total) ? '-' : '';
+          daysSign = sign(this._days) !== sign(total) ? '-' : '';
+          hmsSign = sign(this._milliseconds) !== sign(total) ? '-' : '';
+
+          return (
+              totalSign +
+              'P' +
+              (years ? ymSign + years + 'Y' : '') +
+              (months ? ymSign + months + 'M' : '') +
+              (days ? daysSign + days + 'D' : '') +
+              (hours || minutes || seconds ? 'T' : '') +
+              (hours ? hmsSign + hours + 'H' : '') +
+              (minutes ? hmsSign + minutes + 'M' : '') +
+              (seconds ? hmsSign + s + 'S' : '')
+          );
+      }
+
+      var proto$2 = Duration.prototype;
+
+      proto$2.isValid = isValid$1;
+      proto$2.abs = abs;
+      proto$2.add = add$1;
+      proto$2.subtract = subtract$1;
+      proto$2.as = as;
+      proto$2.asMilliseconds = asMilliseconds;
+      proto$2.asSeconds = asSeconds;
+      proto$2.asMinutes = asMinutes;
+      proto$2.asHours = asHours;
+      proto$2.asDays = asDays;
+      proto$2.asWeeks = asWeeks;
+      proto$2.asMonths = asMonths;
+      proto$2.asQuarters = asQuarters;
+      proto$2.asYears = asYears;
+      proto$2.valueOf = valueOf$1;
+      proto$2._bubble = bubble;
+      proto$2.clone = clone$1;
+      proto$2.get = get$2;
+      proto$2.milliseconds = milliseconds;
+      proto$2.seconds = seconds;
+      proto$2.minutes = minutes;
+      proto$2.hours = hours;
+      proto$2.days = days;
+      proto$2.weeks = weeks;
+      proto$2.months = months;
+      proto$2.years = years;
+      proto$2.humanize = humanize;
+      proto$2.toISOString = toISOString$1;
+      proto$2.toString = toISOString$1;
+      proto$2.toJSON = toISOString$1;
+      proto$2.locale = locale;
+      proto$2.localeData = localeData;
+
+      proto$2.toIsoString = deprecate(
+          'toIsoString() is deprecated. Please use toISOString() instead (notice the capitals)',
+          toISOString$1
+      );
+      proto$2.lang = lang;
+
+      // FORMATTING
+
+      addFormatToken('X', 0, 0, 'unix');
+      addFormatToken('x', 0, 0, 'valueOf');
+
+      // PARSING
+
+      addRegexToken('x', matchSigned);
+      addRegexToken('X', matchTimestamp);
+      addParseToken('X', function (input, array, config) {
+          config._d = new Date(parseFloat(input) * 1000);
+      });
+      addParseToken('x', function (input, array, config) {
+          config._d = new Date(toInt(input));
+      });
+
+      //! moment.js
+
+      hooks.version = '2.27.0';
+
+      setHookCallback(createLocal);
+
+      hooks.fn = proto;
+      hooks.min = min;
+      hooks.max = max;
+      hooks.now = now;
+      hooks.utc = createUTC;
+      hooks.unix = createUnix;
+      hooks.months = listMonths;
+      hooks.isDate = isDate;
+      hooks.locale = getSetGlobalLocale;
+      hooks.invalid = createInvalid;
+      hooks.duration = createDuration;
+      hooks.isMoment = isMoment;
+      hooks.weekdays = listWeekdays;
+      hooks.parseZone = createInZone;
+      hooks.localeData = getLocale;
+      hooks.isDuration = isDuration;
+      hooks.monthsShort = listMonthsShort;
+      hooks.weekdaysMin = listWeekdaysMin;
+      hooks.defineLocale = defineLocale;
+      hooks.updateLocale = updateLocale;
+      hooks.locales = listLocales;
+      hooks.weekdaysShort = listWeekdaysShort;
+      hooks.normalizeUnits = normalizeUnits;
+      hooks.relativeTimeRounding = getSetRelativeTimeRounding;
+      hooks.relativeTimeThreshold = getSetRelativeTimeThreshold;
+      hooks.calendarFormat = getCalendarFormat;
+      hooks.prototype = proto;
+
+      // currently HTML5 input type only supports 24-hour formats
+      hooks.HTML5_FMT = {
+          DATETIME_LOCAL: 'YYYY-MM-DDTHH:mm', // <input type="datetime-local" />
+          DATETIME_LOCAL_SECONDS: 'YYYY-MM-DDTHH:mm:ss', // <input type="datetime-local" step="1" />
+          DATETIME_LOCAL_MS: 'YYYY-MM-DDTHH:mm:ss.SSS', // <input type="datetime-local" step="0.001" />
+          DATE: 'YYYY-MM-DD', // <input type="date" />
+          TIME: 'HH:mm', // <input type="time" />
+          TIME_SECONDS: 'HH:mm:ss', // <input type="time" step="1" />
+          TIME_MS: 'HH:mm:ss.SSS', // <input type="time" step="0.001" />
+          WEEK: 'GGGG-[W]WW', // <input type="week" />
+          MONTH: 'YYYY-MM', // <input type="month" />
+      };
+
+      return hooks;
+
+  })));
+  });
+
   var script$i = Vue.mgComponent('mgDate', {
     meta: {
       title: 'Date selection',
@@ -10878,11 +16558,14 @@
       preferId: true,
       format: function format(v) {
         if (!v) return '';
-        var d = v instanceof Date ? v : new Date(v);
-        console.log('mgDate SHOULD BE DATE', d);
-        return d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
+        return moment(v).format(moment.HTML5_FMT.DATE);
       },
       formatClass: 'text-center'
+    },
+    data: function data() {
+      return {
+        formData: undefined
+      };
     },
     props: {
       min: {
@@ -10901,10 +16584,24 @@
     created: function created() {
       var _this = this;
 
+      this.$debugging = false;
       this.$on('mgValidate', function (reply) {
         if (_this.$props.required && !_this.data) return reply("".concat(_this.$props.title, " is required"));
-        if (_this.$props.min && _.isString(_this.data) && _this.data < _this.$props.min) return reply("".concat($props.title, " is too early (earliest date is ").concat(_this.$props.min, ")"));
-        if (_this.$props.max && _.isString(_this.data) && _this.data > $props.max) return reply("".concat($props.title, " is too late (latest date is ").concat(_this.$props.max, ")"));
+
+        if (_.isString(_this.data)) {
+          var d = moment(_this.data);
+          if (!d.isValid()) return reply("".concat(_this.$props.title, " must be a date"));
+          if (_this.$props.min && d.isBefore(_this.$props.min)) return reply("".concat($props.title, " is too early (earliest date is ").concat(_this.$props.min, ")"));
+          if (_this.$props.max && d.isAfter($props.max)) return reply("".concat($props.title, " is too late (latest date is ").concat(_this.$props.max, ")"));
+        }
+      });
+      this.$watch('data', function () {
+        _this.formData = moment(_this.data).format(moment.HTML5_FMT.DATE);
+      }, {
+        immediate: true
+      });
+      this.$watch('formData', function () {
+        _this.data = moment(_this.formData, moment.HTML5_FMT.DATE).toISOString();
       });
     }
   });
@@ -10917,22 +16614,41 @@
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
-    return _c("input", {
-      directives: [
-        { name: "model", rawName: "v-model", value: _vm.data, expression: "data" }
-      ],
-      staticClass: "form-control",
-      attrs: { type: "date" },
-      domProps: { value: _vm.data },
-      on: {
-        input: function($event) {
-          if ($event.target.composing) {
-            return
+    return _c("div", { staticClass: "mg-datetime" }, [
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.formData,
+            expression: "formData"
           }
-          _vm.data = $event.target.value;
+        ],
+        staticClass: "form-control",
+        attrs: { type: "date", max: _vm.$props.max, min: _vm.$props.min },
+        domProps: { value: _vm.formData },
+        on: {
+          input: function($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.formData = $event.target.value;
+          }
         }
-      }
-    })
+      }),
+      _vm._v(" "),
+      this.$debugging
+        ? _c("div", { staticClass: "card" }, [
+            _c("div", { staticClass: "card-header" }, [
+              _vm._v("\n\t\t\tRaw data\n\t\t")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "card-body" }, [
+              _c("pre", [_vm._v(_vm._s(_vm.$data))])
+            ])
+          ])
+        : _vm._e()
+    ])
   };
   var __vue_staticRenderFns__$c = [];
   __vue_render__$c._withStripped = true;
@@ -10971,21 +16687,31 @@
     'default': __vue_component__$j
   });
 
-  var script$j = Vue.mgComponent('mgEmail', {
+  var script$j = Vue.mgComponent('mgDatetime', {
     meta: {
-      title: 'Email address',
-      icon: 'far fa-at',
+      title: 'Datetime selection',
+      icon: 'far fa-calendar',
       category: 'Simple Inputs',
       preferId: true,
       format: function format(v) {
         if (!v) return '';
-        return "<a href=\"mailto:".concat(v, "\">").concat(v, "</a>");
-      }
+        return moment(v).format(moment.HTML5_FMT.DATETIME_LOCAL);
+      },
+      formatClass: 'text-center'
+    },
+    data: function data() {
+      return {
+        formData: undefined
+      };
     },
     props: {
-      placeholder: {
-        type: 'mgText',
-        help: 'Ghost text to display when the text box has no value'
+      min: {
+        type: 'mgDatetime',
+        title: 'Earliest date'
+      },
+      max: {
+        type: 'mgDatetime',
+        title: 'Latest date'
       },
       required: {
         type: 'mgToggle',
@@ -10995,8 +16721,24 @@
     created: function created() {
       var _this = this;
 
+      this.$debugging = false;
       this.$on('mgValidate', function (reply) {
         if (_this.$props.required && !_this.data) return reply("".concat(_this.$props.title, " is required"));
+
+        if (_.isString(_this.data)) {
+          var d = moment(_this.data);
+          if (!d.isValid()) return reply("".concat(_this.$props.title, " must be a date"));
+          if (_this.$props.min && d.isBefore(_this.$props.min)) return reply("".concat($props.title, " is too early (earliest date is ").concat(_this.$props.min, ")"));
+          if (_this.$props.max && d.isAfter($props.max)) return reply("".concat($props.title, " is too late (latest date is ").concat(_this.$props.max, ")"));
+        }
+      });
+      this.$watch('data', function () {
+        _this.formData = moment(_this.data).format(moment.HTML5_FMT.DATETIME_LOCAL);
+      }, {
+        immediate: true
+      });
+      this.$watch('formData', function () {
+        _this.data = moment(_this.formData, moment.HTML5_FMT.DATETIME_LOCAL).toISOString();
       });
     }
   });
@@ -11009,22 +16751,45 @@
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
-    return _c("input", {
-      directives: [
-        { name: "model", rawName: "v-model", value: _vm.data, expression: "data" }
-      ],
-      staticClass: "form-control",
-      attrs: { type: "email", placeholder: _vm.$props.placeholder },
-      domProps: { value: _vm.data },
-      on: {
-        input: function($event) {
-          if ($event.target.composing) {
-            return
+    return _c("div", { staticClass: "mg-datetime" }, [
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.formData,
+            expression: "formData"
           }
-          _vm.data = $event.target.value;
+        ],
+        staticClass: "form-control",
+        attrs: {
+          type: "datetime-local",
+          max: _vm.$props.max,
+          min: _vm.$props.min
+        },
+        domProps: { value: _vm.formData },
+        on: {
+          input: function($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.formData = $event.target.value;
+          }
         }
-      }
-    })
+      }),
+      _vm._v(" "),
+      this.$debugging
+        ? _c("div", { staticClass: "card" }, [
+            _c("div", { staticClass: "card-header" }, [
+              _vm._v("\n\t\t\tRaw data\n\t\t")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "card-body" }, [
+              _c("pre", [_vm._v(_vm._s(_vm.$data))])
+            ])
+          ])
+        : _vm._e()
+    ])
   };
   var __vue_staticRenderFns__$d = [];
   __vue_render__$d._withStripped = true;
@@ -11058,21 +16823,38 @@
       undefined
     );
 
-  var mgEmail = /*#__PURE__*/Object.freeze({
+  var mgDatetime = /*#__PURE__*/Object.freeze({
     __proto__: null,
     'default': __vue_component__$k
   });
 
-  var script$k = Vue.mgComponent('mgError', {
+  var script$k = Vue.mgComponent('mgEmail', {
     meta: {
-      title: 'Error display',
-      icon: 'far fa-exclamation-circle',
-      category: 'General Decoration'
+      title: 'Email address',
+      icon: 'far fa-at',
+      category: 'Simple Inputs',
+      preferId: true,
+      format: function format(v) {
+        if (!v) return '';
+        return "<a href=\"mailto:".concat(v, "\">").concat(v, "</a>");
+      }
     },
     props: {
-      text: {
-        type: 'mgText'
+      placeholder: {
+        type: 'mgText',
+        help: 'Ghost text to display when the text box has no value'
+      },
+      required: {
+        type: 'mgToggle',
+        "default": false
       }
+    },
+    created: function created() {
+      var _this = this;
+
+      this.$on('mgValidate', function (reply) {
+        if (_this.$props.required && !_this.data) return reply("".concat(_this.$props.title, " is required"));
+      });
     }
   });
 
@@ -11084,9 +16866,22 @@
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
-    return _c("div", { staticClass: "alert alert-danger" }, [
-      _vm._v("\n\t" + _vm._s(_vm.data || _vm.$props.text) + "\n")
-    ])
+    return _c("input", {
+      directives: [
+        { name: "model", rawName: "v-model", value: _vm.data, expression: "data" }
+      ],
+      staticClass: "form-control",
+      attrs: { type: "email", placeholder: _vm.$props.placeholder },
+      domProps: { value: _vm.data },
+      on: {
+        input: function($event) {
+          if ($event.target.composing) {
+            return
+          }
+          _vm.data = $event.target.value;
+        }
+      }
+    })
   };
   var __vue_staticRenderFns__$e = [];
   __vue_render__$e._withStripped = true;
@@ -11120,12 +16915,74 @@
       undefined
     );
 
-  var mgError = /*#__PURE__*/Object.freeze({
+  var mgEmail = /*#__PURE__*/Object.freeze({
     __proto__: null,
     'default': __vue_component__$l
   });
 
-  var script$l = Vue.component('mgFormEditorControls', {
+  var script$l = Vue.mgComponent('mgError', {
+    meta: {
+      title: 'Error display',
+      icon: 'far fa-exclamation-circle',
+      category: 'General Decoration'
+    },
+    props: {
+      text: {
+        type: 'mgText'
+      }
+    }
+  });
+
+  /* script */
+  const __vue_script__$m = script$l;
+
+  /* template */
+  var __vue_render__$f = function() {
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
+    return _c("div", { staticClass: "alert alert-danger" }, [
+      _vm._v("\n\t" + _vm._s(_vm.data || _vm.$props.text) + "\n")
+    ])
+  };
+  var __vue_staticRenderFns__$f = [];
+  __vue_render__$f._withStripped = true;
+
+    /* style */
+    const __vue_inject_styles__$m = undefined;
+    /* scoped */
+    const __vue_scope_id__$m = undefined;
+    /* module identifier */
+    const __vue_module_identifier__$m = undefined;
+    /* functional template */
+    const __vue_is_functional_template__$m = false;
+    /* style inject */
+    
+    /* style inject SSR */
+    
+    /* style inject shadow dom */
+    
+
+    
+    const __vue_component__$m = normalizeComponent(
+      { render: __vue_render__$f, staticRenderFns: __vue_staticRenderFns__$f },
+      __vue_inject_styles__$m,
+      __vue_script__$m,
+      __vue_scope_id__$m,
+      __vue_is_functional_template__$m,
+      __vue_module_identifier__$m,
+      false,
+      undefined,
+      undefined,
+      undefined
+    );
+
+  var mgError = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    'default': __vue_component__$m
+  });
+
+  var script$m = Vue.component('mgFormEditorControls', {
     inject: ['$mgFormEditor'],
     props: {
       config: {
@@ -11136,10 +16993,10 @@
   });
 
   /* script */
-  const __vue_script__$m = script$l;
+  const __vue_script__$n = script$m;
 
   /* template */
-  var __vue_render__$f = function() {
+  var __vue_render__$g = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -11253,34 +17110,34 @@
       ])
     ])
   };
-  var __vue_staticRenderFns__$f = [];
-  __vue_render__$f._withStripped = true;
+  var __vue_staticRenderFns__$g = [];
+  __vue_render__$g._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$m = function (inject) {
+    const __vue_inject_styles__$n = function (inject) {
       if (!inject) return
       inject("data-v-11a6d64e_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Component outlines {{{ */\n/* Neutral / Deselected {{{ */\n.mg-form-editor .mg-component {\n\tborder: 2px solid transparent;\n\tborder-radius: 5px;\n}\n/* }}} */\n/* Hover {{{ */\n.mg-form-editor .mg-component.editHover {\n\tborder: 2px dashed var(--mg-form-editor-hover-bg);\n}\n/* }}} */\n/* Editing {{{ */\n.mg-form-editor .mg-component.editEditing {\n\tborder: 2px solid var(--mg-form-editor-selected-bg);\n}\n/* }}} */\n/* }}} */\n\n/* Edit controls {{{ */\n.mg-form-editor-controls {\n\tposition: absolute;\n\ttransform: translate(2px, -30px);\n\twidth: calc(100% - 20px);\n}\n\n/* Title {{{ */\n.mg-form-editor-controls .mg-form-editor-controls-title,\n.mg-form-editor-controls .mg-form-editor-controls-buttons {\n\tborder-top-left-radius: 5px;\n\tborder-top-right-radius: 5px;\n\tpadding: 2px 8px;\n}\n.mg-form-editor-controls .mg-form-editor-controls-title {\n\tdisplay: inline-block;\n}\n.mg-component.editHover .mg-form-editor-controls-title {\n\tbackground: var(--mg-form-editor-hover-bg);\n\tcolor: var(--mg-form-editor-hover-fg);\n}\n.mg-component.editEditing .mg-form-editor-controls-title {\n\tbackground: var(--mg-form-editor-selected-bg);\n\tcolor: var(--mg-form-editor-selected-fg);\n}\n.mg-component .mg-form-editor-controls-title .mg-form-editor-controls-id {\n\tfont-weight: bold;\n}\n/* }}} */\n\n/* Buttons {{{ */\n.mg-form-editor-controls .mg-form-editor-controls-buttons {\n\tdisplay: none;\n\tfloat: right;\n\tbackground: var(--mg-form-editor-selected-bg);\n\tcolor: var(--mg-form-editor-selected-fg);\n}\n.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons {\n\tdisplay: inline-block;\n}\n.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons > a {\n\tborder-radius: 50%;\n\tpadding: 4px 5px;\n}\n.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons > a:hover {\n\tbackground: var(--mg-form-editor-selected-highlight);\n}\n.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons > a.danger:hover {\n\tbackground: var(--mg-form-editor-selected-danger);\n}\n/* }}} */\n/* }}} */\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgFormEditorControls.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AA8BA,2BAAA;AACA,6BAAA;AACA;CACA,6BAAA;CACA,kBAAA;AACA;AACA,QAAA;AACA,cAAA;AACA;CACA,iDAAA;AACA;AACA,QAAA;AACA,gBAAA;AACA;CACA,mDAAA;AACA;AACA,QAAA;AACA,QAAA;;AAEA,sBAAA;AACA;CACA,kBAAA;CACA,gCAAA;CACA,wBAAA;AACA;;AAEA,cAAA;AACA;;CAEA,2BAAA;CACA,4BAAA;CACA,gBAAA;AACA;AAEA;CACA,qBAAA;AACA;AAEA;CACA,0CAAA;CACA,qCAAA;AACA;AAEA;CACA,6CAAA;CACA,wCAAA;AACA;AAEA;CACA,iBAAA;AACA;AACA,QAAA;;AAEA,gBAAA;AACA;CACA,aAAA;CACA,YAAA;CACA,6CAAA;CACA,wCAAA;AACA;AAEA;CACA,qBAAA;AACA;AAEA;CACA,kBAAA;CACA,gBAAA;AACA;AAEA;CACA,oDAAA;AACA;AAEA;CACA,iDAAA;AACA;AACA,QAAA;AACA,QAAA","file":"mgFormEditorControls.vue","sourcesContent":["<script>\nexport default Vue.component('mgFormEditorControls', {\n\tinject: ['$mgFormEditor'],\n\tprops: {\n\t\tconfig: {type: Object, required: true},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-form-editor-controls\">\n\t\t<div class=\"mg-form-editor-controls-title\">\n\t\t\t{{$props.config.type}}\n\t\t\t<span v-if=\"$props.config.id\" class=\"mg-form-editor-controls-id\">\n\t\t\t\t#{{$props.config.id}}\n\t\t\t</span>\n\t\t</div>\n\t\t<div class=\"mg-form-editor-controls-buttons\">\n\t\t\t<!-- NOTE: Add .stop to ignore next mouse click which would select the element under the cursor -->\n\t\t\t<a @click.stop=\"$mgFormEditor.addTarget = $props.config.$specPath; $mgFormEditor.addOrientation = 'after'; $mgFormEditor.setMode('adding', false)\" class=\"far fa-plus\" v-tooltip=\"'Insert widget after here'\"/>\n\t\t\t<a @click=\"$mgFormEditor.duplicateWidget($props.config.$specPath)\" class=\"far fa-clone\" v-tooltip=\"'Duplicate widget'\"/>\n\t\t\t<!-- FIXME: Not yet working <a @click=\"$mgFormEditor.dragWidget($props.config.$specPath)\" class=\"far fa-arrows-alt\" v-tooltip=\"'Move widget'\"/> -->\n\t\t\t<a @click=\"$mgFormEditor.moveWidget($props.config.$specPath, 'up')\" class=\"far fa-arrow-up\" v-tooltip=\"'Move widget up'\"/>\n\t\t\t<a @click=\"$mgFormEditor.moveWidget($props.config.$specPath, 'down')\" class=\"far fa-arrow-down\" v-tooltip=\"'Move widget down'\"/>\n\t\t\t<a @click.stop=\"$mgFormEditor.removeWidget($props.config.$specPath)\" class=\"far fa-trash danger\" v-tooltip=\"'Delete widget'\"/>\n\t\t</div>\n\t</div>\n</template>\n\n<style>\n/* Component outlines {{{ */\n/* Neutral / Deselected {{{ */\n.mg-form-editor .mg-component {\n\tborder: 2px solid transparent;\n\tborder-radius: 5px;\n}\n/* }}} */\n/* Hover {{{ */\n.mg-form-editor .mg-component.editHover {\n\tborder: 2px dashed var(--mg-form-editor-hover-bg);\n}\n/* }}} */\n/* Editing {{{ */\n.mg-form-editor .mg-component.editEditing {\n\tborder: 2px solid var(--mg-form-editor-selected-bg);\n}\n/* }}} */\n/* }}} */\n\n/* Edit controls {{{ */\n.mg-form-editor-controls {\n\tposition: absolute;\n\ttransform: translate(2px, -30px);\n\twidth: calc(100% - 20px);\n}\n\n/* Title {{{ */\n.mg-form-editor-controls .mg-form-editor-controls-title,\n.mg-form-editor-controls .mg-form-editor-controls-buttons {\n\tborder-top-left-radius: 5px;\n\tborder-top-right-radius: 5px;\n\tpadding: 2px 8px;\n}\n\n.mg-form-editor-controls .mg-form-editor-controls-title {\n\tdisplay: inline-block;\n}\n\n.mg-component.editHover .mg-form-editor-controls-title {\n\tbackground: var(--mg-form-editor-hover-bg);\n\tcolor: var(--mg-form-editor-hover-fg);\n}\n\n.mg-component.editEditing .mg-form-editor-controls-title {\n\tbackground: var(--mg-form-editor-selected-bg);\n\tcolor: var(--mg-form-editor-selected-fg);\n}\n\n.mg-component .mg-form-editor-controls-title .mg-form-editor-controls-id {\n\tfont-weight: bold;\n}\n/* }}} */\n\n/* Buttons {{{ */\n.mg-form-editor-controls .mg-form-editor-controls-buttons {\n\tdisplay: none;\n\tfloat: right;\n\tbackground: var(--mg-form-editor-selected-bg);\n\tcolor: var(--mg-form-editor-selected-fg);\n}\n\n.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons {\n\tdisplay: inline-block;\n}\n\n.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons > a {\n\tborder-radius: 50%;\n\tpadding: 4px 5px;\n}\n\n.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons > a:hover {\n\tbackground: var(--mg-form-editor-selected-highlight);\n}\n\n.mg-component.editEditing .mg-form-editor-controls .mg-form-editor-controls-buttons > a.danger:hover {\n\tbackground: var(--mg-form-editor-selected-danger);\n}\n/* }}} */\n/* }}} */\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
-    const __vue_scope_id__$m = undefined;
+    const __vue_scope_id__$n = undefined;
     /* module identifier */
-    const __vue_module_identifier__$m = undefined;
+    const __vue_module_identifier__$n = undefined;
     /* functional template */
-    const __vue_is_functional_template__$m = false;
+    const __vue_is_functional_template__$n = false;
     /* style inject SSR */
     
     /* style inject shadow dom */
     
 
     
-    const __vue_component__$m = normalizeComponent(
-      { render: __vue_render__$f, staticRenderFns: __vue_staticRenderFns__$f },
-      __vue_inject_styles__$m,
-      __vue_script__$m,
-      __vue_scope_id__$m,
-      __vue_is_functional_template__$m,
-      __vue_module_identifier__$m,
+    const __vue_component__$n = normalizeComponent(
+      { render: __vue_render__$g, staticRenderFns: __vue_staticRenderFns__$g },
+      __vue_inject_styles__$n,
+      __vue_script__$n,
+      __vue_scope_id__$n,
+      __vue_is_functional_template__$n,
+      __vue_module_identifier__$n,
       false,
       createInjector,
       undefined,
@@ -11304,14 +17161,14 @@
   * @emits changeItem Emitted as `({path, value})` when a single config item changes, inexpensive compared to `change`
   */
 
-  var script$m = Vue.component('mgFormEditor', {
+  var script$n = Vue.component('mgFormEditor', {
     provide: function provide() {
       return {
         $mgFormEditor: this
       };
     },
     components: {
-      mgFormEditorControls: __vue_component__$m
+      mgFormEditorControls: __vue_component__$n
     },
     data: function data() {
       return {
@@ -11948,10 +17805,10 @@
   });
 
   /* script */
-  const __vue_script__$n = script$m;
+  const __vue_script__$o = script$n;
 
   /* template */
-  var __vue_render__$g = function() {
+  var __vue_render__$h = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -12075,34 +17932,34 @@
       1
     )
   };
-  var __vue_staticRenderFns__$g = [];
-  __vue_render__$g._withStripped = true;
+  var __vue_staticRenderFns__$h = [];
+  __vue_render__$h._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$n = function (inject) {
+    const __vue_inject_styles__$o = function (inject) {
       if (!inject) return
       inject("data-v-5b23af7c_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Variables {{{ */\n:root {\n\t--mg-form-editor-selected-bg: #007bff;\n\t--mg-form-editor-selected-fg: #fff;;\n\t--mg-form-editor-selected-highlight: #5dabff;\n\t--mg-form-editor-selected-danger: #dc3545;\n\t--mg-form-editor-hover-bg: #77b9ff;\n\t--mg-form-editor-hover-fg: #fff;\n}\n/* }}} */\n\n/* Aside styles - .mgfe-aside {{{ */\n.mgfe-aside {\n\ttransition: transform 0.2s ease-out;\n}\n.mgfe-aside .mg-form {\n\tmargin: 0;\n}\n.mgfe-aside.aside-right.open.open { /* Silly hack to force the transform when open (overrides .asign-sm in priority) */\n\ttransform: translateX(0px);\n}\n.mgfe-aside.aside-right {\n\tposition: fixed;\n\ttop: 0px;\n\tright: 0px;\n\tbottom: 0px;\n\tbackground: #FFF;\n\tz-index: 100;\n\tbox-shadow: 0 1px 5px rgba(0,0,0,.3);\n\twidth: 350px;\n\ttransform: translateX(380px);\n}\n\n/* .mgfe-aside-sm {{{ */\n.mgfe-aside.aside-right.aside-sm {\n\twidth: 40px;\n\ttransform: translateX(50px);\n\ttop: calc(50% - 30px); /* Approx middle of the screen */\n\tbottom: inherit;\n\tborder-radius: 5px;\n}\n.mgfe-aside.aside-right.aside-sm .form-group {\n\tmargin: 0;\n}\n\n/* Remove BS padding from sub-elements */\n.mgfe-aside.aside-right.aside-sm .form-group [class*=\"col-\"] {\n\tpadding: 0;\n}\n/* }}} */\n\n/* Headers {{{ */\n.mgfe-aside .aside-header {\n\tdisplay: flex;\n\talign-items: center;\n\tjustify-content: flex-end;\n\tborder-bottom: 1px solid #e9ecef;\n\tmargin: 0;\n}\n.mgfe-aside .aside-header h4 {\n\tflex-grow: 1;\n}\n.mgfe-aside .aside-header legend.form-control-static {\n\tborder-bottom: none;\n\tfont-size: 17pt;\n}\n.mgfe-aside .aside-header .close {\n\tcolor: #5e5e5e;\n}\n.mgfe-aside .aside-header .close:hover {\n\tcolor: #000;\n}\n.mgfe-aside .aside-header .close::after {\n\tdisplay: inline-block;\n\tfont-family: 'Font Awesome 5 Pro';\n\tfont-weight: 900;\n\tcontent: \"\\f00d\";\n}\n/* }}} */\n\n/* Actions {{{ */\n.mgfe-aside .aside-actions {\n\tjustify-self: flex-end;\n\tmargin-right: 10px;\n}\n.mgfe-aside .aside-actions .btn-group {\n\tborder: none;\n\tbox-shadow: none;\n}\n.mgfe-aside .aside-actions a {\n\tpadding: 8px;\n\tfont-size: 125%;\n}\n/* }}} */\n\n/* Body {{{ */\n.mgfe-aside .aside-body {\n\tmargin-left: 0;\n\tmargin: 10px 0 0;\n\n\t/* Body scrolling */\n\toverflow: auto;\n\theight: calc(100vh - 80px);\n}\n/* }}} */\n/* }}} */\n\n/* Component highlighting {{{\n\n/* Highlight applied to active elements inside an mgContainer */\n.mg-form-editor-target {\n\tborder: 2px solid var(--blue);\n\tborder-radius: 5px;\n\tposition: relative;\n\ttop: -4px;\n\tleft: -4px;\n\tpadding: 2px;\n}\n.mg-form-editor-drop-target {\n}\n.mg-form-editor-drop-target-before {\n\tborder-top: 4px dashed var(--blue);\n}\n.mg-form-editor-drop-target-after {\n\tborder-bottom: 4px dashed var(--blue);\n}\n/* }}} */\n\n/* Drag + Drop {{{ */\nbody.mg-form-editor-dragging * {\n\tcursor: grabbing;\n}\n#mg-form-editor-drag {\n\tdisplay: block;\n\tz-index: 1000;\n\tposition: absolute;\n\ttop: -10000px;\n\tleft: -10000px;\n\tmin-width: 160px;\n\theight: 40px;\n\tborder-radius: 5px;\n\tbackground: #2196F3;\n\tbox-shadow: 1px 1px 4px rgba(0,0,0,.3);\n\tpadding: 10px;\n\tcolor: #FFF;\n}\n#mg-form-editor-drag > i {\n\tmargin-right: 5px;\n}\n/* }}} */\n\n/* Misc fixes {{{ */\n/* Buttons that are also fixed with look weird */\n.mg-form-editor .btn.fa-fw {\n\twidth: 2.30em;\n\tpadding: 4px 2px !important;\n}\n/* }}} */\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgFormEditor.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AA+qBA,kBAAA;AACA;CACA,qCAAA;CACA,kCAAA;CACA,4CAAA;CACA,yCAAA;CACA,kCAAA;CACA,+BAAA;AACA;AACA,QAAA;;AAEA,mCAAA;AACA;CACA,mCAAA;AACA;AAEA;CACA,SAAA;AACA;AAEA,oCAAA,kFAAA;CACA,0BAAA;AACA;AAEA;CACA,eAAA;CACA,QAAA;CACA,UAAA;CACA,WAAA;CACA,gBAAA;CACA,YAAA;CACA,oCAAA;CACA,YAAA;CACA,4BAAA;AACA;;AAEA,uBAAA;AACA;CACA,WAAA;CACA,2BAAA;CACA,qBAAA,EAAA,gCAAA;CACA,eAAA;CACA,kBAAA;AACA;AAEA;CACA,SAAA;AACA;;AAEA,wCAAA;AACA;CACA,UAAA;AACA;AACA,QAAA;;AAEA,gBAAA;AACA;CACA,aAAA;CACA,mBAAA;CACA,yBAAA;CACA,gCAAA;CACA,SAAA;AACA;AAEA;CACA,YAAA;AACA;AAEA;CACA,mBAAA;CACA,eAAA;AACA;AAEA;CACA,cAAA;AACA;AAEA;CACA,WAAA;AACA;AAEA;CACA,qBAAA;CACA,iCAAA;CACA,gBAAA;CACA,gBAAA;AACA;AACA,QAAA;;AAEA,gBAAA;AACA;CACA,sBAAA;CACA,kBAAA;AACA;AAEA;CACA,YAAA;CACA,gBAAA;AACA;AAEA;CACA,YAAA;CACA,eAAA;AACA;AACA,QAAA;;AAEA,aAAA;AACA;CACA,cAAA;CACA,gBAAA;;CAEA,mBAAA;CACA,cAAA;CACA,0BAAA;AACA;AACA,QAAA;AACA,QAAA;;AAEA;;+DAEA;AACA;CACA,6BAAA;CACA,kBAAA;CACA,kBAAA;CACA,SAAA;CACA,UAAA;CACA,YAAA;AACA;AAEA;AACA;AAEA;CACA,kCAAA;AACA;AAEA;CACA,qCAAA;AACA;AACA,QAAA;;AAEA,oBAAA;AACA;CACA,gBAAA;AACA;AAEA;CACA,cAAA;CACA,aAAA;CACA,kBAAA;CACA,aAAA;CACA,cAAA;CACA,gBAAA;CACA,YAAA;CACA,kBAAA;CACA,mBAAA;CACA,sCAAA;CACA,aAAA;CACA,WAAA;AACA;AAEA;CACA,iBAAA;AACA;AACA,QAAA;;AAEA,mBAAA;AACA,gDAAA;AACA;CACA,aAAA;CACA,2BAAA;AACA;AACA,QAAA","file":"mgFormEditor.vue","sourcesContent":["<script>\nimport mgFormEditorControls from './mgFormEditorControls';\n\n/**\n* mg-form-editor - Drag-and-drop form designer for MacGyver\n*\n* @param {Object|Array} config mgForm compatible spec to edit\n* @param {Object} [data] Optional data bindings for the form\n* @param {array<Object>} [verbs] Verb edit mgForm to show in the small edit sidebar, defaults to selecting widgets / adding widgets buttons\n* @param {string} [asideClassActive=\"mgfe-aside aside-right open\"] Class to set all editing sidebars to when inactive\n* @param {string} [asideClassInactive=\"mgfe-aside aside-right\"] Class to set all editing sidebar to when inactive\n* @param {string} [asideClassModeCollapsed=\"aside-sm\"] Class to associate with the smaller toolkit display when editing\n* @param {string} [asideClassModeToc=\"aside-sm\"] Class to associate with the Table-Of-Contents sidebar\n* @param {string} [asideClassModeAdding=\"\"] Class to associate with the editing sidebar when adding\n* @param {string} [asideClassModeEditing=\"\"] Class to associate with the editing sidebar when editing\n*\n* @emits change Emitted as `(config)` on any item configuration change. WARNING, subscribing to this involves an entire deep copy of the config structure, subscribe to changeItem if possible\n* @emits changeItem Emitted as `({path, value})` when a single config item changes, inexpensive compared to `change`\n*/\nexport default Vue.component('mgFormEditor', {\n\tprovide() { return {\n\t\t$mgFormEditor: this,\n\t}},\n\tcomponents: {\n\t\tmgFormEditorControls,\n\t},\n\tdata() { return {\n\t\tmode: 'collapsed', // ENUM: collapsed, toc, editing, adding\n\t\tid: this.$macgyver.nextId(), // ID of the editing form item\n\t\tediting: undefined, // The active item we are editing\n\t\twidgetListMode: 'grid',\n\n\t\t// Asides\n\t\teditConfig: [],\n\t\teditData: {},\n\n\t\taddTarget: undefined, // Spec path to add after, if any\n\t\taddOrientation: 'after',\n\t}},\n\tprops: {\n\t\t// FIXME: Does not like array type specs.\n\t\tconfig: [Object, Array], // Can be a single object, array of objects or shorthand style\n\t\tdata: Object,\n\t\tasideClassActive: {type: String, default: 'mgfe-aside aside-right open'},\n\t\tasideClassInactive: {type: String, default: 'mgfe-aside aside-right'},\n\t\tasideClassModeCollapsed: {type: String, default: 'aside-sm'},\n\t\tasideClassModeToc: {type: String, default: ''},\n\t\tasideClassModeAdding: {type: String, default: ''},\n\t\tasideClassModeEditing: {type: String, default: ''},\n\t\tgeneralVerbs: {\n\t\t\ttype: Array,\n\t\t\tdefault() {\n\t\t\t\treturn [\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"setMode()\",\n\t\t\t\t\t\tclass: 'btn btn-primary text-white px-2',\n\t\t\t\t\t\ticon: 'fa fa-mouse-pointer fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t// FIXME: Why were tooltips failing as Object type?\n\t\t\t\t\t\ttooltip: 'Select widgets to edit',\n\t\t\t\t\t\t//tooltip: \"{content: 'Select widgets to edit', placement: 'left'}\",\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"setMode('toc')\",\n\t\t\t\t\t\tclass: 'btn btn-outline-light border-0 px-2',\n\t\t\t\t\t\ticon: 'fa fa-stream fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\ttooltip: 'Select widgets to edit',\n\t\t\t\t\t\t//tooltip: {content: 'Select widgets to edit', placement: 'left'},\n\t\t\t\t\t},\n\t\t\t\t\t...(this.$prompt?.macgyver ? [{ // Include JSON editing if $prompt.macgyver() is available\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"rawEdit()\",\n\t\t\t\t\t\tclass: 'btn btn-outline-light border-0 px-2',\n\t\t\t\t\t\ticon: 'fa fa-code fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\ttooltip: 'Edit the form contents as JSON',\n\t\t\t\t\t\t//tooltip: {content: 'Edit the form contents as JSON', placement: 'left'},\n\t\t\t\t\t}] : []),\n\t\t\t\t\t{\n\t\t\t\t\t\ttype: 'mgButton',\n\t\t\t\t\t\taction: \"setMode('adding')\",\n\t\t\t\t\t\tclass: 'btn btn-outline-light border-0 px-2',\n\t\t\t\t\t\ticon: 'far fa-plus fa-fw',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\ttooltip: 'Add a new widget',\n\t\t\t\t\t\t//tooltip: {content: 'Add a new widget', placement: 'left'},\n\t\t\t\t\t},\n\t\t\t\t];\n\t\t\t},\n\t\t},\n\t},\n\tcreated() {\n\t\tthis.$debugging = true;\n\t},\n\tmounted() {\n\t\t/*\n\t\t// Potential for highlighting components within nested mgContainer\n\t\tthis.$refs.form.$on('mgComponent.click', (component, e) => {\n\t\t\te.stopPropagation();\n\t\t\te.preventDefault();\n\t\t\tthis.editWidget(component.config.$specPath);\n\t\t});\n\n\t\tthis.$refs.form.$on('mgComponent.mouseEnter', (component, e) => {\n\t\t\tif (component.config.type === 'mgContainer') return;\n\t\t\te.stopPropagation();\n\t\t\t//e.preventDefault();\n\t\t\tvar target = this.$refs.form.getComponentBySpecPath(component.config.$specPath);\n\t\t\t//if (target.$type === 'mgContainer') return;\n\t\t\t// FIXME: Always 2 parents up? Traverse up to next highest mgContainer?\n\t\t\tvar container = target.$parent.$parent;\n\t\t\tif (!container) return;\n\t\t\tvar targetIndex = container.findChildIndex(target);\n\t\t\tcontainer.$set(container.highlights, targetIndex, (container.highlights[targetIndex] || []).concat(['editHover']));\n\t\t});\n\n\t\tthis.$refs.form.$on('mgComponent.mouseLeave', (component, e) => {\n\t\t\tif (component.config.type === 'mgContainer') return;\n\t\t\te.stopPropagation();\n\t\t\t//e.preventDefault();\n\t\t\tvar target = this.$refs.form.getComponentBySpecPath(component.config.$specPath);\n\t\t\t//if (target.$type === 'mgContainer') return;\n\t\t\t// FIXME: Always 2 parents up? Traverse up to next highest mgContainer?\n\t\t\tvar container = target.$parent.$parent;\n\t\t\tif (!container) return;\n\t\t\tvar targetIndex = container.findChildIndex(target);\n\t\t\tcontainer.$set(container.highlights, targetIndex, (container.highlights[targetIndex] || []).filter(c => c != 'editHover'));\n\t\t});\n\t\t*/\n\n\t\t// FIXME: (e.target).closest... mg-container CSS class...\n\t\tthis.$refs.form.$on('mgContainer.click', (container, specPath, componentIndex, e) => {\n\t\t\te.stopPropagation();\n\t\t\te.preventDefault();\n\t\t\tthis.editWidget(specPath);\n\t\t});\n\n\t\tthis.$refs.form.$on('mgContainer.mouseEnter', (container, specPath, componentIndex, e) => {\n\t\t\tvar component = this.$refs.form.getComponentBySpecPath(specPath);\n\t\t\tvar componentIndex = container.findChildIndex(component);\n\t\t\tcontainer.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).concat(['editHover']));\n\t\t});\n\n\t\tthis.$refs.form.$on('mgContainer.mouseLeave', (container, specPath, componentIndex, e) => {\n\t\t\tvar component = this.$refs.form.getComponentBySpecPath(specPath);\n\t\t\tvar componentIndex = container.findChildIndex(component);\n\t\t\tcontainer.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).filter(c => c != 'editHover'));\n\t\t});\n\t},\n\tmethods: {\n\t\t/**\n\t\t* Stop editing / adding and return to regular mode\n\t\t* @param {string} [mode=\"collapsed\"] Mode to switch to\n\t\t* @param {boolean} [clearHighlight=true] Also attempt to clear out any highlight and reset the aside panes\n\t\t*/\n\t\tsetMode(mode = 'collapsed', clearHighlight = true) {\n\t\t\t// Deselect the existing item (if we have one)\n\t\t\tif (this.editing && clearHighlight) {\n\t\t\t\tthis.setComponentHighlight(this.editing, []);\n\t\t\t\tthis.editing = undefined;\n\t\t\t}\n\n\t\t\tthis.$set(this, 'mode', mode || 'collapsed');\n\t\t\treturn true; // Signal to mgForm that we have handled this action\n\t\t},\n\n\n\t\t/**\n\t\t* Delete the active widget\n\t\t*/\n\t\tdeleteWidget() {\n\t\t\tif (!this.editing) {\n\t\t\t\tthis.$macgyver.notify.warn('No widget selected to delete'); // Not editing anyway\n\t\t\t} else {\n\t\t\t\tthis.removeWidget(this.editing.$props.$specPath);\n\t\t\t}\n\n\t\t\treturn true; // Signal to mgForm that we have handled this action\n\t\t},\n\n\n\t\t/**\n\t\t* Set the component.highlight[index] to the given list of CSS classes\n\t\t* @param {VueController} component The VueController to set the highlight of within its mgContainer\n\t\t* @param {array<string>} classes Array of string classes to set\n\t\t*/\n\t\tsetComponentHighlight(component, classes) {\n\t\t\tif (!_.isArray(classes)) throw new Error('setComponentHighlight must be passed an array');\n\n\t\t\tvar container = false;\n\t\t\tcomponent.$emit.up('mgIdentify', component => {\n\t\t\t\tif (!container && component.$props.$type == 'mgContainer') container = component;\n\t\t\t});\n\t\t\tif (!container) return console.warn('[mgFormEditor] setComponentHighlight component failed to find enclosing container', {component});\n\n\t\t\tvar childOffset = container.findChildIndex(component);\n\t\t\tif (childOffset === false) return console.warn('[mgFormEditor]', 'Cannot locate component within container', {container, component});\n\n\t\t\tconsole.log('Set highlight', childOffset, classes);\n\t\t\tcontainer.$set(container.highlights, childOffset, classes);\n\t\t},\n\n\n\t\t/**\n\t\t* Edit a widget by its specPath or component\n\t\t* @param {VueComponent|string} component Either the VueComponent to edit or the specPath of the widget to edit\n\t\t*/\n\t\teditWidget(component) {\n\t\t\tvar component; // The Vue component from the widget path\n\t\t\tif (!_.isObject(component) && !_.isString(component)) throw new Error('editWidget requires either a specPath or VueComponent');\n\t\t\tif (_.isObject(component) && !component._uid) throw new Error('editWidget() requires a valid VueComponent object (or specPath string)');\n\n\t\t\tif (_.isString(component) || _.isArray(component)) component = this.$refs.form.getComponentBySpecPath(component); // Resolve specPath into actual component if eneded\n\n\t\t\tthis.setMode();\n\n\t\t\tthis.$set(this, 'editing', component);\n\t\t\tthis.$set(this, 'mode', 'editing');\n\n\t\t\tthis.setComponentHighlight(component, ['editEditing']);\n\n\t\t\tvar widget = this.$macgyver.widgets[component.$props.$type];\n\t\t\tif (widget) {\n\t\t\t\tthis.$set(this, 'editConfig', [\n\t\t\t\t\t{ // Header area\n\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\trowClass: 'aside-header',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t{id: 'metaIcon', type: 'mgIcon'},\n\t\t\t\t\t\t\t{id: 'id', type: 'mgText', placeholder: 'No ID'},\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t\t\trowClass: 'aside-actions',\n\t\t\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'deleteWidget', class: 'btn btn-link btn-link-danger btn-xs', icon: 'far fa-trash', tooltip: 'Delete this widget'},\n\t\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'setMode', text: '', class: 'btn btn-link btn-xs', icon: 'far fa-times'},\n\t\t\t\t\t\t\t\t],\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t],\n\t\t\t\t\t},\n\t\t\t\t\t{ // Body area\n\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\tlayout: 'form',\n\t\t\t\t\t\tformClass: 'titles-above',\n\t\t\t\t\t\trowClass: 'aside-body',\n\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\titems: _.map(widget.props, (v, k) => _.set(v, 'id', k)),\n\t\t\t\t\t},\n\t\t\t\t]);\n\t\t\t\tthis.$debug('Set editConfig', this.editConfig);\n\n\t\t\t\tthis.$set(this, 'editData',\n\t\t\t\t\t_(widget.props)\n\t\t\t\t\t\t.mapValues((v, k) => _.get(component.$props, k, _.get(widget.props, k).default))\n\t\t\t\t\t\t.set('id', component.$props.$dataPath)\n\t\t\t\t\t\t.set('metaIcon', widget.meta.icon)\n\t\t\t\t\t\t.value()\n\t\t\t\t);\n\t\t\t\tthis.$debug('Set editData', this.editData);\n\t\t\t} else {\n\t\t\t\tthis.$macgyver.notify.warn(`Cannot edit unknown widget \"${component.$props?.$type || 'Unknown type'}\"`);\n\t\t\t\tthis.setMode();\n\t\t\t}\n\t\t},\n\n\n\t\t/**\n\t\t* Change the value of a nested config path\n\t\t* @param {string} path The dotted / array notation path to mutate\n\t\t* @param {*} value The value to set, if undefined the key is removed\n\t\t* @emits change Emitted with the entire deep copied config object\n\t\t* @emits changeItem Emitted as `{path, value}` for a single item mutation\n\t\t*/\n\t\tmutatePath(path, value) {\n\t\t\tconsole.log('mutatePath', path, value);\n\t\t\t// Only bother cloning the entire object if something is listening to 'change'\n\t\t\tif (this.$emit.hasListeners('change')) {\n\t\t\t\tvar configCopy = _.cloneDeep(this.config);\n\t\t\t\tthis.$setPath(configCopy, path, value);\n\t\t\t\tthis.$emit('change', configCopy);\n\t\t\t}\n\n\t\t\tthis.$emit('changeItem', {path: path, value: value});\n\t\t},\n\n\n\t\t/**\n\t\t* Splice items into a deep copy of the config object, emitting change events\n\t\t* @param {string} path The dotted / array notation path to mutate\n\t\t* @param {number} index The index to work from\n\t\t* @param {number} [remove] The number of items to remove\n\t\t* @param {*} [value...] The value(s) to set, if undefined the key is removed\n\t\t* @emits change Emitted with the entire deep copied config object\n\t\t* @emits changeItem Emitted as `{path, value}` for a single item mutation\n\t\t*/\n\t\tmutateSplice(path, index, remove, ...value) {\n\t\t\tconsole.log('mutateSplice', path, index, remove);\n\t\t\tvar configCopy = _.cloneDeep(this.config); // Copy entire object\n\t\t\tvar spliceContents = _.get(configCopy, path); // Extract path from nested object\n\t\t\tif (!_.isArray(spliceContents)) throw new Error('Refusing to splice a non-array');\n\t\t\tspliceContents.splice(index, remove, ...value); // Perform splice\n\n\t\t\tthis.$setPath(configCopy, path, spliceContents); // Place back in mutated object\n\n\t\t\tthis.$emit('change', configCopy);\n\t\t\tthis.$emit('changeItem', {path: path, value: spliceContents});\n\t\t},\n\n\n\t\t/**\n\t\t* Insert a widget at a given path\n\t\t* @param {Object} widget The widget to insert, this must contain at least a `type` key\n\t\t* @param {Object} [options] Additional options\n\t\t* @param {string|array} [options.specPath] The lodash notation specPath to target instead of the last element on the form\n\t\t* @param {string} [options.orientation='after'] Where to insert. ENUM: 'before', 'after', 'last'\n\t\t* @param {boolean} [options.useContainer=true] If no spec path, try and fit the new widget within the last container if one exists\n\t\t* @param {boolean} [options.allocateTitle=true] Try to allocate a title if not supplied\n\t\t* @param {boolean} [options.allocateId=true] Try to allocate an ID if not supplied and the widget has `preferId`\n\t\t* @param {boolean} [options.edit=true] Show the edit dialog after inserting the component\n\t\t* @returns {Object} The inserted widget object (complete with ID if allocateId is specified)\n\t\t*/\n\t\tinsertWidget(widget, options) {\n\t\t\tconsole.log('insertWidget', widget, options);\n\t\t\tvar settings = {\n\t\t\t\tspecPath: undefined,\n\t\t\t\torientation: 'after',\n\t\t\t\tuseContainer: true,\n\t\t\t\tallocateTitle: true,\n\t\t\t\tallocateId: true,\n\t\t\t\tedit: true,\n\t\t\t\t...options,\n\t\t\t};\n\n\t\t\tif (!widget.type) throw new Error('Widget.type must be specified as a minimum for insertWidget()');\n\n\t\t\t// options.allocateTitle / settings.alloacteId {{{\n\t\t\tif ( // A field we want is missing\n\t\t\t\t(settings.allocateTitle && !widget.title)\n\t\t\t\t|| (settings.allocateId && !widget.id)\n\t\t\t) {\n\t\t\t\t// Compute how many of this widget are on the form\n\t\t\t\tvar widgetOffset = this.$macgyver\n\t\t\t\t\t.flatten(this.$props.config, {want: 'array', type: 'spec'})\n\t\t\t\t\t.reduce((i, w) => w.type == widget.type ? i + 1 : i, 0);\n\n\t\t\t\tif (settings.allocateTitle && !widget.title)\n\t\t\t\t\twidget.title = this.$macgyver.widgets[widget.type].meta.title\n\t\t\t\t\t\t+ String(widgetOffset == 0 ? '' : widgetOffset);\n\n\t\t\t\t// Guess at an ID\n\t\t\t\tif (settings.allocateId && !widget.id && this.$macgyver.widgets[widget.type].meta.preferId)\n\t\t\t\t\twidget.id = _.chain(widget.type)\n\t\t\t\t\t\t.replace(/^mg/, '') // Remove first `mg` bit\n\t\t\t\t\t\t.camelCase()\n\t\t\t\t\t\t.replace(/$/, widgetOffset == 0 ? '' : widgetOffset) // Append numeric offset (if there is more than one of this type)\n\t\t\t\t\t\t.value();\n\t\t\t}\n\t\t\t// }}}\n\n\t\t\t// FIXME: Support for array specs without a root mgContainer.\n\t\t\tswitch (settings.orientation) {\n\t\t\t\tcase 'last':\n\t\t\t\t\tif ( // Container -> Container:Last -> New widget\n\t\t\t\t\t\tsettings.useContainer // Insert within container?\n\t\t\t\t\t\t&& this.config.type == 'mgContainer' // First item is a container\n\t\t\t\t\t\t&& _.last(this.config.items).type == 'mgContainer' // Last child is also a container - use this\n\t\t\t\t\t) {\n\t\t\t\t\t\tthis.mutateSplice(`items.${this.config.items.length - 1}.items`, _.last(this.config.items).items.length, 0, widget);\n\t\t\t\t\t} else if ( // Container:Last -> New widget\n\t\t\t\t\t\tsettings.useContainer // Insert within container?\n\t\t\t\t\t\t&& this.config.type == 'mgContainer' // First item is a container\n\t\t\t\t\t) {\n\t\t\t\t\t\tthis.mutateSplice('items', this.config.items.length, 0, widget);\n\t\t\t\t\t} else if (_.isArray(this.config)) { // Append to end of config array\n\t\t\t\t\t\tthis.mutateSplice('', this.config.items.length, 0, widget);\n\t\t\t\t\t} else {\n\t\t\t\t\t\tthrow new Error('Dont know how to append widget to form config');\n\t\t\t\t\t}\n\t\t\t\t\tbreak;\n\t\t\t\tcase 'before':\n\t\t\t\tcase 'after':\n\t\t\t\t\tif (!settings.specPath) throw new Error('Inserting with orientations before / after requires a specPath');\n\t\t\t\t\tvar parentItems = _.isArray(settings.specPath) ? settings.specPath : settings.specPath.split('.');\n\t\t\t\t\tvar targetWidget = parentItems.pop();\n\n\t\t\t\t\tthis.mutateSplice(\n\t\t\t\t\t\tparentItems,\n\t\t\t\t\t\tsettings.orientation == 'after' ? +targetWidget + 1 : targetWidget,\n\t\t\t\t\t\t0,\n\t\t\t\t\t\twidget\n\t\t\t\t\t);\n\t\t\t\t\tbreak;\n\t\t\t\tdefault:\n\t\t\t\t\tthrow new Error(`Dont know how to handle insert of component at with orientation \"${settings.orientation}\"`);\n\t\t\t}\n\n\t\t\tif (settings.edit) {\n\t\t\t\tconsole.warn('FIXME: Unsupported post edit when editing components');\n\t\t\t\t// this.editWidget(widget.id);\n\t\t\t}\n\n\t\t\treturn widget;\n\t\t},\n\n\n\t\t/**\n\t\t* Remove a widget by its specPath\n\t\t* @param {string|array} specPath The lodash notation specPath to remove\n\t\t*/\n\t\tremoveWidget(specPath) {\n\t\t\tthis.setMode(); // Reset mode to close edit panel\n\n\t\t\t// FIXME: Splitting non-array, condition backwards?\n\t\t\tvar parentItems = _.isArray(specPath) ? specPath : specPath.split('.');\n\t\t\tvar targetIndex = parentItems.pop();\n\n\t\t\tthis.mutateSplice(parentItems, targetIndex, 1);\n\t\t},\n\n\n\t\t/**\n\t\t* Duplicate a widget by its specPath\n\t\t* @param {string|array} specPath The lodash notation specPath to remove\n\t\t*/\n\t\tduplicateWidget(specPath) {\n\t\t\tvar parentItems = _.isArray(specPath) ? specPath : specPath.split('.');\n\t\t\tvar targetIndex = parentItems.pop();\n\n\t\t\tthis.setMode(); // Reset mode to close edit panel\n\t\t\tthis.mutatePath(\n\t\t\t\tparentItems,\n\t\t\t\t_(_.get(this.config, parentItems))\n\t\t\t\t\t.map((v, i) => i == targetIndex // Duplicate this item when we find its index\n\t\t\t\t\t\t? [\n\t\t\t\t\t\t\tv, // Original object\n\t\t\t\t\t\t\t_.chain(v)\n\t\t\t\t\t\t\t\t.cloneDeep()\n\t\t\t\t\t\t\t\t.pickBy((v, k) => !k.startsWith('$'))\n\t\t\t\t\t\t\t\t.set('id', this.$macgyver.utils.incrementId(v.id)) // Also increment its ID\n\t\t\t\t\t\t\t\t.value(),\n\t\t\t\t\t\t]\n\t\t\t\t\t\t: v\n\t\t\t\t\t)\n\t\t\t\t\t.flatten()\n\t\t\t\t\t.value()\n\t\t\t);\n\t\t},\n\n\n\t\t/**\n\t\t* Move a widget in a given direction\n\t\t* @param {string|array} specPath The lodash notation SpecPath to move\n\t\t* @param {string} direction The direction to move. ENUM: 'up', 'down'\n\t\t*/\n\t\tmoveWidget(specPath, direction) {\n\t\t\tif (!['up', 'down'].includes(direction)) throw new Error('Unsupported direction');\n\n\t\t\tvar parentItems = _.isArray(specPath) ? specPath : specPath.split('.');\n\t\t\tvar targetIndex = parentItems.pop();\n\n\t\t\tthis.setMode(); // Reset mode to close edit panel\n\t\t\tthis.mutatePath(\n\t\t\t\tparentItems,\n\t\t\t\t_.chain(_.get(this.config, parentItems))\n\t\t\t\t\t.clone()\n\t\t\t\t\t.thru(v => {\n\t\t\t\t\t\ttargetIndex = +targetIndex; // Splat into number\n\t\t\t\t\t\tif (direction == 'up' && targetIndex > 0) {\n\t\t\t\t\t\t\t[v[targetIndex], v[targetIndex-1]]\n\t\t\t\t\t\t\t=\n\t\t\t\t\t\t\t[v[targetIndex-1], v[targetIndex]]\n\t\t\t\t\t\t} else if (direction == 'down' && targetIndex < v.length) {\n\t\t\t\t\t\t\tconsole.log('SWAP', targetIndex, targetIndex + 1);\n\t\t\t\t\t\t\t[v[targetIndex], v[targetIndex+1]]\n\t\t\t\t\t\t\t=\n\t\t\t\t\t\t\t[v[targetIndex+1], v[targetIndex]]\n\t\t\t\t\t\t}\n\t\t\t\t\t\treturn v;\n\t\t\t\t\t})\n\t\t\t\t\t.value()\n\t\t\t);\n\t\t},\n\n\n\t\t/**\n\t\t* Begin drag sequence for a widget\n\t\t* @param {string|array} specPath The lodash notation SpecPath to drag\n\t\t*/\n\t\tdragWidget(specPath) {\n\t\t\tconsole.warn('FIXME: dragWidget() not yet supported');\n\t\t},\n\n\n\t\trawEdit() {\n\t\t\tthis.$prompt.macgyver({\n\t\t\t\ttitle: 'Template JSON',\n\t\t\t\tmacgyver: {\n\t\t\t\t\tid: 'code',\n\t\t\t\t\ttype: 'mgCode',\n\t\t\t\t\tsyntax: 'json',\n\t\t\t\t\tconvert: true,\n\t\t\t\t\tdefault: this.$props.config,\n\t\t\t\t},\n\t\t\t}).then(form => this.$set(this, 'config', form.code))\n\t\t},\n\n\n\t\t// Form layouts {{{\n\t\t/**\n\t\t* Generate the config layout for the Table-Of-Contents sidebar\n\t\t*/\n\t\tgenerateConfigToc() {\n\t\t\tvar genTreeBranch = root =>\n\t\t\t\troot.map(widget => ({\n\t\t\t\t\ttitle: `${widget.type} #${widget.id}`,\n\t\t\t\t\ticon: this.$macgyver.widgets[widget.type].icon,\n\t\t\t\t\tenum: widget.items ? genTreeBranch(widget.items) : undefined,\n\t\t\t\t}));\n\n\t\t\treturn [\n\t\t\t\t{ // Header area\n\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\tborder: false,\n\t\t\t\t\trowClass: 'aside-header',\n\t\t\t\t\tshowTitle: false,\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{type: 'mgHeading', text: 'Form layout'},\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t\trowClass: 'aside-actions',\n\t\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'setMode', text: '', class: 'btn btn-link btn-xs', icon: 'far fa-times'},\n\t\t\t\t\t\t\t],\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t\t{ // Body area\n\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\tlayout: 'form',\n\t\t\t\t\trowClass: 'aside-body',\n\t\t\t\t\tshowTitles: false,\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\ttype: 'mgChoiceTree',\n\t\t\t\t\t\t\ttitle: 'Layout tree',\n\t\t\t\t\t\t\tchange: item => {\n\t\t\t\t\t\t\t\tconsole.log('TREE CLICK', item);\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\tenum: genTreeBranch(\n\t\t\t\t\t\t\t\t[ this.$macgyver.compileSpec(this.$props.config, {clone: false}).spec ]\n\t\t\t\t\t\t\t),\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t];\n\t\t},\n\n\n\t\t/**\n\t\t* Generate the config layout for the \"add widget\" sidebar\n\t\t*/\n\t\tgenerateConfigAdding() {\n\t\t\treturn [\n\t\t\t\t{ // Header area\n\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\tborder: false,\n\t\t\t\t\trowClass: 'aside-header',\n\t\t\t\t\tshowTitle: false,\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{type: 'mgHeading', text: 'Add widget'},\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\t\t\tlayout: 'columns',\n\t\t\t\t\t\t\tborder: false,\n\t\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t\trowClass: 'aside-actions',\n\t\t\t\t\t\t\titems: [\n\t\t\t\t\t\t\t\t{type: 'mgButton', action: 'setMode', text: '', class: 'btn btn-link btn-xs', icon: 'far fa-times'},\n\t\t\t\t\t\t\t],\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t\t{ // Body area\n\t\t\t\t\ttype: 'mgContainer',\n\t\t\t\t\tlayout: 'form',\n\t\t\t\t\trowClass: 'aside-body',\n\t\t\t\t\tshowTitles: false,\n\t\t\t\t\titems: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tid: 'addType',\n\t\t\t\t\t\t\ttype: 'mgChoiceList',\n\t\t\t\t\t\t\ttitle: 'Widget type to add',\n\t\t\t\t\t\t\tenum: _(this.$macgyver.widgets)\n\t\t\t\t\t\t\t\t.map((w, k) => ({\n\t\t\t\t\t\t\t\t\tid: k,\n\t\t\t\t\t\t\t\t\ttitle: w.meta.title,\n\t\t\t\t\t\t\t\t\ticon: `${w.meta.icon} fa-fw`,\n\t\t\t\t\t\t\t\t}))\n\t\t\t\t\t\t\t\t.sortBy('title')\n\t\t\t\t\t\t\t\t.value(),\n\t\t\t\t\t\t\tchange: type => {\n\t\t\t\t\t\t\t\tvar inserted = this.insertWidget({type}, {\n\t\t\t\t\t\t\t\t\torientation: 'last',\n\t\t\t\t\t\t\t\t\tuseContainer: true,\n\t\t\t\t\t\t\t\t\tedit: true,\n\t\t\t\t\t\t\t\t});\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t},\n\t\t\t];\n\t\t},\n\t\t// }}}\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-form-editor\">\n\t\t<!-- Aside collapsed mode {{{ -->\n\t\t<aside :class=\"[mode == 'collapsed' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeCollapsed]\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"mode == 'collapsed'\"\n\t\t\t\t:form=\"`${id}-collapsed`\"\n\t\t\t\t:config=\"$props.generalVerbs\"\n\t\t\t\t:actions=\"{setMode, rawEdit}\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\t\t<!-- Aside toc (table-of-contents) mode {{{ -->\n\t\t<aside :class=\"[mode == 'toc' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeToc]\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"mode == 'toc'\"\n\t\t\t\t:form=\"`${id}-toc`\"\n\t\t\t\t:config=\"generateConfigToc()\"\n\t\t\t\t:actions=\"{setMode}\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\t\t<!-- Aside widget library (add widget) {{{ -->\n\t\t<aside :class=\"[mode == 'adding' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeAdding]\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"mode == 'adding'\"\n\t\t\t\tref=\"formAdd\"\n\t\t\t\t:config=\"generateConfigAdding()\"\n\t\t\t\t:actions=\"{setMode}\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\t\t<!-- Aside item editor (edit widget) {{{ -->\n\t\t<aside :class=\"[mode == 'editing' ? $props.asideClassActive : $props.asideClassInactive, $props.asideClassModeEditing]\">\n\t\t\t<mg-form\n\t\t\t\tv-if=\"mode == 'editing'\"\n\t\t\t\t:form=\"`${id}-edit`\"\n\t\t\t\t:config=\"editConfig\"\n\t\t\t\t:data=\"editData\"\n\t\t\t\t:actions=\"{setMode, deleteWidget}\"\n\t\t\t\t@changeItem=\"mutatePath(`${editing.$specPath}.${$event.path}`, $event.value)\"\n\t\t\t/>\n\t\t</aside>\n\t\t<!-- }}} -->\n\n\t\t<!-- Display form {{{ -->\n\t\t<mg-form\n\t\t\tref=\"form\"\n\t\t\t:config=\"$props.config\"\n\t\t\t:data=\"$props.data\"\n\t\t/>\n\t\t<!-- }}} -->\n\t</div>\n</template>\n\n<style>\n/* Variables {{{ */\n:root {\n\t--mg-form-editor-selected-bg: #007bff;\n\t--mg-form-editor-selected-fg: #fff;;\n\t--mg-form-editor-selected-highlight: #5dabff;\n\t--mg-form-editor-selected-danger: #dc3545;\n\t--mg-form-editor-hover-bg: #77b9ff;\n\t--mg-form-editor-hover-fg: #fff;\n}\n/* }}} */\n\n/* Aside styles - .mgfe-aside {{{ */\n.mgfe-aside {\n\ttransition: transform 0.2s ease-out;\n}\n\n.mgfe-aside .mg-form {\n\tmargin: 0;\n}\n\n.mgfe-aside.aside-right.open.open { /* Silly hack to force the transform when open (overrides .asign-sm in priority) */\n\ttransform: translateX(0px);\n}\n\n.mgfe-aside.aside-right {\n\tposition: fixed;\n\ttop: 0px;\n\tright: 0px;\n\tbottom: 0px;\n\tbackground: #FFF;\n\tz-index: 100;\n\tbox-shadow: 0 1px 5px rgba(0,0,0,.3);\n\twidth: 350px;\n\ttransform: translateX(380px);\n}\n\n/* .mgfe-aside-sm {{{ */\n.mgfe-aside.aside-right.aside-sm {\n\twidth: 40px;\n\ttransform: translateX(50px);\n\ttop: calc(50% - 30px); /* Approx middle of the screen */\n\tbottom: inherit;\n\tborder-radius: 5px;\n}\n\n.mgfe-aside.aside-right.aside-sm .form-group {\n\tmargin: 0;\n}\n\n/* Remove BS padding from sub-elements */\n.mgfe-aside.aside-right.aside-sm .form-group [class*=\"col-\"] {\n\tpadding: 0;\n}\n/* }}} */\n\n/* Headers {{{ */\n.mgfe-aside .aside-header {\n\tdisplay: flex;\n\talign-items: center;\n\tjustify-content: flex-end;\n\tborder-bottom: 1px solid #e9ecef;\n\tmargin: 0;\n}\n\n.mgfe-aside .aside-header h4 {\n\tflex-grow: 1;\n}\n\n.mgfe-aside .aside-header legend.form-control-static {\n\tborder-bottom: none;\n\tfont-size: 17pt;\n}\n\n.mgfe-aside .aside-header .close {\n\tcolor: #5e5e5e;\n}\n\n.mgfe-aside .aside-header .close:hover {\n\tcolor: #000;\n}\n\n.mgfe-aside .aside-header .close::after {\n\tdisplay: inline-block;\n\tfont-family: 'Font Awesome 5 Pro';\n\tfont-weight: 900;\n\tcontent: \"\\f00d\";\n}\n/* }}} */\n\n/* Actions {{{ */\n.mgfe-aside .aside-actions {\n\tjustify-self: flex-end;\n\tmargin-right: 10px;\n}\n\n.mgfe-aside .aside-actions .btn-group {\n\tborder: none;\n\tbox-shadow: none;\n}\n\n.mgfe-aside .aside-actions a {\n\tpadding: 8px;\n\tfont-size: 125%;\n}\n/* }}} */\n\n/* Body {{{ */\n.mgfe-aside .aside-body {\n\tmargin-left: 0;\n\tmargin: 10px 0 0;\n\n\t/* Body scrolling */\n\toverflow: auto;\n\theight: calc(100vh - 80px);\n}\n/* }}} */\n/* }}} */\n\n/* Component highlighting {{{\n\n/* Highlight applied to active elements inside an mgContainer */\n.mg-form-editor-target {\n\tborder: 2px solid var(--blue);\n\tborder-radius: 5px;\n\tposition: relative;\n\ttop: -4px;\n\tleft: -4px;\n\tpadding: 2px;\n}\n\n.mg-form-editor-drop-target {\n}\n\n.mg-form-editor-drop-target-before {\n\tborder-top: 4px dashed var(--blue);\n}\n\n.mg-form-editor-drop-target-after {\n\tborder-bottom: 4px dashed var(--blue);\n}\n/* }}} */\n\n/* Drag + Drop {{{ */\nbody.mg-form-editor-dragging * {\n\tcursor: grabbing;\n}\n\n#mg-form-editor-drag {\n\tdisplay: block;\n\tz-index: 1000;\n\tposition: absolute;\n\ttop: -10000px;\n\tleft: -10000px;\n\tmin-width: 160px;\n\theight: 40px;\n\tborder-radius: 5px;\n\tbackground: #2196F3;\n\tbox-shadow: 1px 1px 4px rgba(0,0,0,.3);\n\tpadding: 10px;\n\tcolor: #FFF;\n}\n\n#mg-form-editor-drag > i {\n\tmargin-right: 5px;\n}\n/* }}} */\n\n/* Misc fixes {{{ */\n/* Buttons that are also fixed with look weird */\n.mg-form-editor .btn.fa-fw {\n\twidth: 2.30em;\n\tpadding: 4px 2px !important;\n}\n/* }}} */\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
-    const __vue_scope_id__$n = undefined;
+    const __vue_scope_id__$o = undefined;
     /* module identifier */
-    const __vue_module_identifier__$n = undefined;
+    const __vue_module_identifier__$o = undefined;
     /* functional template */
-    const __vue_is_functional_template__$n = false;
+    const __vue_is_functional_template__$o = false;
     /* style inject SSR */
     
     /* style inject shadow dom */
     
 
     
-    const __vue_component__$n = normalizeComponent(
-      { render: __vue_render__$g, staticRenderFns: __vue_staticRenderFns__$g },
-      __vue_inject_styles__$n,
-      __vue_script__$n,
-      __vue_scope_id__$n,
-      __vue_is_functional_template__$n,
-      __vue_module_identifier__$n,
+    const __vue_component__$o = normalizeComponent(
+      { render: __vue_render__$h, staticRenderFns: __vue_staticRenderFns__$h },
+      __vue_inject_styles__$o,
+      __vue_script__$o,
+      __vue_scope_id__$o,
+      __vue_is_functional_template__$o,
+      __vue_module_identifier__$o,
       false,
       createInjector,
       undefined,
@@ -12111,7 +17968,7 @@
 
   var mgFormEditor = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$n
+    'default': __vue_component__$o
   });
 
   /**
@@ -12138,7 +17995,7 @@
   * @emits mgContainer.mouseEnter Emitted as `(container, specPath, event)` on the native mouseEnter event of a component within a container
   * @emits mgContainer.mouseLeave Emitted as `(container, specPath, event)` on the native mouseLeave event of a component within a container
   */
-  var script$n = Vue.component('mgForm', {
+  var script$o = Vue.component('mgForm', {
     provide: function provide() {
       return {
         $mgForm: this
@@ -12373,10 +18230,10 @@
   });
 
   /* script */
-  const __vue_script__$o = script$n;
+  const __vue_script__$p = script$o;
 
   /* template */
-  var __vue_render__$h = function() {
+  var __vue_render__$i = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -12403,34 +18260,34 @@
       1
     )
   };
-  var __vue_staticRenderFns__$h = [];
-  __vue_render__$h._withStripped = true;
+  var __vue_staticRenderFns__$i = [];
+  __vue_render__$i._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$o = function (inject) {
+    const __vue_inject_styles__$p = function (inject) {
       if (!inject) return
       inject("data-v-8b1356c4_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Add missing Bootstrap color variables */\n.mg-form {\n\t--btn-default-bg: #e9ecef;\n\t--btn-default-fg: #495057;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgForm.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAyOA,0CAAA;AACA;CACA,yBAAA;CACA,yBAAA;AACA","file":"mgForm.vue","sourcesContent":["<script>\n/**\n* The top level MacGyver form\n* @param {string} [form] Unique form name\n* @param {Object|Array} config The MacGyver form object either in long form nested array structure or short form object (which is converted)\n* @param {boolean} [populateDefaults=true] Apply initial defaults to the data when the config is ready, if false you can call vm.assignDefaults() manually if needed\n* @param {boolean} [actionsFallback=true] Use vm.$eval as a runner when no action listener is found\n* @param {Object|function} [actions] Actions subscribers as an object as a lookup list of action definition string keys and their firable function. Subscriber functions are called with the context as `(...params)`. If the value is a function it is called as the raw contents of the action.\n* @param {Object} [data] The data binding\n*\n* @emits change Emitted as `(data)` whenever any data changes\n* @emits changeItem Emitted as `({path, value})` when any single item changes\n* @emits onAction Emitted as `({action, params})` when any action is fired\n* @emits mgComponent.click Emitted as `(component, event)` on native clicks of a component\n* @emits mgComponent.mouseDown Emitted as `(component, event)` on the native mouseDown event of a component\n* @emits mgComponent.mouseUp Emitted as `(component, event)` on the native mouseUp event of a component\n* @emits mgComponent.mouseMove Emitted as `(component, event)` on the native mouseMove event of a component\n* @emits mgComponent.mouseEnter Emitted as `(component, event)` on the native mouseEnter event of a component\n* @emits mgComponent.mouseLeave Emitted as `(component, event)` on the native mouseLeave event of a component\n* @emits mgComponent.mouseOver Emitted as `(component, event)` on the native mouseOver event of a component\n* @emits mgComponent.mouseOut Emitted as `(component, event)` on the native mouseOut event of a component\n* @emits mgContainer.click Emitted as `(container, specPath, event)` on the native click event of a component within a container\n* @emits mgContainer.mouseEnter Emitted as `(container, specPath, event)` on the native mouseEnter event of a component within a container\n* @emits mgContainer.mouseLeave Emitted as `(container, specPath, event)` on the native mouseLeave event of a component within a container\n*/\nexport default Vue.component('mgForm', {\n\tprovide() { return {\n\t\t$mgForm: this,\n\t}},\n\tdata() { return {\n\t\tid: undefined, // Set on create\n\t\tediting: false, // Set by mgFormEditor when its this components parent\n\t\terrors: [], // array <Object> {error}\n\t\tspec: undefined, // Calculated version of config after its been though $macgyver.compileSpec()\n\t\tformData: {}, // Calculated version of $props.data after default population\n\t\tinRefresh: false, // Whether we are doing a refresh from the top-down, prevents recursive refreshing\n\t}},\n\tprops: {\n\t\tform: String, // Optional overriding form ID\n\t\tconfig: [Object, Array], // Can be a single object, array of objects or shorthand style\n\t\tdata: Object,\n\n\t\tpopulateDefaults: {type: Boolean, default: true},\n\t\tonAction: Function,\n\t\tactionsFallback: {type: Boolean, default: true},\n\t\tactions: { // Object of functions e.g. `{customFunc: ()=> {}}`\n\t\t\ttype: [Function, Object],\n\t\t\tvalidator: v => _.isFunction(v) || _.every(v => _.isFunction(v)),\n\t\t},\n\t},\n\tcreated() {\n\t\tthis.id = this.id || this.$props.form || this.$macgyver.nextId();\n\t},\n\tmounted() {\n\t\tthis.$watch('$props.config', ()=> {\n\t\t\t// console.log('mgForm config clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));\n\t\t\tthis.rebuild();\n\t\t}, {immediate: true, deep: true});\n\n\t\tthis.$watch('$props.data', ()=> {\n\t\t\t// console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));\n\t\t\tthis.rebuildData();\n\t\t}, {immediate: true, deep: true});\n\n\t\tthis.$on('mgChange', data => {\n\t\t\tif (this.inRefresh) return;\n\t\t\tthis.$macgyver.utils.setPath(this.formData, data.path, data.value);\n\t\t\tthis.$emit('changeItem', data);\n\n\t\t\tthis.$emit('change', {...this.formData}); // Has to be a shallow clone so we break the reference and Vue updates\n\t\t\tthis.refreshShowIfs();\n\t\t});\n\n\t\tthis.$on('mgErrors', errors => this.errors = errors);\n\t\t// this.$on('mgForm.rebuild', ()=> this.rebuild()); // FIXME: Needed after new mgForm config clobber detection?\n\t},\n\tmethods: {\n\t\t/**\n\t\t* Force the form to rebuild its config\n\t\t*/\n\t\trebuild() {\n\t\t\tthis.id = this.id || this.$props.form || this.$macgyver.nextId();\n\t\t\t// console.log(`Rebuild form config for form \"${this.id}\"`);\n\n\t\t\tthis.spec = this.$macgyver.compileSpec(this.$props.config);\n\t\t\tif (!this.spec || !this.spec.spec) throw new Error('Invalid Macgyver form spec');\n\t\t},\n\n\n\t\t/**\n\t\t* Force the form to rebuild its data set\n\t\t*/\n\t\trebuildData() {\n\t\t\tif (this.inRefresh) return;\n\t\t\tthis.inRefresh = true;\n\n\t\t\tthis.formData = this.$props.data ? _.cloneDeep(this.$props.data) : {};\n\n\t\t\tif (this.$props.populateDefaults) this.assignDefaults();\n\t\t\tthis.refreshShowIfs();\n\t\t\tthis.$emit.down('mgRefreshForm');\n\t\t\tthis.$nextTick(()=> // Wait one tick for all attempts to recall this function recursively to exhaust\n\t\t\t\tthis.inRefresh = false\n\t\t\t);\n\t\t},\n\n\n\t\t/**\n\t\t* Force recomputation of show via showIf values\n\t\t*/\n\t\trefreshShowIfs() {\n\t\t\tif (!this.spec) return;\n\t\t\tthis.spec.showIfs.forEach(widget =>\n\t\t\t\twidget.show = this.$macgyver.utils.evalMatch(widget.showIf, this.formData)\n\t\t\t);\n\t\t},\n\n\n\t\t/**\n\t\t* Assign initial defaults if a value is not in the data object\n\t\t*/\n\t\tassignDefaults() {\n\t\t\tif (!this.spec) return;\n\t\t\t_.defaultsDeep(this.formData, this.getPrototype());\n\t\t\tthis.$emit('change', this.formData);\n\t\t},\n\n\n\t\t/**\n\t\t* Compute the data prototype of the form\n\t\t* This is an empty object with all the defaults populated\n\t\t* @returns {Object} A prototype data object with all defaults populated\n\t\t* @see $macgyver.forms.getPrototype()\n\t\t*/\n\t\tgetPrototype() {\n\t\t\tif (!this.id) return {}; // Form not yet ready\n\t\t\treturn this.$macgyver.forms.getPrototype(this.spec.spec);\n\t\t},\n\n\n\t\t/**\n\t\t* Execute a function within a form\n\t\t* The default behaviour of this function is documented within the function\n\t\t* @param {string|function} action The action(s) to execute\n\t\t* @param {*} [context] The context of the action, defaults to the form component\n\t\t* @param {*} [params...] Additional parameters to execute\n\t\t* @emits mgRun Event fired at the form level only with a single object of the form `{action, params}`. Use the form property handleActions to specify if the form should handle or trap the event to override\n\t\t*/\n\t\trun(action, context, ...params) {\n\t\t\t// 0. See if what we've been passed is already a function {{{\n\t\t\tif (typeof action == 'function') {\n\t\t\t\treturn action.call(context ?? this);\n\t\t\t}\n\t\t\t// }}}\n\n\t\t\t// 1. Emit mgRun to parents and see if they want to handle it {{{\n\t\t\tvar handled = false;\n\t\t\tthis.$emit.up.call(context ?? this, 'mgRun', {action, params}, isHandled => {\n\t\t\t\tif (isHandled) handled = true;\n\t\t\t});\n\t\t\tif (handled) return;\n\t\t\t// }}}\n\n\t\t\t// 2. Use FORM.$props.onAction(action) and see if returns truthy {{{\n\t\t\tif (this.$props.onAction && this.$props.onAction.call(context ?? this, action, ...params)) return;\n\t\t\t// }}}\n\n\t\t\t// 3a. Does FORM.$props.actions exist and is a function which will handle everything? {{{\n\t\t\tif (this.$props.actions && _.isFunction(this.$props.actions)) {\n\t\t\t\tthis.$props.actions.call(context ?? this, action);\n\t\t\t\treturn;\n\t\t\t}\n\t\t\t// }}}\n\n\t\t\t// 3b. Does FORM.$props.actions[action] exist and if so whether it returns truthy {{{\n\t\t\tvar [junk, actionReadable, actionArgs] = /^([a-z0-9\\_]*?)(\\(.*\\))?$/i.exec(action) || [];\n\t\t\tif (actionReadable && this.$props.actions && this.$props.actions[actionReadable]) {\n\t\t\t\t// Collapse strings to functions\n\t\t\t\tvar func = _.isString(this.$props.actions[actionReadable]) ? this[actionReadable]\n\t\t\t\t\t: this.$props.actions[actionReadable];\n\n\t\t\t\t// Tidy up actionArgs\n\t\t\t\tactionArgs = (actionArgs || '')\n\t\t\t\t\t.replace(/^\\(/, '') // Remove preceeding '('\n\t\t\t\t\t.replace(/\\)$/, '') // Remove succeeding ')'\n\t\t\t\t\t.split(',')\n\t\t\t\t\t.map(i => i && JSON.parse(i.replace(/'/g, '\"')));\n\n\t\t\t\tif (func.call(context ?? this, ...actionArgs, ...params)) return;\n\t\t\t}\n\t\t\t// }}}\n\n\t\t\t// 4. If all else failed and FORM.$props.actionsFallback is true - handle it via vm.$eval {{{\n\t\t\tthis.$macgyver.$eval.call(context ?? this, action, ...params);\n\t\t\t// }}}\n\t\t},\n\n\n\t\t/**\n\t\t* Find a VueComponent instance from a specPath\n\t\t* @param {string|array} specPath The specPath to search for\n\t\t* @param {boolean} [throws=true] Throw an error if the path cannot be found (avoid downstream checking if the specPath is valid)\n\t\t* @returns {VueComponent} Either the found VueComponent or `false` if not found\n\t\t*/\n\t\tgetComponentBySpecPath(specPath, throws = true) {\n\t\t\tvar found = false;\n\t\t\tthis.$emit.down('mgIdentify', widget => {\n\t\t\t\tif (!found && widget.$props.$specPath == specPath)\n\t\t\t\t\tfound = widget;\n\t\t\t});\n\t\t\tif (!found && throws) throw new Error(`Cannot edit component by non-existant specPath \"${specPath}\"`);\n\t\t\treturn found;\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-form\">\n\t\t<div v-if=\"errors.length\" class=\"alert alert-warning\">\n\t\t\t<ul>\n\t\t\t\t<li v-for=\"err in errors\">{{err.error}}</li>\n\t\t\t</ul>\n\t\t</div>\n\n\t\t<mg-component\n\t\t\tv-if=\"spec\"\n\t\t\t:config=\"spec.spec\"\n\t\t/>\n\t</div>\n</template>\n\n<style>\n/* Add missing Bootstrap color variables */\n.mg-form {\n\t--btn-default-bg: #e9ecef;\n\t--btn-default-fg: #495057;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
-    const __vue_scope_id__$o = undefined;
+    const __vue_scope_id__$p = undefined;
     /* module identifier */
-    const __vue_module_identifier__$o = undefined;
+    const __vue_module_identifier__$p = undefined;
     /* functional template */
-    const __vue_is_functional_template__$o = false;
+    const __vue_is_functional_template__$p = false;
     /* style inject SSR */
     
     /* style inject shadow dom */
     
 
     
-    const __vue_component__$o = normalizeComponent(
-      { render: __vue_render__$h, staticRenderFns: __vue_staticRenderFns__$h },
-      __vue_inject_styles__$o,
-      __vue_script__$o,
-      __vue_scope_id__$o,
-      __vue_is_functional_template__$o,
-      __vue_module_identifier__$o,
+    const __vue_component__$p = normalizeComponent(
+      { render: __vue_render__$i, staticRenderFns: __vue_staticRenderFns__$i },
+      __vue_inject_styles__$p,
+      __vue_script__$p,
+      __vue_scope_id__$p,
+      __vue_is_functional_template__$p,
+      __vue_module_identifier__$p,
       false,
       createInjector,
       undefined,
@@ -12439,10 +18296,10 @@
 
   var mgForm = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$o
+    'default': __vue_component__$p
   });
 
-  var script$o = Vue.mgComponent('mgGrid', {
+  var script$p = Vue.mgComponent('mgGrid', {
     meta: {
       title: 'Grid layout',
       icon: 'far fa-grip-horizontal',
@@ -12457,10 +18314,10 @@
   });
 
   /* script */
-  const __vue_script__$p = script$o;
+  const __vue_script__$q = script$p;
 
   /* template */
-  var __vue_render__$i = function() {
+  var __vue_render__$j = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -12486,68 +18343,6 @@
       }),
       0
     )
-  };
-  var __vue_staticRenderFns__$i = [];
-  __vue_render__$i._withStripped = true;
-
-    /* style */
-    const __vue_inject_styles__$p = undefined;
-    /* scoped */
-    const __vue_scope_id__$p = undefined;
-    /* module identifier */
-    const __vue_module_identifier__$p = undefined;
-    /* functional template */
-    const __vue_is_functional_template__$p = false;
-    /* style inject */
-    
-    /* style inject SSR */
-    
-    /* style inject shadow dom */
-    
-
-    
-    const __vue_component__$p = normalizeComponent(
-      { render: __vue_render__$i, staticRenderFns: __vue_staticRenderFns__$i },
-      __vue_inject_styles__$p,
-      __vue_script__$p,
-      __vue_scope_id__$p,
-      __vue_is_functional_template__$p,
-      __vue_module_identifier__$p,
-      false,
-      undefined,
-      undefined,
-      undefined
-    );
-
-  var mgGrid = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    'default': __vue_component__$p
-  });
-
-  var script$p = Vue.mgComponent('mgHeading', {
-    meta: {
-      title: 'Heading',
-      icon: 'far fa-heading',
-      category: 'General Decoration'
-    },
-    props: {
-      text: {
-        type: 'mgText'
-      }
-    }
-  });
-
-  /* script */
-  const __vue_script__$q = script$p;
-
-  /* template */
-  var __vue_render__$j = function() {
-    var _vm = this;
-    var _h = _vm.$createElement;
-    var _c = _vm._self._c || _h;
-    return _c("legend", { staticClass: "form-control-static" }, [
-      _vm._v("\n\t" + _vm._s(_vm.data || _vm.$props.text) + "\n")
-    ])
   };
   var __vue_staticRenderFns__$j = [];
   __vue_render__$j._withStripped = true;
@@ -12581,30 +18376,20 @@
       undefined
     );
 
-  var mgHeading = /*#__PURE__*/Object.freeze({
+  var mgGrid = /*#__PURE__*/Object.freeze({
     __proto__: null,
     'default': __vue_component__$q
   });
 
-  var script$q = Vue.mgComponent('mgHtml', {
+  var script$q = Vue.mgComponent('mgHeading', {
     meta: {
-      title: 'Static HTML',
-      icon: 'fab fa-html5',
+      title: 'Heading',
+      icon: 'far fa-heading',
       category: 'General Decoration'
-    },
-    inject: {
-      $mgForm: {
-        from: '$mgForm'
-      },
-      $mgFormEditor: {
-        from: '$mgFormEditor',
-        "default": false
-      }
     },
     props: {
       text: {
-        type: 'mgCode',
-        syntax: 'html'
+        type: 'mgText'
       }
     }
   });
@@ -12617,27 +18402,9 @@
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
-    return _c(
-      "div",
-      [
-        !_vm.$mgFormEditor
-          ? _c("div", {
-              staticClass: "form-control-static",
-              domProps: { innerHTML: _vm._s(_vm.data || _vm.$props.text) }
-            })
-          : _c("mg-wysiwyg", {
-              attrs: {
-                value: _vm.data === undefined ? _vm.$props.text : _vm.data
-              },
-              on: {
-                change: function($event) {
-                  _vm.data = $event;
-                }
-              }
-            })
-      ],
-      1
-    )
+    return _c("legend", { staticClass: "form-control-static" }, [
+      _vm._v("\n\t" + _vm._s(_vm.data || _vm.$props.text) + "\n")
+    ])
   };
   var __vue_staticRenderFns__$k = [];
   __vue_render__$k._withStripped = true;
@@ -12671,12 +18438,102 @@
       undefined
     );
 
-  var mgHtml = /*#__PURE__*/Object.freeze({
+  var mgHeading = /*#__PURE__*/Object.freeze({
     __proto__: null,
     'default': __vue_component__$r
   });
 
-  var script$r = Vue.mgComponent('mgIcon', {
+  var script$r = Vue.mgComponent('mgHtml', {
+    meta: {
+      title: 'Static HTML',
+      icon: 'fab fa-html5',
+      category: 'General Decoration'
+    },
+    inject: {
+      $mgForm: {
+        from: '$mgForm'
+      },
+      $mgFormEditor: {
+        from: '$mgFormEditor',
+        "default": false
+      }
+    },
+    props: {
+      text: {
+        type: 'mgCode',
+        syntax: 'html'
+      }
+    }
+  });
+
+  /* script */
+  const __vue_script__$s = script$r;
+
+  /* template */
+  var __vue_render__$l = function() {
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
+    return _c(
+      "div",
+      [
+        !_vm.$mgFormEditor
+          ? _c("div", {
+              staticClass: "form-control-static",
+              domProps: { innerHTML: _vm._s(_vm.data || _vm.$props.text) }
+            })
+          : _c("mg-wysiwyg", {
+              attrs: {
+                value: _vm.data === undefined ? _vm.$props.text : _vm.data
+              },
+              on: {
+                change: function($event) {
+                  _vm.data = $event;
+                }
+              }
+            })
+      ],
+      1
+    )
+  };
+  var __vue_staticRenderFns__$l = [];
+  __vue_render__$l._withStripped = true;
+
+    /* style */
+    const __vue_inject_styles__$s = undefined;
+    /* scoped */
+    const __vue_scope_id__$s = undefined;
+    /* module identifier */
+    const __vue_module_identifier__$s = undefined;
+    /* functional template */
+    const __vue_is_functional_template__$s = false;
+    /* style inject */
+    
+    /* style inject SSR */
+    
+    /* style inject shadow dom */
+    
+
+    
+    const __vue_component__$s = normalizeComponent(
+      { render: __vue_render__$l, staticRenderFns: __vue_staticRenderFns__$l },
+      __vue_inject_styles__$s,
+      __vue_script__$s,
+      __vue_scope_id__$s,
+      __vue_is_functional_template__$s,
+      __vue_module_identifier__$s,
+      false,
+      undefined,
+      undefined,
+      undefined
+    );
+
+  var mgHtml = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    'default': __vue_component__$s
+  });
+
+  var script$s = Vue.mgComponent('mgIcon', {
     meta: {
       title: 'Icon',
       icon: 'far fa-flag',
@@ -12774,10 +18631,10 @@
   });
 
   /* script */
-  const __vue_script__$s = script$r;
+  const __vue_script__$t = script$s;
 
   /* template */
-  var __vue_render__$l = function() {
+  var __vue_render__$m = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -12830,34 +18687,34 @@
       1
     )
   };
-  var __vue_staticRenderFns__$l = [];
-  __vue_render__$l._withStripped = true;
+  var __vue_staticRenderFns__$m = [];
+  __vue_render__$m._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$s = function (inject) {
+    const __vue_inject_styles__$t = function (inject) {
       if (!inject) return
       inject("data-v-3817fda0_0", { source: "\n.btn.btn-icon-fixed {\n\tbox-shadow: none;\n\twidth: 32px;\n\theight: 32px;\n\tpadding: 7px 0;\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgIcon.vue"],"names":[],"mappings":";AA0FA;CACA,gBAAA;CACA,WAAA;CACA,YAAA;CACA,cAAA;CACA,aAAA;CACA,uBAAA;CACA,mBAAA;AACA","file":"mgIcon.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgIcon', {\n\tmeta: {\n\t\ttitle: 'Icon',\n\t\ticon: 'far fa-flag',\n\t\tcategory: 'Simple Inputs',\n\t\tpreferId: true,\n\t},\n\tprops: {\n\t\ticonFallback: {type: 'mgIcon', default: 'far fa-info', help: 'The icon to use if non is selected'},\n\t\trequired: {type: 'mgToggle', default: false},\n\t\tinterface: {type: 'mgChoiceButtons', default: 'modal', enum: ['modal', 'dropdown']},\n\t\ticonFeed: {type: 'mgText', default: '/api/webfonts/fa.json', advanced: true, help: 'The data source to import icon information', relative: true},\n\t\tclassName: {type: 'mgText', default: 'btn btn-light btn-circle', advanced: true},\n\t\tclassActive: {type: 'mgText', advanced: true},\n\t\tclassInactive: {type: 'mgText', advanced: true},\n\t},\n\tcreated() {\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);\n\t\t});\n\t},\n\tmethods: {\n\t\tselectIcon() {\n\t\t\tPromise.resolve()\n\t\t\t\t.then(()=> this.$macgyver.notify.loading(this._uid, true))\n\t\t\t\t.then(()=> this.$http.get(this.$props.iconFeed))\n\t\t\t\t.then(res => { this.$macgyver.notify.loading(this._uid, false); return res })\n\t\t\t\t.then(res => this.$macgyver.$prompt.macgyver({\n\t\t\t\t\ttitle: 'Select icon',\n\t\t\t\t\tbuttons: [], // We're capturing the first click so we don't need confirm buttons\n\t\t\t\t\tmacgyver: [\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tid: 'className',\n\t\t\t\t\t\t\ttype: 'mgChoiceButtons',\n\t\t\t\t\t\t\tshowTitle: false,\n\t\t\t\t\t\t\tclassWrapper: '',\n\t\t\t\t\t\t\tenum: res.data.map(icon => ({\n\t\t\t\t\t\t\t\tid: icon.class,\n\t\t\t\t\t\t\t\tclass: `btn btn-icon-fixed ${icon.class} fa-fw`,\n\t\t\t\t\t\t\t\tclassActive: `btn btn-primary btn-icon-fixed ${icon.class} fa-fw`,\n\t\t\t\t\t\t\t})),\n\t\t\t\t\t\t},\n\t\t\t\t\t],\n\t\t\t\t\tonShow: ()=> {\n\t\t\t\t\t\t// Bind to the mg-form element, detect the first change and close the dialog\n\t\t\t\t\t\tthis.$macgyver.$prompt.settings.macgyverForm.$on('mgChange', ()=> setTimeout(()=> { // Timeout not really needed but it lets the button highlight before we close\n\t\t\t\t\t\t\tthis.$macgyver.$prompt.close(true, this.$macgyver.$prompt.settings.value);\n\t\t\t\t\t\t}, 100));\n\t\t\t\t\t},\n\t\t\t\t}))\n\t\t\t\t.then(form => this.data = form.className)\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-icon\">\n\t\t<a\n\t\t\tv-if=\"$props.interface == 'modal'\"\n\t\t\t@click=\"selectIcon()\"\n\t\t\tclass=\"btn btn-light btn-icon-fixed\"\n\t\t\t:class=\"data ? [data, $props.classActive || $props.className] : [$props.iconFallback, $props.classInactive || $props.className]\"\n\t\t/>\n\t\t<mg-choice-dropdown\n\t\t\tv-else-if=\"$props.interface == 'dropdown'\"\n\t\t\tenum-source=\"url\"\n\t\t\t:enum-url=\"{\n\t\t\t\turl: $props.iconFeed,\n\t\t\t\ttype: 'array',\n\t\t\t\tmappings: {\n\t\t\t\t\tid: {required: true, from: 'class'},\n\t\t\t\t\ttitle: {required: true, from: 'id'},\n\t\t\t\t\ticon: {required: true, from: 'class'},\n\t\t\t\t},\n\t\t\t}\"\n\t\t\t:default=\"$props.default\"\n\t\t\t:required=\"$props.required\"\n\t\t\t:value=\"data\"\n\t\t\t@change=\"data = $event\"\n\t\t/>\n\t\t<mg-error\n\t\t\tv-else\n\t\t\terror-text=\"Unknown mgIcon interface\"\n\t\t/>\n\t</div>\n</template>\n\n<style>\n.btn.btn-icon-fixed {\n\tbox-shadow: none;\n\twidth: 32px;\n\theight: 32px;\n\tpadding: 7px 0;\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
-    const __vue_scope_id__$s = undefined;
+    const __vue_scope_id__$t = undefined;
     /* module identifier */
-    const __vue_module_identifier__$s = undefined;
+    const __vue_module_identifier__$t = undefined;
     /* functional template */
-    const __vue_is_functional_template__$s = false;
+    const __vue_is_functional_template__$t = false;
     /* style inject SSR */
     
     /* style inject shadow dom */
     
 
     
-    const __vue_component__$s = normalizeComponent(
-      { render: __vue_render__$l, staticRenderFns: __vue_staticRenderFns__$l },
-      __vue_inject_styles__$s,
-      __vue_script__$s,
-      __vue_scope_id__$s,
-      __vue_is_functional_template__$s,
-      __vue_module_identifier__$s,
+    const __vue_component__$t = normalizeComponent(
+      { render: __vue_render__$m, staticRenderFns: __vue_staticRenderFns__$m },
+      __vue_inject_styles__$t,
+      __vue_script__$t,
+      __vue_scope_id__$t,
+      __vue_is_functional_template__$t,
+      __vue_module_identifier__$t,
       false,
       createInjector,
       undefined,
@@ -12866,10 +18723,10 @@
 
   var mgIcon = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$s
+    'default': __vue_component__$t
   });
 
-  var script$s = Vue.mgComponent('mgInfoBlock', {
+  var script$t = Vue.mgComponent('mgInfoBlock', {
     meta: {
       title: 'Info Block',
       icon: 'far fa-info-square',
@@ -12995,10 +18852,10 @@
   });
 
   /* script */
-  const __vue_script__$t = script$s;
+  const __vue_script__$u = script$t;
 
   /* template */
-  var __vue_render__$m = function() {
+  var __vue_render__$n = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -13029,34 +18886,34 @@
       ]
     )
   };
-  var __vue_staticRenderFns__$m = [];
-  __vue_render__$m._withStripped = true;
+  var __vue_staticRenderFns__$n = [];
+  __vue_render__$n._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$t = function (inject) {
+    const __vue_inject_styles__$u = function (inject) {
       if (!inject) return
       inject("data-v-31c83535_0", { source: "\n.mg-info-block {\n\tbackground: transparent;\n\tborder-radius: 5px;\n}\n.mg-info-block .mg-info-block-text {\n\tfont-size: 200%;\n\tfont-weight: bold;\n}\n.mg-info-block .mg-info-block-title {\n\tfont-size: 90%;\n\topacity: 0.8;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgInfoBlock.vue"],"names":[],"mappings":";AA+EA;CACA,uBAAA;CACA,kBAAA;AACA;AAEA;CACA,eAAA;CACA,iBAAA;AACA;AAEA;CACA,cAAA;CACA,YAAA;AACA","file":"mgInfoBlock.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgInfoBlock', {\n\tmeta: {\n\t\ttitle: 'Info Block',\n\t\ticon: 'far fa-info-square',\n\t\tcategory: 'Data display',\n\t\tformat: false,\n\t},\n\tdata() { return {\n\t\tisLoading: false,\n\t}},\n\tprops: {\n\t\ttext: {type: 'mgText', help: 'Text to display, if a URL is also specified this is overridden when the result loads', default: ''},\n\t\turl: {type: 'mgUrl', relative: true, default: '/api/datafeeds/random/number?$extract=number'},\n\t\tcoloring: {\n\t\t\ttype: 'mgChoiceDropdown',\n\t\t\tdefault: 'bg-primary',\n\t\t\tenum: [\n\t\t\t\t{id: 'bg-primary text-white', text: 'Primary'},\n\t\t\t\t{id: 'bg-secondary', text: 'Secondary'},\n\t\t\t\t{id: 'bg-success text-white', text: 'Success'},\n\t\t\t\t{id: 'bg-danger text-white', text: 'Danger'},\n\t\t\t\t{id: 'bg-warning text-white', text: 'Warning'},\n\t\t\t\t{id: 'bg-info text-white', text: 'Info'},\n\t\t\t\t{id: 'bg-light', text: 'Light'},\n\t\t\t\t{id: 'bg-dark text-white', text: 'Dark'},\n\t\t\t\t{id: 'bg-muted', text: 'Muted'},\n\t\t\t],\n\t\t},\n\t\ticon: {type: 'mgIcon', default: 'far fa-info-circle'},\n\t\ticonLoading: {type: 'mgIcon', default: 'far fa-spinner fa-spin', advanced: true},\n\t\ticonSize: {\n\t\t\ttype: 'mgChoiceButtons',\n\t\t\tdefault: 'fa-4x',\n\t\t\tadvanced: true,\n\t\t\tenum: [\n\t\t\t\t{id: '', text: 'Normal'},\n\t\t\t\t{id: 'fa-2x', text: '2x'},\n\t\t\t\t{id: 'fa-3x', text: '3x'},\n\t\t\t\t{id: 'fa-4x', text: '4x'},\n\t\t\t\t{id: 'fa-5x', text: '5x'},\n\t\t\t\t{id: 'fa-6x', text: '6x'},\n\t\t\t\t{id: 'fa-7x', text: '7x'},\n\t\t\t\t{id: 'fa-8x', text: '8x'},\n\t\t\t],\n\t\t},\n\t},\n\tcreated() {\n\t\tthis.$watch('$props.url', ()=> {\n\t\t\tif (!this.$props.url) return;\n\t\t\tPromise.resolve()\n\t\t\t\t.then(()=> this.isLoading = true)\n\t\t\t\t.then(()=> this.$macgyver.utils.fetch(this.$props.url, {\n\t\t\t\t\ttype: 'object',\n\t\t\t\t\tmappings: {extract: {required: true}},\n\t\t\t\t\tformat: d => d.extract,\n\t\t\t\t}))\n\t\t\t\t.then(data => this.$set(this, 'data', data))\n\t\t\t\t.then(()=> this.isLoading = false)\n\t\t}, {immediate: true});\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"card mg-info-block\" :class=\"$props.coloring\">\n\t\t<div class=\"card-body media\">\n\t\t\t<div class=\"mr-3\">\n\t\t\t\t<i :class=\"[isLoading ? $props.iconLoading : $props.icon, $props.iconSize]\"/>\n\t\t\t</div>\n\t\t\t<div class=\"media-body\">\n\t\t\t\t<div class=\"mg-info-block-text\">{{data || $props.text}}</div>\n\t\t\t\t<div class=\"mg-info-block-title\">{{$props.title}}</div>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n\n<style>\n.mg-info-block {\n\tbackground: transparent;\n\tborder-radius: 5px;\n}\n\n.mg-info-block .mg-info-block-text {\n\tfont-size: 200%;\n\tfont-weight: bold;\n}\n\n.mg-info-block .mg-info-block-title {\n\tfont-size: 90%;\n\topacity: 0.8;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
-    const __vue_scope_id__$t = undefined;
+    const __vue_scope_id__$u = undefined;
     /* module identifier */
-    const __vue_module_identifier__$t = undefined;
+    const __vue_module_identifier__$u = undefined;
     /* functional template */
-    const __vue_is_functional_template__$t = false;
+    const __vue_is_functional_template__$u = false;
     /* style inject SSR */
     
     /* style inject shadow dom */
     
 
     
-    const __vue_component__$t = normalizeComponent(
-      { render: __vue_render__$m, staticRenderFns: __vue_staticRenderFns__$m },
-      __vue_inject_styles__$t,
-      __vue_script__$t,
-      __vue_scope_id__$t,
-      __vue_is_functional_template__$t,
-      __vue_module_identifier__$t,
+    const __vue_component__$u = normalizeComponent(
+      { render: __vue_render__$n, staticRenderFns: __vue_staticRenderFns__$n },
+      __vue_inject_styles__$u,
+      __vue_script__$u,
+      __vue_scope_id__$u,
+      __vue_is_functional_template__$u,
+      __vue_module_identifier__$u,
       false,
       createInjector,
       undefined,
@@ -13065,10 +18922,10 @@
 
   var mgInfoBlock = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$t
+    'default': __vue_component__$u
   });
 
-  var script$t = Vue.mgComponent('mgLabel', {
+  var script$u = Vue.mgComponent('mgLabel', {
     meta: {
       title: 'Read-only label',
       icon: 'far fa-font',
@@ -13087,10 +18944,10 @@
   });
 
   /* script */
-  const __vue_script__$u = script$t;
+  const __vue_script__$v = script$u;
 
   /* template */
-  var __vue_render__$n = function() {
+  var __vue_render__$o = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -13098,17 +18955,17 @@
       _vm._v("\n\t" + _vm._s(_vm.data || _vm.$props.text) + "\n")
     ])
   };
-  var __vue_staticRenderFns__$n = [];
-  __vue_render__$n._withStripped = true;
+  var __vue_staticRenderFns__$o = [];
+  __vue_render__$o._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$u = undefined;
+    const __vue_inject_styles__$v = undefined;
     /* scoped */
-    const __vue_scope_id__$u = undefined;
+    const __vue_scope_id__$v = undefined;
     /* module identifier */
-    const __vue_module_identifier__$u = undefined;
+    const __vue_module_identifier__$v = undefined;
     /* functional template */
-    const __vue_is_functional_template__$u = false;
+    const __vue_is_functional_template__$v = false;
     /* style inject */
     
     /* style inject SSR */
@@ -13117,13 +18974,13 @@
     
 
     
-    const __vue_component__$u = normalizeComponent(
-      { render: __vue_render__$n, staticRenderFns: __vue_staticRenderFns__$n },
-      __vue_inject_styles__$u,
-      __vue_script__$u,
-      __vue_scope_id__$u,
-      __vue_is_functional_template__$u,
-      __vue_module_identifier__$u,
+    const __vue_component__$v = normalizeComponent(
+      { render: __vue_render__$o, staticRenderFns: __vue_staticRenderFns__$o },
+      __vue_inject_styles__$v,
+      __vue_script__$v,
+      __vue_scope_id__$v,
+      __vue_is_functional_template__$v,
+      __vue_module_identifier__$v,
       false,
       undefined,
       undefined,
@@ -13132,10 +18989,10 @@
 
   var mgLabel = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$u
+    'default': __vue_component__$v
   });
 
-  var script$u = Vue.mgComponent('mgList', {
+  var script$v = Vue.mgComponent('mgList', {
     meta: {
       title: 'List',
       icon: 'far fa-list-ul',
@@ -13209,10 +19066,10 @@
   });
 
   /* script */
-  const __vue_script__$v = script$u;
+  const __vue_script__$w = script$v;
 
   /* template */
-  var __vue_render__$o = function() {
+  var __vue_render__$p = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -13332,34 +19189,34 @@
       ])
     ])
   };
-  var __vue_staticRenderFns__$o = [];
-  __vue_render__$o._withStripped = true;
+  var __vue_staticRenderFns__$p = [];
+  __vue_render__$p._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$v = function (inject) {
+    const __vue_inject_styles__$w = function (inject) {
       if (!inject) return
       inject("data-v-4db17ef8_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Cell padding */\n.mg-list td {\n\tpadding: 0px !important;\n}\n.mg-list td input[type=\"text\"] {\n\tborder: none;\n}\n\n/* Row number cell */\n.mg-list td.row-number-cell {\n\ttext-align: center;\n\twidth: 30px;\n\tvertical-align: middle;\n}\n\n/* Verb cell */\n.mg-list .verb-cell {\n\twidth: 30px;\n\ttext-align: center;\n\tvertical-align: middle;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgList.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AA2EA,iBAAA;AACA;CACA,uBAAA;AACA;AAEA;CACA,YAAA;AACA;;AAEA,oBAAA;AACA;CACA,kBAAA;CACA,WAAA;CACA,sBAAA;AACA;;AAEA,cAAA;AACA;CACA,WAAA;CACA,kBAAA;CACA,sBAAA;AACA","file":"mgList.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgList', {\n\tmeta: {\n\t\ttitle: 'List',\n\t\ticon: 'far fa-list-ul',\n\t\tcategory: 'Simple Inputs',\n\t\tpreferId: true,\n\t\tformat: v => (v || []).join(', '),\n\t},\n\tdata() { return {\n\t\tnewItem: '',\n\t}},\n\tprops: {\n\t\tallowDelete: {type: 'mgToggle', default: true},\n\t\tmin: {type: 'mgNumber', title: 'Minimum number of items'},\n\t\tmax: {type: 'mgNumber', title: 'Maximum number of items'},\n\t\trequired: {type: 'mgToggle', default: false},\n\t\tnumbered: {type: 'mgToggle', default: true},\n\t\taddButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},\n\t\taddButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},\n\t},\n\tcreated() {\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.required && (!this.data || !this.data.length)) return reply(`${this.$props.title} is required`);\n\t\t\tif (this.$props.min && _.isString(this.data) && this.data.length < this.$props.min) return reply(`${this.$props.title} must have at least ${this.$props.min} items`);\n\t\t\tif (this.$props.max && _.isString(this.data) && this.data.length > this.$props.max) return reply(`${this.$props.title} must have at most ${this.$props.max} items`);\n\t\t});\n\t},\n\tmethods: {\n\t\taddItem() {\n\t\t\tif (!_.isArray(this.data)) this.data = [];\n\t\t\tthis.data.push(this.newItem);\n\t\t\tthis.newItem = '';\n\t\t},\n\t\tchangeItem(index, value) {\n\t\t\tthis.$set(this.data, index, value);\n\t\t},\n\t\tremoveItem(index) {\n\t\t\tthis.data = this.data.filter((x, i) => i != index);\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<table class=\"table table-bordered mg-list\">\n\t\t<tbody>\n\t\t\t<tr v-for=\"(row, rowIndex) in data\">\n\t\t\t\t<td v-if=\"$props.numbered\" class=\"row-number-cell\">{{rowIndex + 1 | number}}</td>\n\t\t\t\t<td>\n\t\t\t\t\t<input :value=\"row\" @change=\"changeItem(rowIndex, $event.srcElement.value)\" type=\"text\" class=\"form-control\"/>\n\t\t\t\t</td>\n\t\t\t\t<td v-if=\"$props.allowDelete\" class=\"verb-cell\">\n\t\t\t\t\t<a @click=\"removeItem(rowIndex)\" class=\"btn btn-link btn-link-danger btn-xs text-muted\"><i class=\"fa fa-trash\"></i></a>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tbody>\n\t\t<tfoot class=\"hidden-print\">\n\t\t\t<tr>\n\t\t\t\t<td v-if=\"$props.numbered\" class=\"row-number-cell\">\n\t\t\t\t\t<a v-if=\"!$props.allowDelete\" @click=\"addItem()\" :class=\"newItem ? $props.addButtonActiveClass : $props.addButtonInactiveClass\"/>\n\t\t\t\t\t<i v-else class=\"far fa-asterisk\"></i>\n\t\t\t\t</td>\n\t\t\t\t<td :colspan=\"$props.allowDelete ? 1 : 2\">\n\t\t\t\t\t<input @keyup.enter=\"addItem()\" v-model=\"newItem\" type=\"text\" class=\"form-control\"/>\n\t\t\t\t</td>\n\t\t\t\t<td v-if=\"$props.allowDelete\" class=\"verb-cell\">\n\t\t\t\t\t<a @click=\"addItem()\" :class=\"newItem ? $props.addButtonActiveClass : $props.addButtonInactiveClass\"/>\n\t\t\t\t</td>\n\t\t\t</tr>\n\t\t</tfoot>\n\t</table>\n</template>\n\n<style>\n/* Cell padding */\n.mg-list td {\n\tpadding: 0px !important;\n}\n\n.mg-list td input[type=\"text\"] {\n\tborder: none;\n}\n\n/* Row number cell */\n.mg-list td.row-number-cell {\n\ttext-align: center;\n\twidth: 30px;\n\tvertical-align: middle;\n}\n\n/* Verb cell */\n.mg-list .verb-cell {\n\twidth: 30px;\n\ttext-align: center;\n\tvertical-align: middle;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
-    const __vue_scope_id__$v = undefined;
+    const __vue_scope_id__$w = undefined;
     /* module identifier */
-    const __vue_module_identifier__$v = undefined;
+    const __vue_module_identifier__$w = undefined;
     /* functional template */
-    const __vue_is_functional_template__$v = false;
+    const __vue_is_functional_template__$w = false;
     /* style inject SSR */
     
     /* style inject shadow dom */
     
 
     
-    const __vue_component__$v = normalizeComponent(
-      { render: __vue_render__$o, staticRenderFns: __vue_staticRenderFns__$o },
-      __vue_inject_styles__$v,
-      __vue_script__$v,
-      __vue_scope_id__$v,
-      __vue_is_functional_template__$v,
-      __vue_module_identifier__$v,
+    const __vue_component__$w = normalizeComponent(
+      { render: __vue_render__$p, staticRenderFns: __vue_staticRenderFns__$p },
+      __vue_inject_styles__$w,
+      __vue_script__$w,
+      __vue_scope_id__$w,
+      __vue_is_functional_template__$w,
+      __vue_module_identifier__$w,
       false,
       createInjector,
       undefined,
@@ -13368,10 +19225,10 @@
 
   var mgList = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$v
+    'default': __vue_component__$w
   });
 
-  var script$v = Vue.mgComponent('mgNumber', {
+  var script$w = Vue.mgComponent('mgNumber', {
     meta: {
       title: 'Number',
       icon: 'far fa-sort-numeric-down',
@@ -13479,10 +19336,10 @@
   });
 
   /* script */
-  const __vue_script__$w = script$v;
+  const __vue_script__$x = script$w;
 
   /* template */
-  var __vue_render__$p = function() {
+  var __vue_render__$q = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -13623,34 +19480,34 @@
       ]
     )
   };
-  var __vue_staticRenderFns__$p = [];
-  __vue_render__$p._withStripped = true;
+  var __vue_staticRenderFns__$q = [];
+  __vue_render__$q._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$w = function (inject) {
+    const __vue_inject_styles__$x = function (inject) {
       if (!inject) return
       inject("data-v-9bb59ec0_0", { source: "\n.mg-number input[type=number] {\n\tpadding: 0 10px;\n}\n.mg-number .btn {\n\tbox-shadow: none;\n\tborder: 1px solid #f0f0f0;\n\tdisplay: flex;\n\talign-items: center;\n}\n\n/* Hide the spin button in mgNumber controls */\n.mg-number input[type=number]::-webkit-outer-spin-button,\n.mg-number input[type=number]::-webkit-inner-spin-button {\n\t/* display: none; <- Crashes Chrome on hover */\n\t-webkit-appearance: none;\n\tmargin: 0; /* <-- Apparently some margin is still there even though it's hidden */\n}\n\n\n\n/* Slider {{{ */\n.mg-number.mg-number-slider input[type=\"range\"] {\n\tdisplay: inline-block;\n\t-webkit-appearance: none;\n\twidth: calc(100% - (73px));\n\theight: 10px;\n\tborder-radius: 5px;\n\tbackground: var(--btn-default-bg);\n\toutline: none;\n\tpadding: 0;\n\tmargin: 0;\n}\n.mg-number.mg-number-slider input[type=\"range\"]::-webkit-slider-thumb {\n\t-webkit-appearance: none;\n\tappearance: none;\n\twidth: 20px;\n\theight: 20px;\n\tborder-radius: 50%;\n\tbackground: var(--primary);\n\tcursor: pointer;\n\t-webkit-transition: background .15s ease-in-out;\n\ttransition: background .15s ease-in-out;\n}\n.mg-number.mg-number-slider input[type=\"range\"]::-webkit-slider-thumb:hover,\n.mg-number.mg-number-slider input[type=\"range\"]:active::-webkit-slider-thumb,\n.mg-number.mg-number-slider input[type=\"range\"]::-moz-range-thumb:hover,\n.mg-number.mg-number-slider input[type=\"range\"]:active::-moz-range-thumb {\n\tbackground: var(--primary);\n}\n.mg-number.mg-number-slider input[type=\"range\"]::-moz-range-thumb {\n\twidth: 20px;\n\theight: 20px;\n\tborder: 0;\n\tborder-radius: 50%;\n\tcolor: var(--btn-default-fg);\n\tbackground: var(--btn-default-bg);\n\tcursor: pointer;\n\t-moz-transition: background .15s ease-in-out;\n\ttransition: background .15s ease-in-out;\n}\n.mg-number.mg-number-slider input[type=\"range\"]:focus::-webkit-slider-thumb {\n\tbox-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--primary);\n}\n.mg-number.mg-number-slider .mg-number-slider-value {\n\tdisplay: inline-block;\n\tposition: relative;\n\twidth: 60px;\n\tline-height: 20px;\n\ttext-align: center;\n\tborder-radius: 3px;\n\tcolor: var(--btn-default-fg);\n\tbackground: var(--btn-default-bg);\n\tpadding: 5px 10px;\n\tmargin-left: 8px;\n}\n.mg-number.mg-number-slider .mg-number-slider-value:after {\n\tposition: absolute;\n\ttop: 8px;\n\tleft: -7px;\n\twidth: 0;\n\theight: 0;\n\tborder-top: 7px solid transparent;\n\tborder-right: 7px solid var(--btn-default-bg);\n\tborder-bottom: 7px solid transparent;\n\tcontent: '';\n}\n::-moz-range-track {\n\tbackground: var(--btn-default-bg);\n\tborder: 0;\n}\ninput::-moz-focus-inner,\ninput::-moz-focus-outer {\n\tborder: 0;\n}\n/* }}} */\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgNumber.vue"],"names":[],"mappings":";AA0EA;CACA,eAAA;AACA;AAEA;CACA,gBAAA;CACA,yBAAA;CACA,aAAA;CACA,mBAAA;AACA;;AAEA,8CAAA;AACA;;CAEA,8CAAA;CACA,wBAAA;CACA,SAAA,EAAA,sEAAA;AACA;;;;AAIA,eAAA;AACA;CACA,qBAAA;CACA,wBAAA;CACA,0BAAA;CACA,YAAA;CACA,kBAAA;CACA,iCAAA;CACA,aAAA;CACA,UAAA;CACA,SAAA;AACA;AAEA;CACA,wBAAA;CACA,gBAAA;CACA,WAAA;CACA,YAAA;CACA,kBAAA;CACA,0BAAA;CACA,eAAA;CACA,+CAAA;CACA,uCAAA;AACA;AAEA;;;;CAIA,0BAAA;AACA;AAEA;CACA,WAAA;CACA,YAAA;CACA,SAAA;CACA,kBAAA;CACA,4BAAA;CACA,iCAAA;CACA,eAAA;CACA,4CAAA;CACA,uCAAA;AACA;AAEA;CACA,oDAAA;AACA;AAEA;CACA,qBAAA;CACA,kBAAA;CACA,WAAA;CACA,iBAAA;CACA,kBAAA;CACA,kBAAA;CACA,4BAAA;CACA,iCAAA;CACA,iBAAA;CACA,gBAAA;AACA;AACA;CACA,kBAAA;CACA,QAAA;CACA,UAAA;CACA,QAAA;CACA,SAAA;CACA,iCAAA;CACA,6CAAA;CACA,oCAAA;CACA,WAAA;AACA;AAEA;CACA,iCAAA;CACA,SAAA;AACA;AAEA;;CAEA,SAAA;AACA;AACA,QAAA","file":"mgNumber.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgNumber', {\n\tmeta: {\n\t\ttitle: 'Number',\n\t\ticon: 'far fa-sort-numeric-down',\n\t\tcategory: 'Simple Inputs',\n\t\tpreferId: true,\n\t\tshorthand: ['integer', 'int', 'float', 'num'],\n\t\tformat: v => {\n\t\t\tif (!v) return '';\n\t\t\treturn (_.isNumber(v) ? v : parseInt(v)).toLocaleString();\n\t\t},\n\t\tformatClass: 'text-right',\n\t},\n\tprops: {\n\t\tmin: {type: 'mgNumber', title: 'Minimum value'},\n\t\tmax: {type: 'mgNumber', title: 'Maximum value'},\n\t\tstep: {type: 'mgNumber', title: 'Value to increment / decrement by'},\n\t\tplaceholder: {type: 'mgNumber', help: 'Ghost text to display when there is no value'},\n\t\trequired: {type: 'mgToggle', default: false},\n\t\tinterface: {type: 'mgChoiceDropdown', title: 'Interface', help: 'How to allow number input', default: 'bumpers', enum: [\n\t\t\t{id: 'bumpers', title: 'Number input with buttons'},\n\t\t\t{id: 'slider', title: 'Slider bar'},\n\t\t\t{id: 'input', title: 'Number input box only'},\n\t\t]},\n\t\tbumperDownClass: {type: 'mgText', default: 'btn btn-light fa fa-arrow-down input-group-prepend', advanced: true, showIf: 'interface == \"bumpers\"'},\n\t\tbumperUpClass: {type: 'mgText', default: 'btn btn-light fa fa-arrow-up input-group-append', advanced: true, showIf: 'interface == \"bumpers\"'},\n\t\tprefix: {type: 'mgText', title: 'Prefix', help: 'Prefix to show before the input', showIf: 'interface == \"input\"'},\n\t\tprefixClass: {type: 'mgText', default: 'input-group-prepend input-group-text', advanced: true, showIf: 'interface == \"input\"'},\n\t\tsuffix: {type: 'mgText', title: 'Suffix', help: 'Suffix to show after the input', showIf: 'interface == \"input\"'},\n\t\tsuffixClass: {type: 'mgText', default: 'input-group-append input-group-text', advanced: true, showIf: 'interface == \"input\"'},\n\t},\n\tcreated() {\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);\n\t\t\tif (this.$props.min && this.data < this.$props.min) return reply(`${this.$props.title} is too small (minimum value is ${this.$props.min})`);\n\t\t\tif (this.$props.max && this.data > this.$props.max) return reply(`${this.$props.title} is too large (maximum value is ${this.$props.max})`);\n\t\t});\n\t},\n\tmethods: {\n\t\tadd(steps) {\n\t\t\tif (!_.isNumber(this.data)) return this.data = this.$props.min || 0; // Not already a number default to the min or zero\n\n\t\t\tthis.data += steps * (this.$props.step || 1);\n\t\t\tif (this.$props.max && this.data > this.$props.max) this.data = this.$props.max;\n\t\t\tif (this.$props.min && this.data < this.$props.min) this.data = this.$props.min;\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-number\" :class=\"`mg-number-${$props.interface}`\">\n\t\t<div v-if=\"$props.interface == 'slider'\">\n\t\t\t<input v-model=\"data\" type=\"range\" class=\"form-control\" :placeholder=\"$props.placeholder\" :min=\"$props.min\" :max=\"$props.max\" :step=\"$props.step\"/>\n\t\t\t<label class=\"mg-number-slider-value\">{{(data || '?') | number}}</label>\n\t\t</div>\n\t\t<div v-else-if=\"$props.interface == 'bumpers'\" class=\"input-group\">\n\t\t\t<a @click=\"add(-1)\" class=\"hidden-print\" :class=\"$props.bumperDownClass\"></a>\n\t\t\t<input v-model=\"data\" type=\"number\" class=\"form-control\" :placeholder=\"$props.placeholder\" :min=\"$props.min\" :max=\"$props.max\" :step=\"$props.step\"/>\n\t\t\t<a @click=\"add(1)\" class=\"hidden-print\" :class=\"$props.bumperUpClass\"></a>\n\t\t</div>\n\t\t<div v-else-if=\"$props.interface == 'input'\" class=\"input-group\">\n\t\t\t<div v-if=\"$props.prefix\" :class=\"$props.prefixClass\">{{$props.prefix}}</div>\n\t\t\t<input v-model=\"data\" type=\"number\" class=\"form-control\" :placeholder=\"$props.placeholder\" :min=\"$props.min\" :max=\"$props.max\" :step=\"$props.step\"/>\n\t\t\t<div v-if=\"$props.suffix\" :class=\"$props.suffixClass\">{{$props.suffix}}</div>\n\t\t</div>\n\t\t<div v-else class=\"alert alert-warning\">\n\t\t\tUnknown mgNumber interface '{{$props.interface}}'\n\t\t</div>\n\t</div>\n</template>\n\n<style>\n.mg-number input[type=number] {\n\tpadding: 0 10px;\n}\n\n.mg-number .btn {\n\tbox-shadow: none;\n\tborder: 1px solid #f0f0f0;\n\tdisplay: flex;\n\talign-items: center;\n}\n\n/* Hide the spin button in mgNumber controls */\n.mg-number input[type=number]::-webkit-outer-spin-button,\n.mg-number input[type=number]::-webkit-inner-spin-button {\n\t/* display: none; <- Crashes Chrome on hover */\n\t-webkit-appearance: none;\n\tmargin: 0; /* <-- Apparently some margin is still there even though it's hidden */\n}\n\n\n\n/* Slider {{{ */\n.mg-number.mg-number-slider input[type=\"range\"] {\n\tdisplay: inline-block;\n\t-webkit-appearance: none;\n\twidth: calc(100% - (73px));\n\theight: 10px;\n\tborder-radius: 5px;\n\tbackground: var(--btn-default-bg);\n\toutline: none;\n\tpadding: 0;\n\tmargin: 0;\n}\n\n.mg-number.mg-number-slider input[type=\"range\"]::-webkit-slider-thumb {\n\t-webkit-appearance: none;\n\tappearance: none;\n\twidth: 20px;\n\theight: 20px;\n\tborder-radius: 50%;\n\tbackground: var(--primary);\n\tcursor: pointer;\n\t-webkit-transition: background .15s ease-in-out;\n\ttransition: background .15s ease-in-out;\n}\n\n.mg-number.mg-number-slider input[type=\"range\"]::-webkit-slider-thumb:hover,\n.mg-number.mg-number-slider input[type=\"range\"]:active::-webkit-slider-thumb,\n.mg-number.mg-number-slider input[type=\"range\"]::-moz-range-thumb:hover,\n.mg-number.mg-number-slider input[type=\"range\"]:active::-moz-range-thumb {\n\tbackground: var(--primary);\n}\n\n.mg-number.mg-number-slider input[type=\"range\"]::-moz-range-thumb {\n\twidth: 20px;\n\theight: 20px;\n\tborder: 0;\n\tborder-radius: 50%;\n\tcolor: var(--btn-default-fg);\n\tbackground: var(--btn-default-bg);\n\tcursor: pointer;\n\t-moz-transition: background .15s ease-in-out;\n\ttransition: background .15s ease-in-out;\n}\n\n.mg-number.mg-number-slider input[type=\"range\"]:focus::-webkit-slider-thumb {\n\tbox-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--primary);\n}\n\n.mg-number.mg-number-slider .mg-number-slider-value {\n\tdisplay: inline-block;\n\tposition: relative;\n\twidth: 60px;\n\tline-height: 20px;\n\ttext-align: center;\n\tborder-radius: 3px;\n\tcolor: var(--btn-default-fg);\n\tbackground: var(--btn-default-bg);\n\tpadding: 5px 10px;\n\tmargin-left: 8px;\n}\n.mg-number.mg-number-slider .mg-number-slider-value:after {\n\tposition: absolute;\n\ttop: 8px;\n\tleft: -7px;\n\twidth: 0;\n\theight: 0;\n\tborder-top: 7px solid transparent;\n\tborder-right: 7px solid var(--btn-default-bg);\n\tborder-bottom: 7px solid transparent;\n\tcontent: '';\n}\n\n::-moz-range-track {\n\tbackground: var(--btn-default-bg);\n\tborder: 0;\n}\n\ninput::-moz-focus-inner,\ninput::-moz-focus-outer {\n\tborder: 0;\n}\n/* }}} */\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
-    const __vue_scope_id__$w = undefined;
+    const __vue_scope_id__$x = undefined;
     /* module identifier */
-    const __vue_module_identifier__$w = undefined;
+    const __vue_module_identifier__$x = undefined;
     /* functional template */
-    const __vue_is_functional_template__$w = false;
+    const __vue_is_functional_template__$x = false;
     /* style inject SSR */
     
     /* style inject shadow dom */
     
 
     
-    const __vue_component__$w = normalizeComponent(
-      { render: __vue_render__$p, staticRenderFns: __vue_staticRenderFns__$p },
-      __vue_inject_styles__$w,
-      __vue_script__$w,
-      __vue_scope_id__$w,
-      __vue_is_functional_template__$w,
-      __vue_module_identifier__$w,
+    const __vue_component__$x = normalizeComponent(
+      { render: __vue_render__$q, staticRenderFns: __vue_staticRenderFns__$q },
+      __vue_inject_styles__$x,
+      __vue_script__$x,
+      __vue_scope_id__$x,
+      __vue_is_functional_template__$x,
+      __vue_module_identifier__$x,
       false,
       createInjector,
       undefined,
@@ -13659,7 +19516,7 @@
 
   var mgNumber = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$w
+    'default': __vue_component__$x
   });
 
   var vueInputFacade_umd_min = createCommonjsModule(function (module, exports) {
@@ -13669,7 +19526,7 @@
   var InputFacade = unwrapExports(vueInputFacade_umd_min);
 
   Vue.use(InputFacade);
-  var script$w = Vue.mgComponent('mgPassword', {
+  var script$x = Vue.mgComponent('mgPassword', {
     meta: {
       title: 'Password',
       icon: 'far fa-edit',
@@ -13752,10 +19609,10 @@
   });
 
   /* script */
-  const __vue_script__$x = script$w;
+  const __vue_script__$y = script$x;
 
   /* template */
-  var __vue_render__$q = function() {
+  var __vue_render__$r = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -13793,17 +19650,17 @@
       })
     ])
   };
-  var __vue_staticRenderFns__$q = [];
-  __vue_render__$q._withStripped = true;
+  var __vue_staticRenderFns__$r = [];
+  __vue_render__$r._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$x = undefined;
+    const __vue_inject_styles__$y = undefined;
     /* scoped */
-    const __vue_scope_id__$x = undefined;
+    const __vue_scope_id__$y = undefined;
     /* module identifier */
-    const __vue_module_identifier__$x = undefined;
+    const __vue_module_identifier__$y = undefined;
     /* functional template */
-    const __vue_is_functional_template__$x = false;
+    const __vue_is_functional_template__$y = false;
     /* style inject */
     
     /* style inject SSR */
@@ -13812,13 +19669,13 @@
     
 
     
-    const __vue_component__$x = normalizeComponent(
-      { render: __vue_render__$q, staticRenderFns: __vue_staticRenderFns__$q },
-      __vue_inject_styles__$x,
-      __vue_script__$x,
-      __vue_scope_id__$x,
-      __vue_is_functional_template__$x,
-      __vue_module_identifier__$x,
+    const __vue_component__$y = normalizeComponent(
+      { render: __vue_render__$r, staticRenderFns: __vue_staticRenderFns__$r },
+      __vue_inject_styles__$y,
+      __vue_script__$y,
+      __vue_scope_id__$y,
+      __vue_is_functional_template__$y,
+      __vue_module_identifier__$y,
       false,
       undefined,
       undefined,
@@ -13827,10 +19684,10 @@
 
   var mgPassword = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$x
+    'default': __vue_component__$y
   });
 
-  var script$x = Vue.mgComponent('mgPermissions', {
+  var script$y = Vue.mgComponent('mgPermissions', {
     meta: {
       title: 'Permissions',
       icon: 'far fa-key',
@@ -13904,10 +19761,10 @@
   });
 
   /* script */
-  const __vue_script__$y = script$x;
+  const __vue_script__$z = script$y;
 
   /* template */
-  var __vue_render__$r = function() {
+  var __vue_render__$s = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -13943,17 +19800,17 @@
       2
     )
   };
-  var __vue_staticRenderFns__$r = [];
-  __vue_render__$r._withStripped = true;
+  var __vue_staticRenderFns__$s = [];
+  __vue_render__$s._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$y = undefined;
+    const __vue_inject_styles__$z = undefined;
     /* scoped */
-    const __vue_scope_id__$y = undefined;
+    const __vue_scope_id__$z = undefined;
     /* module identifier */
-    const __vue_module_identifier__$y = undefined;
+    const __vue_module_identifier__$z = undefined;
     /* functional template */
-    const __vue_is_functional_template__$y = false;
+    const __vue_is_functional_template__$z = false;
     /* style inject */
     
     /* style inject SSR */
@@ -13962,13 +19819,13 @@
     
 
     
-    const __vue_component__$y = normalizeComponent(
-      { render: __vue_render__$r, staticRenderFns: __vue_staticRenderFns__$r },
-      __vue_inject_styles__$y,
-      __vue_script__$y,
-      __vue_scope_id__$y,
-      __vue_is_functional_template__$y,
-      __vue_module_identifier__$y,
+    const __vue_component__$z = normalizeComponent(
+      { render: __vue_render__$s, staticRenderFns: __vue_staticRenderFns__$s },
+      __vue_inject_styles__$z,
+      __vue_script__$z,
+      __vue_scope_id__$z,
+      __vue_is_functional_template__$z,
+      __vue_module_identifier__$z,
       false,
       undefined,
       undefined,
@@ -13977,10 +19834,10 @@
 
   var mgPermissions = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$y
+    'default': __vue_component__$z
   });
 
-  var script$y = Vue.mgComponent('mgPlaceholder', {
+  var script$z = Vue.mgComponent('mgPlaceholder', {
     meta: {
       title: 'Placeholder',
       icon: 'far fa-construction',
@@ -14011,10 +19868,10 @@
   });
 
   /* script */
-  const __vue_script__$z = script$y;
+  const __vue_script__$A = script$z;
 
   /* template */
-  var __vue_render__$s = function() {
+  var __vue_render__$t = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -14034,34 +19891,34 @@
       ]
     )
   };
-  var __vue_staticRenderFns__$s = [];
-  __vue_render__$s._withStripped = true;
+  var __vue_staticRenderFns__$t = [];
+  __vue_render__$t._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$z = function (inject) {
+    const __vue_inject_styles__$A = function (inject) {
       if (!inject) return
       inject("data-v-046c7424_0", { source: "\n.mg-placeholder {\n\tmin-height: 100px;\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n\tborder-radius: 5px;\n}\n\n/* Style: placeholder-box {{{ */\n.mg-placeholder.mg-placeholder-box {\n\tborder: 1px solid #000;\n\tbackground:\n\t\tlinear-gradient(to top left,\n\t\t\trgba(0,0,0,0) 0%,\n\t\t\trgba(0,0,0,0) calc(50% - 0.8px),\n\t\t\trgba(0,0,0,1) 50%,\n\t\t\trgba(0,0,0,0) calc(50% + 0.8px),\n\t\t\trgba(0,0,0,0) 100%),\n\t\tlinear-gradient(to top right,\n\t\t\trgba(0,0,0,0) 0%,\n\t\t\trgba(0,0,0,0) calc(50% - 0.8px),\n\t\t\trgba(0,0,0,1) 50%,\n\t\t\trgba(0,0,0,0) calc(50% + 0.8px),\n\t\t\trgba(0,0,0,0) 100%);\n}\n.mg-placeholder.mg-placeholder-box > .mg-placeholder-text {\n\tbackground: #FFF;\n\tborder-radius: 10px;\n\tpadding: 10px 15px;\n}\n/* }}} */\n\n/* Style: placeholder-construction {{{ */\n.mg-placeholder.mg-placeholder-construction {\n\tbackground: repeating-linear-gradient(45deg, #dfc458, #dfc458 10px, #666 10px, #666 20px);\n}\n.mg-placeholder.mg-placeholder-construction > .mg-placeholder-text {\n\tfont-size: 20pt;\n\tcolor: #FFF;\n\ttext-shadow: -2px -2px 1px #000, 2px -2px 1px #000, -2px 2px 1px #000, 2px 2px 1px #000;\n}\n/* }}} */\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgPlaceholder.vue"],"names":[],"mappings":";AAiCA;CACA,iBAAA;CACA,aAAA;CACA,uBAAA;CACA,mBAAA;CACA,kBAAA;AACA;;AAEA,+BAAA;AACA;CACA,sBAAA;CACA;;;;;;;;;;;;sBAYA;AACA;AAEA;CACA,gBAAA;CACA,mBAAA;CACA,kBAAA;AACA;AACA,QAAA;;AAEA,wCAAA;AACA;CACA,yFAAA;AACA;AAEA;CACA,eAAA;CACA,WAAA;CACA,uFAAA;AACA;AACA,QAAA","file":"mgPlaceholder.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgPlaceholder', {\n\tmeta: {\n\t\ttitle: 'Placeholder',\n\t\ticon: 'far fa-construction',\n\t\tcategory: 'General Decoration',\n\t},\n\tprops: {\n\t\ttext: {type: 'mgText'},\n\t\theight: {type: 'mgNumber', default: '100%'},\n\t\tstyle: {\n\t\t\ttype: 'mgChoiceButtons',\n\t\t\tdefault: 'mg-placeholder-box',\n\t\t\ticonSelected: 'far fa-fw fa-check',\n\t\t\ticonDefault: 'far fa-fw',\n\t\t\tenum: [\n\t\t\t\t{id: 'mg-placeholder-box', title: 'Lined box'},\n\t\t\t\t{id: 'mg-placeholder-construction', title: 'Construction area'},\n\t\t\t],\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-placeholder\" :class=\"$props.style\" :style=\"`height: ${$props.height || 'auto'}`\">\n\t\t<div v-if=\"$props.text\" class=\"mg-placeholder-text\">\n\t\t\t{{$props.text}}\n\t\t</div>\n\t</div>\n</template>\n\n<style>\n.mg-placeholder {\n\tmin-height: 100px;\n\tdisplay: flex;\n\tjustify-content: center;\n\talign-items: center;\n\tborder-radius: 5px;\n}\n\n/* Style: placeholder-box {{{ */\n.mg-placeholder.mg-placeholder-box {\n\tborder: 1px solid #000;\n\tbackground:\n\t\tlinear-gradient(to top left,\n\t\t\trgba(0,0,0,0) 0%,\n\t\t\trgba(0,0,0,0) calc(50% - 0.8px),\n\t\t\trgba(0,0,0,1) 50%,\n\t\t\trgba(0,0,0,0) calc(50% + 0.8px),\n\t\t\trgba(0,0,0,0) 100%),\n\t\tlinear-gradient(to top right,\n\t\t\trgba(0,0,0,0) 0%,\n\t\t\trgba(0,0,0,0) calc(50% - 0.8px),\n\t\t\trgba(0,0,0,1) 50%,\n\t\t\trgba(0,0,0,0) calc(50% + 0.8px),\n\t\t\trgba(0,0,0,0) 100%);\n}\n\n.mg-placeholder.mg-placeholder-box > .mg-placeholder-text {\n\tbackground: #FFF;\n\tborder-radius: 10px;\n\tpadding: 10px 15px;\n}\n/* }}} */\n\n/* Style: placeholder-construction {{{ */\n.mg-placeholder.mg-placeholder-construction {\n\tbackground: repeating-linear-gradient(45deg, #dfc458, #dfc458 10px, #666 10px, #666 20px);\n}\n\n.mg-placeholder.mg-placeholder-construction > .mg-placeholder-text {\n\tfont-size: 20pt;\n\tcolor: #FFF;\n\ttext-shadow: -2px -2px 1px #000, 2px -2px 1px #000, -2px 2px 1px #000, 2px 2px 1px #000;\n}\n/* }}} */\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
-    const __vue_scope_id__$z = undefined;
+    const __vue_scope_id__$A = undefined;
     /* module identifier */
-    const __vue_module_identifier__$z = undefined;
+    const __vue_module_identifier__$A = undefined;
     /* functional template */
-    const __vue_is_functional_template__$z = false;
+    const __vue_is_functional_template__$A = false;
     /* style inject SSR */
     
     /* style inject shadow dom */
     
 
     
-    const __vue_component__$z = normalizeComponent(
-      { render: __vue_render__$s, staticRenderFns: __vue_staticRenderFns__$s },
-      __vue_inject_styles__$z,
-      __vue_script__$z,
-      __vue_scope_id__$z,
-      __vue_is_functional_template__$z,
-      __vue_module_identifier__$z,
+    const __vue_component__$A = normalizeComponent(
+      { render: __vue_render__$t, staticRenderFns: __vue_staticRenderFns__$t },
+      __vue_inject_styles__$A,
+      __vue_script__$A,
+      __vue_scope_id__$A,
+      __vue_is_functional_template__$A,
+      __vue_module_identifier__$A,
       false,
       createInjector,
       undefined,
@@ -14070,10 +19927,10 @@
 
   var mgPlaceholder = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$z
+    'default': __vue_component__$A
   });
 
-  var script$z = Vue.mgComponent('mgQuery', {
+  var script$A = Vue.mgComponent('mgQuery', {
     meta: {
       title: 'Query',
       icon: 'far fa-filter',
@@ -14280,7 +20137,7 @@
                       console.log('Change simple operand for path', path, 'to', value);
                       _this.data[path] = value;
                     } else {
-                      _this.data[path] = _objectSpread2({}, _.isPlainObject(_this.data[path]) ? _this.data : null, _defineProperty({}, value, ''));
+                      _this.data[path] = _objectSpread2(_objectSpread2({}, _.isPlainObject(_this.data[path]) ? _this.data : null), {}, _defineProperty({}, value, ''));
                     }
 
                     _this.refresh();
@@ -14343,10 +20200,10 @@
   });
 
   /* script */
-  const __vue_script__$A = script$z;
+  const __vue_script__$B = script$A;
 
   /* template */
-  var __vue_render__$t = function() {
+  var __vue_render__$u = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -14384,17 +20241,17 @@
       1
     )
   };
-  var __vue_staticRenderFns__$t = [];
-  __vue_render__$t._withStripped = true;
+  var __vue_staticRenderFns__$u = [];
+  __vue_render__$u._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$A = undefined;
+    const __vue_inject_styles__$B = undefined;
     /* scoped */
-    const __vue_scope_id__$A = undefined;
+    const __vue_scope_id__$B = undefined;
     /* module identifier */
-    const __vue_module_identifier__$A = undefined;
+    const __vue_module_identifier__$B = undefined;
     /* functional template */
-    const __vue_is_functional_template__$A = false;
+    const __vue_is_functional_template__$B = false;
     /* style inject */
     
     /* style inject SSR */
@@ -14403,13 +20260,13 @@
     
 
     
-    const __vue_component__$A = normalizeComponent(
-      { render: __vue_render__$t, staticRenderFns: __vue_staticRenderFns__$t },
-      __vue_inject_styles__$A,
-      __vue_script__$A,
-      __vue_scope_id__$A,
-      __vue_is_functional_template__$A,
-      __vue_module_identifier__$A,
+    const __vue_component__$B = normalizeComponent(
+      { render: __vue_render__$u, staticRenderFns: __vue_staticRenderFns__$u },
+      __vue_inject_styles__$B,
+      __vue_script__$B,
+      __vue_scope_id__$B,
+      __vue_is_functional_template__$B,
+      __vue_module_identifier__$B,
       false,
       undefined,
       undefined,
@@ -14418,10 +20275,10 @@
 
   var mgQuery = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$A
+    'default': __vue_component__$B
   });
 
-  var script$A = Vue.mgComponent('mgRestQuery', {
+  var script$B = Vue.mgComponent('mgRestQuery', {
     meta: {
       title: 'ReST Query',
       icon: 'far fa-database',
@@ -14501,10 +20358,10 @@
   });
 
   /* script */
-  const __vue_script__$B = script$A;
+  const __vue_script__$C = script$B;
 
   /* template */
-  var __vue_render__$u = function() {
+  var __vue_render__$v = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -14541,76 +20398,19 @@
       ]
     )
   };
-  var __vue_staticRenderFns__$u = [];
-  __vue_render__$u._withStripped = true;
-
-    /* style */
-    const __vue_inject_styles__$B = undefined;
-    /* scoped */
-    const __vue_scope_id__$B = undefined;
-    /* module identifier */
-    const __vue_module_identifier__$B = undefined;
-    /* functional template */
-    const __vue_is_functional_template__$B = false;
-    /* style inject */
-    
-    /* style inject SSR */
-    
-    /* style inject shadow dom */
-    
-
-    
-    const __vue_component__$B = normalizeComponent(
-      { render: __vue_render__$u, staticRenderFns: __vue_staticRenderFns__$u },
-      __vue_inject_styles__$B,
-      __vue_script__$B,
-      __vue_scope_id__$B,
-      __vue_is_functional_template__$B,
-      __vue_module_identifier__$B,
-      false,
-      undefined,
-      undefined,
-      undefined
-    );
-
-  var mgRestQuery = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    'default': __vue_component__$B
-  });
-
-  var script$B = Vue.mgComponent('mgSeperator', {
-    meta: {
-      title: 'Seperator',
-      icon: 'far fa-minus',
-      category: 'General Decoration'
-    }
-  });
-
-  /* script */
-  const __vue_script__$C = script$B;
-
-  /* template */
-  var __vue_render__$v = function() {
-    var _vm = this;
-    var _h = _vm.$createElement;
-    var _c = _vm._self._c || _h;
-    return _c("hr", { staticClass: "mg-seperator" })
-  };
   var __vue_staticRenderFns__$v = [];
   __vue_render__$v._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$C = function (inject) {
-      if (!inject) return
-      inject("data-v-294de21a_0", { source: "\n.mg-seperator {\n\tmargin-top: 0px;\n\tmargin-bottom: 10px;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgSeperator.vue"],"names":[],"mappings":";AAeA;CACA,eAAA;CACA,mBAAA;AACA","file":"mgSeperator.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgSeperator', {\n\tmeta: {\n\t\ttitle: 'Seperator',\n\t\ticon: 'far fa-minus',\n\t\tcategory: 'General Decoration',\n\t},\n});\n</script>\n\n<template>\n\t<hr class=\"mg-seperator\"/>\n</template>\n\n<style>\n.mg-seperator {\n\tmargin-top: 0px;\n\tmargin-bottom: 10px;\n}\n</style>\n"]}, media: undefined });
-
-    };
+    const __vue_inject_styles__$C = undefined;
     /* scoped */
     const __vue_scope_id__$C = undefined;
     /* module identifier */
     const __vue_module_identifier__$C = undefined;
     /* functional template */
     const __vue_is_functional_template__$C = false;
+    /* style inject */
+    
     /* style inject SSR */
     
     /* style inject shadow dom */
@@ -14625,6 +20425,63 @@
       __vue_is_functional_template__$C,
       __vue_module_identifier__$C,
       false,
+      undefined,
+      undefined,
+      undefined
+    );
+
+  var mgRestQuery = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    'default': __vue_component__$C
+  });
+
+  var script$C = Vue.mgComponent('mgSeperator', {
+    meta: {
+      title: 'Seperator',
+      icon: 'far fa-minus',
+      category: 'General Decoration'
+    }
+  });
+
+  /* script */
+  const __vue_script__$D = script$C;
+
+  /* template */
+  var __vue_render__$w = function() {
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
+    return _c("hr", { staticClass: "mg-seperator" })
+  };
+  var __vue_staticRenderFns__$w = [];
+  __vue_render__$w._withStripped = true;
+
+    /* style */
+    const __vue_inject_styles__$D = function (inject) {
+      if (!inject) return
+      inject("data-v-294de21a_0", { source: "\n.mg-seperator {\n\tmargin-top: 0px;\n\tmargin-bottom: 10px;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgSeperator.vue"],"names":[],"mappings":";AAeA;CACA,eAAA;CACA,mBAAA;AACA","file":"mgSeperator.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgSeperator', {\n\tmeta: {\n\t\ttitle: 'Seperator',\n\t\ticon: 'far fa-minus',\n\t\tcategory: 'General Decoration',\n\t},\n});\n</script>\n\n<template>\n\t<hr class=\"mg-seperator\"/>\n</template>\n\n<style>\n.mg-seperator {\n\tmargin-top: 0px;\n\tmargin-bottom: 10px;\n}\n</style>\n"]}, media: undefined });
+
+    };
+    /* scoped */
+    const __vue_scope_id__$D = undefined;
+    /* module identifier */
+    const __vue_module_identifier__$D = undefined;
+    /* functional template */
+    const __vue_is_functional_template__$D = false;
+    /* style inject SSR */
+    
+    /* style inject shadow dom */
+    
+
+    
+    const __vue_component__$D = normalizeComponent(
+      { render: __vue_render__$w, staticRenderFns: __vue_staticRenderFns__$w },
+      __vue_inject_styles__$D,
+      __vue_script__$D,
+      __vue_scope_id__$D,
+      __vue_is_functional_template__$D,
+      __vue_module_identifier__$D,
+      false,
       createInjector,
       undefined,
       undefined
@@ -14632,10 +20489,10 @@
 
   var mgSeperator = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$C
+    'default': __vue_component__$D
   });
 
-  var script$C = Vue.mgComponent('mgTable', {
+  var script$D = Vue.mgComponent('mgTable', {
     meta: {
       title: 'Table layout',
       icon: 'far fa-table',
@@ -14768,10 +20625,10 @@
   });
 
   /* script */
-  const __vue_script__$D = script$C;
+  const __vue_script__$E = script$D;
 
   /* template */
-  var __vue_render__$w = function() {
+  var __vue_render__$x = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -14873,43 +20730,47 @@
                         _vm._m(0, true),
                         _vm._v(" "),
                         _c("ul", { staticClass: "dropdown-menu pull-right" }, [
-                          _c("li", [
-                            _c(
-                              "a",
-                              {
-                                on: {
-                                  click: function($event) {
-                                    return _vm.createRow(rowNumber)
-                                  }
-                                }
-                              },
-                              [
-                                _c("i", {
-                                  staticClass: "far fa-arrow-circle-up"
-                                }),
-                                _vm._v(" Add row above")
-                              ]
-                            )
-                          ]),
+                          _vm.$props.allowAdd
+                            ? _c("li", [
+                                _c(
+                                  "a",
+                                  {
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.createRow(rowNumber)
+                                      }
+                                    }
+                                  },
+                                  [
+                                    _c("i", {
+                                      staticClass: "far fa-arrow-circle-up"
+                                    }),
+                                    _vm._v(" Add row above")
+                                  ]
+                                )
+                              ])
+                            : _vm._e(),
                           _vm._v(" "),
-                          _c("li", [
-                            _c(
-                              "a",
-                              {
-                                on: {
-                                  click: function($event) {
-                                    return _vm.createRow(rowNumber)
-                                  }
-                                }
-                              },
-                              [
-                                _c("i", {
-                                  staticClass: "far fa-arrow-circle-down"
-                                }),
-                                _vm._v(" Add row below")
-                              ]
-                            )
-                          ]),
+                          _vm.$props.allowAdd
+                            ? _c("li", [
+                                _c(
+                                  "a",
+                                  {
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.createRow(rowNumber)
+                                      }
+                                    }
+                                  },
+                                  [
+                                    _c("i", {
+                                      staticClass: "far fa-arrow-circle-down"
+                                    }),
+                                    _vm._v(" Add row below")
+                                  ]
+                                )
+                              ])
+                            : _vm._e(),
                           _vm._v(" "),
                           _vm.$props.allowDelete
                             ? _c("li", { staticClass: "dropdown-divider" })
@@ -15021,7 +20882,7 @@
         : _vm._e()
     ])
   };
-  var __vue_staticRenderFns__$w = [
+  var __vue_staticRenderFns__$x = [
     function() {
       var _vm = this;
       var _h = _vm.$createElement;
@@ -15033,33 +20894,33 @@
       )
     }
   ];
-  __vue_render__$w._withStripped = true;
+  __vue_render__$x._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$D = function (inject) {
+    const __vue_inject_styles__$E = function (inject) {
       if (!inject) return
-      inject("data-v-0b5a6229_0", { source: "\n.mg-table .row-number {\n\tfont-size: 16px;\n\ttext-align: middle;\n}\n.mg-table td.row-number {\n\tmargin-top: 14px;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgTable.vue"],"names":[],"mappings":";AA0LA;CACA,eAAA;CACA,kBAAA;AACA;AAEA;CACA,gBAAA;AACA","file":"mgTable.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgTable', {\n\tmeta: {\n\t\ttitle: 'Table layout',\n\t\ticon: 'far fa-table',\n\t\tcategory: 'Layout',\n\t},\n\tdata() { return {\n\t\tnewRow: {},\n\t\t// TODO: Is this really needed? Perhaps when `url` is specified?\n\t\tisAdding: false,\n\t\tdata: [],\n\t}},\n\tprops: {\n\t\turl: {type: 'mgUrl', relative: true, help: 'Data feed to populate the table'},\n\t\tallowAdd: {type: 'mgToggle', title: 'Allow Row Addition', default: true},\n\t\tallowDelete: {type: 'mgToggle', title: 'Allow Row Deletion', default: true},\n\t\ttextEmpty: {type: 'mgText', title: 'No data message', default: 'No data'},\n\t\titems: {\n\t\t\ttype: 'mgAlert',\n\t\t\tvueType: 'array',\n\t\t\ttext: 'Use the editor to define child widgets',\n\t\t\tdefault: () => [\n\t\t\t\t// FIXME: Defaults are not initialised\n\t\t\t\t{id: 'col1', title: 'Col 1', type: 'mgText', default: '1'},\n\t\t\t\t{id: 'col2', title: 'Col 2', type: 'mgText', default: '2'},\n\t\t\t],\n\t\t},\n\t\taddButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},\n\t\taddButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},\n\t\trowNumbers: {type: 'mgToggle', help: 'Show the row number at the beginning of each row', default: true},\n\t},\n\tchildProps: {\n\t\tshowTitle: {type: 'mgToggle', default: false, title: 'Show Title'},\n\t},\n\tcreated() {\n\t\tthis.$debugging = true;\n\t},\n\tmounted() {\n\t\tthis.$watch('$props.url', ()=> {\n\t\t\tif (!this.$props.url) return;\n\t\t\tthis.$macgyver.utils.fetch(this.$props.url, {type: 'array'})\n\t\t\t\t.then(data => this.$set(this.$props, 'data', data))\n\t\t}, {immediate: true});\n\t},\n\twatch: {\n\t\tdata: {\n\t\t\timmediate: true,\n\t\t\thandler() {\n\t\t\t\t// Ensure that data is always an array\n\t\t\t\tif (!_.isArray(this.data)) this.data = [];\n\t\t\t},\n\t\t},\n\t},\n\t// To ensure reactivity to array of objects https://stackoverflow.com/a/56793403/2438830\n\tcomputed: {\n\t\touterKey() {\n\t\t\treturn this.data && this.data.length;\n\t\t}\n\t},\n\tmethods: {\n\t\tcreateRow(offset) { // Offset is the row to create after - i.e. array position splice\n\t\t\tthis.$debug('createRow', offset, this.$data.newRow);\n\t\t\tthis.isAdding = true;\n\t\t\tif (typeof offset === 'undefined') {\n\t\t\t\tthis.data.push(this.$data.newRow);\n\t\t\t} else {\n\t\t\t\tthis.data.splice(offset, 0, this.$data.newRow);\n\t\t\t}\n\t\t\tthis.$data.newRow = {};\n\t\t\tthis.isAdding = false;\n\t\t},\n\t\tdeleteRow(offset) {\n\t\t\tthis.$debug('deleteRow', offset);\n\t\t\tthis.data.splice(offset, 1);\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-table\">\n\t\t<table class=\"table table-bordered table-striped table-hover\">\n\t\t\t<thead>\n\t\t\t\t<tr>\n\t\t\t\t\t<th v-if=\"$props.rowNumbers\" class=\"row-number\">#</th>\n\t\t\t\t\t<th v-for=\"col in $props.items\" :key=\"col.id\" :style=\"(col.width ? 'width: ' + col.width + '; ' : '') + col.class\">\n\t\t\t\t\t\t{{col.title}}\n\t\t\t\t\t</th>\n\t\t\t\t\t<th class=\"btn-context\"></th>\n\t\t\t\t</tr>\n\t\t\t</thead>\n\t\t\t<tbody :key=\"outerKey\">\n\t\t\t\t<tr v-if=\"!data || !data.length\">\n\t\t\t\t\t<td :colspan=\"$props.items.length + ($props.rowNumbers ? 2 : 1)\">\n\t\t\t\t\t\t<div class=\"alert alert-warning m-10\">{{$props.textEmpty || 'No data'}}</div>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr v-for=\"(row, rowNumber) in data\" :key=\"rowNumber\">\n\t\t\t\t\t<td v-if=\"$props.rowNumbers\" class=\"row-number\">\n\t\t\t\t\t\t{{rowNumber + 1 | number}}\n\t\t\t\t\t</td>\n\t\t\t\t\t<td v-for=\"col in $props.items\" :key=\"col.id\" :class=\"col.class\">\n\t\t\t\t\t\t<!-- Works -->\n\t\t\t\t\t\t<!--mg-text\n\t\t\t\t\t\t\t:value=\"row[col.$dataPath]\"\n\t\t\t\t\t\t\t@change=\"$setPath(row, col.$dataPath, $event)\"\n\t\t\t\t\t\t/-->\n\n\t\t\t\t\t\t<!-- Works -->\n\t\t\t\t\t\t<mg-form\n\t\t\t\t\t\t\t:config=\"col\"\n\t\t\t\t\t\t\t:data=\"row\"\n\t\t\t\t\t\t\t@changeItem=\"$setPath(row, $event.path, $event.value)\"\n\t\t\t\t\t\t/>\n\n\t\t\t\t\t\t<!-- // FIXME: Should pass through value and change events properties? -->\n\t\t\t\t\t\t<!--mg-component\n\t\t\t\t\t\t\t:config=\"{\n\t\t\t\t\t\t\t\tid: col.id,\n\t\t\t\t\t\t\t\ttype: col.type,\n\t\t\t\t\t\t\t}\"\n\t\t\t\t\t\t\t:value=\"row[col.$dataPath]\"\n\t\t\t\t\t\t\t@change=\"$setPath(row, col.$dataPath, $event)\"\n\t\t\t\t\t\t/-->\n\t\t\t\t\t</td>\n\t\t\t\t\t<td class=\"btn-context\">\n\t\t\t\t\t\t<div class=\"btn-group\">\n\t\t\t\t\t\t\t<a class=\"btn btn-context\" data-toggle=\"dropdown\"><i class=\"far fa-ellipsis-v\"></i></a>\n\t\t\t\t\t\t\t<ul class=\"dropdown-menu pull-right\">\n\t\t\t\t\t\t\t\t<li><a @click=\"createRow(rowNumber)\"><i class=\"far fa-arrow-circle-up\"></i> Add row above</a></li>\n\t\t\t\t\t\t\t\t<li><a @click=\"createRow(rowNumber)\"><i class=\"far fa-arrow-circle-down\"></i> Add row below</a></li>\n\t\t\t\t\t\t\t\t<li v-if=\"$props.allowDelete\" class=\"dropdown-divider\"></li>\n\t\t\t\t\t\t\t\t<li v-if=\"$props.allowDelete\" class=\"dropdown-item-danger\"><a @click=\"deleteRow(rowNumber)\"><i class=\"far fa-trash\"></i> Delete</a></li>\n\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr class=\"mgTable-append\" v-if=\"$props.allowAdd\">\n\t\t\t\t\t<td v-if=\"$props.rowNumbers\" class=\"row-number\">\n\t\t\t\t\t\t<i class=\"far fa-asterisk\"></i>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td v-for=\"(col, colNumber) in $props.items\" :key=\"col.id\">\n\t\t\t\t\t\t<!-- Works -->\n\t\t\t\t\t\t<!--mg-text\n\t\t\t\t\t\t\t:value=\"newRow[col.$dataPath]\"\n\t\t\t\t\t\t\t@change=\"$setPath(newRow, col.$dataPath, $event)\"\n\t\t\t\t\t\t/-->\n\n\t\t\t\t\t\t<!-- Works -->\n\t\t\t\t\t\t<mg-form\n\t\t\t\t\t\t\t:config=\"col\"\n\t\t\t\t\t\t\t:data=\"newRow\"\n\t\t\t\t\t\t\t@changeItem=\"$setPath(newRow, $event.path, $event.value)\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<a @click=\"createRow()\" :class=\"isAdding ? $props.addButtonActiveClass : $props.addButtonInactiveClass\"></a>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t</tbody>\n\t\t</table>\n\n\t\t<div v-if=\"$debugging\" class=\"card\">\n\t\t\t<div class=\"card-header\">\n\t\t\t\tRaw data\n\t\t\t\t<i class=\"float-right fas fa-debug fa-lg\" v-tooltip=\"'Only visible to users with the Debug permission'\"/>\n\t\t\t</div>\n\t\t\t<div class=\"card-body\">\n\t\t\t\t<pre>{{$data}}</pre>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<!--div v-if=\"$debugging\" class=\"card\">\n\t\t\t<div class=\"card-header\">\n\t\t\t\tRaw properties\n\t\t\t\t<i class=\"float-right fas fa-debug fa-lg\" v-tooltip=\"'Only visible to users with the Debug permission'\"/>\n\t\t\t</div>\n\t\t\t<div class=\"card-body\">\n\t\t\t\t<pre>{{$props}}</pre>\n\t\t\t</div>\n\t\t</div-->\n\t</div>\n</template>\n\n<style>\n.mg-table .row-number {\n\tfont-size: 16px;\n\ttext-align: middle;\n}\n\n.mg-table td.row-number {\n\tmargin-top: 14px;\n}\n</style>\n"]}, media: undefined });
+      inject("data-v-4bfa5f1f_0", { source: "\n.mg-table .row-number {\n\tfont-size: 16px;\n\ttext-align: middle;\n}\n.mg-table td.row-number {\n\tmargin-top: 14px;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgTable.vue"],"names":[],"mappings":";AA0LA;CACA,eAAA;CACA,kBAAA;AACA;AAEA;CACA,gBAAA;AACA","file":"mgTable.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgTable', {\n\tmeta: {\n\t\ttitle: 'Table layout',\n\t\ticon: 'far fa-table',\n\t\tcategory: 'Layout',\n\t},\n\tdata() { return {\n\t\tnewRow: {},\n\t\t// TODO: Is this really needed? Perhaps when `url` is specified?\n\t\tisAdding: false,\n\t\tdata: [],\n\t}},\n\tprops: {\n\t\turl: {type: 'mgUrl', relative: true, help: 'Data feed to populate the table'},\n\t\tallowAdd: {type: 'mgToggle', title: 'Allow Row Addition', default: true},\n\t\tallowDelete: {type: 'mgToggle', title: 'Allow Row Deletion', default: true},\n\t\ttextEmpty: {type: 'mgText', title: 'No data message', default: 'No data'},\n\t\titems: {\n\t\t\ttype: 'mgAlert',\n\t\t\tvueType: 'array',\n\t\t\ttext: 'Use the editor to define child widgets',\n\t\t\tdefault: () => [\n\t\t\t\t// FIXME: Defaults are not initialised\n\t\t\t\t{id: 'col1', title: 'Col 1', type: 'mgText', default: '1'},\n\t\t\t\t{id: 'col2', title: 'Col 2', type: 'mgText', default: '2'},\n\t\t\t],\n\t\t},\n\t\taddButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},\n\t\taddButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},\n\t\trowNumbers: {type: 'mgToggle', help: 'Show the row number at the beginning of each row', default: true},\n\t},\n\tchildProps: {\n\t\tshowTitle: {type: 'mgToggle', default: false, title: 'Show Title'},\n\t},\n\tcreated() {\n\t\tthis.$debugging = true;\n\t},\n\tmounted() {\n\t\tthis.$watch('$props.url', ()=> {\n\t\t\tif (!this.$props.url) return;\n\t\t\tthis.$macgyver.utils.fetch(this.$props.url, {type: 'array'})\n\t\t\t\t.then(data => this.$set(this.$props, 'data', data))\n\t\t}, {immediate: true});\n\t},\n\twatch: {\n\t\tdata: {\n\t\t\timmediate: true,\n\t\t\thandler() {\n\t\t\t\t// Ensure that data is always an array\n\t\t\t\tif (!_.isArray(this.data)) this.data = [];\n\t\t\t},\n\t\t},\n\t},\n\t// To ensure reactivity to array of objects https://stackoverflow.com/a/56793403/2438830\n\tcomputed: {\n\t\touterKey() {\n\t\t\treturn this.data && this.data.length;\n\t\t}\n\t},\n\tmethods: {\n\t\tcreateRow(offset) { // Offset is the row to create after - i.e. array position splice\n\t\t\tthis.$debug('createRow', offset, this.$data.newRow);\n\t\t\tthis.isAdding = true;\n\t\t\tif (typeof offset === 'undefined') {\n\t\t\t\tthis.data.push(this.$data.newRow);\n\t\t\t} else {\n\t\t\t\tthis.data.splice(offset, 0, this.$data.newRow);\n\t\t\t}\n\t\t\tthis.$data.newRow = {};\n\t\t\tthis.isAdding = false;\n\t\t},\n\t\tdeleteRow(offset) {\n\t\t\tthis.$debug('deleteRow', offset);\n\t\t\tthis.data.splice(offset, 1);\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-table\">\n\t\t<table class=\"table table-bordered table-striped table-hover\">\n\t\t\t<thead>\n\t\t\t\t<tr>\n\t\t\t\t\t<th v-if=\"$props.rowNumbers\" class=\"row-number\">#</th>\n\t\t\t\t\t<th v-for=\"col in $props.items\" :key=\"col.id\" :style=\"(col.width ? 'width: ' + col.width + '; ' : '') + col.class\">\n\t\t\t\t\t\t{{col.title}}\n\t\t\t\t\t</th>\n\t\t\t\t\t<th class=\"btn-context\"></th>\n\t\t\t\t</tr>\n\t\t\t</thead>\n\t\t\t<tbody :key=\"outerKey\">\n\t\t\t\t<tr v-if=\"!data || !data.length\">\n\t\t\t\t\t<td :colspan=\"$props.items.length + ($props.rowNumbers ? 2 : 1)\">\n\t\t\t\t\t\t<div class=\"alert alert-warning m-10\">{{$props.textEmpty || 'No data'}}</div>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr v-for=\"(row, rowNumber) in data\" :key=\"rowNumber\">\n\t\t\t\t\t<td v-if=\"$props.rowNumbers\" class=\"row-number\">\n\t\t\t\t\t\t{{rowNumber + 1 | number}}\n\t\t\t\t\t</td>\n\t\t\t\t\t<td v-for=\"col in $props.items\" :key=\"col.id\" :class=\"col.class\">\n\t\t\t\t\t\t<!-- Works -->\n\t\t\t\t\t\t<!--mg-text\n\t\t\t\t\t\t\t:value=\"row[col.$dataPath]\"\n\t\t\t\t\t\t\t@change=\"$setPath(row, col.$dataPath, $event)\"\n\t\t\t\t\t\t/-->\n\n\t\t\t\t\t\t<!-- Works -->\n\t\t\t\t\t\t<mg-form\n\t\t\t\t\t\t\t:config=\"col\"\n\t\t\t\t\t\t\t:data=\"row\"\n\t\t\t\t\t\t\t@changeItem=\"$setPath(row, $event.path, $event.value)\"\n\t\t\t\t\t\t/>\n\n\t\t\t\t\t\t<!-- // FIXME: Should pass through value and change events properties? -->\n\t\t\t\t\t\t<!--mg-component\n\t\t\t\t\t\t\t:config=\"{\n\t\t\t\t\t\t\t\tid: col.id,\n\t\t\t\t\t\t\t\ttype: col.type,\n\t\t\t\t\t\t\t}\"\n\t\t\t\t\t\t\t:value=\"row[col.$dataPath]\"\n\t\t\t\t\t\t\t@change=\"$setPath(row, col.$dataPath, $event)\"\n\t\t\t\t\t\t/-->\n\t\t\t\t\t</td>\n\t\t\t\t\t<td class=\"btn-context\">\n\t\t\t\t\t\t<div class=\"btn-group\">\n\t\t\t\t\t\t\t<a class=\"btn btn-context\" data-toggle=\"dropdown\"><i class=\"far fa-ellipsis-v\"></i></a>\n\t\t\t\t\t\t\t<ul class=\"dropdown-menu pull-right\">\n\t\t\t\t\t\t\t\t<li v-if=\"$props.allowAdd\"><a @click=\"createRow(rowNumber)\"><i class=\"far fa-arrow-circle-up\"></i> Add row above</a></li>\n\t\t\t\t\t\t\t\t<li v-if=\"$props.allowAdd\"><a @click=\"createRow(rowNumber)\"><i class=\"far fa-arrow-circle-down\"></i> Add row below</a></li>\n\t\t\t\t\t\t\t\t<li v-if=\"$props.allowDelete\" class=\"dropdown-divider\"></li>\n\t\t\t\t\t\t\t\t<li v-if=\"$props.allowDelete\" class=\"dropdown-item-danger\"><a @click=\"deleteRow(rowNumber)\"><i class=\"far fa-trash\"></i> Delete</a></li>\n\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr class=\"mgTable-append\" v-if=\"$props.allowAdd\">\n\t\t\t\t\t<td v-if=\"$props.rowNumbers\" class=\"row-number\">\n\t\t\t\t\t\t<i class=\"far fa-asterisk\"></i>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td v-for=\"(col, colNumber) in $props.items\" :key=\"col.id\">\n\t\t\t\t\t\t<!-- Works -->\n\t\t\t\t\t\t<!--mg-text\n\t\t\t\t\t\t\t:value=\"newRow[col.$dataPath]\"\n\t\t\t\t\t\t\t@change=\"$setPath(newRow, col.$dataPath, $event)\"\n\t\t\t\t\t\t/-->\n\n\t\t\t\t\t\t<!-- Works -->\n\t\t\t\t\t\t<mg-form\n\t\t\t\t\t\t\t:config=\"col\"\n\t\t\t\t\t\t\t:data=\"newRow\"\n\t\t\t\t\t\t\t@changeItem=\"$setPath(newRow, $event.path, $event.value)\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<a @click=\"createRow()\" :class=\"isAdding ? $props.addButtonActiveClass : $props.addButtonInactiveClass\"></a>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t</tbody>\n\t\t</table>\n\n\t\t<div v-if=\"$debugging\" class=\"card\">\n\t\t\t<div class=\"card-header\">\n\t\t\t\tRaw data\n\t\t\t\t<i class=\"float-right fas fa-debug fa-lg\" v-tooltip=\"'Only visible to users with the Debug permission'\"/>\n\t\t\t</div>\n\t\t\t<div class=\"card-body\">\n\t\t\t\t<pre>{{$data}}</pre>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<!--div v-if=\"$debugging\" class=\"card\">\n\t\t\t<div class=\"card-header\">\n\t\t\t\tRaw properties\n\t\t\t\t<i class=\"float-right fas fa-debug fa-lg\" v-tooltip=\"'Only visible to users with the Debug permission'\"/>\n\t\t\t</div>\n\t\t\t<div class=\"card-body\">\n\t\t\t\t<pre>{{$props}}</pre>\n\t\t\t</div>\n\t\t</div-->\n\t</div>\n</template>\n\n<style>\n.mg-table .row-number {\n\tfont-size: 16px;\n\ttext-align: middle;\n}\n\n.mg-table td.row-number {\n\tmargin-top: 14px;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
-    const __vue_scope_id__$D = undefined;
+    const __vue_scope_id__$E = undefined;
     /* module identifier */
-    const __vue_module_identifier__$D = undefined;
+    const __vue_module_identifier__$E = undefined;
     /* functional template */
-    const __vue_is_functional_template__$D = false;
+    const __vue_is_functional_template__$E = false;
     /* style inject SSR */
     
     /* style inject shadow dom */
     
 
     
-    const __vue_component__$D = normalizeComponent(
-      { render: __vue_render__$w, staticRenderFns: __vue_staticRenderFns__$w },
-      __vue_inject_styles__$D,
-      __vue_script__$D,
-      __vue_scope_id__$D,
-      __vue_is_functional_template__$D,
-      __vue_module_identifier__$D,
+    const __vue_component__$E = normalizeComponent(
+      { render: __vue_render__$x, staticRenderFns: __vue_staticRenderFns__$x },
+      __vue_inject_styles__$E,
+      __vue_script__$E,
+      __vue_scope_id__$E,
+      __vue_is_functional_template__$E,
+      __vue_module_identifier__$E,
       false,
       createInjector,
       undefined,
@@ -15068,10 +20929,10 @@
 
   var mgTable = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$D
+    'default': __vue_component__$E
   });
 
-  var script$D = Vue.mgComponent('mgTextArea', {
+  var script$E = Vue.mgComponent('mgTextArea', {
     meta: {
       title: 'Multi-line text',
       icon: 'fa fa-align-justify',
@@ -15114,10 +20975,10 @@
   });
 
   /* script */
-  const __vue_script__$E = script$D;
+  const __vue_script__$F = script$E;
 
   /* template */
-  var __vue_render__$x = function() {
+  var __vue_render__$y = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -15144,17 +21005,17 @@
       }
     })
   };
-  var __vue_staticRenderFns__$x = [];
-  __vue_render__$x._withStripped = true;
+  var __vue_staticRenderFns__$y = [];
+  __vue_render__$y._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$E = undefined;
+    const __vue_inject_styles__$F = undefined;
     /* scoped */
-    const __vue_scope_id__$E = undefined;
+    const __vue_scope_id__$F = undefined;
     /* module identifier */
-    const __vue_module_identifier__$E = undefined;
+    const __vue_module_identifier__$F = undefined;
     /* functional template */
-    const __vue_is_functional_template__$E = false;
+    const __vue_is_functional_template__$F = false;
     /* style inject */
     
     /* style inject SSR */
@@ -15163,13 +21024,13 @@
     
 
     
-    const __vue_component__$E = normalizeComponent(
-      { render: __vue_render__$x, staticRenderFns: __vue_staticRenderFns__$x },
-      __vue_inject_styles__$E,
-      __vue_script__$E,
-      __vue_scope_id__$E,
-      __vue_is_functional_template__$E,
-      __vue_module_identifier__$E,
+    const __vue_component__$F = normalizeComponent(
+      { render: __vue_render__$y, staticRenderFns: __vue_staticRenderFns__$y },
+      __vue_inject_styles__$F,
+      __vue_script__$F,
+      __vue_scope_id__$F,
+      __vue_is_functional_template__$F,
+      __vue_module_identifier__$F,
       false,
       undefined,
       undefined,
@@ -15178,11 +21039,11 @@
 
   var mgTextArea = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$E
+    'default': __vue_component__$F
   });
 
   Vue.use(InputFacade);
-  var script$E = Vue.mgComponent('mgText', {
+  var script$F = Vue.mgComponent('mgText', {
     meta: {
       title: 'Text',
       icon: 'far fa-edit',
@@ -15323,10 +21184,10 @@
   });
 
   /* script */
-  const __vue_script__$F = script$E;
+  const __vue_script__$G = script$F;
 
   /* template */
-  var __vue_render__$y = function() {
+  var __vue_render__$z = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -15378,106 +21239,6 @@
         : _vm._e()
     ])
   };
-  var __vue_staticRenderFns__$y = [];
-  __vue_render__$y._withStripped = true;
-
-    /* style */
-    const __vue_inject_styles__$F = undefined;
-    /* scoped */
-    const __vue_scope_id__$F = undefined;
-    /* module identifier */
-    const __vue_module_identifier__$F = undefined;
-    /* functional template */
-    const __vue_is_functional_template__$F = false;
-    /* style inject */
-    
-    /* style inject SSR */
-    
-    /* style inject shadow dom */
-    
-
-    
-    const __vue_component__$F = normalizeComponent(
-      { render: __vue_render__$y, staticRenderFns: __vue_staticRenderFns__$y },
-      __vue_inject_styles__$F,
-      __vue_script__$F,
-      __vue_scope_id__$F,
-      __vue_is_functional_template__$F,
-      __vue_module_identifier__$F,
-      false,
-      undefined,
-      undefined,
-      undefined
-    );
-
-  var mgText = /*#__PURE__*/Object.freeze({
-    __proto__: null,
-    'default': __vue_component__$F
-  });
-
-  var script$F = Vue.mgComponent('mgTime', {
-    meta: {
-      title: 'Time selection',
-      icon: 'fa fa-clock',
-      category: 'Simple Inputs',
-      preferId: true,
-      format: function format(v) {
-        if (!v) return '';
-        var d = v instanceof Date ? v : new Date(v);
-        return d.toLocaleTimeString();
-      },
-      formatClass: 'text-center'
-    },
-    props: {
-      min: {
-        type: 'mgTime',
-        title: 'Earliest time'
-      },
-      max: {
-        type: 'mgNumber',
-        title: 'Latest time'
-      },
-      required: {
-        type: 'mgToggle',
-        "default": false
-      }
-    },
-    created: function created() {
-      var _this = this;
-
-      this.$on('mgValidate', function (reply) {
-        if (_this.$props.required && !_this.data) return reply("".concat(_this.$props.title, " is required"));
-        if (_this.$props.min && _.isString(_this.data) && _this.data < _this.$props.min) return reply("".concat(_this.$props.title, " is too early (earliest time is ").concat(_this.$props.min, ")"));
-        if (_this.$props.max && _.isString(_this.data) && _this.data > _this.$props.max) return reply("".concat(_this.$props.title, " is too late (latest time is ").concat(_this.$props.max, ")"));
-      });
-    }
-  });
-
-  /* script */
-  const __vue_script__$G = script$F;
-
-  /* template */
-  var __vue_render__$z = function() {
-    var _vm = this;
-    var _h = _vm.$createElement;
-    var _c = _vm._self._c || _h;
-    return _c("input", {
-      directives: [
-        { name: "model", rawName: "v-model", value: _vm.data, expression: "data" }
-      ],
-      staticClass: "form-control",
-      attrs: { type: "time" },
-      domProps: { value: _vm.data },
-      on: {
-        input: function($event) {
-          if ($event.target.composing) {
-            return
-          }
-          _vm.data = $event.target.value;
-        }
-      }
-    })
-  };
   var __vue_staticRenderFns__$z = [];
   __vue_render__$z._withStripped = true;
 
@@ -15510,9 +21271,146 @@
       undefined
     );
 
-  var mgTime = /*#__PURE__*/Object.freeze({
+  var mgText = /*#__PURE__*/Object.freeze({
     __proto__: null,
     'default': __vue_component__$G
+  });
+
+  var script$G = Vue.mgComponent('mgTime', {
+    meta: {
+      title: 'Time selection',
+      icon: 'far fa-calendar',
+      category: 'Simple Inputs',
+      preferId: true,
+      format: function format(v) {
+        if (!v) return '';
+        return v; //return moment.duration(v).humanize();
+      },
+      formatClass: 'text-center'
+    },
+    data: function data() {
+      return {
+        formData: undefined
+      };
+    },
+    props: {
+      min: {
+        type: 'mgTime',
+        title: 'Earliest time'
+      },
+      max: {
+        type: 'mgTime',
+        title: 'Latest time'
+      },
+      required: {
+        type: 'mgToggle',
+        "default": false
+      }
+    },
+    created: function created() {
+      var _this = this;
+
+      this.$debugging = true;
+      this.$on('mgValidate', function (reply) {
+        if (_this.$props.required && !_this.data) return reply("".concat(_this.$props.title, " is required"));
+
+        if (_.isString(_this.data)) {
+          var d = moment.duration(_this.data);
+          if (!moment.isDuration(d)) return reply("".concat(_this.$props.title, " must be a time"));
+          if (_this.$props.min && d.asMilliseconds() < moment.duration(_this.$props.min).asMilliseconds()) return reply("".concat($props.title, " is too early (earliest time is ").concat(_this.$props.min, ")"));
+          if (_this.$props.max && d.asMilliseconds() > moment.duration(_this.$props.max).asMilliseconds()) return reply("".concat($props.title, " is too late (latest time is ").concat(_this.$props.max, ")"));
+        }
+      });
+      this.$watch('data', function () {
+        _this.formData = data;
+      }, {
+        immediate: true
+      });
+      this.$watch('formData', function () {
+        _this.data = moment.duration(_this.formData).toISOString();
+      });
+    }
+  });
+
+  /* script */
+  const __vue_script__$H = script$G;
+
+  /* template */
+  var __vue_render__$A = function() {
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
+    return _c("div", { staticClass: "mg-datetime" }, [
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.formData,
+            expression: "formData"
+          }
+        ],
+        staticClass: "form-control",
+        attrs: { type: "time", max: _vm.$props.max, min: _vm.$props.min },
+        domProps: { value: _vm.formData },
+        on: {
+          input: function($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.formData = $event.target.value;
+          }
+        }
+      }),
+      _vm._v(" "),
+      this.$debugging
+        ? _c("div", { staticClass: "card" }, [
+            _c("div", { staticClass: "card-header" }, [
+              _vm._v("\n\t\t\tRaw data\n\t\t")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "card-body" }, [
+              _c("pre", [_vm._v(_vm._s(_vm.$data))])
+            ])
+          ])
+        : _vm._e()
+    ])
+  };
+  var __vue_staticRenderFns__$A = [];
+  __vue_render__$A._withStripped = true;
+
+    /* style */
+    const __vue_inject_styles__$H = undefined;
+    /* scoped */
+    const __vue_scope_id__$H = undefined;
+    /* module identifier */
+    const __vue_module_identifier__$H = undefined;
+    /* functional template */
+    const __vue_is_functional_template__$H = false;
+    /* style inject */
+    
+    /* style inject SSR */
+    
+    /* style inject shadow dom */
+    
+
+    
+    const __vue_component__$H = normalizeComponent(
+      { render: __vue_render__$A, staticRenderFns: __vue_staticRenderFns__$A },
+      __vue_inject_styles__$H,
+      __vue_script__$H,
+      __vue_scope_id__$H,
+      __vue_is_functional_template__$H,
+      __vue_module_identifier__$H,
+      false,
+      undefined,
+      undefined,
+      undefined
+    );
+
+  var mgTime = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    'default': __vue_component__$H
   });
 
   var dist = createCommonjsModule(function (module, exports) {
@@ -16358,7 +22256,7 @@
   var ToggleButton = unwrapExports(dist);
 
   Vue.use(ToggleButton);
-  var script$G = Vue.mgComponent('mgToggle', {
+  var script$H = Vue.mgComponent('mgToggle', {
     meta: {
       title: 'Toggle Switch',
       icon: 'far fa-toggle-on',
@@ -16411,10 +22309,10 @@
   });
 
   /* script */
-  const __vue_script__$H = script$G;
+  const __vue_script__$I = script$H;
 
   /* template */
-  var __vue_render__$A = function() {
+  var __vue_render__$B = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -16433,34 +22331,34 @@
       on: { change: _vm.changeHandler }
     })
   };
-  var __vue_staticRenderFns__$A = [];
-  __vue_render__$A._withStripped = true;
+  var __vue_staticRenderFns__$B = [];
+  __vue_render__$B._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$H = function (inject) {
+    const __vue_inject_styles__$I = function (inject) {
       if (!inject) return
       inject("data-v-1f7796b2_0", { source: "\n.mg-toggle {\n\tmargin-top: 7px;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgToggle.vue"],"names":[],"mappings":";AA0CA;CACA,eAAA;AACA","file":"mgToggle.vue","sourcesContent":["<script>\nimport ToggleButton from 'vue-js-toggle-button';\nVue.use(ToggleButton);\n\nexport default Vue.mgComponent('mgToggle', {\n\tmeta: {\n\t\ttitle: 'Toggle Switch',\n\t\ticon: 'far fa-toggle-on',\n\t\tcategory: 'Simple Inputs',\n\t\tpreferId: true,\n\t\tformat: (v, config) => v ? config.onText : config.offText,\n\t\tformatClass: 'text-center',\n\t\tshorthand: ['boolean', 'switch', 'toggle'],\n\t},\n\tprops: {\n\t\tonText: {type: 'mgText', default: 'on'},\n\t\tonColor: {type: 'mgColor', default: '#75c791', advanced: true},\n\t\toffText: {type: 'mgText', default: 'off'},\n\t\toffColor: {type: 'mgColor', default: '#bfcbd9', advanced: true},\n\t\tswitchColor: {type: 'mgColor', default: '#fff', advanced: true},\n\t\tdisabledColor: {type: 'mgColor', default: '#cccccc', advanced: true},\n\t},\n\tmethods: {\n\t\tchangeHandler(e) {\n\t\t\tthis.$mgForm.$emit('mgChange', {path: this.$props.$dataPath, value: e.value});\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<toggle-button\n\t\tclass=\"mg-toggle\"\n\t\t:value=\"data\"\n\t\t:color=\"{checked: $props.onColor, unchecked: $props.offColor, disabled: $props.disabledColor}\"\n\t\t:labels=\"{checked: $props.onText, unchecked: $props.offText}\"\n\t\t:switchColor=\"$props.switchColor\"\n\t\t@change=\"changeHandler\"\n\t/>\n</template>\n\n<style>\n.mg-toggle {\n\tmargin-top: 7px;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
-    const __vue_scope_id__$H = undefined;
+    const __vue_scope_id__$I = undefined;
     /* module identifier */
-    const __vue_module_identifier__$H = undefined;
+    const __vue_module_identifier__$I = undefined;
     /* functional template */
-    const __vue_is_functional_template__$H = false;
+    const __vue_is_functional_template__$I = false;
     /* style inject SSR */
     
     /* style inject shadow dom */
     
 
     
-    const __vue_component__$H = normalizeComponent(
-      { render: __vue_render__$A, staticRenderFns: __vue_staticRenderFns__$A },
-      __vue_inject_styles__$H,
-      __vue_script__$H,
-      __vue_scope_id__$H,
-      __vue_is_functional_template__$H,
-      __vue_module_identifier__$H,
+    const __vue_component__$I = normalizeComponent(
+      { render: __vue_render__$B, staticRenderFns: __vue_staticRenderFns__$B },
+      __vue_inject_styles__$I,
+      __vue_script__$I,
+      __vue_scope_id__$I,
+      __vue_is_functional_template__$I,
+      __vue_module_identifier__$I,
       false,
       createInjector,
       undefined,
@@ -16469,10 +22367,10 @@
 
   var mgToggle = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$H
+    'default': __vue_component__$I
   });
 
-  var script$H = Vue.mgComponent('mgUrl', {
+  var script$I = Vue.mgComponent('mgUrl', {
     meta: {
       title: 'URL',
       icon: 'far fa-globe',
@@ -16509,10 +22407,10 @@
   });
 
   /* script */
-  const __vue_script__$I = script$H;
+  const __vue_script__$J = script$I;
 
   /* template */
-  var __vue_render__$B = function() {
+  var __vue_render__$C = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -16533,17 +22431,17 @@
       }
     })
   };
-  var __vue_staticRenderFns__$B = [];
-  __vue_render__$B._withStripped = true;
+  var __vue_staticRenderFns__$C = [];
+  __vue_render__$C._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$I = undefined;
+    const __vue_inject_styles__$J = undefined;
     /* scoped */
-    const __vue_scope_id__$I = undefined;
+    const __vue_scope_id__$J = undefined;
     /* module identifier */
-    const __vue_module_identifier__$I = undefined;
+    const __vue_module_identifier__$J = undefined;
     /* functional template */
-    const __vue_is_functional_template__$I = false;
+    const __vue_is_functional_template__$J = false;
     /* style inject */
     
     /* style inject SSR */
@@ -16552,13 +22450,13 @@
     
 
     
-    const __vue_component__$I = normalizeComponent(
-      { render: __vue_render__$B, staticRenderFns: __vue_staticRenderFns__$B },
-      __vue_inject_styles__$I,
-      __vue_script__$I,
-      __vue_scope_id__$I,
-      __vue_is_functional_template__$I,
-      __vue_module_identifier__$I,
+    const __vue_component__$J = normalizeComponent(
+      { render: __vue_render__$C, staticRenderFns: __vue_staticRenderFns__$C },
+      __vue_inject_styles__$J,
+      __vue_script__$J,
+      __vue_scope_id__$J,
+      __vue_is_functional_template__$J,
+      __vue_module_identifier__$J,
       false,
       undefined,
       undefined,
@@ -16567,10 +22465,10 @@
 
   var mgUrl = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$I
+    'default': __vue_component__$J
   });
 
-  var script$I = Vue.mgComponent('mgVideo', {
+  var script$J = Vue.mgComponent('mgVideo', {
     meta: {
       title: 'Video',
       icon: 'far fa-film',
@@ -16623,10 +22521,10 @@
   });
 
   /* script */
-  const __vue_script__$J = script$I;
+  const __vue_script__$K = script$J;
 
   /* template */
-  var __vue_render__$C = function() {
+  var __vue_render__$D = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -16659,34 +22557,34 @@
       ]
     )
   };
-  var __vue_staticRenderFns__$C = [];
-  __vue_render__$C._withStripped = true;
+  var __vue_staticRenderFns__$D = [];
+  __vue_render__$D._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$J = function (inject) {
+    const __vue_inject_styles__$K = function (inject) {
       if (!inject) return
       inject("data-v-046a7f3d_0", { source: "\n.mg-video .alert {\n\tdisplay: flex;\n\theight: 100%;\n\twidth: 100%;\n\tjustify-content: center;\n\talign-items: center;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgVideo.vue"],"names":[],"mappings":";AA+DA;CACA,aAAA;CACA,YAAA;CACA,WAAA;CACA,uBAAA;CACA,mBAAA;AACA","file":"mgVideo.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgVideo', {\n\tmeta: {\n\t\ttitle: 'Video',\n\t\ticon: 'far fa-film',\n\t\tcategory: 'Media',\n\t\tpreferId: true,\n\t},\n\tprops: {\n\t\turl: {type: 'mgUrl'},\n\t\twidth: {type: 'mgText', default: '100%'},\n\t\theight: {type: 'mgText', default: '315px'},\n\t\tautoPlay: {type: 'mgToggle', default: false},\n\t\tshowControls: {type: 'mgToggle', default: true},\n\t\tloop: {type: 'mgToggle', default: false},\n\t},\n\tcomputed: {\n\t\tvideoResource() {\n\t\t\tif (!this.$props.url) {\n\t\t\t\treturn {type: 'none'};\n\t\t\t} else if (/^https?:\\/\\/(www\\.)?youtube\\.com/.test(this.$props.url)) {\n\t\t\t\treturn {\n\t\t\t\t\ttype: 'youTube',\n\t\t\t\t\turl: this.$props.url\n\t\t\t\t\t\t+ `?autoplay=${this.$props.autoPlay ? '1' : '0'}`\n\t\t\t\t\t\t+ `&controls=${this.$props.showControls ? '1' : '0'}`\n\t\t\t\t\t\t+ `&loop=${this.$props.loop ? '1' : '0'}`\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\treturn {type: 'unknown'};\n\t\t\t}\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-video\" :style=\"{width: $props.width, height: $props.height}\">\n\t\t<div\n\t\t\tv-if=\"!videoResource || videoResource.type == 'none'\"\n\t\t\tclass=\"alert alert-warning\"\n\t\t>\n\t\t\tNo video URL provided\n\t\t</div>\n\t\t<iframe\n\t\t\tv-else-if=\"videoResource.type == 'youTube'\"\n\t\t\twidth=\"100%\"\n\t\t\theight=\"100%\"\n\t\t\t:src=\"videoResource.url\"\n\t\t\tframeborder=\"0\"\n\t\t\tallow=\"accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture\"\n\t\t\tallowfullscreen\n\t\t/>\n\t\t<div\n\t\t\tv-else\n\t\t\tclass=\"alert alert-warning\" \n\t\t>\n\t\t\tUnsupported video URL\n\t\t</div>\n\t</div>\n</template>\n\n<style>\n.mg-video .alert {\n\tdisplay: flex;\n\theight: 100%;\n\twidth: 100%;\n\tjustify-content: center;\n\talign-items: center;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
-    const __vue_scope_id__$J = undefined;
+    const __vue_scope_id__$K = undefined;
     /* module identifier */
-    const __vue_module_identifier__$J = undefined;
+    const __vue_module_identifier__$K = undefined;
     /* functional template */
-    const __vue_is_functional_template__$J = false;
+    const __vue_is_functional_template__$K = false;
     /* style inject SSR */
     
     /* style inject shadow dom */
     
 
     
-    const __vue_component__$J = normalizeComponent(
-      { render: __vue_render__$C, staticRenderFns: __vue_staticRenderFns__$C },
-      __vue_inject_styles__$J,
-      __vue_script__$J,
-      __vue_scope_id__$J,
-      __vue_is_functional_template__$J,
-      __vue_module_identifier__$J,
+    const __vue_component__$K = normalizeComponent(
+      { render: __vue_render__$D, staticRenderFns: __vue_staticRenderFns__$D },
+      __vue_inject_styles__$K,
+      __vue_script__$K,
+      __vue_scope_id__$K,
+      __vue_is_functional_template__$K,
+      __vue_module_identifier__$K,
       false,
       createInjector,
       undefined,
@@ -16695,7 +22593,7 @@
 
   var mgVideo = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$J
+    'default': __vue_component__$K
   });
 
   var quill = createCommonjsModule(function (module, exports) {
@@ -28645,7 +34543,7 @@
   }(); // module.exports = MarkdownShortcuts;
 
   //
-  var script$J = {
+  var script$K = {
     name: "VueEditor",
     mixins: [oldApi],
     props: {
@@ -28971,36 +34869,36 @@
   var browser = createInjector$1;
 
   /* script */
-  const __vue_script__$K = script$J;
+  const __vue_script__$L = script$K;
 
   /* template */
-  var __vue_render__$D = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"quillWrapper"},[_vm._t("toolbar"),_vm._v(" "),_c('div',{ref:"quillContainer",attrs:{"id":_vm.id}}),_vm._v(" "),(_vm.useCustomImageHandler)?_c('input',{ref:"fileInput",staticStyle:{"display":"none"},attrs:{"id":"file-upload","type":"file","accept":"image/*"},on:{"change":function($event){return _vm.emitImageInfo($event)}}}):_vm._e()],2)};
-  var __vue_staticRenderFns__$D = [];
+  var __vue_render__$E = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"quillWrapper"},[_vm._t("toolbar"),_vm._v(" "),_c('div',{ref:"quillContainer",attrs:{"id":_vm.id}}),_vm._v(" "),(_vm.useCustomImageHandler)?_c('input',{ref:"fileInput",staticStyle:{"display":"none"},attrs:{"id":"file-upload","type":"file","accept":"image/*"},on:{"change":function($event){return _vm.emitImageInfo($event)}}}):_vm._e()],2)};
+  var __vue_staticRenderFns__$E = [];
 
     /* style */
-    const __vue_inject_styles__$K = function (inject) {
+    const __vue_inject_styles__$L = function (inject) {
       if (!inject) return
       inject("data-v-59392418_0", { source: "/*!\n * Quill Editor v1.3.6\n * https://quilljs.com/\n * Copyright (c) 2014, Jason Chen\n * Copyright (c) 2013, salesforce.com\n */.ql-container{box-sizing:border-box;font-family:Helvetica,Arial,sans-serif;font-size:13px;height:100%;margin:0;position:relative}.ql-container.ql-disabled .ql-tooltip{visibility:hidden}.ql-container.ql-disabled .ql-editor ul[data-checked]>li::before{pointer-events:none}.ql-clipboard{left:-100000px;height:1px;overflow-y:hidden;position:absolute;top:50%}.ql-clipboard p{margin:0;padding:0}.ql-editor{box-sizing:border-box;line-height:1.42;height:100%;outline:0;overflow-y:auto;padding:12px 15px;tab-size:4;-moz-tab-size:4;text-align:left;white-space:pre-wrap;word-wrap:break-word}.ql-editor>*{cursor:text}.ql-editor blockquote,.ql-editor h1,.ql-editor h2,.ql-editor h3,.ql-editor h4,.ql-editor h5,.ql-editor h6,.ql-editor ol,.ql-editor p,.ql-editor pre,.ql-editor ul{margin:0;padding:0;counter-reset:list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9}.ql-editor ol,.ql-editor ul{padding-left:1.5em}.ql-editor ol>li,.ql-editor ul>li{list-style-type:none}.ql-editor ul>li::before{content:'\\2022'}.ql-editor ul[data-checked=false],.ql-editor ul[data-checked=true]{pointer-events:none}.ql-editor ul[data-checked=false]>li *,.ql-editor ul[data-checked=true]>li *{pointer-events:all}.ql-editor ul[data-checked=false]>li::before,.ql-editor ul[data-checked=true]>li::before{color:#777;cursor:pointer;pointer-events:all}.ql-editor ul[data-checked=true]>li::before{content:'\\2611'}.ql-editor ul[data-checked=false]>li::before{content:'\\2610'}.ql-editor li::before{display:inline-block;white-space:nowrap;width:1.2em}.ql-editor li:not(.ql-direction-rtl)::before{margin-left:-1.5em;margin-right:.3em;text-align:right}.ql-editor li.ql-direction-rtl::before{margin-left:.3em;margin-right:-1.5em}.ql-editor ol li:not(.ql-direction-rtl),.ql-editor ul li:not(.ql-direction-rtl){padding-left:1.5em}.ql-editor ol li.ql-direction-rtl,.ql-editor ul li.ql-direction-rtl{padding-right:1.5em}.ql-editor ol li{counter-reset:list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;counter-increment:list-0}.ql-editor ol li:before{content:counter(list-0,decimal) '. '}.ql-editor ol li.ql-indent-1{counter-increment:list-1}.ql-editor ol li.ql-indent-1:before{content:counter(list-1,lower-alpha) '. '}.ql-editor ol li.ql-indent-1{counter-reset:list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9}.ql-editor ol li.ql-indent-2{counter-increment:list-2}.ql-editor ol li.ql-indent-2:before{content:counter(list-2,lower-roman) '. '}.ql-editor ol li.ql-indent-2{counter-reset:list-3 list-4 list-5 list-6 list-7 list-8 list-9}.ql-editor ol li.ql-indent-3{counter-increment:list-3}.ql-editor ol li.ql-indent-3:before{content:counter(list-3,decimal) '. '}.ql-editor ol li.ql-indent-3{counter-reset:list-4 list-5 list-6 list-7 list-8 list-9}.ql-editor ol li.ql-indent-4{counter-increment:list-4}.ql-editor ol li.ql-indent-4:before{content:counter(list-4,lower-alpha) '. '}.ql-editor ol li.ql-indent-4{counter-reset:list-5 list-6 list-7 list-8 list-9}.ql-editor ol li.ql-indent-5{counter-increment:list-5}.ql-editor ol li.ql-indent-5:before{content:counter(list-5,lower-roman) '. '}.ql-editor ol li.ql-indent-5{counter-reset:list-6 list-7 list-8 list-9}.ql-editor ol li.ql-indent-6{counter-increment:list-6}.ql-editor ol li.ql-indent-6:before{content:counter(list-6,decimal) '. '}.ql-editor ol li.ql-indent-6{counter-reset:list-7 list-8 list-9}.ql-editor ol li.ql-indent-7{counter-increment:list-7}.ql-editor ol li.ql-indent-7:before{content:counter(list-7,lower-alpha) '. '}.ql-editor ol li.ql-indent-7{counter-reset:list-8 list-9}.ql-editor ol li.ql-indent-8{counter-increment:list-8}.ql-editor ol li.ql-indent-8:before{content:counter(list-8,lower-roman) '. '}.ql-editor ol li.ql-indent-8{counter-reset:list-9}.ql-editor ol li.ql-indent-9{counter-increment:list-9}.ql-editor ol li.ql-indent-9:before{content:counter(list-9,decimal) '. '}.ql-editor .ql-indent-1:not(.ql-direction-rtl){padding-left:3em}.ql-editor li.ql-indent-1:not(.ql-direction-rtl){padding-left:4.5em}.ql-editor .ql-indent-1.ql-direction-rtl.ql-align-right{padding-right:3em}.ql-editor li.ql-indent-1.ql-direction-rtl.ql-align-right{padding-right:4.5em}.ql-editor .ql-indent-2:not(.ql-direction-rtl){padding-left:6em}.ql-editor li.ql-indent-2:not(.ql-direction-rtl){padding-left:7.5em}.ql-editor .ql-indent-2.ql-direction-rtl.ql-align-right{padding-right:6em}.ql-editor li.ql-indent-2.ql-direction-rtl.ql-align-right{padding-right:7.5em}.ql-editor .ql-indent-3:not(.ql-direction-rtl){padding-left:9em}.ql-editor li.ql-indent-3:not(.ql-direction-rtl){padding-left:10.5em}.ql-editor .ql-indent-3.ql-direction-rtl.ql-align-right{padding-right:9em}.ql-editor li.ql-indent-3.ql-direction-rtl.ql-align-right{padding-right:10.5em}.ql-editor .ql-indent-4:not(.ql-direction-rtl){padding-left:12em}.ql-editor li.ql-indent-4:not(.ql-direction-rtl){padding-left:13.5em}.ql-editor .ql-indent-4.ql-direction-rtl.ql-align-right{padding-right:12em}.ql-editor li.ql-indent-4.ql-direction-rtl.ql-align-right{padding-right:13.5em}.ql-editor .ql-indent-5:not(.ql-direction-rtl){padding-left:15em}.ql-editor li.ql-indent-5:not(.ql-direction-rtl){padding-left:16.5em}.ql-editor .ql-indent-5.ql-direction-rtl.ql-align-right{padding-right:15em}.ql-editor li.ql-indent-5.ql-direction-rtl.ql-align-right{padding-right:16.5em}.ql-editor .ql-indent-6:not(.ql-direction-rtl){padding-left:18em}.ql-editor li.ql-indent-6:not(.ql-direction-rtl){padding-left:19.5em}.ql-editor .ql-indent-6.ql-direction-rtl.ql-align-right{padding-right:18em}.ql-editor li.ql-indent-6.ql-direction-rtl.ql-align-right{padding-right:19.5em}.ql-editor .ql-indent-7:not(.ql-direction-rtl){padding-left:21em}.ql-editor li.ql-indent-7:not(.ql-direction-rtl){padding-left:22.5em}.ql-editor .ql-indent-7.ql-direction-rtl.ql-align-right{padding-right:21em}.ql-editor li.ql-indent-7.ql-direction-rtl.ql-align-right{padding-right:22.5em}.ql-editor .ql-indent-8:not(.ql-direction-rtl){padding-left:24em}.ql-editor li.ql-indent-8:not(.ql-direction-rtl){padding-left:25.5em}.ql-editor .ql-indent-8.ql-direction-rtl.ql-align-right{padding-right:24em}.ql-editor li.ql-indent-8.ql-direction-rtl.ql-align-right{padding-right:25.5em}.ql-editor .ql-indent-9:not(.ql-direction-rtl){padding-left:27em}.ql-editor li.ql-indent-9:not(.ql-direction-rtl){padding-left:28.5em}.ql-editor .ql-indent-9.ql-direction-rtl.ql-align-right{padding-right:27em}.ql-editor li.ql-indent-9.ql-direction-rtl.ql-align-right{padding-right:28.5em}.ql-editor .ql-video{display:block;max-width:100%}.ql-editor .ql-video.ql-align-center{margin:0 auto}.ql-editor .ql-video.ql-align-right{margin:0 0 0 auto}.ql-editor .ql-bg-black{background-color:#000}.ql-editor .ql-bg-red{background-color:#e60000}.ql-editor .ql-bg-orange{background-color:#f90}.ql-editor .ql-bg-yellow{background-color:#ff0}.ql-editor .ql-bg-green{background-color:#008a00}.ql-editor .ql-bg-blue{background-color:#06c}.ql-editor .ql-bg-purple{background-color:#93f}.ql-editor .ql-color-white{color:#fff}.ql-editor .ql-color-red{color:#e60000}.ql-editor .ql-color-orange{color:#f90}.ql-editor .ql-color-yellow{color:#ff0}.ql-editor .ql-color-green{color:#008a00}.ql-editor .ql-color-blue{color:#06c}.ql-editor .ql-color-purple{color:#93f}.ql-editor .ql-font-serif{font-family:Georgia,Times New Roman,serif}.ql-editor .ql-font-monospace{font-family:Monaco,Courier New,monospace}.ql-editor .ql-size-small{font-size:.75em}.ql-editor .ql-size-large{font-size:1.5em}.ql-editor .ql-size-huge{font-size:2.5em}.ql-editor .ql-direction-rtl{direction:rtl;text-align:inherit}.ql-editor .ql-align-center{text-align:center}.ql-editor .ql-align-justify{text-align:justify}.ql-editor .ql-align-right{text-align:right}.ql-editor.ql-blank::before{color:rgba(0,0,0,.6);content:attr(data-placeholder);font-style:italic;left:15px;pointer-events:none;position:absolute;right:15px}.ql-snow .ql-toolbar:after,.ql-snow.ql-toolbar:after{clear:both;content:'';display:table}.ql-snow .ql-toolbar button,.ql-snow.ql-toolbar button{background:0 0;border:none;cursor:pointer;display:inline-block;float:left;height:24px;padding:3px 5px;width:28px}.ql-snow .ql-toolbar button svg,.ql-snow.ql-toolbar button svg{float:left;height:100%}.ql-snow .ql-toolbar button:active:hover,.ql-snow.ql-toolbar button:active:hover{outline:0}.ql-snow .ql-toolbar input.ql-image[type=file],.ql-snow.ql-toolbar input.ql-image[type=file]{display:none}.ql-snow .ql-toolbar .ql-picker-item.ql-selected,.ql-snow .ql-toolbar .ql-picker-item:hover,.ql-snow .ql-toolbar .ql-picker-label.ql-active,.ql-snow .ql-toolbar .ql-picker-label:hover,.ql-snow .ql-toolbar button.ql-active,.ql-snow .ql-toolbar button:focus,.ql-snow .ql-toolbar button:hover,.ql-snow.ql-toolbar .ql-picker-item.ql-selected,.ql-snow.ql-toolbar .ql-picker-item:hover,.ql-snow.ql-toolbar .ql-picker-label.ql-active,.ql-snow.ql-toolbar .ql-picker-label:hover,.ql-snow.ql-toolbar button.ql-active,.ql-snow.ql-toolbar button:focus,.ql-snow.ql-toolbar button:hover{color:#06c}.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-fill,.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill,.ql-snow .ql-toolbar .ql-picker-item:hover .ql-fill,.ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke.ql-fill,.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-fill,.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke.ql-fill,.ql-snow .ql-toolbar .ql-picker-label:hover .ql-fill,.ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke.ql-fill,.ql-snow .ql-toolbar button.ql-active .ql-fill,.ql-snow .ql-toolbar button.ql-active .ql-stroke.ql-fill,.ql-snow .ql-toolbar button:focus .ql-fill,.ql-snow .ql-toolbar button:focus .ql-stroke.ql-fill,.ql-snow .ql-toolbar button:hover .ql-fill,.ql-snow .ql-toolbar button:hover .ql-stroke.ql-fill,.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-fill,.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill,.ql-snow.ql-toolbar .ql-picker-item:hover .ql-fill,.ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke.ql-fill,.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-fill,.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke.ql-fill,.ql-snow.ql-toolbar .ql-picker-label:hover .ql-fill,.ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke.ql-fill,.ql-snow.ql-toolbar button.ql-active .ql-fill,.ql-snow.ql-toolbar button.ql-active .ql-stroke.ql-fill,.ql-snow.ql-toolbar button:focus .ql-fill,.ql-snow.ql-toolbar button:focus .ql-stroke.ql-fill,.ql-snow.ql-toolbar button:hover .ql-fill,.ql-snow.ql-toolbar button:hover .ql-stroke.ql-fill{fill:#06c}.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke,.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter,.ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke,.ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke-miter,.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke,.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter,.ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke,.ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke-miter,.ql-snow .ql-toolbar button.ql-active .ql-stroke,.ql-snow .ql-toolbar button.ql-active .ql-stroke-miter,.ql-snow .ql-toolbar button:focus .ql-stroke,.ql-snow .ql-toolbar button:focus .ql-stroke-miter,.ql-snow .ql-toolbar button:hover .ql-stroke,.ql-snow .ql-toolbar button:hover .ql-stroke-miter,.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke,.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter,.ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke,.ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke-miter,.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke,.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter,.ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke,.ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke-miter,.ql-snow.ql-toolbar button.ql-active .ql-stroke,.ql-snow.ql-toolbar button.ql-active .ql-stroke-miter,.ql-snow.ql-toolbar button:focus .ql-stroke,.ql-snow.ql-toolbar button:focus .ql-stroke-miter,.ql-snow.ql-toolbar button:hover .ql-stroke,.ql-snow.ql-toolbar button:hover .ql-stroke-miter{stroke:#06c}@media (pointer:coarse){.ql-snow .ql-toolbar button:hover:not(.ql-active),.ql-snow.ql-toolbar button:hover:not(.ql-active){color:#444}.ql-snow .ql-toolbar button:hover:not(.ql-active) .ql-fill,.ql-snow .ql-toolbar button:hover:not(.ql-active) .ql-stroke.ql-fill,.ql-snow.ql-toolbar button:hover:not(.ql-active) .ql-fill,.ql-snow.ql-toolbar button:hover:not(.ql-active) .ql-stroke.ql-fill{fill:#444}.ql-snow .ql-toolbar button:hover:not(.ql-active) .ql-stroke,.ql-snow .ql-toolbar button:hover:not(.ql-active) .ql-stroke-miter,.ql-snow.ql-toolbar button:hover:not(.ql-active) .ql-stroke,.ql-snow.ql-toolbar button:hover:not(.ql-active) .ql-stroke-miter{stroke:#444}}.ql-snow{box-sizing:border-box}.ql-snow *{box-sizing:border-box}.ql-snow .ql-hidden{display:none}.ql-snow .ql-out-bottom,.ql-snow .ql-out-top{visibility:hidden}.ql-snow .ql-tooltip{position:absolute;transform:translateY(10px)}.ql-snow .ql-tooltip a{cursor:pointer;text-decoration:none}.ql-snow .ql-tooltip.ql-flip{transform:translateY(-10px)}.ql-snow .ql-formats{display:inline-block;vertical-align:middle}.ql-snow .ql-formats:after{clear:both;content:'';display:table}.ql-snow .ql-stroke{fill:none;stroke:#444;stroke-linecap:round;stroke-linejoin:round;stroke-width:2}.ql-snow .ql-stroke-miter{fill:none;stroke:#444;stroke-miterlimit:10;stroke-width:2}.ql-snow .ql-fill,.ql-snow .ql-stroke.ql-fill{fill:#444}.ql-snow .ql-empty{fill:none}.ql-snow .ql-even{fill-rule:evenodd}.ql-snow .ql-stroke.ql-thin,.ql-snow .ql-thin{stroke-width:1}.ql-snow .ql-transparent{opacity:.4}.ql-snow .ql-direction svg:last-child{display:none}.ql-snow .ql-direction.ql-active svg:last-child{display:inline}.ql-snow .ql-direction.ql-active svg:first-child{display:none}.ql-snow .ql-editor h1{font-size:2em}.ql-snow .ql-editor h2{font-size:1.5em}.ql-snow .ql-editor h3{font-size:1.17em}.ql-snow .ql-editor h4{font-size:1em}.ql-snow .ql-editor h5{font-size:.83em}.ql-snow .ql-editor h6{font-size:.67em}.ql-snow .ql-editor a{text-decoration:underline}.ql-snow .ql-editor blockquote{border-left:4px solid #ccc;margin-bottom:5px;margin-top:5px;padding-left:16px}.ql-snow .ql-editor code,.ql-snow .ql-editor pre{background-color:#f0f0f0;border-radius:3px}.ql-snow .ql-editor pre{white-space:pre-wrap;margin-bottom:5px;margin-top:5px;padding:5px 10px}.ql-snow .ql-editor code{font-size:85%;padding:2px 4px}.ql-snow .ql-editor pre.ql-syntax{background-color:#23241f;color:#f8f8f2;overflow:visible}.ql-snow .ql-editor img{max-width:100%}.ql-snow .ql-picker{color:#444;display:inline-block;float:left;font-size:14px;font-weight:500;height:24px;position:relative;vertical-align:middle}.ql-snow .ql-picker-label{cursor:pointer;display:inline-block;height:100%;padding-left:8px;padding-right:2px;position:relative;width:100%}.ql-snow .ql-picker-label::before{display:inline-block;line-height:22px}.ql-snow .ql-picker-options{background-color:#fff;display:none;min-width:100%;padding:4px 8px;position:absolute;white-space:nowrap}.ql-snow .ql-picker-options .ql-picker-item{cursor:pointer;display:block;padding-bottom:5px;padding-top:5px}.ql-snow .ql-picker.ql-expanded .ql-picker-label{color:#ccc;z-index:2}.ql-snow .ql-picker.ql-expanded .ql-picker-label .ql-fill{fill:#ccc}.ql-snow .ql-picker.ql-expanded .ql-picker-label .ql-stroke{stroke:#ccc}.ql-snow .ql-picker.ql-expanded .ql-picker-options{display:block;margin-top:-1px;top:100%;z-index:1}.ql-snow .ql-color-picker,.ql-snow .ql-icon-picker{width:28px}.ql-snow .ql-color-picker .ql-picker-label,.ql-snow .ql-icon-picker .ql-picker-label{padding:2px 4px}.ql-snow .ql-color-picker .ql-picker-label svg,.ql-snow .ql-icon-picker .ql-picker-label svg{right:4px}.ql-snow .ql-icon-picker .ql-picker-options{padding:4px 0}.ql-snow .ql-icon-picker .ql-picker-item{height:24px;width:24px;padding:2px 4px}.ql-snow .ql-color-picker .ql-picker-options{padding:3px 5px;width:152px}.ql-snow .ql-color-picker .ql-picker-item{border:1px solid transparent;float:left;height:16px;margin:2px;padding:0;width:16px}.ql-snow .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) svg{position:absolute;margin-top:-9px;right:0;top:50%;width:18px}.ql-snow .ql-picker.ql-font .ql-picker-item[data-label]:not([data-label=''])::before,.ql-snow .ql-picker.ql-font .ql-picker-label[data-label]:not([data-label=''])::before,.ql-snow .ql-picker.ql-header .ql-picker-item[data-label]:not([data-label=''])::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-label]:not([data-label=''])::before,.ql-snow .ql-picker.ql-size .ql-picker-item[data-label]:not([data-label=''])::before,.ql-snow .ql-picker.ql-size .ql-picker-label[data-label]:not([data-label=''])::before{content:attr(data-label)}.ql-snow .ql-picker.ql-header{width:98px}.ql-snow .ql-picker.ql-header .ql-picker-item::before,.ql-snow .ql-picker.ql-header .ql-picker-label::before{content:'Normal'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"1\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"1\"]::before{content:'Heading 1'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"2\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"2\"]::before{content:'Heading 2'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"3\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"3\"]::before{content:'Heading 3'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"4\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"4\"]::before{content:'Heading 4'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"5\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"5\"]::before{content:'Heading 5'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"6\"]::before,.ql-snow .ql-picker.ql-header .ql-picker-label[data-value=\"6\"]::before{content:'Heading 6'}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"1\"]::before{font-size:2em}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"2\"]::before{font-size:1.5em}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"3\"]::before{font-size:1.17em}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"4\"]::before{font-size:1em}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"5\"]::before{font-size:.83em}.ql-snow .ql-picker.ql-header .ql-picker-item[data-value=\"6\"]::before{font-size:.67em}.ql-snow .ql-picker.ql-font{width:108px}.ql-snow .ql-picker.ql-font .ql-picker-item::before,.ql-snow .ql-picker.ql-font .ql-picker-label::before{content:'Sans Serif'}.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=serif]::before,.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=serif]::before{content:'Serif'}.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=monospace]::before,.ql-snow .ql-picker.ql-font .ql-picker-label[data-value=monospace]::before{content:'Monospace'}.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=serif]::before{font-family:Georgia,Times New Roman,serif}.ql-snow .ql-picker.ql-font .ql-picker-item[data-value=monospace]::before{font-family:Monaco,Courier New,monospace}.ql-snow .ql-picker.ql-size{width:98px}.ql-snow .ql-picker.ql-size .ql-picker-item::before,.ql-snow .ql-picker.ql-size .ql-picker-label::before{content:'Normal'}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=small]::before,.ql-snow .ql-picker.ql-size .ql-picker-label[data-value=small]::before{content:'Small'}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=large]::before,.ql-snow .ql-picker.ql-size .ql-picker-label[data-value=large]::before{content:'Large'}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=huge]::before,.ql-snow .ql-picker.ql-size .ql-picker-label[data-value=huge]::before{content:'Huge'}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=small]::before{font-size:10px}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=large]::before{font-size:18px}.ql-snow .ql-picker.ql-size .ql-picker-item[data-value=huge]::before{font-size:32px}.ql-snow .ql-color-picker.ql-background .ql-picker-item{background-color:#fff}.ql-snow .ql-color-picker.ql-color .ql-picker-item{background-color:#000}.ql-toolbar.ql-snow{border:1px solid #ccc;box-sizing:border-box;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;padding:8px}.ql-toolbar.ql-snow .ql-formats{margin-right:15px}.ql-toolbar.ql-snow .ql-picker-label{border:1px solid transparent}.ql-toolbar.ql-snow .ql-picker-options{border:1px solid transparent;box-shadow:rgba(0,0,0,.2) 0 2px 8px}.ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-label{border-color:#ccc}.ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options{border-color:#ccc}.ql-toolbar.ql-snow .ql-color-picker .ql-picker-item.ql-selected,.ql-toolbar.ql-snow .ql-color-picker .ql-picker-item:hover{border-color:#000}.ql-toolbar.ql-snow+.ql-container.ql-snow{border-top:0}.ql-snow .ql-tooltip{background-color:#fff;border:1px solid #ccc;box-shadow:0 0 5px #ddd;color:#444;padding:5px 12px;white-space:nowrap}.ql-snow .ql-tooltip::before{content:\"Visit URL:\";line-height:26px;margin-right:8px}.ql-snow .ql-tooltip input[type=text]{display:none;border:1px solid #ccc;font-size:13px;height:26px;margin:0;padding:3px 5px;width:170px}.ql-snow .ql-tooltip a.ql-preview{display:inline-block;max-width:200px;overflow-x:hidden;text-overflow:ellipsis;vertical-align:top}.ql-snow .ql-tooltip a.ql-action::after{border-right:1px solid #ccc;content:'Edit';margin-left:16px;padding-right:8px}.ql-snow .ql-tooltip a.ql-remove::before{content:'Remove';margin-left:8px}.ql-snow .ql-tooltip a{line-height:26px}.ql-snow .ql-tooltip.ql-editing a.ql-preview,.ql-snow .ql-tooltip.ql-editing a.ql-remove{display:none}.ql-snow .ql-tooltip.ql-editing input[type=text]{display:inline-block}.ql-snow .ql-tooltip.ql-editing a.ql-action::after{border-right:0;content:'Save';padding-right:0}.ql-snow .ql-tooltip[data-mode=link]::before{content:\"Enter link:\"}.ql-snow .ql-tooltip[data-mode=formula]::before{content:\"Enter formula:\"}.ql-snow .ql-tooltip[data-mode=video]::before{content:\"Enter video:\"}.ql-snow a{color:#06c}.ql-container.ql-snow{border:1px solid #ccc}", map: undefined, media: undefined })
   ,inject("data-v-59392418_1", { source: ".ql-editor{min-height:200px;font-size:16px}.ql-snow .ql-stroke.ql-thin,.ql-snow .ql-thin{stroke-width:1px!important}.quillWrapper .ql-snow.ql-toolbar{padding-top:8px;padding-bottom:4px}.quillWrapper .ql-snow.ql-toolbar .ql-formats{margin-bottom:10px}.ql-snow .ql-toolbar button svg,.quillWrapper .ql-snow.ql-toolbar button svg{width:22px;height:22px}.quillWrapper .ql-editor ul[data-checked=false]>li::before,.quillWrapper .ql-editor ul[data-checked=true]>li::before{font-size:1.35em;vertical-align:baseline;bottom:-.065em;font-weight:900;color:#222}.quillWrapper .ql-snow .ql-stroke{stroke:rgba(63,63,63,.95);stroke-linecap:square;stroke-linejoin:initial;stroke-width:1.7px}.quillWrapper .ql-picker-label{font-size:15px}.quillWrapper .ql-snow .ql-active .ql-stroke{stroke-width:2.25px}.quillWrapper .ql-toolbar.ql-snow .ql-formats{vertical-align:top}.ql-picker:not(.ql-background){position:relative;top:2px}.ql-picker.ql-color-picker svg{width:22px!important;height:22px!important}.quillWrapper .imageResizeActive img{display:block;cursor:pointer}.quillWrapper .imageResizeActive~div svg{cursor:pointer}", map: undefined, media: undefined });
 
     };
     /* scoped */
-    const __vue_scope_id__$K = undefined;
+    const __vue_scope_id__$L = undefined;
     /* module identifier */
-    const __vue_module_identifier__$K = undefined;
+    const __vue_module_identifier__$L = undefined;
     /* functional template */
-    const __vue_is_functional_template__$K = false;
+    const __vue_is_functional_template__$L = false;
     /* style inject SSR */
     
 
     
     var VueEditor = normalizeComponent_1(
-      { render: __vue_render__$D, staticRenderFns: __vue_staticRenderFns__$D },
-      __vue_inject_styles__$K,
-      __vue_script__$K,
-      __vue_scope_id__$K,
-      __vue_is_functional_template__$K,
-      __vue_module_identifier__$K,
+      { render: __vue_render__$E, staticRenderFns: __vue_staticRenderFns__$E },
+      __vue_inject_styles__$L,
+      __vue_script__$L,
+      __vue_scope_id__$L,
+      __vue_is_functional_template__$L,
+      __vue_module_identifier__$L,
       browser,
       undefined
     );
@@ -29031,7 +34929,7 @@
     GlobalVue.use(VPlugin);
   }
 
-  var script$K = Vue.mgComponent('mgWysiwyg', {
+  var script$L = Vue.mgComponent('mgWysiwyg', {
     meta: {
       title: 'WYSIWYG editor',
       icon: 'far fa-atlas',
@@ -29062,10 +34960,10 @@
   });
 
   /* script */
-  const __vue_script__$L = script$K;
+  const __vue_script__$M = script$L;
 
   /* template */
-  var __vue_render__$E = function() {
+  var __vue_render__$F = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -29081,17 +34979,17 @@
       }
     })
   };
-  var __vue_staticRenderFns__$E = [];
-  __vue_render__$E._withStripped = true;
+  var __vue_staticRenderFns__$F = [];
+  __vue_render__$F._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$L = undefined;
+    const __vue_inject_styles__$M = undefined;
     /* scoped */
-    const __vue_scope_id__$L = undefined;
+    const __vue_scope_id__$M = undefined;
     /* module identifier */
-    const __vue_module_identifier__$L = undefined;
+    const __vue_module_identifier__$M = undefined;
     /* functional template */
-    const __vue_is_functional_template__$L = false;
+    const __vue_is_functional_template__$M = false;
     /* style inject */
     
     /* style inject SSR */
@@ -29100,13 +34998,13 @@
     
 
     
-    const __vue_component__$K = normalizeComponent(
-      { render: __vue_render__$E, staticRenderFns: __vue_staticRenderFns__$E },
-      __vue_inject_styles__$L,
-      __vue_script__$L,
-      __vue_scope_id__$L,
-      __vue_is_functional_template__$L,
-      __vue_module_identifier__$L,
+    const __vue_component__$L = normalizeComponent(
+      { render: __vue_render__$F, staticRenderFns: __vue_staticRenderFns__$F },
+      __vue_inject_styles__$M,
+      __vue_script__$M,
+      __vue_scope_id__$M,
+      __vue_is_functional_template__$M,
+      __vue_module_identifier__$M,
       false,
       undefined,
       undefined,
@@ -29115,7 +35013,7 @@
 
   var mgWysiwyg = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    'default': __vue_component__$K
+    'default': __vue_component__$L
   });
 
 }(Vue, $));

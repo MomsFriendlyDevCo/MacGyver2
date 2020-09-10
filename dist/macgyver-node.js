@@ -80,7 +80,7 @@ function _setPrototypeOf(o, p) {
   return _setPrototypeOf(o, p);
 }
 
-function isNativeReflectConstruct() {
+function _isNativeReflectConstruct() {
   if (typeof Reflect === "undefined" || !Reflect.construct) return false;
   if (Reflect.construct.sham) return false;
   if (typeof Proxy === "function") return true;
@@ -94,7 +94,7 @@ function isNativeReflectConstruct() {
 }
 
 function _construct(Parent, args, Class) {
-  if (isNativeReflectConstruct()) {
+  if (_isNativeReflectConstruct()) {
     _construct = Reflect.construct;
   } else {
     _construct = function _construct(Parent, args, Class) {
@@ -149,7 +149,7 @@ function _wrapNativeSuper(Class) {
 }
 
 function _slicedToArray(arr, i) {
-  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
+  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
 }
 
 function _arrayWithHoles(arr) {
@@ -157,10 +157,7 @@ function _arrayWithHoles(arr) {
 }
 
 function _iterableToArrayLimit(arr, i) {
-  if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) {
-    return;
-  }
-
+  if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return;
   var _arr = [];
   var _n = true;
   var _d = false;
@@ -186,8 +183,25 @@ function _iterableToArrayLimit(arr, i) {
   return _arr;
 }
 
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
+
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+  return arr2;
+}
+
 function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance");
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 
 function _wrapRegExp(re, groups) {
@@ -6517,7 +6531,7 @@ $macgyver.compileSpec = function (spec, options) {
             return widget;
           } else if (isString_1(id) && id.startsWith('mg')) {
             // ID is type, payload is widget
-            return _objectSpread2({}, widget, {
+            return _objectSpread2(_objectSpread2({}, widget), {}, {
               type: id
             });
           } else if (widget.type) {
@@ -6534,9 +6548,9 @@ $macgyver.compileSpec = function (spec, options) {
 
             if (found) {
               // Found either a widget of form `mg${type}` or a widget with that type as a shorthand
-              return _objectSpread2({
+              return _objectSpread2(_objectSpread2({
                 id: id
-              }, widget, {
+              }, widget), {}, {
                 type: found.meta.id
               });
             } else {
@@ -6548,9 +6562,9 @@ $macgyver.compileSpec = function (spec, options) {
             }
           } else if (isPlainObject_1(widget)) {
             // Given object but it explicitly does not have a type - assume mgText
-            return _objectSpread2({
+            return _objectSpread2(_objectSpread2({
               id: id
-            }, widget, {
+            }, widget), {}, {
               type: 'mgText'
             });
           } else {
@@ -6843,7 +6857,7 @@ $macgyver.utils.evalCompile = function (expression) {
   } else if (isPlainObject_1(expression)) {
     // An object but not as Sift function
     return asFunc ? createDefaultQueryTester(expression) : expression;
-  } else if (isString_1(expression) && (match = _wrapRegExp(/^[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*([\.0-9A-Z_a-z]+)([\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*==?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*!=[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*<=?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*>=?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+\$lte?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+\$gte?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+)(.+)[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*$/, {
+  } else if (isString_1(expression) && (match = /*#__PURE__*/_wrapRegExp(/^[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*([\.0-9A-Z_a-z]+)([\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*==?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*!=[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*<=?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*>=?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+\$lte?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+|[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+\$gte?[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]+)(.+)[\t-\r \xA0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]*$/, {
     left: 1,
     operand: 2,
     right: 3
@@ -7012,7 +7026,7 @@ $macgyver.utils.incrementId = function (str) {
     return str;
   } else if (/[0-9]$/.test(str)) {
     // Ends in a number
-    var extracted = _wrapRegExp(/^(.*)([0-9]+)$/, {
+    var extracted = /*#__PURE__*/_wrapRegExp(/^(.*)([0-9]+)$/, {
       prefix: 1,
       numeric: 2
     }).exec(str); // Extract numeric suffix
@@ -7026,8 +7040,8 @@ $macgyver.utils.incrementId = function (str) {
 };
 
 /*!
- * Vue.js v2.6.11
- * (c) 2014-2019 Evan You
+ * Vue.js v2.6.12
+ * (c) 2014-2020 Evan You
  * Released under the MIT License.
  */
 /*  */
@@ -12477,7 +12491,7 @@ Object.defineProperty(Vue$1, 'FunctionalRenderContext', {
   value: FunctionalRenderContext
 });
 
-Vue$1.version = '2.6.11';
+Vue$1.version = '2.6.12';
 
 /*  */
 
@@ -14046,7 +14060,7 @@ function updateDOMProps (oldVnode, vnode) {
       // skip the update if old and new VDOM state is the same.
       // `value` is handled separately because the DOM value may be temporarily
       // out of sync with VDOM state due to focus, composition and modifiers.
-      // This  #4521 by skipping the unnecesarry `checked` update.
+      // This  #4521 by skipping the unnecessary `checked` update.
       cur !== oldProps[key]
     ) {
       // some property updates can throw
@@ -15507,7 +15521,7 @@ Vue$1.prototype.$macgyver = function () {
   Vue$1.mgComponent = function (name, component) {
     if (macgyver.widgets[name]) throw new Error("Cannot redeclare MacGyver component \"".concat(name, "\""));
     if (!name.startsWith('mg')) throw new Error("All MacGyver components must be prefixed with \"mg\", given \"".concat(name, "\""));
-    macgyver.widgets[name] = _objectSpread2({}, component, {
+    macgyver.widgets[name] = _objectSpread2(_objectSpread2({}, component), {}, {
       meta: _objectSpread2({
         id: _.camelCase(name),
         title: _.startCase(name),
@@ -15630,6 +15644,7 @@ Vue$1.prototype.$macgyver = function () {
               newProp.type = Object;
 
             case 'mgDate':
+            case 'mgDatetime':
             case 'mgTime':
               newProp.type = Date;
               break;

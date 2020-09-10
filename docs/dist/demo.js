@@ -78,7 +78,7 @@
           var _this = this;
 
           this.$router.push({
-            query: _objectSpread2({}, this.$route.query, {
+            query: _objectSpread2(_objectSpread2({}, this.$route.query), {}, {
               example: this.example
             })
           });
