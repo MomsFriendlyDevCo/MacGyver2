@@ -128,8 +128,8 @@ export default Vue.mgComponent('mgTable', {
 						<div class="btn-group">
 							<a class="btn btn-context" data-toggle="dropdown"><i class="far fa-ellipsis-v"></i></a>
 							<ul class="dropdown-menu pull-right">
-								<li><a @click="createRow(rowNumber)"><i class="far fa-arrow-circle-up"></i> Add row above</a></li>
-								<li><a @click="createRow(rowNumber)"><i class="far fa-arrow-circle-down"></i> Add row below</a></li>
+								<li v-if="$props.allowAdd"><a @click="createRow(rowNumber)"><i class="far fa-arrow-circle-up"></i> Add row above</a></li>
+								<li v-if="$props.allowAdd"><a @click="createRow(rowNumber)"><i class="far fa-arrow-circle-down"></i> Add row below</a></li>
 								<li v-if="$props.allowDelete" class="dropdown-divider"></li>
 								<li v-if="$props.allowDelete" class="dropdown-item-danger"><a @click="deleteRow(rowNumber)"><i class="far fa-trash"></i> Delete</a></li>
 							</ul>
