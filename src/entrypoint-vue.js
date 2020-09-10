@@ -27,6 +27,7 @@ import('./components/mgColor');
 import('./components/mgComponent');
 import('./components/mgContainer');
 import('./components/mgDate');
+import('./components/mgDatetime');
 import('./components/mgEmail');
 import('./components/mgError');
 import('./components/mgFormEditor');

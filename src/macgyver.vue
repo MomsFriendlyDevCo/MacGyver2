@@ -138,6 +138,7 @@ Vue.prototype.$macgyver = (()=> {
 							case 'mgQuery':
 								newProp.type = Object;
 							case 'mgDate':
+							case 'mgDatetime':
 							case 'mgTime':
 								newProp.type = Date;
 								break;
