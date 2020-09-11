@@ -16614,7 +16614,7 @@
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
-    return _c("div", { staticClass: "mg-datetime" }, [
+    return _c("div", { staticClass: "mg-date" }, [
       _c("input", {
         directives: [
           {
@@ -16847,6 +16847,14 @@
       required: {
         type: 'mgToggle',
         "default": false
+      },
+      disabled: {
+        type: 'mgToggle',
+        "default": false
+      },
+      readonly: {
+        type: 'mgToggle',
+        "default": false
       }
     },
     created: function created() {
@@ -16866,22 +16874,34 @@
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
-    return _c("input", {
-      directives: [
-        { name: "model", rawName: "v-model", value: _vm.data, expression: "data" }
-      ],
-      staticClass: "form-control",
-      attrs: { type: "email", placeholder: _vm.$props.placeholder },
-      domProps: { value: _vm.data },
-      on: {
-        input: function($event) {
-          if ($event.target.composing) {
-            return
+    return _c("div", { staticClass: "mg-email" }, [
+      _c("input", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.data,
+            expression: "data"
           }
-          _vm.data = $event.target.value;
+        ],
+        staticClass: "form-control",
+        attrs: {
+          type: "email",
+          disabled: _vm.$props.disabled,
+          placeholder: _vm.$props.placeholder,
+          readonly: _vm.$props.readonly
+        },
+        domProps: { value: _vm.data },
+        on: {
+          input: function($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.data = $event.target.value;
+          }
         }
-      }
-    })
+      })
+    ])
   };
   var __vue_staticRenderFns__$e = [];
   __vue_render__$e._withStripped = true;
@@ -20658,7 +20678,9 @@
                   )
                 }),
                 _vm._v(" "),
-                _c("th", { staticClass: "btn-context" })
+                _vm.$props.allowAdd || _vm.$props.allowDelete
+                  ? _c("th", { staticClass: "btn-context" }, [_vm._v(" ")])
+                  : _vm._e()
               ],
               2
             )
@@ -20676,7 +20698,11 @@
                         attrs: {
                           colspan:
                             _vm.$props.items.length +
-                            (_vm.$props.rowNumbers ? 2 : 1)
+                            (_vm.$props.rowNumbers ? 1 : 0) +
+                            (_vm.$props.allowAdd || _vm.$props.allowDelete
+                              ? 1
+                              : 0) +
+                            1
                         }
                       },
                       [
@@ -20725,78 +20751,91 @@
                       )
                     }),
                     _vm._v(" "),
-                    _c("td", { staticClass: "btn-context" }, [
-                      _c("div", { staticClass: "btn-group" }, [
-                        _vm._m(0, true),
-                        _vm._v(" "),
-                        _c("ul", { staticClass: "dropdown-menu pull-right" }, [
-                          _vm.$props.allowAdd
-                            ? _c("li", [
-                                _c(
-                                  "a",
-                                  {
-                                    on: {
-                                      click: function($event) {
-                                        return _vm.createRow(rowNumber)
-                                      }
-                                    }
-                                  },
-                                  [
-                                    _c("i", {
-                                      staticClass: "far fa-arrow-circle-up"
-                                    }),
-                                    _vm._v(" Add row above")
-                                  ]
-                                )
-                              ])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm.$props.allowAdd
-                            ? _c("li", [
-                                _c(
-                                  "a",
-                                  {
-                                    on: {
-                                      click: function($event) {
-                                        return _vm.createRow(rowNumber)
-                                      }
-                                    }
-                                  },
-                                  [
-                                    _c("i", {
-                                      staticClass: "far fa-arrow-circle-down"
-                                    }),
-                                    _vm._v(" Add row below")
-                                  ]
-                                )
-                              ])
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm.$props.allowDelete
-                            ? _c("li", { staticClass: "dropdown-divider" })
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm.$props.allowDelete
-                            ? _c("li", { staticClass: "dropdown-item-danger" }, [
-                                _c(
-                                  "a",
-                                  {
-                                    on: {
-                                      click: function($event) {
-                                        return _vm.deleteRow(rowNumber)
-                                      }
-                                    }
-                                  },
-                                  [
-                                    _c("i", { staticClass: "far fa-trash" }),
-                                    _vm._v(" Delete")
-                                  ]
-                                )
-                              ])
-                            : _vm._e()
+                    _vm.$props.allowAdd || _vm.$props.allowDelete
+                      ? _c("td", { staticClass: "btn-context" }, [
+                          _c("div", { staticClass: "btn-group" }, [
+                            _vm._m(0, true),
+                            _vm._v(" "),
+                            _c(
+                              "ul",
+                              { staticClass: "dropdown-menu pull-right" },
+                              [
+                                _vm.$props.allowAdd
+                                  ? _c("li", [
+                                      _c(
+                                        "a",
+                                        {
+                                          on: {
+                                            click: function($event) {
+                                              return _vm.createRow(rowNumber)
+                                            }
+                                          }
+                                        },
+                                        [
+                                          _c("i", {
+                                            staticClass: "far fa-arrow-circle-up"
+                                          }),
+                                          _vm._v(" Add row above")
+                                        ]
+                                      )
+                                    ])
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _vm.$props.allowAdd
+                                  ? _c("li", [
+                                      _c(
+                                        "a",
+                                        {
+                                          on: {
+                                            click: function($event) {
+                                              return _vm.createRow(rowNumber)
+                                            }
+                                          }
+                                        },
+                                        [
+                                          _c("i", {
+                                            staticClass:
+                                              "far fa-arrow-circle-down"
+                                          }),
+                                          _vm._v(" Add row below")
+                                        ]
+                                      )
+                                    ])
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _vm.$props.allowDelete
+                                  ? _c("li", { staticClass: "dropdown-divider" })
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _vm.$props.allowDelete
+                                  ? _c(
+                                      "li",
+                                      { staticClass: "dropdown-item-danger" },
+                                      [
+                                        _c(
+                                          "a",
+                                          {
+                                            on: {
+                                              click: function($event) {
+                                                return _vm.deleteRow(rowNumber)
+                                              }
+                                            }
+                                          },
+                                          [
+                                            _c("i", {
+                                              staticClass: "far fa-trash"
+                                            }),
+                                            _vm._v(" Delete")
+                                          ]
+                                        )
+                                      ]
+                                    )
+                                  : _vm._e()
+                              ]
+                            )
+                          ])
                         ])
-                      ])
-                    ])
+                      : _vm._e()
                   ],
                   2
                 )
@@ -20899,7 +20938,7 @@
     /* style */
     const __vue_inject_styles__$E = function (inject) {
       if (!inject) return
-      inject("data-v-4bfa5f1f_0", { source: "\n.mg-table .row-number {\n\tfont-size: 16px;\n\ttext-align: middle;\n}\n.mg-table td.row-number {\n\tmargin-top: 14px;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgTable.vue"],"names":[],"mappings":";AA0LA;CACA,eAAA;CACA,kBAAA;AACA;AAEA;CACA,gBAAA;AACA","file":"mgTable.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgTable', {\n\tmeta: {\n\t\ttitle: 'Table layout',\n\t\ticon: 'far fa-table',\n\t\tcategory: 'Layout',\n\t},\n\tdata() { return {\n\t\tnewRow: {},\n\t\t// TODO: Is this really needed? Perhaps when `url` is specified?\n\t\tisAdding: false,\n\t\tdata: [],\n\t}},\n\tprops: {\n\t\turl: {type: 'mgUrl', relative: true, help: 'Data feed to populate the table'},\n\t\tallowAdd: {type: 'mgToggle', title: 'Allow Row Addition', default: true},\n\t\tallowDelete: {type: 'mgToggle', title: 'Allow Row Deletion', default: true},\n\t\ttextEmpty: {type: 'mgText', title: 'No data message', default: 'No data'},\n\t\titems: {\n\t\t\ttype: 'mgAlert',\n\t\t\tvueType: 'array',\n\t\t\ttext: 'Use the editor to define child widgets',\n\t\t\tdefault: () => [\n\t\t\t\t// FIXME: Defaults are not initialised\n\t\t\t\t{id: 'col1', title: 'Col 1', type: 'mgText', default: '1'},\n\t\t\t\t{id: 'col2', title: 'Col 2', type: 'mgText', default: '2'},\n\t\t\t],\n\t\t},\n\t\taddButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},\n\t\taddButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},\n\t\trowNumbers: {type: 'mgToggle', help: 'Show the row number at the beginning of each row', default: true},\n\t},\n\tchildProps: {\n\t\tshowTitle: {type: 'mgToggle', default: false, title: 'Show Title'},\n\t},\n\tcreated() {\n\t\tthis.$debugging = true;\n\t},\n\tmounted() {\n\t\tthis.$watch('$props.url', ()=> {\n\t\t\tif (!this.$props.url) return;\n\t\t\tthis.$macgyver.utils.fetch(this.$props.url, {type: 'array'})\n\t\t\t\t.then(data => this.$set(this.$props, 'data', data))\n\t\t}, {immediate: true});\n\t},\n\twatch: {\n\t\tdata: {\n\t\t\timmediate: true,\n\t\t\thandler() {\n\t\t\t\t// Ensure that data is always an array\n\t\t\t\tif (!_.isArray(this.data)) this.data = [];\n\t\t\t},\n\t\t},\n\t},\n\t// To ensure reactivity to array of objects https://stackoverflow.com/a/56793403/2438830\n\tcomputed: {\n\t\touterKey() {\n\t\t\treturn this.data && this.data.length;\n\t\t}\n\t},\n\tmethods: {\n\t\tcreateRow(offset) { // Offset is the row to create after - i.e. array position splice\n\t\t\tthis.$debug('createRow', offset, this.$data.newRow);\n\t\t\tthis.isAdding = true;\n\t\t\tif (typeof offset === 'undefined') {\n\t\t\t\tthis.data.push(this.$data.newRow);\n\t\t\t} else {\n\t\t\t\tthis.data.splice(offset, 0, this.$data.newRow);\n\t\t\t}\n\t\t\tthis.$data.newRow = {};\n\t\t\tthis.isAdding = false;\n\t\t},\n\t\tdeleteRow(offset) {\n\t\t\tthis.$debug('deleteRow', offset);\n\t\t\tthis.data.splice(offset, 1);\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-table\">\n\t\t<table class=\"table table-bordered table-striped table-hover\">\n\t\t\t<thead>\n\t\t\t\t<tr>\n\t\t\t\t\t<th v-if=\"$props.rowNumbers\" class=\"row-number\">#</th>\n\t\t\t\t\t<th v-for=\"col in $props.items\" :key=\"col.id\" :style=\"(col.width ? 'width: ' + col.width + '; ' : '') + col.class\">\n\t\t\t\t\t\t{{col.title}}\n\t\t\t\t\t</th>\n\t\t\t\t\t<th class=\"btn-context\"></th>\n\t\t\t\t</tr>\n\t\t\t</thead>\n\t\t\t<tbody :key=\"outerKey\">\n\t\t\t\t<tr v-if=\"!data || !data.length\">\n\t\t\t\t\t<td :colspan=\"$props.items.length + ($props.rowNumbers ? 2 : 1)\">\n\t\t\t\t\t\t<div class=\"alert alert-warning m-10\">{{$props.textEmpty || 'No data'}}</div>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr v-for=\"(row, rowNumber) in data\" :key=\"rowNumber\">\n\t\t\t\t\t<td v-if=\"$props.rowNumbers\" class=\"row-number\">\n\t\t\t\t\t\t{{rowNumber + 1 | number}}\n\t\t\t\t\t</td>\n\t\t\t\t\t<td v-for=\"col in $props.items\" :key=\"col.id\" :class=\"col.class\">\n\t\t\t\t\t\t<!-- Works -->\n\t\t\t\t\t\t<!--mg-text\n\t\t\t\t\t\t\t:value=\"row[col.$dataPath]\"\n\t\t\t\t\t\t\t@change=\"$setPath(row, col.$dataPath, $event)\"\n\t\t\t\t\t\t/-->\n\n\t\t\t\t\t\t<!-- Works -->\n\t\t\t\t\t\t<mg-form\n\t\t\t\t\t\t\t:config=\"col\"\n\t\t\t\t\t\t\t:data=\"row\"\n\t\t\t\t\t\t\t@changeItem=\"$setPath(row, $event.path, $event.value)\"\n\t\t\t\t\t\t/>\n\n\t\t\t\t\t\t<!-- // FIXME: Should pass through value and change events properties? -->\n\t\t\t\t\t\t<!--mg-component\n\t\t\t\t\t\t\t:config=\"{\n\t\t\t\t\t\t\t\tid: col.id,\n\t\t\t\t\t\t\t\ttype: col.type,\n\t\t\t\t\t\t\t}\"\n\t\t\t\t\t\t\t:value=\"row[col.$dataPath]\"\n\t\t\t\t\t\t\t@change=\"$setPath(row, col.$dataPath, $event)\"\n\t\t\t\t\t\t/-->\n\t\t\t\t\t</td>\n\t\t\t\t\t<td class=\"btn-context\">\n\t\t\t\t\t\t<div class=\"btn-group\">\n\t\t\t\t\t\t\t<a class=\"btn btn-context\" data-toggle=\"dropdown\"><i class=\"far fa-ellipsis-v\"></i></a>\n\t\t\t\t\t\t\t<ul class=\"dropdown-menu pull-right\">\n\t\t\t\t\t\t\t\t<li v-if=\"$props.allowAdd\"><a @click=\"createRow(rowNumber)\"><i class=\"far fa-arrow-circle-up\"></i> Add row above</a></li>\n\t\t\t\t\t\t\t\t<li v-if=\"$props.allowAdd\"><a @click=\"createRow(rowNumber)\"><i class=\"far fa-arrow-circle-down\"></i> Add row below</a></li>\n\t\t\t\t\t\t\t\t<li v-if=\"$props.allowDelete\" class=\"dropdown-divider\"></li>\n\t\t\t\t\t\t\t\t<li v-if=\"$props.allowDelete\" class=\"dropdown-item-danger\"><a @click=\"deleteRow(rowNumber)\"><i class=\"far fa-trash\"></i> Delete</a></li>\n\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr class=\"mgTable-append\" v-if=\"$props.allowAdd\">\n\t\t\t\t\t<td v-if=\"$props.rowNumbers\" class=\"row-number\">\n\t\t\t\t\t\t<i class=\"far fa-asterisk\"></i>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td v-for=\"(col, colNumber) in $props.items\" :key=\"col.id\">\n\t\t\t\t\t\t<!-- Works -->\n\t\t\t\t\t\t<!--mg-text\n\t\t\t\t\t\t\t:value=\"newRow[col.$dataPath]\"\n\t\t\t\t\t\t\t@change=\"$setPath(newRow, col.$dataPath, $event)\"\n\t\t\t\t\t\t/-->\n\n\t\t\t\t\t\t<!-- Works -->\n\t\t\t\t\t\t<mg-form\n\t\t\t\t\t\t\t:config=\"col\"\n\t\t\t\t\t\t\t:data=\"newRow\"\n\t\t\t\t\t\t\t@changeItem=\"$setPath(newRow, $event.path, $event.value)\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<a @click=\"createRow()\" :class=\"isAdding ? $props.addButtonActiveClass : $props.addButtonInactiveClass\"></a>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t</tbody>\n\t\t</table>\n\n\t\t<div v-if=\"$debugging\" class=\"card\">\n\t\t\t<div class=\"card-header\">\n\t\t\t\tRaw data\n\t\t\t\t<i class=\"float-right fas fa-debug fa-lg\" v-tooltip=\"'Only visible to users with the Debug permission'\"/>\n\t\t\t</div>\n\t\t\t<div class=\"card-body\">\n\t\t\t\t<pre>{{$data}}</pre>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<!--div v-if=\"$debugging\" class=\"card\">\n\t\t\t<div class=\"card-header\">\n\t\t\t\tRaw properties\n\t\t\t\t<i class=\"float-right fas fa-debug fa-lg\" v-tooltip=\"'Only visible to users with the Debug permission'\"/>\n\t\t\t</div>\n\t\t\t<div class=\"card-body\">\n\t\t\t\t<pre>{{$props}}</pre>\n\t\t\t</div>\n\t\t</div-->\n\t</div>\n</template>\n\n<style>\n.mg-table .row-number {\n\tfont-size: 16px;\n\ttext-align: middle;\n}\n\n.mg-table td.row-number {\n\tmargin-top: 14px;\n}\n</style>\n"]}, media: undefined });
+      inject("data-v-0e5ad3a9_0", { source: "\n.mg-table .row-number {\n\tfont-size: 16px;\n\ttext-align: middle;\n}\n.mg-table td.row-number {\n\tmargin-top: 14px;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgTable.vue"],"names":[],"mappings":";AA0LA;CACA,eAAA;CACA,kBAAA;AACA;AAEA;CACA,gBAAA;AACA","file":"mgTable.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgTable', {\n\tmeta: {\n\t\ttitle: 'Table layout',\n\t\ticon: 'far fa-table',\n\t\tcategory: 'Layout',\n\t},\n\tdata() { return {\n\t\tnewRow: {},\n\t\t// TODO: Is this really needed? Perhaps when `url` is specified?\n\t\tisAdding: false,\n\t\tdata: [],\n\t}},\n\tprops: {\n\t\turl: {type: 'mgUrl', relative: true, help: 'Data feed to populate the table'},\n\t\tallowAdd: {type: 'mgToggle', title: 'Allow Row Addition', default: true},\n\t\tallowDelete: {type: 'mgToggle', title: 'Allow Row Deletion', default: true},\n\t\ttextEmpty: {type: 'mgText', title: 'No data message', default: 'No data'},\n\t\titems: {\n\t\t\ttype: 'mgAlert',\n\t\t\tvueType: 'array',\n\t\t\ttext: 'Use the editor to define child widgets',\n\t\t\tdefault: () => [\n\t\t\t\t// FIXME: Defaults are not initialised\n\t\t\t\t{id: 'col1', title: 'Col 1', type: 'mgText', default: '1'},\n\t\t\t\t{id: 'col2', title: 'Col 2', type: 'mgText', default: '2'},\n\t\t\t],\n\t\t},\n\t\taddButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},\n\t\taddButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},\n\t\trowNumbers: {type: 'mgToggle', help: 'Show the row number at the beginning of each row', default: true},\n\t},\n\tchildProps: {\n\t\tshowTitle: {type: 'mgToggle', default: false, title: 'Show Title'},\n\t},\n\tcreated() {\n\t\tthis.$debugging = true;\n\t},\n\tmounted() {\n\t\tthis.$watch('$props.url', ()=> {\n\t\t\tif (!this.$props.url) return;\n\t\t\tthis.$macgyver.utils.fetch(this.$props.url, {type: 'array'})\n\t\t\t\t.then(data => this.$set(this.$props, 'data', data))\n\t\t}, {immediate: true});\n\t},\n\twatch: {\n\t\tdata: {\n\t\t\timmediate: true,\n\t\t\thandler() {\n\t\t\t\t// Ensure that data is always an array\n\t\t\t\tif (!_.isArray(this.data)) this.data = [];\n\t\t\t},\n\t\t},\n\t},\n\t// To ensure reactivity to array of objects https://stackoverflow.com/a/56793403/2438830\n\tcomputed: {\n\t\touterKey() {\n\t\t\treturn this.data && this.data.length;\n\t\t}\n\t},\n\tmethods: {\n\t\tcreateRow(offset) { // Offset is the row to create after - i.e. array position splice\n\t\t\tthis.$debug('createRow', offset, this.$data.newRow);\n\t\t\tthis.isAdding = true;\n\t\t\tif (typeof offset === 'undefined') {\n\t\t\t\tthis.data.push(this.$data.newRow);\n\t\t\t} else {\n\t\t\t\tthis.data.splice(offset, 0, this.$data.newRow);\n\t\t\t}\n\t\t\tthis.$data.newRow = {};\n\t\t\tthis.isAdding = false;\n\t\t},\n\t\tdeleteRow(offset) {\n\t\t\tthis.$debug('deleteRow', offset);\n\t\t\tthis.data.splice(offset, 1);\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-table\">\n\t\t<table class=\"table table-bordered table-striped table-hover\">\n\t\t\t<thead>\n\t\t\t\t<tr>\n\t\t\t\t\t<th v-if=\"$props.rowNumbers\" class=\"row-number\">&#35;</th>\n\t\t\t\t\t<th v-for=\"col in $props.items\" :key=\"col.id\" :style=\"(col.width ? 'width: ' + col.width + '; ' : '') + col.class\">\n\t\t\t\t\t\t{{col.title}}\n\t\t\t\t\t</th>\n\t\t\t\t\t<th v-if=\"$props.allowAdd || $props.allowDelete\" class=\"btn-context\">&nbsp;</th>\n\t\t\t\t</tr>\n\t\t\t</thead>\n\t\t\t<tbody :key=\"outerKey\">\n\t\t\t\t<tr v-if=\"!data || !data.length\">\n\t\t\t\t\t<td :colspan=\"$props.items.length + ($props.rowNumbers ? 1 : 0) + (($props.allowAdd || $props.allowDelete) ? 1 : 0) + 1\">\n\t\t\t\t\t\t<div class=\"alert alert-warning m-10\">{{$props.textEmpty || 'No data'}}</div>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr v-for=\"(row, rowNumber) in data\" :key=\"rowNumber\">\n\t\t\t\t\t<td v-if=\"$props.rowNumbers\" class=\"row-number\">\n\t\t\t\t\t\t{{rowNumber + 1 | number}}\n\t\t\t\t\t</td>\n\t\t\t\t\t<td v-for=\"col in $props.items\" :key=\"col.id\" :class=\"col.class\">\n\t\t\t\t\t\t<!-- Works -->\n\t\t\t\t\t\t<!--mg-text\n\t\t\t\t\t\t\t:value=\"row[col.$dataPath]\"\n\t\t\t\t\t\t\t@change=\"$setPath(row, col.$dataPath, $event)\"\n\t\t\t\t\t\t/-->\n\n\t\t\t\t\t\t<!-- Works -->\n\t\t\t\t\t\t<mg-form\n\t\t\t\t\t\t\t:config=\"col\"\n\t\t\t\t\t\t\t:data=\"row\"\n\t\t\t\t\t\t\t@changeItem=\"$setPath(row, $event.path, $event.value)\"\n\t\t\t\t\t\t/>\n\n\t\t\t\t\t\t<!-- // FIXME: Should pass through value and change events properties? -->\n\t\t\t\t\t\t<!--mg-component\n\t\t\t\t\t\t\t:config=\"{\n\t\t\t\t\t\t\t\tid: col.id,\n\t\t\t\t\t\t\t\ttype: col.type,\n\t\t\t\t\t\t\t}\"\n\t\t\t\t\t\t\t:value=\"row[col.$dataPath]\"\n\t\t\t\t\t\t\t@change=\"$setPath(row, col.$dataPath, $event)\"\n\t\t\t\t\t\t/-->\n\t\t\t\t\t</td>\n\t\t\t\t\t<td v-if=\"$props.allowAdd || $props.allowDelete\" class=\"btn-context\">\n\t\t\t\t\t\t<div class=\"btn-group\">\n\t\t\t\t\t\t\t<a class=\"btn btn-context\" data-toggle=\"dropdown\"><i class=\"far fa-ellipsis-v\"></i></a>\n\t\t\t\t\t\t\t<ul class=\"dropdown-menu pull-right\">\n\t\t\t\t\t\t\t\t<li v-if=\"$props.allowAdd\"><a @click=\"createRow(rowNumber)\"><i class=\"far fa-arrow-circle-up\"></i> Add row above</a></li>\n\t\t\t\t\t\t\t\t<li v-if=\"$props.allowAdd\"><a @click=\"createRow(rowNumber)\"><i class=\"far fa-arrow-circle-down\"></i> Add row below</a></li>\n\t\t\t\t\t\t\t\t<li v-if=\"$props.allowDelete\" class=\"dropdown-divider\"></li>\n\t\t\t\t\t\t\t\t<li v-if=\"$props.allowDelete\" class=\"dropdown-item-danger\"><a @click=\"deleteRow(rowNumber)\"><i class=\"far fa-trash\"></i> Delete</a></li>\n\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t\t<tr class=\"mgTable-append\" v-if=\"$props.allowAdd\">\n\t\t\t\t\t<td v-if=\"$props.rowNumbers\" class=\"row-number\">\n\t\t\t\t\t\t<i class=\"far fa-asterisk\"></i>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td v-for=\"(col, colNumber) in $props.items\" :key=\"col.id\">\n\t\t\t\t\t\t<!-- Works -->\n\t\t\t\t\t\t<!--mg-text\n\t\t\t\t\t\t\t:value=\"newRow[col.$dataPath]\"\n\t\t\t\t\t\t\t@change=\"$setPath(newRow, col.$dataPath, $event)\"\n\t\t\t\t\t\t/-->\n\n\t\t\t\t\t\t<!-- Works -->\n\t\t\t\t\t\t<mg-form\n\t\t\t\t\t\t\t:config=\"col\"\n\t\t\t\t\t\t\t:data=\"newRow\"\n\t\t\t\t\t\t\t@changeItem=\"$setPath(newRow, $event.path, $event.value)\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</td>\n\t\t\t\t\t<td>\n\t\t\t\t\t\t<a @click=\"createRow()\" :class=\"isAdding ? $props.addButtonActiveClass : $props.addButtonInactiveClass\"></a>\n\t\t\t\t\t</td>\n\t\t\t\t</tr>\n\t\t\t</tbody>\n\t\t</table>\n\n\t\t<div v-if=\"$debugging\" class=\"card\">\n\t\t\t<div class=\"card-header\">\n\t\t\t\tRaw data\n\t\t\t\t<i class=\"float-right fas fa-debug fa-lg\" v-tooltip=\"'Only visible to users with the Debug permission'\"/>\n\t\t\t</div>\n\t\t\t<div class=\"card-body\">\n\t\t\t\t<pre>{{$data}}</pre>\n\t\t\t</div>\n\t\t</div>\n\n\t\t<!--div v-if=\"$debugging\" class=\"card\">\n\t\t\t<div class=\"card-header\">\n\t\t\t\tRaw properties\n\t\t\t\t<i class=\"float-right fas fa-debug fa-lg\" v-tooltip=\"'Only visible to users with the Debug permission'\"/>\n\t\t\t</div>\n\t\t\t<div class=\"card-body\">\n\t\t\t\t<pre>{{$props}}</pre>\n\t\t\t</div>\n\t\t</div-->\n\t</div>\n</template>\n\n<style>\n.mg-table .row-number {\n\tfont-size: 16px;\n\ttext-align: middle;\n}\n\n.mg-table td.row-number {\n\tmargin-top: 14px;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
@@ -21070,6 +21109,14 @@
         type: 'mgToggle',
         "default": false
       },
+      disabled: {
+        type: 'mgToggle',
+        "default": false
+      },
+      readonly: {
+        type: 'mgToggle',
+        "default": false
+      },
       mask: {
         type: 'mgText',
         help: 'Text input mask to restrict to, #=Number, S=Letter, X=Alpha-numeric, A=Alpha Uppercase, a=Alpha lowercase, \=Escape'
@@ -21211,7 +21258,9 @@
         attrs: {
           type: "text",
           autocomplete: _vm.$props.autoComplete,
+          disabled: _vm.$props.disabled,
           placeholder: _vm.$props.placeholder,
+          readonly: _vm.$props.readonly,
           list: _vm.datalist ? "mg-text-datalist-" + _vm._uid : undefined
         },
         domProps: { value: _vm.data },
@@ -21283,9 +21332,8 @@
       category: 'Simple Inputs',
       preferId: true,
       format: function format(v) {
-        if (!v) return ''; //toLocaleTimeString
-
-        return moment.duration(v).humanize();
+        if (!v) return '';
+        return v; //return moment.duration(v).humanize();
       },
       formatClass: 'text-center'
     },
@@ -21311,15 +21359,15 @@
     created: function created() {
       var _this = this;
 
-      this.$debugging = true;
+      this.$debugging = false;
       this.$on('mgValidate', function (reply) {
         if (_this.$props.required && !_this.data) return reply("".concat(_this.$props.title, " is required"));
 
         if (_.isString(_this.data)) {
-          var d = moment(_this.data);
-          if (!d.isValid()) return reply("".concat(_this.$props.title, " must be a time"));
-          if (_this.$props.min && d.isBefore(_this.$props.min)) return reply("".concat($props.title, " is too early (earliest time is ").concat(_this.$props.min, ")"));
-          if (_this.$props.max && d.isAfter($props.max)) return reply("".concat($props.title, " is too late (latest time is ").concat(_this.$props.max, ")"));
+          var d = moment.duration(_this.data);
+          if (!moment.isDuration(d)) return reply("".concat(_this.$props.title, " must be a time"));
+          if (_this.$props.min && d.asMilliseconds() < moment.duration(_this.$props.min).asMilliseconds()) return reply("".concat($props.title, " is too early (earliest time is ").concat(_this.$props.min, ")"));
+          if (_this.$props.max && d.asMilliseconds() > moment.duration(_this.$props.max).asMilliseconds()) return reply("".concat($props.title, " is too late (latest time is ").concat(_this.$props.max, ")"));
         }
       });
       this.$watch('data', function () {
@@ -21341,7 +21389,7 @@
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
-    return _c("div", { staticClass: "mg-datetime" }, [
+    return _c("div", { staticClass: "mg-time" }, [
       _c("input", {
         directives: [
           {
