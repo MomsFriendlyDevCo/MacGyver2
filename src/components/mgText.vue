@@ -16,6 +16,8 @@ export default Vue.mgComponent('mgText', {
 		lengthMax: {type: 'mgNumber', title: 'Maximum Length'},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
 		required: {type: 'mgToggle', default: false},
+		disabled: {type: 'mgToggle', default: false},
+		readonly: {type: 'mgToggle', default: false},
 		mask: {type: 'mgText', help: 'Text input mask to restrict to, #=Number, S=Letter, X=Alpha-numeric, A=Alpha Uppercase, a=Alpha lowercase, \=Escape'},
 		focus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},
 		autoComplete: {
@@ -89,7 +91,9 @@ export default Vue.mgComponent('mgText', {
 			type="text"
 			class="form-control"
 			:autocomplete="$props.autoComplete"
+			:disabled="$props.disabled"
 			:placeholder="$props.placeholder"
+			:readonly="$props.readonly"
 			:list="datalist ? `mg-text-datalist-${_uid}` : undefined"
 			v-facade="$props.mask"
 		/>

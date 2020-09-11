@@ -13,6 +13,8 @@ export default Vue.mgComponent('mgEmail', {
 	props: {
 		placeholder: {type: 'mgText', help: 'Ghost text to display when the text box has no value'},
 		required: {type: 'mgToggle', default: false},
+		disabled: {type: 'mgToggle', default: false},
+		readonly: {type: 'mgToggle', default: false},
 	},
 	created() {
 		this.$on('mgValidate', reply => {
@@ -23,5 +25,14 @@ export default Vue.mgComponent('mgEmail', {
 </script>
 
 <template>
-	<input v-model="data" type="email" class="form-control" :placeholder="$props.placeholder"/>
+	<div class="mg-email">
+		<input
+			v-model="data"
+			type="email"
+			class="form-control"
+			:disabled="$props.disabled"
+			:placeholder="$props.placeholder"
+			:readonly="$props.readonly"
+		/>
+	</div>
 </template>
