@@ -6942,7 +6942,7 @@ $macgyver.utils.setPath = function (target, path, value, options) {
 
   var settings = _objectSpread2({
     arrayNumeric: true,
-    debug: false,
+    debug: true,
     removeUndefined: true
   }, options);
 
@@ -6962,7 +6962,7 @@ $macgyver.utils.setPath = function (target, path, value, options) {
       }
     } else if (node[chunk] === undefined) {
       // This chunk (and all following chunks) does't exist - populate from here
-      chunks.slice(chunkIndex).forEach(function (chunk) {
+      chunks.slice(chunkIndex, chunks.length - 1).forEach(function (chunk) {
         if (settings.arrayNumeric && isFinite(chunk)) {
           $macgyver.utils.set(node, chunk, []);
         } else {
@@ -6971,6 +6971,7 @@ $macgyver.utils.setPath = function (target, path, value, options) {
 
         node = node[chunk];
       });
+      $macgyver.utils.set(node, chunks[chunks.length - 1], value);
       return true;
     } else {
       node = node[chunk];
