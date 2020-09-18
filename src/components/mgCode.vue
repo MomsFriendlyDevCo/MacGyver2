@@ -28,13 +28,28 @@ export default Vue.mgComponent('mgCode', {
 			var value = this.editor.getValue();
 			if (this.$props.convert && this.$props.syntax == 'json') {
 				try {
+					// FIXME: Maybe better off saving stringified version and parsing after query
 					value = JSON.parse(value);
-					this.$mgForm.$emit('mgChange', {path: this.$props.id, value})
+
+					/*
+					// Replace dollarsign prefixed items with Unicode
+					// https://stackoverflow.com/a/39126851/2438830
+					function replaceKeysDeep(obj) {
+						return _.transform(obj, function(res, v, k) {
+							var cur = _.isString(k) ? k.replace(/^\$/, '\uFF04') : k;
+							res[cur] = _.isObject(v) ? replaceKeysDeep(v) : v;
+						});
+					}
+					replaceKeysDeep(value);
+					*/
+
+					this.$mgForm.$emit('mgChange', {path: this.$props.$dataPath, value: value})
 				} catch (e) {
-					// Silently fail as the JSON is invalueid
+					// Silently fail as the JSON is invalid
+					console.log('Invalid JSON', e);
 				}
 			} else {
-				this.$mgForm.$emit('mgChange', {path: this.$props.id, value})
+				this.$mgForm.$emit('mgChange', {path: this.$props.$dataPath, value: value})
 			}
 			return true;
 		});
@@ -56,7 +71,7 @@ export default Vue.mgComponent('mgCode', {
 				: this.data ? this.data
 				: ''
 			, 1);
-		}, {immediate: true});
+		}, {deep: true, immediate: true});
 	},
 	render(h) {
 		return h('div', {
