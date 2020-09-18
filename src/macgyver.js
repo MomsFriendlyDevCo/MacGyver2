@@ -626,7 +626,7 @@ $macgyver.utils.setPath = (target, path, value, options) => {
 				$macgyver.utils.set(node, chunk, value);
 			}
 		} else if (node[chunk] === undefined) { // This chunk (and all following chunks) does't exist - populate from here
-			chunks.slice(chunkIndex).forEach(chunk => {
+			chunks.slice(chunkIndex, chunks.length - 1).forEach(chunk => {
 				if (settings.arrayNumeric && isFinite(chunk)) {
 					$macgyver.utils.set(node, chunk, []);
 				} else {
@@ -634,6 +634,7 @@ $macgyver.utils.setPath = (target, path, value, options) => {
 				}
 				node = node[chunk];
 			});
+			$macgyver.utils.set(node, chunks[chunks.length - 1], value);
 			return true;
 		} else {
 			node = node[chunk];
