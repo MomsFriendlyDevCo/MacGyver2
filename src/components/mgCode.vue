@@ -24,11 +24,10 @@ export default Vue.mgComponent('mgCode', {
 			showPrintMargin: false,
 		});
 
-		this.editor.on('change', ()=> {
+		this.editor.on('change', (delta)=> {
 			var value = this.editor.getValue();
 			if (this.$props.convert && this.$props.syntax == 'json') {
 				try {
-					// FIXME: Maybe better off saving stringified version and parsing after query
 					value = JSON.parse(value);
 
 					/*
@@ -43,19 +42,20 @@ export default Vue.mgComponent('mgCode', {
 					replaceKeysDeep(value);
 					*/
 
-					this.$mgForm.$emit('mgChange', {path: this.$props.$dataPath, value: value})
+					this.data = value;
 				} catch (e) {
 					// Silently fail as the JSON is invalid
 					console.log('Invalid JSON', e);
 				}
 			} else {
-				this.$mgForm.$emit('mgChange', {path: this.$props.$dataPath, value: value})
+				this.data = value;
 			}
 			return true;
 		});
 
 		this.$nextTick(()=> this.editor.resize());
 
+		/*
 		this.$watch('config', ()=> {
 			// TODO: Make compatible with Parcel
 			//if (this.$props.syntax) this.editor.getSession().setMode(`ace/mode/${this.$props.syntax}`);
@@ -64,13 +64,18 @@ export default Vue.mgComponent('mgCode', {
 			// FIXME: deep?
 			immediate: true
 		});
+		*/
 
-		this.$watch('data', ()=> {
-			this.editor.setValue(
-				_.isArray(this.data) || _.isObject(this.data) ? JSON.stringify(this.data, null, '\t') // Parse raw objects into JSON
-				: this.data ? this.data
-				: ''
-			, 1);
+		this.$watch('data', (newVal, oldVal)=> {
+			var value = this.editor.getValue();
+
+			if (this.$props.convert && this.$props.syntax == 'json')
+				newVal = JSON.stringify(newVal, null, '\t');
+
+			// FIXME: This comparison will fail with parsed (convert = true) instances, resulting in update loop.
+			if (newVal === value) return;
+
+			this.editor.setValue(newVal, 1);
 		}, {deep: true, immediate: true});
 	},
 	render(h) {
