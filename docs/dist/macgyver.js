@@ -6997,7 +6997,7 @@
 
     var settings = _objectSpread2({
       arrayNumeric: true,
-      debug: true,
+      debug: false,
       removeUndefined: true
     }, options);
 
@@ -9800,39 +9800,31 @@
       this.editor.setOptions({
         showPrintMargin: false
       });
-      this.editor.on('change', function () {
+      this.editor.on('change', function (delta) {
         var value = _this.editor.getValue();
 
         if (_this.$props.convert && _this.$props.syntax == 'json') {
           try {
+            value = JSON.parse(value);
+            /*
             // Replace dollarsign prefixed items with Unicode
             // https://stackoverflow.com/a/39126851/2438830
-            var replaceKeysDeep = function replaceKeysDeep(obj) {
-              return _.transform(obj, function (res, v, k) {
-                console.log('transform', res, v, k);
-                var cur = k.replace(/^\$/, "\uFF04") || k;
-                res[cur] = _.isObject(v) ? replaceKeysDeep(v) : v;
-              });
-            };
-
-            console.log('value', value);
-            value = JSON.parse(value);
+            function replaceKeysDeep(obj) {
+            	return _.transform(obj, function(res, v, k) {
+            		var cur = _.isString(k) ? k.replace(/^\$/, '\uFF04') : k;
+            		res[cur] = _.isObject(v) ? replaceKeysDeep(v) : v;
+            	});
+            }
             replaceKeysDeep(value);
-            console.log('value', value);
+            */
 
-            _this.$mgForm.$emit('mgChange', {
-              path: _this.$props.$dataPath,
-              value: value
-            });
+            _this.data = value;
           } catch (e) {
             // Silently fail as the JSON is invalid
             console.log('Invalid JSON', e);
           }
         } else {
-          _this.$mgForm.$emit('mgChange', {
-            path: _this.$props.$dataPath,
-            value: value
-          });
+          _this.data = value;
         }
 
         return true;
@@ -9840,16 +9832,28 @@
       this.$nextTick(function () {
         return _this.editor.resize();
       });
-      this.$watch('config', function () {// TODO: Make compatible with Parcel
-        //if (this.$props.syntax) this.editor.getSession().setMode(`ace/mode/${this.$props.syntax}`);
-        //if (this.$props.theme) this.editor.setTheme(`ace/theme/${this.$props.theme}`);
+      /*
+      this.$watch('config', ()=> {
+      	// TODO: Make compatible with Parcel
+      	//if (this.$props.syntax) this.editor.getSession().setMode(`ace/mode/${this.$props.syntax}`);
+      	//if (this.$props.theme) this.editor.setTheme(`ace/theme/${this.$props.theme}`);
       }, {
-        // FIXME: deep?
-        immediate: true
+      	// FIXME: deep?
+      	immediate: true
       });
-      this.$watch('data', function () {
-        _this.editor.setValue(_.isArray(_this.data) || _.isObject(_this.data) ? JSON.stringify(_this.data, null, '\t') // Parse raw objects into JSON
-        : _this.data ? _this.data : '', 1);
+      */
+
+      this.$watch('data', function (newVal, oldVal) {
+        if (!newVal) return;
+
+        var value = _this.editor.getValue();
+
+        if (_this.$props.convert && _this.$props.syntax == 'json') newVal = JSON.stringify(newVal, null, '\t');
+        console.log('watch', newVal, value, _this.$props.convert, _this.$props.syntax); // FIXME: This comparison will fail with parsed (convert = true) instances, resulting in update loop.
+
+        if (newVal === value) return;
+
+        _this.editor.setValue(newVal, 1);
       }, {
         deep: true,
         immediate: true
@@ -9873,7 +9877,7 @@
     /* style */
     const __vue_inject_styles__$f = function (inject) {
       if (!inject) return
-      inject("data-v-56233e5a_0", { source: "\n.mg-code {\n\tborder: 1px solid #f0f0f0;\n\tborder-radius: 5px;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgCode.vue"],"names":[],"mappings":";AAuFA;CACA,yBAAA;CACA,kBAAA;AACA","file":"mgCode.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgCode', {\n\tmeta: {\n\t\ttitle: 'Code Editor',\n\t\ticon: 'fal fa-code',\n\t\tcategory: 'Complex Inputs',\n\t\tpreferId: true,\n\t},\n\tprops: {\n\t\tsyntax: {type: 'mgChoiceDropdown', enum: ['text', 'json', 'javascript', 'html', 'css'], default: 'json'},\n\t\tconvert: {type: 'mgToggle', default: true, showIf: 'syntax == \"json\"', help: 'Convert data back to a native JS object'},\n\t\ttheme: {type: 'mgChoiceDropdown', enum: ['chrome'], advanced: true, default: 'chrome', help: 'The syntax color scheme to use'},\n\t\theight: {type: 'mgText', default: '400px', help: 'The size of the editing window as a valid CSS measurement', advanced: true},\n\t},\n\tbeforeDestroy() {\n\t\tthis.editor.destroy();\n\t\tthis.editor.container.remove();\n\t},\n\tmounted() {\n\t\tthis.editor = ace.edit(this.$el);\n\t\tthis.editor.$blockScrolling = Infinity;\n\n\t\tthis.editor.setOptions({\n\t\t\tshowPrintMargin: false,\n\t\t});\n\n\t\tthis.editor.on('change', ()=> {\n\t\t\tvar value = this.editor.getValue();\n\t\t\tif (this.$props.convert && this.$props.syntax == 'json') {\n\t\t\t\ttry {\n\t\t\t\t\tconsole.log('value', value);\n\t\t\t\t\tvalue = JSON.parse(value);\n\n\t\t\t\t\t// Replace dollarsign prefixed items with Unicode\n\t\t\t\t\t// https://stackoverflow.com/a/39126851/2438830\n\t\t\t\t\tfunction replaceKeysDeep(obj) {\n\t\t\t\t\t\treturn _.transform(obj, function(res, v, k) {\n\t\t\t\t\t\t\tconsole.log('transform', res, v, k);\n\t\t\t\t\t\t\tvar cur = k.replace(/^\\$/, '\\uFF04') || k;\n\t\t\t\t\t\t\tres[cur] = _.isObject(v) ? replaceKeysDeep(v) : v;\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t\treplaceKeysDeep(value);\n\t\t\t\t\tconsole.log('value', value);\n\n\t\t\t\t\tthis.$mgForm.$emit('mgChange', {path: this.$props.$dataPath, value: value})\n\t\t\t\t} catch (e) {\n\t\t\t\t\t// Silently fail as the JSON is invalid\n\t\t\t\t\tconsole.log('Invalid JSON', e);\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tthis.$mgForm.$emit('mgChange', {path: this.$props.$dataPath, value: value})\n\t\t\t}\n\t\t\treturn true;\n\t\t});\n\n\t\tthis.$nextTick(()=> this.editor.resize());\n\n\t\tthis.$watch('config', ()=> {\n\t\t\t// TODO: Make compatible with Parcel\n\t\t\t//if (this.$props.syntax) this.editor.getSession().setMode(`ace/mode/${this.$props.syntax}`);\n\t\t\t//if (this.$props.theme) this.editor.setTheme(`ace/theme/${this.$props.theme}`);\n\t\t}, {\n\t\t\t// FIXME: deep?\n\t\t\timmediate: true\n\t\t});\n\n\t\tthis.$watch('data', ()=> {\n\t\t\tthis.editor.setValue(\n\t\t\t\t_.isArray(this.data) || _.isObject(this.data) ? JSON.stringify(this.data, null, '\\t') // Parse raw objects into JSON\n\t\t\t\t: this.data ? this.data\n\t\t\t\t: ''\n\t\t\t, 1);\n\t\t}, {deep: true, immediate: true});\n\t},\n\trender(h) {\n\t\treturn h('div', {\n\t\t\tattrs: {\n\t\t\t\tclass: 'mg-code',\n\t\t\t\tstyle: `height: ${this.$props.height}; width: 100%`,\n\t\t\t},\n\t\t});\n\t},\n});\n</script>\n\n<style>\n.mg-code {\n\tborder: 1px solid #f0f0f0;\n\tborder-radius: 5px;\n}\n</style>\n"]}, media: undefined });
+      inject("data-v-197ec477_0", { source: "\n.mg-code {\n\tborder: 1px solid #f0f0f0;\n\tborder-radius: 5px;\n\tmin-width: 150px;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgCode.vue"],"names":[],"mappings":";AA+FA;CACA,yBAAA;CACA,kBAAA;CACA,gBAAA;AACA","file":"mgCode.vue","sourcesContent":["<script>\nexport default Vue.mgComponent('mgCode', {\n\tmeta: {\n\t\ttitle: 'Code Editor',\n\t\ticon: 'fal fa-code',\n\t\tcategory: 'Complex Inputs',\n\t\tpreferId: true,\n\t},\n\tprops: {\n\t\tsyntax: {type: 'mgChoiceDropdown', enum: ['text', 'json', 'javascript', 'html', 'css'], default: 'json'},\n\t\tconvert: {type: 'mgToggle', default: true, showIf: 'syntax == \"json\"', help: 'Convert data back to a native JS object'},\n\t\ttheme: {type: 'mgChoiceDropdown', enum: ['chrome'], advanced: true, default: 'chrome', help: 'The syntax color scheme to use'},\n\t\theight: {type: 'mgText', default: '400px', help: 'The size of the editing window as a valid CSS measurement', advanced: true},\n\t},\n\tbeforeDestroy() {\n\t\tthis.editor.destroy();\n\t\tthis.editor.container.remove();\n\t},\n\tmounted() {\n\t\tthis.editor = ace.edit(this.$el);\n\t\tthis.editor.$blockScrolling = Infinity;\n\n\t\tthis.editor.setOptions({\n\t\t\tshowPrintMargin: false,\n\t\t});\n\n\t\tthis.editor.on('change', (delta)=> {\n\t\t\tvar value = this.editor.getValue();\n\t\t\tif (this.$props.convert && this.$props.syntax == 'json') {\n\t\t\t\ttry {\n\t\t\t\t\tvalue = JSON.parse(value);\n\n\t\t\t\t\t/*\n\t\t\t\t\t// Replace dollarsign prefixed items with Unicode\n\t\t\t\t\t// https://stackoverflow.com/a/39126851/2438830\n\t\t\t\t\tfunction replaceKeysDeep(obj) {\n\t\t\t\t\t\treturn _.transform(obj, function(res, v, k) {\n\t\t\t\t\t\t\tvar cur = _.isString(k) ? k.replace(/^\\$/, '\\uFF04') : k;\n\t\t\t\t\t\t\tres[cur] = _.isObject(v) ? replaceKeysDeep(v) : v;\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t\treplaceKeysDeep(value);\n\t\t\t\t\t*/\n\n\t\t\t\t\tthis.data = value;\n\t\t\t\t} catch (e) {\n\t\t\t\t\t// Silently fail as the JSON is invalid\n\t\t\t\t\tconsole.log('Invalid JSON', e);\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tthis.data = value;\n\t\t\t}\n\t\t\treturn true;\n\t\t});\n\n\t\tthis.$nextTick(()=> this.editor.resize());\n\n\t\t/*\n\t\tthis.$watch('config', ()=> {\n\t\t\t// TODO: Make compatible with Parcel\n\t\t\t//if (this.$props.syntax) this.editor.getSession().setMode(`ace/mode/${this.$props.syntax}`);\n\t\t\t//if (this.$props.theme) this.editor.setTheme(`ace/theme/${this.$props.theme}`);\n\t\t}, {\n\t\t\t// FIXME: deep?\n\t\t\timmediate: true\n\t\t});\n\t\t*/\n\n\t\tthis.$watch('data', (newVal, oldVal)=> {\n\t\t\tif (!newVal) return;\n\t\t\tvar value = this.editor.getValue();\n\n\t\t\tif (this.$props.convert && this.$props.syntax == 'json')\n\t\t\t\tnewVal = JSON.stringify(newVal, null, '\\t');\n\n\t\t\tconsole.log('watch', newVal, value, this.$props.convert, this.$props.syntax);\n\n\t\t\t// FIXME: This comparison will fail with parsed (convert = true) instances, resulting in update loop.\n\t\t\tif (newVal === value) return;\n\n\t\t\tthis.editor.setValue(newVal, 1);\n\t\t}, {deep: true, immediate: true});\n\t},\n\trender(h) {\n\t\treturn h('div', {\n\t\t\tattrs: {\n\t\t\t\tclass: 'mg-code',\n\t\t\t\tstyle: `height: ${this.$props.height}; width: 100%`,\n\t\t\t},\n\t\t});\n\t},\n});\n</script>\n\n<style>\n.mg-code {\n\tborder: 1px solid #f0f0f0;\n\tborder-radius: 5px;\n\tmin-width: 150px;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */

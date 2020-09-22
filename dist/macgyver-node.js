@@ -6942,7 +6942,7 @@ $macgyver.utils.setPath = function (target, path, value, options) {
 
   var settings = _objectSpread2({
     arrayNumeric: true,
-    debug: true,
+    debug: false,
     removeUndefined: true
   }, options);
 
