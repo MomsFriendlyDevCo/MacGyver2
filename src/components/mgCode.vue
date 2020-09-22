@@ -67,10 +67,13 @@ export default Vue.mgComponent('mgCode', {
 		*/
 
 		this.$watch('data', (newVal, oldVal)=> {
+			if (!newVal) return;
 			var value = this.editor.getValue();
 
 			if (this.$props.convert && this.$props.syntax == 'json')
 				newVal = JSON.stringify(newVal, null, '\t');
+
+			console.log('watch', newVal, value, this.$props.convert, this.$props.syntax);
 
 			// FIXME: This comparison will fail with parsed (convert = true) instances, resulting in update loop.
 			if (newVal === value) return;
@@ -93,5 +96,6 @@ export default Vue.mgComponent('mgCode', {
 .mg-code {
 	border: 1px solid #f0f0f0;
 	border-radius: 5px;
+	min-width: 150px;
 }
 </style>
