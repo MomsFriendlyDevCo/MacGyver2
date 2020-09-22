@@ -73,8 +73,6 @@ export default Vue.mgComponent('mgCode', {
 			if (this.$props.convert && this.$props.syntax == 'json')
 				newVal = JSON.stringify(newVal, null, '\t');
 
-			console.log('watch', newVal, value, this.$props.convert, this.$props.syntax);
-
 			// FIXME: This comparison will fail with parsed (convert = true) instances, resulting in update loop.
 			if (newVal === value) return;
 
