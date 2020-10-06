@@ -15608,6 +15608,7 @@ Vue$1.prototype.$macgyver = function () {
         } else {
           switch (prop.type) {
             case 'mgText':
+            case 'mgAutocomplete':
             case 'mgChoiceButtons':
             case 'mgChoiceDropdown':
             case 'mgChoiceRadio':
@@ -15658,6 +15659,11 @@ Vue$1.prototype.$macgyver = function () {
               console.warn('Used native binding in component prop (e.g. `{type: Array}`). Always use mg* component types so these components are editable in the mgFormEditor');
               newProp.type = prop.type; // Native Vue types
 
+              break;
+
+            case Function:
+              console.warn('Used native binding in component prop (e.g. `{type: Function}`). Always use mg* component types so these components are editable in the mgFormEditor');
+              newProp.type = Function;
               break;
 
             default:
