@@ -68,75 +68,6 @@ export default Vue.mgComponent("mgAutocomplete", {
 			help: "Path within data feed for options label"
 		},
 
-		/**
-		* Callback to generate the label text. If {option}
-		* is an object, returns option[this.label] by default.
-		*
-		* Label text is used for filtering comparison and
-		* displaying. If you only need to adjust the
-		* display, you should use the `option` and
-		* `selected-option` slots.
-		*
-		* @type {Function}
-		* @param  {Object || String} option
-		* @return {String}
-		*/
-		getOptionLabel: {
-			type: Function,
-			default(option) {
-				if (typeof option === "object") {
-					if (!_.has(option, this.$props.optionLabelPath)) {
-						return console.warn(
-							`[vue-select warn]: Label key "option.${this.label}" does not` +
-								` exist in options object ${JSON.stringify(
-									option
-								)}.\n` +
-								"https://vue-select.org/api/props.html#getoptionlabel"
-						);
-					}
-					return _.get(option, this.$props.optionLabelPath);
-				}
-				return option;
-			},
-		},
-
-		/**
-		* Generate a unique identifier for each option. If `option`
-		* is an object and `option.hasOwnProperty('id')` exists,
-		* `option.id` is used by default, otherwise the option
-		* will be serialized to JSON.
-		*
-		* If you are supplying a lot of options, you should
-		* provide your own keys, as JSON.stringify can be
-		* slow with lots of objects.
-		*
-		* The result of this function*must* be unique.
-		*
-		* @type {Function}
-		* @param  {Object || String} option
-		* @return {String}
-		*/
-		getOptionKey: {
-			type: Function,
-			default(option) {
-				if (typeof option !== "object") {
-					return option;
-				}
-
-				try {
-					return _.has(option, this.$props.optionKeyPath)
-						? _.get(option, this.$props.optionKeyPath)
-						: sortAndStringify(option);
-				} catch (e) {
-					const warning =
-						`[vue-select warn]: Could not stringify this option ` +
-						`to generate unique key. Please provide'getOptionKey' prop ` +
-						`to return a unique key for each option.\n` +
-						"https://vue-select.org/api/props.html#getoptionkey";
-					return console.warn(warning, option, e);
-				}
-			},
-		},
 	},
 	created() {
 		this.$on("mgValidate", (reply) => {
@@ -184,19 +115,6 @@ export default Vue.mgComponent("mgAutocomplete", {
 			this.fetchEnum(search).then(() => loading(false));
 		},
 
-		/*
-		// TODO: Default and move out a layer
-		getOptionKey(e) {
-			console.log("getOptionKey", e._id);
-			return e._id;
-		},
-
-		getOptionLabel(e) {
-			console.log("getOptionLabel", e.meta.title);
-			return e.meta.title;
-		},
-		*/
-
 		fetchEnum(query) {
 			console.log("fetchEnum", this.$props.enumUrl, query);
 			if (!this.$props.enumUrl || !query) return Promise.resolve();
@@ -226,6 +144,14 @@ export default Vue.mgComponent("mgAutocomplete", {
 					) || this.$props.default;
 			}
 		},
+
+		getOptionLabel(option) {
+			return _.get(option, this.$props.optionLabelPath, '');
+		},
+
+		getOptionKey(option) {
+			return _.get(option, this.$props.optionKeyPath, '');
+		},
 	},
 });
 </script>
@@ -238,8 +164,8 @@ export default Vue.mgComponent("mgAutocomplete", {
 		:options="enumIter"
 		:placeholder="$props.placeholder"
 		:clearable="!$props.required"
-		:get-option-key="$props.getOptionKey"
-		:get-option-label="$props.getOptionLabel"
+		:get-option-key="getOptionKey"
+		:get-option-label="getOptionLabel"
 		@search="searchHandler"
 		@input="changeHandler"
 	>
