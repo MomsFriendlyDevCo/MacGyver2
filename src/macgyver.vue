@@ -106,6 +106,7 @@ Vue.prototype.$macgyver = (()=> {
 					} else {
 						switch (prop.type) {
 							case 'mgText':
+							case 'mgAutocomplete':
 							case 'mgChoiceButtons':
 							case 'mgChoiceDropdown':
 							case 'mgChoiceRadio':
@@ -150,7 +151,6 @@ Vue.prototype.$macgyver = (()=> {
 								console.warn('Used native binding in component prop (e.g. `{type: Array}`). Always use mg* component types so these components are editable in the mgFormEditor');
 								newProp.type = prop.type; // Native Vue types
 								break;
-
 							default:
 								console.warn(`Unknown primative mapping of prop type "${prop.type}" while declaring component "${name}" - assuming "String"`);
 								newProp.type = String;
