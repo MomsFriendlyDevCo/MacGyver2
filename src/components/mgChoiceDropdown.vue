@@ -94,7 +94,9 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 		@input="changeHandler"
 	>
 		<template #selected-option="option">
+			<!-- TODO: getOptionIcon -->
 			<i v-if="option.icon" :class="option.icon"/>
+			<!-- TODO: getOptionLabel -->
 			{{option.title}}
 		</template>
 		<template #option="option">
