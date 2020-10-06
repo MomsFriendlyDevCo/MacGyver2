@@ -165,6 +165,7 @@ export default Vue.mgComponent("mgAutocomplete", {
 	methods: {
 		changeHandler(e) {
 			console.log("changeHandler", e);
+			if (!e) return this.data = this.selected = null;
 			this.data = this.getOptionKey(e);
 			this.selected = e;
 		},
