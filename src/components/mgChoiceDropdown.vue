@@ -93,9 +93,9 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 		:clearable="!$props.required"
 		@input="changeHandler"
 	>
-		<template #selected-option="selected">
-			<i v-if="selected.icon" :class="selected.icon"/>
-			{{selected.title}}
+		<template #selected-option="option">
+			<i v-if="option.icon" :class="option.icon"/>
+			{{option.title}}
 		</template>
 		<template #option="option">
 			<i v-if="option.icon" :class="option.icon"/>
