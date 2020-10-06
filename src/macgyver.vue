@@ -151,6 +151,10 @@ Vue.prototype.$macgyver = (()=> {
 								console.warn('Used native binding in component prop (e.g. `{type: Array}`). Always use mg* component types so these components are editable in the mgFormEditor');
 								newProp.type = prop.type; // Native Vue types
 								break;
+							case Function:
+								console.warn('Used native binding in component prop (e.g. `{type: Function}`). Always use mg* component types so these components are editable in the mgFormEditor');
+								newProp.type = Function;
+								break;
 							default:
 								console.warn(`Unknown primative mapping of prop type "${prop.type}" while declaring component "${name}" - assuming "String"`);
 								newProp.type = String;
