@@ -57,14 +57,15 @@ export default Vue.mgComponent("mgAutocomplete", {
 			help: "Auto-focus the element when it appears on screen",
 		},
 
-		/**
-		* Tells vue-select what key to use when generating option
-		* labels when each `option` is an object.
-		* @type {String}
-		*/
-		label: {
-			type: String,
-			default: "label",
+		optionKeyPath: {
+			type: "mgText",
+			default: "id",
+			help: "Path within data feed for options key"
+		},
+		optionLabelPath: {
+			type: "mgText",
+			default: "title",
+			help: "Path within data feed for options label"
 		},
 
 		/**
@@ -84,7 +85,7 @@ export default Vue.mgComponent("mgAutocomplete", {
 			type: Function,
 			default(option) {
 				if (typeof option === "object") {
-					if (!option.hasOwnProperty(this.label)) {
+					if (!_.has(option, this.$props.optionLabelPath)) {
 						return console.warn(
 							`[vue-select warn]: Label key "option.${this.label}" does not` +
 								` exist in options object ${JSON.stringify(
@@ -93,7 +94,7 @@ export default Vue.mgComponent("mgAutocomplete", {
 								"https://vue-select.org/api/props.html#getoptionlabel"
 						);
 					}
-					return option[this.label];
+					return _.get(option, this.$props.optionLabelPath);
 				}
 				return option;
 			},
@@ -123,8 +124,8 @@ export default Vue.mgComponent("mgAutocomplete", {
 				}
 
 				try {
-					return option.hasOwnProperty("id")
-						? option.id
+					return _.has(option, this.$props.optionKeyPath)
+						? _.get(option, this.$props.optionKeyPath)
 						: sortAndStringify(option);
 				} catch (e) {
 					const warning =
