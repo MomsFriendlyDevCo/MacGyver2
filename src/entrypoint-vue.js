@@ -12,7 +12,7 @@ import('./services/watchAll');
 // NOTE: These are defined as dynamic imports as we need window.macgyver to be a accessible
 
 import('./components/mgAlert');
-import('./components/mgAutocomplete');
+import('./components/mgChoiceAutocomplete');
 import('./components/mgButton');
 import('./components/mgCheckBox');
 import('./components/mgChoiceButtons');

@@ -7215,7 +7215,7 @@
           } else {
             switch (prop.type) {
               case 'mgText':
-              case 'mgAutocomplete':
+              case 'mgChoiceAutocomplete':
               case 'mgChoiceButtons':
               case 'mgChoiceDropdown':
               case 'mgChoiceRadio':
@@ -7464,7 +7464,7 @@
   // NOTE: These are defined as dynamic imports as we need window.macgyver to be a accessible
 
   Promise.resolve().then(function () { return mgAlert; });
-  Promise.resolve().then(function () { return mgAutocomplete; });
+  Promise.resolve().then(function () { return mgChoiceAutocomplete; });
   Promise.resolve().then(function () { return mgButton; });
   Promise.resolve().then(function () { return mgCheckBox; });
   Promise.resolve().then(function () { return mgChoiceButtons; });
@@ -7978,7 +7978,7 @@
 
   var _enumSource;
   Vue.component("v-select", VueSelect);
-  var script$4 = Vue.mgComponent("mgAutocomplete", {
+  var script$4 = Vue.mgComponent("mgChoiceAutocomplete", {
     meta: {
       title: "Autocomplete",
       icon: "far fa-chevron-circle-down",
@@ -8035,75 +8035,15 @@
         "default": false,
         help: "Auto-focus the element when it appears on screen"
       },
-
-      /**
-      * Tells vue-select what key to use when generating option
-      * labels when each `option` is an object.
-      * @type {String}
-      */
-      label: {
-        type: String,
-        "default": "label"
+      optionKeyPath: {
+        type: "mgText",
+        "default": "id",
+        help: "Path within data feed for options key"
       },
-
-      /**
-      * Callback to generate the label text. If {option}
-      * is an object, returns option[this.label] by default.
-      *
-      * Label text is used for filtering comparison and
-      * displaying. If you only need to adjust the
-      * display, you should use the `option` and
-      * `selected-option` slots.
-      *
-      * @type {Function}
-      * @param  {Object || String} option
-      * @return {String}
-      */
-      getOptionLabel: {
-        type: Function,
-        "default": function _default(option) {
-          if (_typeof(option) === "object") {
-            if (!option.hasOwnProperty(this.label)) {
-              return console.warn("[vue-select warn]: Label key \"option.".concat(this.label, "\" does not") + " exist in options object ".concat(JSON.stringify(option), ".\n") + "https://vue-select.org/api/props.html#getoptionlabel");
-            }
-
-            return option[this.label];
-          }
-
-          return option;
-        }
-      },
-
-      /**
-      * Generate a unique identifier for each option. If `option`
-      * is an object and `option.hasOwnProperty('id')` exists,
-      * `option.id` is used by default, otherwise the option
-      * will be serialized to JSON.
-      *
-      * If you are supplying a lot of options, you should
-      * provide your own keys, as JSON.stringify can be
-      * slow with lots of objects.
-      *
-      * The result of this function*must* be unique.
-      *
-      * @type {Function}
-      * @param  {Object || String} option
-      * @return {String}
-      */
-      getOptionKey: {
-        type: Function,
-        "default": function _default(option) {
-          if (_typeof(option) !== "object") {
-            return option;
-          }
-
-          try {
-            return option.hasOwnProperty("id") ? option.id : sortAndStringify(option);
-          } catch (e) {
-            var warning = "[vue-select warn]: Could not stringify this option " + "to generate unique key. Please provide'getOptionKey' prop " + "to return a unique key for each option.\n" + "https://vue-select.org/api/props.html#getoptionkey";
-            return console.warn(warning, option, e);
-          }
-        }
+      optionLabelPath: {
+        type: "mgText",
+        "default": "title",
+        help: "Path within data feed for options label"
       }
     },
     created: function created() {
@@ -8133,6 +8073,7 @@
     methods: {
       changeHandler: function changeHandler(e) {
         console.log("changeHandler", e);
+        if (!e) return this.data = this.selected = null;
         this.data = this.getOptionKey(e);
         this.selected = e;
       },
@@ -8151,18 +8092,6 @@
           return loading(false);
         });
       },
-
-      /*
-      // TODO: Default and move out a layer
-      getOptionKey(e) {
-      	console.log("getOptionKey", e._id);
-      	return e._id;
-      },
-      	getOptionLabel(e) {
-      	console.log("getOptionLabel", e.meta.title);
-      	return e.meta.title;
-      },
-      */
       fetchEnum: function fetchEnum(query) {
         var _this2 = this;
 
@@ -8195,6 +8124,12 @@
             return _this3.getOptionKey(e) == _this3.$props["default"];
           }) || this.$props["default"];
         }
+      },
+      getOptionLabel: function getOptionLabel(option) {
+        return _.get(option, this.$props.optionLabelPath, '');
+      },
+      getOptionKey: function getOptionKey(option) {
+        return _.get(option, this.$props.optionKeyPath, '');
       }
     }
   });
@@ -8215,8 +8150,8 @@
         options: _vm.enumIter,
         placeholder: _vm.$props.placeholder,
         clearable: !_vm.$props.required,
-        "get-option-key": _vm.$props.getOptionKey,
-        "get-option-label": _vm.$props.getOptionLabel
+        "get-option-key": _vm.getOptionKey,
+        "get-option-label": _vm.getOptionLabel
       },
       on: { search: _vm.searchHandler, input: _vm.changeHandler },
       scopedSlots: _vm._u([
@@ -8273,7 +8208,7 @@
       undefined
     );
 
-  var mgAutocomplete = /*#__PURE__*/Object.freeze({
+  var mgChoiceAutocomplete = /*#__PURE__*/Object.freeze({
     __proto__: null,
     'default': __vue_component__$5
   });

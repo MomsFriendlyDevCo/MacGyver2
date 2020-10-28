@@ -106,7 +106,7 @@ Vue.prototype.$macgyver = (()=> {
 					} else {
 						switch (prop.type) {
 							case 'mgText':
-							case 'mgAutocomplete':
+							case 'mgChoiceAutocomplete':
 							case 'mgChoiceButtons':
 							case 'mgChoiceDropdown':
 							case 'mgChoiceRadio':
