@@ -7215,7 +7215,7 @@
           } else {
             switch (prop.type) {
               case 'mgText':
-              case 'mgAutocomplete':
+              case 'mgChoiceAutocomplete':
               case 'mgChoiceButtons':
               case 'mgChoiceDropdown':
               case 'mgChoiceRadio':
@@ -7464,7 +7464,7 @@
   // NOTE: These are defined as dynamic imports as we need window.macgyver to be a accessible
 
   Promise.resolve().then(function () { return mgAlert; });
-  Promise.resolve().then(function () { return mgAutocomplete; });
+  Promise.resolve().then(function () { return mgChoiceAutocomplete; });
   Promise.resolve().then(function () { return mgButton; });
   Promise.resolve().then(function () { return mgCheckBox; });
   Promise.resolve().then(function () { return mgChoiceButtons; });
@@ -7978,7 +7978,7 @@
 
   var _enumSource;
   Vue.component("v-select", VueSelect);
-  var script$4 = Vue.mgComponent("mgAutocomplete", {
+  var script$4 = Vue.mgComponent("mgChoiceAutocomplete", {
     meta: {
       title: "Autocomplete",
       icon: "far fa-chevron-circle-down",
@@ -8092,18 +8092,6 @@
           return loading(false);
         });
       },
-
-      /*
-      // TODO: Default and move out a layer
-      getOptionKey(e) {
-      	console.log("getOptionKey", e._id);
-      	return e._id;
-      },
-      	getOptionLabel(e) {
-      	console.log("getOptionLabel", e.meta.title);
-      	return e.meta.title;
-      },
-      */
       fetchEnum: function fetchEnum(query) {
         var _this2 = this;
 
@@ -8137,9 +8125,19 @@
           }) || this.$props["default"];
         }
       },
+
+      /**
+      * Retrieve option label based on path specified in properties.
+      * @param {Object} option The selected option within enum
+      */
       getOptionLabel: function getOptionLabel(option) {
         return _.get(option, this.$props.optionLabelPath, '');
       },
+
+      /**
+      * Retrieve option key based on path specified in properties.
+      * @param {Object} option The selected option within enum
+      */
       getOptionKey: function getOptionKey(option) {
         return _.get(option, this.$props.optionKeyPath, '');
       }
@@ -8220,7 +8218,7 @@
       undefined
     );
 
-  var mgAutocomplete = /*#__PURE__*/Object.freeze({
+  var mgChoiceAutocomplete = /*#__PURE__*/Object.freeze({
     __proto__: null,
     'default': __vue_component__$5
   });
@@ -8899,6 +8897,16 @@
         type: 'mgToggle',
         "default": false,
         help: 'Auto-focus the element when it appears on screen'
+      },
+      optionKeyPath: {
+        type: "mgText",
+        "default": "id",
+        help: "Path within data feed for options key"
+      },
+      optionLabelPath: {
+        type: "mgText",
+        "default": "title",
+        help: "Path within data feed for options label"
       }
     },
     created: function created() {
@@ -8936,9 +8944,10 @@
       });
     },
     methods: {
-      changeHandler: function changeHandler(val) {
-        this.data = val === null || val === void 0 ? void 0 : val.id;
-        this.selected = val;
+      changeHandler: function changeHandler(e) {
+        if (!e) return this.data = this.selected = null;
+        this.data = this.getOptionKey(e);
+        this.selected = e;
       },
 
       /**
@@ -8954,13 +8963,29 @@
 
         if (this.data) {
           this.selected = this.enumIter.find(function (e) {
-            return e.id == _this2.data;
+            return _this2.getOptionKey(e) == _this2.data;
           }) || this.data;
         } else if (this.$props["default"]) {
           this.selected = this.enumIter.find(function (e) {
-            return e.id == _this2.$props["default"];
+            return _this2.getOptionKey(e) == _this2.$props["default"];
           }) || this.$props["default"];
         }
+      },
+
+      /**
+      * Retrieve option label based on path specified in properties.
+      * @param {Object} option The selected option within enum
+      */
+      getOptionLabel: function getOptionLabel(option) {
+        return _.get(option, this.$props.optionLabelPath, '');
+      },
+
+      /**
+      * Retrieve option key based on path specified in properties.
+      * @param {Object} option The selected option within enum
+      */
+      getOptionKey: function getOptionKey(option) {
+        return _.get(option, this.$props.optionKeyPath, '');
       }
     },
     mounted: function mounted() {
@@ -8986,7 +9011,9 @@
         label: "title",
         options: _vm.enumIter,
         placeholder: _vm.$props.placeholder,
-        clearable: !_vm.$props.required
+        clearable: !_vm.$props.required,
+        "get-option-key": _vm.getOptionKey,
+        "get-option-label": _vm.getOptionLabel
       },
       on: { input: _vm.changeHandler },
       scopedSlots: _vm._u([
@@ -8995,8 +9022,7 @@
           fn: function(option) {
             return [
               option.icon ? _c("i", { class: option.icon }) : _vm._e(),
-              _vm._v(" "),
-              _vm._v("\n\t\t" + _vm._s(option.title) + "\n\t")
+              _vm._v("\n\t\t" + _vm._s(_vm.getOptionLabel(option)) + "\n\t")
             ]
           }
         },
@@ -9005,7 +9031,7 @@
           fn: function(option) {
             return [
               option.icon ? _c("i", { class: option.icon }) : _vm._e(),
-              _vm._v("\n\t\t" + _vm._s(option.title) + "\n\t")
+              _vm._v("\n\t\t" + _vm._s(_vm.getOptionLabel(option)) + "\n\t")
             ]
           }
         }
@@ -9018,7 +9044,7 @@
     /* style */
     const __vue_inject_styles__$a = function (inject) {
       if (!inject) return
-      inject("data-v-43cacd36_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Make look consistant with Bootstrap */\n.v-select.open .dropdown-toggle {\n\tborder-color: #5cb3fd;\n}\n\n/* Remove weird dropdown icon that Bootstrap adds */\n.v-select .dropdown-toggle::after {\n\tdisplay: none;\n}\n\n/* Wider spacing for clear button */\n.v-select .dropdown-toggle .clear {\n\tmargin-right: 10px;\n}\n\n/* Align dropdown icon correctly */\n.v-select .open-indicator {\n\tmargin-top: -2px;\n}\n.v-select .vs__selected i {\n\tmargin-right: 5px;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgChoiceDropdown.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AA6GA,wCAAA;AACA;CACA,qBAAA;AACA;;AAEA,mDAAA;AACA;CACA,aAAA;AACA;;AAEA,mCAAA;AACA;CACA,kBAAA;AACA;;AAEA,kCAAA;AACA;CACA,gBAAA;AACA;AAEA;CACA,iBAAA;AACA","file":"mgChoiceDropdown.vue","sourcesContent":["<script>\nimport VueSelect from 'vue-select';\nimport 'vue-select/dist/vue-select.css';\n\nVue.component('v-select', VueSelect);\n\nexport default Vue.mgComponent('mgChoiceDropdown', {\n\tmeta: {\n\t\ttitle: 'Dropdown multiple-choice',\n\t\ticon: 'far fa-chevron-circle-down',\n\t\tcategory: 'Choice Selectors',\n\t\tpreferId: true,\n\t\tshorthand: ['choice', 'choose', 'dropdown', 'pick'],\n\t},\n\tdata() { return {\n\t\tselected: [],\n\t\tenumIter: [],\n\t}},\n\tprops: {\n\t\tenumSource: {type: 'mgChoiceButtons', default: 'list', enum: ['list', 'url'], default: 'list', help: 'Where to populate the list data from'},\n\t\tenum: {\n\t\t\ttype: 'mgTable',\n\t\t\ttitle: 'List items',\n\t\t\tshowIf: 'enumSource == \"list\"',\n\t\t\titems: [\n\t\t\t\t{id: 'id', type: 'mgText', required: true},\n\t\t\t\t{id: 'title', type: 'mgText', required: true},\n\t\t\t\t{id: 'icon', type: 'mgIcon'},\n\t\t\t],\n\t\t},\n\t\tenumUrl: {type: 'mgUrl', vueType: ['string', 'object'], showIf: 'enumSource == \"url\"', help: 'Data feed URL to fetch choice values from'},\n\t\tplaceholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},\n\t\trequired: {type: 'mgToggle', default: false, help: 'One choice must be selected'},\n\t\tfocus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},\n\t},\n\tcreated() {\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);\n\t\t});\n\n\t\tthis.$watch('$props.enumUrl', ()=> {\n\t\t\tif (!this.$props.enumUrl) return;\n\t\t\tthis.$macgyver.utils.fetch(this.$props.enumUrl, {type: 'array'})\n\t\t\t\t.then(data => this.setEnum(data))\n\t\t}, {immediate: true});\n\n\t\tthis.$watch('$props.enum', ()=> {\n\t\t\tif (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings\n\t\t\t\tthis.setEnum(this.$props.enum.map(i => ({id: _.camelCase(i), title: i})));\n\t\t\t} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection\n\t\t\t\tthis.setEnum(this.$props.enum);\n\t\t\t}\n\t\t}, {immediate: true});\n\t},\n\tmethods: {\n\t\tchangeHandler(val) {\n\t\t\tthis.data = val?.id;\n\t\t\tthis.selected = val;\n\t\t},\n\n\t\t/**\n\t\t* Populate the enumIter object\n\t\t* This function also correctly populates the selected item (or the default)\n\t\t* Each item is assumed to have the spec `{id: String, title: String, icon?: String}`\n\t\t* @param {array<Object>} enumIter The new iterable enum\n\t\t*/\n\t\tsetEnum(enumIter) {\n\t\t\tthis.enumIter = enumIter;\n\n\t\t\tif (this.data) {\n\t\t\t\tthis.selected = this.enumIter.find(e => e.id == this.data) || this.data;\n\t\t\t} else if (this.$props.default) {\n\t\t\t\tthis.selected = this.enumIter.find(e => e.id == this.$props.default) || this.$props.default;\n\t\t\t}\n\t\t},\n\t},\n\tmounted() {\n\t\tif (this.$props.focus) {\n\t\t\t// NOTE: Focus selection does NOT work if DevTools is open in Chome\n\t\t\tthis.$refs.select.searchEl.focus();\n\t\t}\n\t},\n});\n</script>\n\n<template>\n\t<v-select\n\t\tref=\"select\"\n\t\t:value=\"selected\"\n\t\tlabel=\"title\"\n\t\t:options=\"enumIter\"\n\t\t:placeholder=\"$props.placeholder\"\n\t\t:clearable=\"!$props.required\"\n\t\t@input=\"changeHandler\"\n\t>\n\t\t<template #selected-option=\"option\">\n\t\t\t<!-- TODO: getOptionIcon -->\n\t\t\t<i v-if=\"option.icon\" :class=\"option.icon\"/>\n\t\t\t<!-- TODO: getOptionLabel -->\n\t\t\t{{option.title}}\n\t\t</template>\n\t\t<template #option=\"option\">\n\t\t\t<i v-if=\"option.icon\" :class=\"option.icon\"/>\n\t\t\t{{option.title}}\n\t\t</template>\n\t</v-select>\n</template>\n\n<style>\n/* Make look consistant with Bootstrap */\n.v-select.open .dropdown-toggle {\n\tborder-color: #5cb3fd;\n}\n\n/* Remove weird dropdown icon that Bootstrap adds */\n.v-select .dropdown-toggle::after {\n\tdisplay: none;\n}\n\n/* Wider spacing for clear button */\n.v-select .dropdown-toggle .clear {\n\tmargin-right: 10px;\n}\n\n/* Align dropdown icon correctly */\n.v-select .open-indicator {\n\tmargin-top: -2px;\n}\n\n.v-select .vs__selected i {\n\tmargin-right: 5px;\n}\n</style>\n"]}, media: undefined });
+      inject("data-v-5cb5ffcc_0", { source: "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* Make look consistant with Bootstrap */\n.v-select.open .dropdown-toggle {\n\tborder-color: #5cb3fd;\n}\n\n/* Remove weird dropdown icon that Bootstrap adds */\n.v-select .dropdown-toggle::after {\n\tdisplay: none;\n}\n\n/* Wider spacing for clear button */\n.v-select .dropdown-toggle .clear {\n\tmargin-right: 10px;\n}\n\n/* Align dropdown icon correctly */\n.v-select .open-indicator {\n\tmargin-top: -2px;\n}\n.v-select .vs__selected i {\n\tmargin-right: 5px;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgChoiceDropdown.vue"],"names":[],"mappings":";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAgJA,wCAAA;AACA;CACA,qBAAA;AACA;;AAEA,mDAAA;AACA;CACA,aAAA;AACA;;AAEA,mCAAA;AACA;CACA,kBAAA;AACA;;AAEA,kCAAA;AACA;CACA,gBAAA;AACA;AAEA;CACA,iBAAA;AACA","file":"mgChoiceDropdown.vue","sourcesContent":["<script>\nimport VueSelect from 'vue-select';\nimport 'vue-select/dist/vue-select.css';\n\nVue.component('v-select', VueSelect);\n\nexport default Vue.mgComponent('mgChoiceDropdown', {\n\tmeta: {\n\t\ttitle: 'Dropdown multiple-choice',\n\t\ticon: 'far fa-chevron-circle-down',\n\t\tcategory: 'Choice Selectors',\n\t\tpreferId: true,\n\t\tshorthand: ['choice', 'choose', 'dropdown', 'pick'],\n\t},\n\tdata() { return {\n\t\tselected: [],\n\t\tenumIter: [],\n\t}},\n\tprops: {\n\t\tenumSource: {type: 'mgChoiceButtons', default: 'list', enum: ['list', 'url'], default: 'list', help: 'Where to populate the list data from'},\n\t\tenum: {\n\t\t\ttype: 'mgTable',\n\t\t\ttitle: 'List items',\n\t\t\tshowIf: 'enumSource == \"list\"',\n\t\t\titems: [\n\t\t\t\t{id: 'id', type: 'mgText', required: true},\n\t\t\t\t{id: 'title', type: 'mgText', required: true},\n\t\t\t\t{id: 'icon', type: 'mgIcon'},\n\t\t\t],\n\t\t},\n\t\tenumUrl: {type: 'mgUrl', vueType: ['string', 'object'], showIf: 'enumSource == \"url\"', help: 'Data feed URL to fetch choice values from'},\n\t\tplaceholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},\n\t\trequired: {type: 'mgToggle', default: false, help: 'One choice must be selected'},\n\t\tfocus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},\n\n\t\toptionKeyPath: {\n\t\t\ttype: \"mgText\",\n\t\t\tdefault: \"id\",\n\t\t\thelp: \"Path within data feed for options key\"\n\t\t},\n\t\toptionLabelPath: {\n\t\t\ttype: \"mgText\",\n\t\t\tdefault: \"title\",\n\t\t\thelp: \"Path within data feed for options label\"\n\t\t},\n\t},\n\tcreated() {\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);\n\t\t});\n\n\t\tthis.$watch('$props.enumUrl', ()=> {\n\t\t\tif (!this.$props.enumUrl) return;\n\t\t\tthis.$macgyver.utils.fetch(this.$props.enumUrl, {type: 'array'})\n\t\t\t\t.then(data => this.setEnum(data))\n\t\t}, {immediate: true});\n\n\t\tthis.$watch('$props.enum', ()=> {\n\t\t\tif (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings\n\t\t\t\tthis.setEnum(this.$props.enum.map(i => ({id: _.camelCase(i), title: i})));\n\t\t\t} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection\n\t\t\t\tthis.setEnum(this.$props.enum);\n\t\t\t}\n\t\t}, {immediate: true});\n\t},\n\tmethods: {\n\t\tchangeHandler(e) {\n\t\t\tif (!e) return this.data = this.selected = null;\n\t\t\tthis.data = this.getOptionKey(e);\n\t\t\tthis.selected = e;\n\t\t},\n\n\t\t/**\n\t\t* Populate the enumIter object\n\t\t* This function also correctly populates the selected item (or the default)\n\t\t* Each item is assumed to have the spec `{id: String, title: String, icon?: String}`\n\t\t* @param {array<Object>} enumIter The new iterable enum\n\t\t*/\n\t\tsetEnum(enumIter) {\n\t\t\tthis.enumIter = enumIter;\n\n\t\t\tif (this.data) {\n\t\t\t\tthis.selected =\n\t\t\t\t\tthis.enumIter.find(\n\t\t\t\t\t\t(e) => this.getOptionKey(e) == this.data\n\t\t\t\t\t) || this.data;\n\t\t\t} else if (this.$props.default) {\n\t\t\t\tthis.selected =\n\t\t\t\t\tthis.enumIter.find(\n\t\t\t\t\t\t(e) => this.getOptionKey(e) == this.$props.default\n\t\t\t\t\t) || this.$props.default;\n\t\t\t}\n\t\t},\n\n\t\t/**\n\t\t* Retrieve option label based on path specified in properties.\n\t\t* @param {Object} option The selected option within enum\n\t\t*/\n\t\tgetOptionLabel(option) {\n\t\t\treturn _.get(option, this.$props.optionLabelPath, '');\n\t\t},\n\n\t\t/**\n\t\t* Retrieve option key based on path specified in properties.\n\t\t* @param {Object} option The selected option within enum\n\t\t*/\n\t\tgetOptionKey(option) {\n\t\t\treturn _.get(option, this.$props.optionKeyPath, '');\n\t\t},\n\t},\n\tmounted() {\n\t\tif (this.$props.focus) {\n\t\t\t// NOTE: Focus selection does NOT work if DevTools is open in Chome\n\t\t\tthis.$refs.select.searchEl.focus();\n\t\t}\n\t},\n});\n</script>\n\n<template>\n\t<v-select\n\t\tref=\"select\"\n\t\t:value=\"selected\"\n\t\tlabel=\"title\"\n\t\t:options=\"enumIter\"\n\t\t:placeholder=\"$props.placeholder\"\n\t\t:clearable=\"!$props.required\"\n\t\t:get-option-key=\"getOptionKey\"\n\t\t:get-option-label=\"getOptionLabel\"\n\t\t@input=\"changeHandler\"\n\t>\n\t\t<template #selected-option=\"option\">\n\t\t\t<!-- TODO: getOptionIcon -->\n\t\t\t<i v-if=\"option.icon\" :class=\"option.icon\" />\n\t\t\t{{ getOptionLabel(option) }}\n\t\t</template>\n\t\t<template #option=\"option\">\n\t\t\t<i v-if=\"option.icon\" :class=\"option.icon\" />\n\t\t\t{{ getOptionLabel(option) }}\n\t\t</template>\n\t</v-select>\n</template>\n\n<style>\n/* Make look consistant with Bootstrap */\n.v-select.open .dropdown-toggle {\n\tborder-color: #5cb3fd;\n}\n\n/* Remove weird dropdown icon that Bootstrap adds */\n.v-select .dropdown-toggle::after {\n\tdisplay: none;\n}\n\n/* Wider spacing for clear button */\n.v-select .dropdown-toggle .clear {\n\tmargin-right: 10px;\n}\n\n/* Align dropdown icon correctly */\n.v-select .open-indicator {\n\tmargin-top: -2px;\n}\n\n.v-select .vs__selected i {\n\tmargin-right: 5px;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
@@ -9569,12 +9595,7 @@
     'default': __vue_component__$d
   });
 
-  /**
-  * NOTE: Toggling deselection from the menu is not yet supported until
-  *       https://github.com/sagalbot/vue-select/pull/877
-  *       Has been merged
-  *       - MC 2020-01-10
-  */
+  var _enumSource$2;
   Vue.component('v-select', VueSelect);
   var script$d = Vue.mgComponent('mgChoiceTags', {
     meta: {
@@ -9585,21 +9606,36 @@
     },
     data: function data() {
       return {
-        value: [],
+        selected: [],
         enumIter: []
       };
     },
     props: {
+      enumSource: (_enumSource$2 = {
+        type: 'mgChoiceButtons',
+        "default": 'list',
+        "enum": ['list', 'url']
+      }, _defineProperty(_enumSource$2, "default", 'list'), _defineProperty(_enumSource$2, "help", 'Where to populate the list data from'), _enumSource$2),
       "enum": {
         type: 'mgTable',
         title: 'List items',
+        showIf: 'enumSource == "list"',
         items: [{
           id: 'id',
-          title: 'ID'
+          type: 'mgText',
+          required: true
         }, {
           id: 'title',
-          title: 'Title'
-        }]
+          type: 'mgText',
+          required: true
+        } //{id: 'icon', type: 'mgIcon'},
+        ]
+      },
+      enumUrl: {
+        type: 'mgUrl',
+        vueType: ['string', 'object'],
+        showIf: 'enumSource == "url"',
+        help: 'Data feed URL to fetch choice values from'
       },
       placeholder: {
         type: 'mgText',
@@ -9624,6 +9660,16 @@
         type: 'mgNumber',
         "default": 0,
         help: 'Maximum number of tags to display before showing helper text, set to zero to disable'
+      },
+      optionKeyPath: {
+        type: "mgText",
+        "default": "id",
+        help: "Path within data feed for options key"
+      },
+      optionLabelPath: {
+        type: "mgText",
+        "default": "title",
+        help: "Path within data feed for options label"
       }
     },
     created: function created() {
@@ -9632,39 +9678,77 @@
       this.$on('mgValidate', function (reply) {
         if (_this.$props.required && !_this.data || !_this.data.length) return reply("".concat(_this.$props.title, " is required"));
       });
+      this.$watch('$props.enumUrl', function () {
+        if (!_this.$props.enumUrl) return;
+
+        _this.$macgyver.utils.fetch(_this.$props.enumUrl, {
+          type: 'array'
+        }).then(function (data) {
+          return _this.setEnum(data);
+        });
+      }, {
+        immediate: true
+      });
       this.$watch('$props.enum', function () {
         if (_.isArray(_this.$props["enum"]) && _.isString(_this.$props["enum"][0])) {
           // Array of strings
-          _this.enumIter = _this.$props["enum"].map(function (i) {
+          _this.setEnum(_this.$props["enum"].map(function (i) {
             return {
               id: _.camelCase(i),
               title: i
             };
-          });
+          }));
         } else if (_.isArray(_this.$props["enum"]) && _.isObject(_this.$props["enum"][0])) {
           // Collection
-          _this.enumIter = _this.$props["enum"];
-        }
-
-        if (_this.data) {
-          _this.value = _this.enumIter.filter(function (e) {
-            return e.id == _this.data;
-          }) || _this.data;
-        } else if (_this.$props["default"]) {
-          _this.value = _this.enumIter.filter(function (e) {
-            return e.id == _this.$props["default"];
-          }) || _this.$props["default"];
+          _this.setEnum(_this.$props["enum"]);
         }
       }, {
         immediate: true
       });
     },
     methods: {
-      change: function change(val) {
-        this.data = val.map(function (i) {
-          return i.id;
-        });
-        this.value = val;
+      changeHandler: function changeHandler(e) {
+        if (!e) return this.data = this.selected = null;
+        this.data = this.getOptionKey(e);
+        this.selected = e;
+      },
+
+      /**
+      * Populate the enumIter object
+      * This function also correctly populates the selected item (or the default)
+      * Each item is assumed to have the spec `{id: String, title: String, icon?: String}`
+      * @param {array<Object>} enumIter The new iterable enum
+      */
+      setEnum: function setEnum(enumIter) {
+        var _this2 = this;
+
+        this.enumIter = enumIter;
+
+        if (this.data) {
+          this.selected = this.enumIter.find(function (e) {
+            return _this2.getOptionKey(e) == _this2.data;
+          }) || this.data;
+        } else if (this.$props["default"]) {
+          this.selected = this.enumIter.find(function (e) {
+            return _this2.getOptionKey(e) == _this2.$props["default"];
+          }) || this.$props["default"];
+        }
+      },
+
+      /**
+      * Retrieve option label based on path specified in properties.
+      * @param {Object} option The selected option within enum
+      */
+      getOptionLabel: function getOptionLabel(option) {
+        return _.get(option, this.$props.optionLabelPath, '');
+      },
+
+      /**
+      * Retrieve option key based on path specified in properties.
+      * @param {Object} option The selected option within enum
+      */
+      getOptionKey: function getOptionKey(option) {
+        return _.get(option, this.$props.optionKeyPath, '');
       }
     }
   });
@@ -9680,31 +9764,30 @@
     return _c("v-select", {
       staticClass: "mg-choice-tags",
       attrs: {
-        value: _vm.value,
+        value: _vm.selected,
         label: "title",
         options: _vm.enumIter,
         placeholder: _vm.$props.placeholder,
         taggable: _vm.$props.allowCreate,
         "no-drop": !_vm.$props.showDropdown,
         "close-on-select": false,
-        multiple: true
+        multiple: true,
+        "get-option-key": _vm.getOptionKey,
+        "get-option-label": _vm.getOptionLabel
       },
-      on: { input: _vm.change },
+      on: { input: _vm.changeHandler },
       scopedSlots: _vm._u([
         {
           key: "option",
           fn: function(option) {
             return [
-              _c("i", {
-                staticClass: "far fa-fw",
-                class: _vm.value.some(function(v) {
-                  return v.id == option.id
-                })
-                  ? "fa-check"
-                  : "",
-                attrs: { "data-id": option.id }
-              }),
-              _vm._v("\n\t\t" + _vm._s(option.title) + "\n\t")
+              _vm._v(
+                "\n\t\t" +
+                  _vm._s(_vm.selected) +
+                  "\n\t\t" +
+                  _vm._s(_vm.getOptionLabel(option)) +
+                  "\n\t"
+              )
             ]
           }
         },
@@ -9713,9 +9796,13 @@
           fn: function(props) {
             return [
               !_vm.$props.maxVisible ||
-              _vm.value.length - 1 < _vm.$props.maxVisible
+              _vm.selected.length - 1 < _vm.$props.maxVisible
                 ? _c("span", { staticClass: "vs__selected" }, [
-                    _vm._v("\n\t\t\t" + _vm._s(props.option.title) + "\n\t\t\t"),
+                    _vm._v(
+                      "\n\t\t\t" +
+                        _vm._s(_vm.getOptionLabel(props.option)) +
+                        "\n\t\t\t"
+                    ),
                     _c("i", {
                       staticClass: "far fa-times ml-1 clickable",
                       on: {
@@ -9725,11 +9812,12 @@
                       }
                     })
                   ])
-                : props.option.id == _vm.value[0].id
+                : _vm.getOptionKey(props.option) ==
+                  _vm.getOptionKey(_vm.selected[0])
                 ? _c("span", { staticClass: "vs__selected_overflow" }, [
                     _vm._v(
                       "\n\t\t\t" +
-                        _vm._s(_vm.value.length) +
+                        _vm._s(_vm.selected.length) +
                         " items selected\n\t\t"
                     )
                   ])
@@ -9746,7 +9834,7 @@
     /* style */
     const __vue_inject_styles__$e = function (inject) {
       if (!inject) return
-      inject("data-v-3ade858b_0", { source: "\n.mg-choice-tags.v-select .vs__selected > i {\n\tcursor: pointer;\n}\n.mg-choice-tags.v-select .vs__selected_overflow {\n\tmargin: 2px 10px;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgChoiceTags.vue"],"names":[],"mappings":";AAwGA;CACA,eAAA;AACA;AAEA;CACA,gBAAA;AACA","file":"mgChoiceTags.vue","sourcesContent":["<script>\n/**\n* NOTE: Toggling deselection from the menu is not yet supported until\n*       https://github.com/sagalbot/vue-select/pull/877\n*       Has been merged\n*       - MC 2020-01-10\n*/\n\nimport VueSelect from 'vue-select';\nimport 'vue-select/dist/vue-select.css';\n\nVue.component('v-select', VueSelect);\n\nexport default Vue.mgComponent('mgChoiceTags', {\n\tmeta: {\n\t\ttitle: 'Dropdown multiple-choice',\n\t\ticon: 'far fa-tags',\n\t\tcategory: 'Choice Selectors',\n\t\tpreferId: true,\n\t},\n\tdata() { return {\n\t\tvalue: [],\n\t\tenumIter: [],\n\t}},\n\tprops: {\n\t\tenum: {\n\t\t\ttype: 'mgTable',\n\t\t\ttitle: 'List items',\n\t\t\titems: [\n\t\t\t\t{id: 'id', title: 'ID'},\n\t\t\t\t{id: 'title', title: 'Title'},\n\t\t\t],\n\t\t},\n\t\tplaceholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},\n\t\trequired: {type: 'mgToggle', default: false, help: 'One choice must be selected'},\n\t\tallowCreate: {type: 'mgToggle', default: false, help: 'Allow the user to create their own tags in addition to the supplied ones'},\n\t\tshowDropdown: {type: 'mgToggle', default: true, help: 'When clicking, show a dropdown box. Disabling will only allow the user to use existing tags'},\n\t\tmaxVisible: {type: 'mgNumber', default: 0, help: 'Maximum number of tags to display before showing helper text, set to zero to disable'},\n\t},\n\tcreated() {\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.required && !this.data || !this.data.length) return reply(`${this.$props.title} is required`);\n\t\t});\n\n\t\tthis.$watch('$props.enum', ()=> {\n\t\t\tif (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings\n\t\t\t\tthis.enumIter = this.$props.enum.map(i => ({id: _.camelCase(i), title: i}));\n\t\t\t} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection\n\t\t\t\tthis.enumIter = this.$props.enum;\n\t\t\t}\n\n\t\t\tif (this.data) {\n\t\t\t\tthis.value = this.enumIter.filter(e => e.id == this.data) || this.data;\n\t\t\t} else if (this.$props.default) {\n\t\t\t\tthis.value = this.enumIter.filter(e => e.id == this.$props.default) || this.$props.default;\n\t\t\t}\n\t\t}, {immediate: true});\n\t},\n\tmethods: {\n\t\tchange(val) {\n\t\t\tthis.data = val.map(i => i.id);\n\t\t\tthis.value = val;\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<v-select\n\t\tclass=\"mg-choice-tags\"\n\t\t:value=\"value\"\n\t\tlabel=\"title\"\n\t\t:options=\"enumIter\"\n\t\t:placeholder=\"$props.placeholder\"\n\t\t:taggable=\"$props.allowCreate\"\n\t\t:no-drop=\"!$props.showDropdown\"\n\t\t:close-on-select=\"false\"\n\t\t:multiple=\"true\"\n\t\t@input=\"change\"\n\t>\n\t\t<template #option=\"option\">\n\t\t\t<i\n\t\t\t\tclass=\"far fa-fw\"\n\t\t\t\t:class=\"value.some(v => v.id == option.id) ? 'fa-check' : ''\"\n\t\t\t\t:data-id=\"option.id\"\n\t\t\t/>\n\t\t\t{{option.title}}\n\t\t</template>\n\t\t<template #selected-option-container=\"props\">\n\t\t\t<span v-if=\"!$props.maxVisible || value.length - 1 < $props.maxVisible\" class=\"vs__selected\">\n\t\t\t\t{{props.option.title}}\n\t\t\t\t<i @click=\"props.deselect(props.option)\" class=\"far fa-times ml-1 clickable\"/>\n\t\t\t</span>\n\t\t\t<!-- Render only the first selected element - skip the rest -->\n\t\t\t<span v-else-if=\"props.option.id == value[0].id\" class=\"vs__selected_overflow\">\n\t\t\t\t{{value.length}} items selected\n\t\t\t</span>\n\t\t\t<!-- Not sure why Vue needs an empty element but if its not here it falls back to the v-select render -->\n\t\t\t<span v-else/>\n\t\t</template>\n\t</v-select>\n</template>\n\n<style>\n.mg-choice-tags.v-select .vs__selected > i {\n\tcursor: pointer;\n}\n\n.mg-choice-tags.v-select .vs__selected_overflow {\n\tmargin: 2px 10px;\n}\n</style>\n"]}, media: undefined });
+      inject("data-v-1214e7be_0", { source: "\n.mg-choice-tags.v-select .vs__selected > i {\n\tcursor: pointer;\n}\n.mg-choice-tags.v-select .vs__selected_overflow {\n\tmargin: 2px 10px;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgChoiceTags.vue"],"names":[],"mappings":";AAiKA;CACA,eAAA;AACA;AAEA;CACA,gBAAA;AACA","file":"mgChoiceTags.vue","sourcesContent":["<script>\n/**\n* NOTE: Toggling deselection from the menu is not yet supported until\n*       https://github.com/sagalbot/vue-select/pull/877\n*       Has been merged\n*       - MC 2020-01-10\n*/\n\nimport VueSelect from 'vue-select';\nimport 'vue-select/dist/vue-select.css';\n\nVue.component('v-select', VueSelect);\n\nexport default Vue.mgComponent('mgChoiceTags', {\n\tmeta: {\n\t\ttitle: 'Dropdown multiple-choice',\n\t\ticon: 'far fa-tags',\n\t\tcategory: 'Choice Selectors',\n\t\tpreferId: true,\n\t},\n\tdata() { return {\n\t\tselected: [],\n\t\tenumIter: [],\n\t}},\n\tprops: {\n\t\tenumSource: {type: 'mgChoiceButtons', default: 'list', enum: ['list', 'url'], default: 'list', help: 'Where to populate the list data from'},\n\t\tenum: {\n\t\t\ttype: 'mgTable',\n\t\t\ttitle: 'List items',\n\t\t\tshowIf: 'enumSource == \"list\"',\n\t\t\titems: [\n\t\t\t\t{id: 'id', type: 'mgText', required: true},\n\t\t\t\t{id: 'title', type: 'mgText', required: true},\n\t\t\t\t//{id: 'icon', type: 'mgIcon'},\n\t\t\t],\n\t\t},\n\t\tenumUrl: {type: 'mgUrl', vueType: ['string', 'object'], showIf: 'enumSource == \"url\"', help: 'Data feed URL to fetch choice values from'},\n\t\tplaceholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},\n\t\trequired: {type: 'mgToggle', default: false, help: 'One choice must be selected'},\n\t\tallowCreate: {type: 'mgToggle', default: false, help: 'Allow the user to create their own tags in addition to the supplied ones'},\n\t\tshowDropdown: {type: 'mgToggle', default: true, help: 'When clicking, show a dropdown box. Disabling will only allow the user to use existing tags'},\n\t\tmaxVisible: {type: 'mgNumber', default: 0, help: 'Maximum number of tags to display before showing helper text, set to zero to disable'},\n\n\t\toptionKeyPath: {\n\t\t\ttype: \"mgText\",\n\t\t\tdefault: \"id\",\n\t\t\thelp: \"Path within data feed for options key\"\n\t\t},\n\t\toptionLabelPath: {\n\t\t\ttype: \"mgText\",\n\t\t\tdefault: \"title\",\n\t\t\thelp: \"Path within data feed for options label\"\n\t\t},\n\t},\n\tcreated() {\n\t\tthis.$on('mgValidate', reply => {\n\t\t\tif (this.$props.required && !this.data || !this.data.length) return reply(`${this.$props.title} is required`);\n\t\t});\n\n\t\tthis.$watch('$props.enumUrl', ()=> {\n\t\t\tif (!this.$props.enumUrl) return;\n\t\t\tthis.$macgyver.utils.fetch(this.$props.enumUrl, {type: 'array'})\n\t\t\t\t.then(data => this.setEnum(data))\n\t\t}, {immediate: true});\n\n\t\tthis.$watch('$props.enum', ()=> {\n\t\t\tif (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings\n\t\t\t\tthis.setEnum(this.$props.enum.map(i => ({id: _.camelCase(i), title: i})));\n\t\t\t} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection\n\t\t\t\tthis.setEnum(this.$props.enum);\n\t\t\t}\n\t\t}, {immediate: true});\n\t},\n\tmethods: {\n\t\tchangeHandler(e) {\n\t\t\tif (!e) return this.data = this.selected = null;\n\t\t\tthis.data = this.getOptionKey(e);\n\t\t\tthis.selected = e;\n\t\t},\n\n\t\t/**\n\t\t* Populate the enumIter object\n\t\t* This function also correctly populates the selected item (or the default)\n\t\t* Each item is assumed to have the spec `{id: String, title: String, icon?: String}`\n\t\t* @param {array<Object>} enumIter The new iterable enum\n\t\t*/\n\t\tsetEnum(enumIter) {\n\t\t\tthis.enumIter = enumIter;\n\n\t\t\tif (this.data) {\n\t\t\t\tthis.selected =\n\t\t\t\t\tthis.enumIter.find(\n\t\t\t\t\t\t(e) => this.getOptionKey(e) == this.data\n\t\t\t\t\t) || this.data;\n\t\t\t} else if (this.$props.default) {\n\t\t\t\tthis.selected =\n\t\t\t\t\tthis.enumIter.find(\n\t\t\t\t\t\t(e) => this.getOptionKey(e) == this.$props.default\n\t\t\t\t\t) || this.$props.default;\n\t\t\t}\n\t\t},\n\n\t\t/**\n\t\t* Retrieve option label based on path specified in properties.\n\t\t* @param {Object} option The selected option within enum\n\t\t*/\n\t\tgetOptionLabel(option) {\n\t\t\treturn _.get(option, this.$props.optionLabelPath, '');\n\t\t},\n\n\t\t/**\n\t\t* Retrieve option key based on path specified in properties.\n\t\t* @param {Object} option The selected option within enum\n\t\t*/\n\t\tgetOptionKey(option) {\n\t\t\treturn _.get(option, this.$props.optionKeyPath, '');\n\t\t},\n\t},\n});\n</script>\n\n<template>\n\t<v-select\n\t\tclass=\"mg-choice-tags\"\n\t\t:value=\"selected\"\n\t\tlabel=\"title\"\n\t\t:options=\"enumIter\"\n\t\t:placeholder=\"$props.placeholder\"\n\t\t:taggable=\"$props.allowCreate\"\n\t\t:no-drop=\"!$props.showDropdown\"\n\t\t:close-on-select=\"false\"\n\t\t:multiple=\"true\"\n\t\t:get-option-key=\"getOptionKey\"\n\t\t:get-option-label=\"getOptionLabel\"\n\t\t@input=\"changeHandler\"\n\t>\n\t\t<template #option=\"option\">\n\t\t\t<!--i\n\t\t\t\tclass=\"far fa-fw\"\n\t\t\t\t:class=\"selected.some(v => getOptionKey(v) == getOptionKey(option)) ? 'fa-check' : ''\"\n\t\t\t\t:data-id=\"getOptionKey(option)\"\n\t\t\t/-->\n\t\t\t{{selected}}\n\t\t\t{{ getOptionLabel(option) }}\n\t\t</template>\n\t\t<template #selected-option-container=\"props\">\n\t\t\t<span v-if=\"!$props.maxVisible || selected.length - 1 < $props.maxVisible\" class=\"vs__selected\">\n\t\t\t\t{{ getOptionLabel(props.option) }}\n\t\t\t\t<i @click=\"props.deselect(props.option)\" class=\"far fa-times ml-1 clickable\"/>\n\t\t\t</span>\n\t\t\t<!-- Render only the first selected element - skip the rest -->\n\t\t\t<span v-else-if=\"getOptionKey(props.option) == getOptionKey(selected[0])\" class=\"vs__selected_overflow\">\n\t\t\t\t{{selected.length}} items selected\n\t\t\t</span>\n\t\t\t<!-- Not sure why Vue needs an empty element but if its not here it falls back to the v-select render -->\n\t\t\t<span v-else/>\n\t\t</template>\n\t</v-select>\n</template>\n\n<style>\n.mg-choice-tags.v-select .vs__selected > i {\n\tcursor: pointer;\n}\n\n.mg-choice-tags.v-select .vs__selected_overflow {\n\tmargin: 2px 10px;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
