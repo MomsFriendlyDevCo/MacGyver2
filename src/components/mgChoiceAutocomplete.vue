@@ -145,10 +145,18 @@ export default Vue.mgComponent("mgChoiceAutocomplete", {
 			}
 		},
 
+		/**
+		* Retrieve option label based on path specified in properties.
+		* @param {Object} option The selected option within enum
+		*/
 		getOptionLabel(option) {
 			return _.get(option, this.$props.optionLabelPath, '');
 		},
 
+		/**
+		* Retrieve option key based on path specified in properties.
+		* @param {Object} option The selected option within enum
+		*/
 		getOptionKey(option) {
 			return _.get(option, this.$props.optionKeyPath, '');
 		},

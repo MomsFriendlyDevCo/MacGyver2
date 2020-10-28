@@ -32,6 +32,17 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 		focus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},
+
+		optionKeyPath: {
+			type: "mgText",
+			default: "id",
+			help: "Path within data feed for options key"
+		},
+		optionLabelPath: {
+			type: "mgText",
+			default: "title",
+			help: "Path within data feed for options label"
+		},
 	},
 	created() {
 		this.$on('mgValidate', reply => {
@@ -53,9 +64,10 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 		}, {immediate: true});
 	},
 	methods: {
-		changeHandler(val) {
-			this.data = val?.id;
-			this.selected = val;
+		changeHandler(e) {
+			if (!e) return this.data = this.selected = null;
+			this.data = this.getOptionKey(e);
+			this.selected = e;
 		},
 
 		/**
@@ -68,10 +80,32 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 			this.enumIter = enumIter;
 
 			if (this.data) {
-				this.selected = this.enumIter.find(e => e.id == this.data) || this.data;
+				this.selected =
+					this.enumIter.find(
+						(e) => this.getOptionKey(e) == this.data
+					) || this.data;
 			} else if (this.$props.default) {
-				this.selected = this.enumIter.find(e => e.id == this.$props.default) || this.$props.default;
+				this.selected =
+					this.enumIter.find(
+						(e) => this.getOptionKey(e) == this.$props.default
+					) || this.$props.default;
 			}
+		},
+
+		/**
+		* Retrieve option label based on path specified in properties.
+		* @param {Object} option The selected option within enum
+		*/
+		getOptionLabel(option) {
+			return _.get(option, this.$props.optionLabelPath, '');
+		},
+
+		/**
+		* Retrieve option key based on path specified in properties.
+		* @param {Object} option The selected option within enum
+		*/
+		getOptionKey(option) {
+			return _.get(option, this.$props.optionKeyPath, '');
 		},
 	},
 	mounted() {
@@ -91,17 +125,18 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 		:options="enumIter"
 		:placeholder="$props.placeholder"
 		:clearable="!$props.required"
+		:get-option-key="getOptionKey"
+		:get-option-label="getOptionLabel"
 		@input="changeHandler"
 	>
 		<template #selected-option="option">
 			<!-- TODO: getOptionIcon -->
-			<i v-if="option.icon" :class="option.icon"/>
-			<!-- TODO: getOptionLabel -->
-			{{option.title}}
+			<i v-if="option.icon" :class="option.icon" />
+			{{ getOptionLabel(option) }}
 		</template>
 		<template #option="option">
-			<i v-if="option.icon" :class="option.icon"/>
-			{{option.title}}
+			<i v-if="option.icon" :class="option.icon" />
+			{{ getOptionLabel(option) }}
 		</template>
 	</v-select>
 </template>
