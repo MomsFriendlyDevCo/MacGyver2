@@ -29,20 +29,21 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 			],
 		},
 		enumUrl: {type: 'mgUrl', vueType: ['string', 'object'], showIf: 'enumSource == "url"', help: 'Data feed URL to fetch choice values from'},
-		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
-		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
-		focus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},
-
 		optionKeyPath: {
 			type: "mgText",
 			default: "id",
-			help: "Path within data feed for options key"
+			help: "Path within data feed for options key",
+			showIf: 'enumSource == "url"',
 		},
 		optionLabelPath: {
 			type: "mgText",
 			default: "title",
-			help: "Path within data feed for options label"
+			help: "Path within data feed for options label",
+			showIf: 'enumSource == "url"',
 		},
+		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
+		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
+		focus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},
 	},
 	created() {
 		this.$on('mgValidate', reply => {

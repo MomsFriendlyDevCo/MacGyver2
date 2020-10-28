@@ -35,22 +35,23 @@ export default Vue.mgComponent('mgChoiceTags', {
 			],
 		},
 		enumUrl: {type: 'mgUrl', vueType: ['string', 'object'], showIf: 'enumSource == "url"', help: 'Data feed URL to fetch choice values from'},
+		optionKeyPath: {
+			type: "mgText",
+			default: "id",
+			help: "Path within data feed for options key",
+			showIf: 'enumSource == "url"',
+		},
+		optionLabelPath: {
+			type: "mgText",
+			default: "title",
+			help: "Path within data feed for options label",
+			showIf: 'enumSource == "url"',
+		},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 		allowCreate: {type: 'mgToggle', default: false, help: 'Allow the user to create their own tags in addition to the supplied ones'},
 		showDropdown: {type: 'mgToggle', default: true, help: 'When clicking, show a dropdown box. Disabling will only allow the user to use existing tags'},
 		maxVisible: {type: 'mgNumber', default: 0, help: 'Maximum number of tags to display before showing helper text, set to zero to disable'},
-
-		optionKeyPath: {
-			type: "mgText",
-			default: "id",
-			help: "Path within data feed for options key"
-		},
-		optionLabelPath: {
-			type: "mgText",
-			default: "title",
-			help: "Path within data feed for options label"
-		},
 	},
 	created() {
 		this.$on('mgValidate', reply => {

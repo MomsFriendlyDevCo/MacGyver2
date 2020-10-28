@@ -42,6 +42,18 @@ export default Vue.mgComponent("mgChoiceAutocomplete", {
 			showIf: 'enumSource == "url"',
 			help: "Data feed URL to fetch choice values from",
 		},
+		optionKeyPath: {
+			type: "mgText",
+			default: "id",
+			help: "Path within data feed for options key",
+			showIf: 'enumSource == "url"',
+		},
+		optionLabelPath: {
+			type: "mgText",
+			default: "title",
+			help: "Path within data feed for options label",
+			showIf: 'enumSource == "url"',
+		},
 		placeholder: {
 			type: "mgText",
 			help: "Ghost text to display when there is no value",
@@ -56,18 +68,6 @@ export default Vue.mgComponent("mgChoiceAutocomplete", {
 			default: false,
 			help: "Auto-focus the element when it appears on screen",
 		},
-
-		optionKeyPath: {
-			type: "mgText",
-			default: "id",
-			help: "Path within data feed for options key"
-		},
-		optionLabelPath: {
-			type: "mgText",
-			default: "title",
-			help: "Path within data feed for options label"
-		},
-
 	},
 	created() {
 		this.$on("mgValidate", (reply) => {
