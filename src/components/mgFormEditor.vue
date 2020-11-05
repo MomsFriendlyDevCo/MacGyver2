@@ -342,6 +342,9 @@ export default Vue.component('mgFormEditor', {
 
 			if (!widget.type) throw new Error('Widget.type must be specified as a minimum for insertWidget()');
 
+			// Ensure containers have items
+			if (widget.type === 'mgContainer' && !widget.items) widget.items = [];
+
 			// options.allocateTitle / settings.alloacteId {{{
 			if ( // A field we want is missing
 				(settings.allocateTitle && !widget.title)
@@ -372,9 +375,9 @@ export default Vue.component('mgFormEditor', {
 					if ( // Container -> Container:Last -> New widget
 						settings.useContainer // Insert within container?
 						&& this.config.type == 'mgContainer' // First item is a container
-						&& _.last(this.config.items).type == 'mgContainer' // Last child is also a container - use this
+						&& _.last(this.config.items)?.type == 'mgContainer' // Last child is also a container - use this
 					) {
-						this.mutateSplice(`items.${this.config.items.length - 1}.items`, _.last(this.config.items).items.length, 0, widget);
+						this.mutateSplice(`items.${this.config.items.length - 1}.items`, _.last(this.config.items)?.items.length || 0, 0, widget);
 					} else if ( // Container:Last -> New widget
 						settings.useContainer // Insert within container?
 						&& this.config.type == 'mgContainer' // First item is a container
