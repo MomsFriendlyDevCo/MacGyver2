@@ -25,6 +25,7 @@
     "jquery": "^3.4.1",
     "lodash": "^4.17.15",
     "moment": "^2.27.0",
+    "v-jsoneditor": "^1.4.2",
     "vue-input-facade": "^1.1.5",
     "vue-select": "^3.4.0",
     "vue2-editor": "^2.10.2"
