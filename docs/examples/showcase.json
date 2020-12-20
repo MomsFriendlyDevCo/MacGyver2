@@ -547,10 +547,18 @@
 					"urlUpload": "/api/debug/403"
 				},
 				{
-					"id": "demoCode",
+					"id": "demoCodeJs",
 					"type": "mgCode",
-					"title": "Code",
-					"default": {"foo": 1, "bar": {"baz": [2, 3, "hello"]}}
+					"title": "Code (JS)",
+					"default": "function() {}",
+					"syntax": "javascript"
+				},
+				{
+					"id": "demoCodeJson",
+					"type": "mgCode",
+					"title": "Code (JSON)",
+					"default": {"foo": 1, "bar": {"baz": [2, 3, "hello"]}},
+					"syntax": "json"
 				},
 				{
 					"id": "demoWysiwyg",

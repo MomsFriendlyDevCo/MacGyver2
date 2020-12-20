@@ -7727,6 +7727,7 @@
         }
       } else if (node[chunk] === undefined) {
         // This chunk (and all following chunks) does't exist - populate from here
+        // FIXME: This is the version which doesn't set the final key.
         chunks.slice(chunkIndex).forEach(function (chunk) {
           if (settings.arrayNumeric && isFinite(chunk)) {
             _this.$set(node, chunk, []);
@@ -10145,6 +10146,19 @@
   var VJsoneditor = unwrapExports(vJsoneditor_min);
   var vJsoneditor_min_1 = vJsoneditor_min.VJsoneditor;
 
+  /**
+  * Code editor with multi-language support
+  *
+  * @param {number} height The size of the editing window
+  * @param {string} syntax ENUM: ['text', 'json', 'javascript', 'html', 'css']
+  * @param {object} options Further customisations for underlying library
+  *
+  * @emits change Emitted as `(newValue)` when the value changes
+  *
+  * @example Display a code editor box
+  * <mg-code syntax="javascript" :value="someValue" @change="someValue = $event">
+  */
+
   var script$f = Vue.mgComponent('mgCode', {
     meta: {
       title: 'Code Editor',
@@ -10157,76 +10171,100 @@
     },
     data: function data() {
       return {
-        options: {}
+        editor: undefined
       };
     },
+    computed: {
+      // TODO: Could pick options based on what each library supports
+      options: function options() {
+        if (this.syntax === 'json') {
+          return _objectSpread2({
+            enableSort: false,
+            search: false,
+            mode: 'code',
+            modes: ['code', 'tree']
+          }, _.isPlainObject(this.$props.options) ? this.$props.options : {});
+        } else {
+          return _objectSpread2({
+            showPrintMargin: false
+          }, _.isPlainObject(this.$props.options) ? this.$props.options : {});
+        }
+      }
+    },
     props: {
-      enableSort: {
-        type: 'mgChoiceCheckbox',
-        "default": true
-      },
-      mode: {
-        type: 'mgChoiceDropdown',
-        "enum": ['view', 'form', 'code', 'text', 'preview'],
-        "default": 'tree'
-      },
-      modes: {
-        type: 'mgChoiceList',
-        "default": ['tree', 'code']
-      },
-      search: {
-        type: 'mgChoiceCheckbox',
-        "default": true
+      height: {
+        type: 'mgText',
+        "default": '400',
+        help: 'The size of the editing window',
+        advanced: true
       },
       syntax: {
         type: 'mgChoiceDropdown',
         "enum": ['text', 'json', 'javascript', 'html', 'css'],
         "default": 'json'
       },
-      theme: {
-        type: 'mgChoiceDropdown',
-        "enum": ['chrome'],
-        advanced: true,
-        "default": 'chrome',
-        help: 'The syntax color scheme to use'
-      },
-      height: {
-        type: 'mgText',
-        "default": '400px',
-        help: 'The size of the editing window as a valid CSS measurement',
-        advanced: true
+      options: {
+        type: 'mgCode',
+        "default": {},
+        help: 'Further customisations for underlying library'
       }
     },
     methods: {
+      initAceMode: function initAceMode(mode) {
+        var _this = this;
+
+        return new Promise(function (resolve, reject) {
+          var script = document.createElement('script');
+          script.src = 'node_modules/ace-builds/src-noconflict/mode-' + mode + '.js';
+          script.addEventListener('load', resolve);
+          script.addEventListener('error', function (e) {
+            return reject(e.error);
+          });
+          document.head.appendChild(script);
+        }).then(function () {
+          var Mode = ace.require('ace/mode/' + mode).Mode;
+
+          _this.editor.session.setMode(new Mode());
+        });
+      },
+      initAce: function initAce() {
+        var _this2 = this;
+
+        this.$el.style = "position: absolute; height: ".concat(this.$props.height, "px; width: 100%;");
+        this.editor = ace.edit(this.$el);
+        this.initAceMode(this.syntax);
+        this.editor.$blockScrolling = Infinity;
+        this.editor.setOptions(this.options);
+        this.$nextTick(function () {
+          return _this2.editor.resize(true);
+        });
+        this.editor.on('change', function (delta) {
+          _this2.data = _this2.editor.getValue();
+          return true;
+        });
+        this.$watch('data', function (newVal, oldVal) {
+          if (!newVal) return;
+          if (newVal === _this2.editor.getValue()) return;
+
+          _this2.editor.setValue(newVal, 1);
+        }, {
+          deep: true,
+          immediate: true
+        });
+      },
       errorHandler: function errorHandler(e) {
         console.log('errorHandler', e);
       }
     },
-    created: function created() {
-      this.$debugging = true;
-      this.options.mode = this.mode;
-      this.options.modes = this.modes;
+    mounted: function mounted() {
+      if (this.syntax === 'json') return;
+      this.initAce();
     },
     beforeDestroy: function beforeDestroy() {
-      console.log('Skipping...');
-      return;
-    },
-    mounted: function mounted() {
-
-      console.log('Skipping...');
-      return;
+      if (!this.editor) return;
+      this.editor.destroy();
+      this.editor.container.remove();
     }
-    /*
-    render(h) {
-    	return h('div', {
-    		attrs: {
-    			class: 'mg-code',
-    			style: `height: ${this.$props.height}; width: 100%`,
-    		},
-    	});
-    },
-    */
-
   });
 
   /* script */
@@ -10241,40 +10279,18 @@
       "div",
       { staticClass: "mg-code" },
       [
-        _c("v-jsoneditor", {
-          attrs: { options: _vm.options, plus: false, height: _vm.height },
-          on: { error: _vm.errorHandler },
-          model: {
-            value: _vm.data,
-            callback: function($$v) {
-              _vm.data = $$v;
-            },
-            expression: "data"
-          }
-        }),
-        _vm._v(" "),
-        this.$debugging
-          ? _c("div", { staticClass: "card" }, [
-              _c("div", { staticClass: "card-header" }, [
-                _vm._v("\n\t\t\tRaw data\n\t\t\t"),
-                _c("i", {
-                  directives: [
-                    {
-                      name: "tooltip",
-                      rawName: "v-tooltip",
-                      value: "Only visible to users with the Debug permission",
-                      expression:
-                        "'Only visible to users with the Debug permission'"
-                    }
-                  ],
-                  staticClass: "float-right fas fa-debug fa-lg"
-                })
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "card-body" }, [
-                _c("pre", [_vm._v(_vm._s(typeof _vm.$data.data))])
-              ])
-            ])
+        _vm.syntax == "json"
+          ? _c("v-jsoneditor", {
+              attrs: { options: _vm.options, plus: false, height: _vm.height },
+              on: { error: _vm.errorHandler },
+              model: {
+                value: _vm.data,
+                callback: function($$v) {
+                  _vm.data = $$v;
+                },
+                expression: "data"
+              }
+            })
           : _vm._e()
       ],
       1
@@ -10286,7 +10302,7 @@
     /* style */
     const __vue_inject_styles__$g = function (inject) {
       if (!inject) return
-      inject("data-v-79cc1d85_0", { source: "\n.mg-code {\n\tborder: 1px solid #f0f0f0;\n\tborder-radius: 5px;\n\tmin-width: 150px;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgCode.vue"],"names":[],"mappings":";AA6IA;CACA,yBAAA;CACA,kBAAA;CACA,gBAAA;AACA","file":"mgCode.vue","sourcesContent":["<script>\nimport VJsoneditor from 'v-jsoneditor';\n\nexport default Vue.mgComponent('mgCode', {\n\tmeta: {\n\t\ttitle: 'Code Editor',\n\t\ticon: 'fal fa-code',\n\t\tcategory: 'Complex Inputs',\n\t\tpreferId: true,\n\t},\n\tcomponents: {VJsoneditor},\n\tdata() { return {\n\t\toptions: {},\n\t}},\n\tprops: {\n\t\tenableSort: {type: 'mgChoiceCheckbox', default: true},\n\t\tmode: {type: 'mgChoiceDropdown', enum: ['view', 'form', 'code', 'text', 'preview'], default: 'tree'},\n\t\tmodes: {type: 'mgChoiceList', default: ['tree', 'code']},\n\t\tsearch: {type: 'mgChoiceCheckbox', default: true},\n\t\tsyntax: {type: 'mgChoiceDropdown', enum: ['text', 'json', 'javascript', 'html', 'css'], default: 'json'},\n\t\ttheme: {type: 'mgChoiceDropdown', enum: ['chrome'], advanced: true, default: 'chrome', help: 'The syntax color scheme to use'},\n\t\theight: {type: 'mgText', default: '400px', help: 'The size of the editing window as a valid CSS measurement', advanced: true},\n\t},\n\tmethods: {\n\t\terrorHandler(e) {\n\t\t\tconsole.log('errorHandler', e);\n\t\t}\n\t},\n\tcreated() {\n\t\tthis.$debugging = true;\n\n\t\tthis.options.mode = this.mode;\n\t\tthis.options.modes = this.modes;\n\t},\n\tbeforeDestroy() {\n\t\tconsole.log('Skipping...');\n\t\treturn;\n\t\tthis.editor.destroy();\n\t\tthis.editor.container.remove();\n\t},\n\tmounted() {\n\t\tconsole.log('Skipping...');\n\t\treturn;\n\t\tthis.editor = ace.edit(this.$el);\n\t\tthis.editor.$blockScrolling = Infinity;\n\n\t\tthis.editor.setOptions({\n\t\t\tshowPrintMargin: false,\n\t\t});\n\n\t\tthis.editor.on('change', (delta)=> {\n\t\t\tvar value = this.editor.getValue();\n\t\t\tif (this.$props.convert && this.$props.syntax == 'json') {\n\t\t\t\ttry {\n\t\t\t\t\tvalue = JSON.parse(value);\n\n\t\t\t\t\t/*\n\t\t\t\t\t// Replace dollarsign prefixed items with Unicode\n\t\t\t\t\t// https://stackoverflow.com/a/39126851/2438830\n\t\t\t\t\tfunction replaceKeysDeep(obj) {\n\t\t\t\t\t\treturn _.transform(obj, function(res, v, k) {\n\t\t\t\t\t\t\tvar cur = _.isString(k) ? k.replace(/^\\$/, '\\uFF04') : k;\n\t\t\t\t\t\t\tres[cur] = _.isObject(v) ? replaceKeysDeep(v) : v;\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t\treplaceKeysDeep(value);\n\t\t\t\t\t*/\n\n\t\t\t\t\tthis.data = value;\n\t\t\t\t} catch (e) {\n\t\t\t\t\t// Silently fail as the JSON is invalid\n\t\t\t\t\tconsole.log('Invalid JSON', e);\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\tthis.data = value;\n\t\t\t}\n\t\t\treturn true;\n\t\t});\n\n\t\tthis.$nextTick(()=> this.editor.resize());\n\n\t\t/*\n\t\tthis.$watch('config', ()=> {\n\t\t\t// TODO: Make compatible with Parcel\n\t\t\t//if (this.$props.syntax) this.editor.getSession().setMode(`ace/mode/${this.$props.syntax}`);\n\t\t\t//if (this.$props.theme) this.editor.setTheme(`ace/theme/${this.$props.theme}`);\n\t\t}, {\n\t\t\t// FIXME: deep?\n\t\t\timmediate: true\n\t\t});\n\t\t*/\n\n\t\tthis.$watch('data', (newVal, oldVal)=> {\n\t\t\tif (!newVal) return;\n\t\t\tvar value = this.editor.getValue();\n\n\t\t\tif (this.$props.convert && this.$props.syntax == 'json')\n\t\t\t\tnewVal = JSON.stringify(newVal, null, '\\t');\n\n\t\t\t// FIXME: This comparison will fail with parsed (convert = true) instances, resulting in update loop.\n\t\t\tif (newVal === value) return;\n\n\t\t\tthis.editor.setValue(newVal, 1);\n\t\t}, {deep: true, immediate: true});\n\t},\n\t/*\n\trender(h) {\n\t\treturn h('div', {\n\t\t\tattrs: {\n\t\t\t\tclass: 'mg-code',\n\t\t\t\tstyle: `height: ${this.$props.height}; width: 100%`,\n\t\t\t},\n\t\t});\n\t},\n\t*/\n});\n</script>\n\n<template>\n\t<div class=\"mg-code\">\n\t\t<v-jsoneditor\n\t\t\tv-model=\"data\"\n\t\t\t:options=\"options\"\n\t\t\t:plus=\"false\"\n\t\t\t:height=\"height\"\n\t\t\t@error=\"errorHandler\"\n\t\t/>\n\n\t\t<div v-if=\"this.$debugging\" class=\"card\">\n\t\t\t<div class=\"card-header\">\n\t\t\t\tRaw data\n\t\t\t\t<i class=\"float-right fas fa-debug fa-lg\" v-tooltip=\"'Only visible to users with the Debug permission'\"/>\n\t\t\t</div>\n\t\t\t<div class=\"card-body\">\n\t\t\t\t<pre>{{typeof $data.data}}</pre>\n\t\t\t</div>\n\t\t</div>\n\t</div>\n</template>\n\n<style>\n.mg-code {\n\tborder: 1px solid #f0f0f0;\n\tborder-radius: 5px;\n\tmin-width: 150px;\n}\n</style>\n"]}, media: undefined });
+      inject("data-v-69973137_0", { source: "\n.mg-code {\n\tborder: 1px solid #f0f0f0;\n\tborder-radius: 5px;\n\tmin-width: 150px;\n}\n.jsoneditor-menu a.jsoneditor-poweredBy {\n\tdisplay: none;\n}\n", map: {"version":3,"sources":["/home/user/src/mfdc/MacGyver2/src/components/mgCode.vue"],"names":[],"mappings":";AAqHA;CACA,yBAAA;CACA,kBAAA;CACA,gBAAA;AACA;AACA;CACA,aAAA;AACA","file":"mgCode.vue","sourcesContent":["<script>\nimport VJsoneditor from 'v-jsoneditor';\n\n/**\n* Code editor with multi-language support\n*\n* @param {number} height The size of the editing window\n* @param {string} syntax ENUM: ['text', 'json', 'javascript', 'html', 'css']\n* @param {object} options Further customisations for underlying library\n*\n* @emits change Emitted as `(newValue)` when the value changes\n*\n* @example Display a code editor box\n* <mg-code syntax=\"javascript\" :value=\"someValue\" @change=\"someValue = $event\">\n*/\nexport default Vue.mgComponent('mgCode', {\n\tmeta: {\n\t\ttitle: 'Code Editor',\n\t\ticon: 'fal fa-code',\n\t\tcategory: 'Complex Inputs',\n\t\tpreferId: true,\n\t},\n\tcomponents: {VJsoneditor},\n\tdata() { return {\n\t\teditor: undefined,\n\t}},\n\tcomputed: {\n\t\t// TODO: Could pick options based on what each library supports\n\t\toptions() {\n\t\t\tif (this.syntax === 'json') {\n\t\t\t\treturn {\n\t\t\t\t\tenableSort: false,\n\t\t\t\t\tsearch: false,\n\t\t\t\t\tmode: 'code',\n\t\t\t\t\tmodes: ['code', 'tree'],\n\t\t\t\t\t..._.isPlainObject(this.$props.options) ? this.$props.options : {},\n\t\t\t\t};\n\t\t\t} else {\n\t\t\t\treturn {\n\t\t\t\t\tshowPrintMargin: false,\n\t\t\t\t\t..._.isPlainObject(this.$props.options) ? this.$props.options : {},\n\t\t\t\t};\n\t\t\t}\n\t\t},\n\t},\n\tprops: {\n\t\theight: {type: 'mgText', default: '400', help: 'The size of the editing window', advanced: true},\n\t\tsyntax: {type: 'mgChoiceDropdown', enum: ['text', 'json', 'javascript', 'html', 'css'], default: 'json'},\n\t\toptions: {type: 'mgCode', default: {}, help: 'Further customisations for underlying library'},\n\t},\n\tmethods: {\n\t\tinitAceMode(mode) {\n\t\t\treturn new Promise((resolve, reject) => {\n\t\t\t\tconst script = document.createElement('script');\n\t\t\t\tscript.src = 'node_modules/ace-builds/src-noconflict/mode-' + mode + '.js';\n\t\t\t\tscript.addEventListener('load', resolve);\n\t\t\t\tscript.addEventListener('error', e => reject(e.error));\n\t\t\t\tdocument.head.appendChild(script);\n\t\t\t}).then(() => {\n\t\t\t\tvar Mode = ace.require('ace/mode/' + mode).Mode;\n\t\t\t\tthis.editor.session.setMode(new Mode());\n\t\t\t});\n\t\t},\n\t\tinitAce() {\n\t\t\tthis.$el.style = `position: absolute; height: ${this.$props.height}px; width: 100%;`;\n\t\t\tthis.editor = ace.edit(this.$el);\n\n\t\t\tthis.initAceMode(this.syntax);\n\n\t\t\tthis.editor.$blockScrolling = Infinity;\n\t\t\tthis.editor.setOptions(this.options);\n\n\t\t\tthis.$nextTick(()=> this.editor.resize(true));\n\n\t\t\tthis.editor.on('change', delta => {\n\t\t\t\tthis.data = this.editor.getValue();\n\t\t\t\treturn true;\n\t\t\t});\n\n\t\t\tthis.$watch('data', (newVal, oldVal)=> {\n\t\t\t\tif (!newVal) return;\n\t\t\t\tif (newVal === this.editor.getValue()) return;\n\t\t\t\tthis.editor.setValue(newVal, 1);\n\t\t\t}, {deep: true, immediate: true});\n\t\t},\n\t\terrorHandler(e) {\n\t\t\tconsole.log('errorHandler', e);\n\t\t}\n\t},\n\tmounted() {\n\t\tif (this.syntax === 'json') return;\n\t\t\n\t\tthis.initAce();\n\t},\n\tbeforeDestroy() {\n\t\tif (!this.editor) return;\n\n\t\tthis.editor.destroy();\n\t\tthis.editor.container.remove();\n\t},\n});\n</script>\n\n<template>\n\t<div class=\"mg-code\">\n\t\t<v-jsoneditor\n\t\t\tv-if=\"syntax == 'json'\"\n\t\t\tv-model=\"data\"\n\t\t\t:options=\"options\"\n\t\t\t:plus=\"false\"\n\t\t\t:height=\"height\"\n\t\t\t@error=\"errorHandler\"\n\t\t/>\n\t</div>\n</template>\n\n<style>\n.mg-code {\n\tborder: 1px solid #f0f0f0;\n\tborder-radius: 5px;\n\tmin-width: 150px;\n}\n.jsoneditor-menu a.jsoneditor-poweredBy {\n\tdisplay: none;\n}\n</style>\n"]}, media: undefined });
 
     };
     /* scoped */
