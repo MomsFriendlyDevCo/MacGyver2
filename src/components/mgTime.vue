@@ -35,8 +35,9 @@ export default Vue.mgComponent('mgTime', {
 			}
 		});
 
-		this.$watch('data', ()=> {
-			this.formData = data;
+		this.$watch('data', newVal => {
+			if (!newVal) return;
+			this.formData = newVal;
 		}, { immediate: true });
 
 		this.$watch('formData', ()=> {

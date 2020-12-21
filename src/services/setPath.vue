@@ -47,6 +47,7 @@ export default Vue.prototype.$setPath = function(target, path, value, options) {
 				this.$set(node, chunk, value);
 			}
 		} else if (node[chunk] === undefined) { // This chunk (and all following chunks) does't exist - populate from here
+			// FIXME: This is the version which doesn't set the final key.
 			chunks.slice(chunkIndex).forEach(chunk => {
 				if (settings.arrayNumeric && isFinite(chunk)) {
 					this.$set(node, chunk, []);
