@@ -10,18 +10,34 @@ var plumber = require('gulp-plumber');
 var rename = require('gulp-rename');
 var replace = require('gulp-replace');
 var rimraf = require('rimraf');
-var rollup = require('rollup');
 var uglify = require('gulp-uglify');
 var vm = require('vm');
 var watch = require('gulp-watch');
 var yaml = require('yaml');
 
+var fspath = require('path');
+var blockHead = require('gulp-block-head');
+var glob = require('globby');
+var parcel = require('parcel-bundler');
+
 var cache = {}; // Caches for various Rollup builds
 var isProduction = !!process.env.NODE_ENV && process.env.NODE_ENV=='production';
 
 gulp.task('default', 'serve');
-gulp.task('build', ['build:demo', 'build:vue', 'build:node']);
+gulp.task('build', ['build:demo', 'build:vue']);
 gulp.task('build:demo', ['build:demo:vue', 'build:demo:fa', 'build:docs']);
+
+/*
+const webpack = require('webpack-stream');
+gulp.task('build:webpack', function () {
+  return gulp
+    .src('./src/macgyver.vue')
+    //.pipe(webpack(require('./webpack.config.js')))
+	.pipe(webpack({}))
+    .pipe(gulp.dest('dist/'));
+});
+*/
+
 
 
 /**
@@ -42,7 +58,7 @@ gulp.task('serve', 'build', ()=> {
 
 	watch(['./src/**/*.{js,vue}'], ()=> {
 		gulp.log('Rebuild MacGyver...');
-		return gulp.run('build:node', 'build:vue');
+		return gulp.run('build:vue');
 	});
 
 	watch(['./demo/**/*.{js,vue}'], ()=> {
@@ -72,57 +88,58 @@ gulp.task('serve:docs', 'build:docs', ()=> {
 
 
 /**
-* Build main MacGyver stack for Node
-*/
-gulp.task('build:node', ()=>
-	rollup.rollup({
-		input: './src/entrypoint-node.js',
-		cache: cache.macgyverNode || false,
-		inlineDynamicImports: true,
-		plugins: [
-			require('rollup-plugin-commonjs')({
-				include: ['node_modules/**/*', 'dist/**/*'],
-				namedExports: {
-					'dist/macgyver.js': ['macgyver'],
-				},
-			}),
-			require('rollup-plugin-vue')(),
-			require('rollup-plugin-includepaths')({
-				paths: ['dist'],
-			}),
-			require('rollup-plugin-node-resolve')({
-				mainFields: ['browser', 'module', 'main'],
-				extensions: ['.js'],
-			}),
-			require('rollup-plugin-babel')({
-				presets: ['@babel/env'],
-				plugins: [
-					['@babel/plugin-proposal-pipeline-operator', {proposal: 'fsharp'}],
-					'@babel/plugin-proposal-throw-expressions',
-					'lodash',
-				],
-				exclude: 'node_modules/**',
-			}),
-			isProduction && require('rollup-plugin-uglify').uglify(),
-		],
-	}).then(bundle => {
-		cache.macgyverNode = bundle.cache;
-		bundle.write({
-			format: 'cjs',
-			file: './dist/macgyver-node.js',
-			name: 'macgyver',
-			sourcemap: true,
-		});
-	})
-);
-
-
-/**
 * Build main MacGyver stack for Vue
 */
-gulp.task('build:vue', ()=>
+gulp.task('build:vue', ()=> {
+	return Promise.resolve()
+		.then(()=> gulp.log('Compiling via Parcel'))
+		//.then(()=> new parcel(['./tmp/**/*.vue', './tmp/**/*.js'], {
+		.then(()=> new parcel(['./src/VueMacgyver.js'], {
+			outDir: './dist',
+			outFile: 'macgyver.js',
+			watch: false,
+			cache: true,
+			cacheDir: '.cache',
+			minify: true,
+			sourceMaps: true,
+			autoInstall: false, // Disable install of missing deps
+			detailedReport: true,
+			/*
+			Specified in package.json
+			presets: ['@babel/env'],
+			plugins: [
+				['@babel/plugin-proposal-pipeline-operator', {proposal: 'fsharp'}],
+				'@babel/plugin-proposal-throw-expressions',
+				'lodash',
+			],
+			*/
+		}))
+		.then(bundler => bundler.bundle())
+});
+
+/*
+.then(() => new Promise((resolve, reject) => {
+	gulp.src(glob.sync([
+		'src\/**\/*.js',
+	]))
+	.pipe(blockHead({
+		blocks: {
+			script(content, path, block) {
+				return content;
+			},
+		},
+	}))
+	//.pipe(concat(fspath.basename(dumpPath)))
+	//.pipe(gulp.dest(fspath.dirname(dumpPath)))
+	.pipe(gulp.dest('./tmp'))
+	.on('finish', ()=> resolve())
+	// TODO: Reject on errors.
+}))
+*/
+
+gulp.task('build:vueaaa', ()=>
 	rollup.rollup({
-		input: './src/entrypoint-vue.js',
+		input: './src/macgyver.vue',
 		cache: cache.macgyverVue || false,
 		inlineDynamicImports: true,
 		external: [ // Don't include these in the Bundle as they are included elsewhere
@@ -179,7 +196,7 @@ gulp.task('build:vue', ()=>
 			sourcemap: true,
 			globals: {
 				jquery: '$',
-				vue: 'Vue',
+				//vue: 'Vue',
 			},
 		});
 	})

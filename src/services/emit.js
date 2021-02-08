@@ -1,4 +1,3 @@
-<script>
 var methods = {}; // Method's to glue onto vm.$emit
 
 /**
@@ -80,18 +79,19 @@ methods.hasListeners = function(msg) {
 	);
 };
 
-Vue.mixin({
-	beforeCreate() {
-		this.$emit = this.$emit.bind(this); // Rebind $emit to this vm so we get the right context
+export default {
+	install: function(Vue, options) {
+		Vue.mixin({
+			beforeCreate() {
+				this.$emit = this.$emit.bind(this); // Rebind $emit to this vm so we get the right context
 
-		// Long-winded version of _.mapValues() where we remap each method to a binding of this vm
-		Object.assign(this.$emit, Object.fromEntries(
-			Object.entries(methods).map(i =>
-				[i[0], i[1].bind(this)]
-			)
-		));
-	},
-});
-
-export default methods;
-</script>
+				// Long-winded version of _.mapValues() where we remap each method to a binding of this vm
+				Object.assign(this.$emit, Object.fromEntries(
+					Object.entries(methods).map(i =>
+						[i[0], i[1].bind(this)]
+					)
+				));
+			},
+		});
+	}
+};
