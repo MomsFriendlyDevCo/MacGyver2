@@ -23,9 +23,6 @@
 * @emits mgContainer.mouseEnter Emitted as `(container, specPath, event)` on the native mouseEnter event of a component within a container
 * @emits mgContainer.mouseLeave Emitted as `(container, specPath, event)` on the native mouseLeave event of a component within a container
 */
-
-// TODO: app.mgComponent('mgForm', {?
-// Vue.component
 export default app.mgComponent('mgForm', {
 	provide() { return {
 		$mgForm: this,

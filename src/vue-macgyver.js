@@ -236,13 +236,6 @@ export default {
 
 		//Vue.use(ComponentForm);
 
-		//Vue.use('./services/setPath.vue');
-		//Vue.use('./services/watchAll.vue');
-
-		//import('./services/emit.vue');
-		//import('./services/setPath.vue');
-		//import('./services/watchAll.vue');
-
 		// Import all MacGyver components
 		// NOTE: These are defined as dynamic imports as we need window.macgyver to be a accessible
 
