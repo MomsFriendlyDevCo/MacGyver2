@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgLabel', {
+export default app.mgComponent('mgLabel', {
 	meta: {
 		title: 'Read-only label',
 		icon: 'far fa-font',

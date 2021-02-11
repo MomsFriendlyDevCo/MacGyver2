@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgNumber', {
+export default app.mgComponent('mgNumber', {
 	meta: {
 		title: 'Number',
 		icon: 'far fa-sort-numeric-down',

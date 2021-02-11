@@ -94,7 +94,10 @@ gulp.task('build:vue', ()=> {
 	return Promise.resolve()
 		.then(()=> gulp.log('Compiling via Parcel'))
 		//.then(()=> new parcel(['./tmp/**/*.vue', './tmp/**/*.js'], {
-		.then(()=> new parcel(['./src/VueMacgyver.js'], {
+		.then(()=> new parcel([
+			'./src/vue-macgyver.js',
+			//'./src/components/*.vue',
+		], {
 			outDir: './dist',
 			outFile: 'macgyver.js',
 			watch: false,

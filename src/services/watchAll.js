@@ -10,46 +10,47 @@
 * @param {boolean} [options.preventLoops=true] Assume that the watcher can effect a peer expression and that we should not keep retriggering this watch expression
 */
 export default {
-	install: function(Vue, options) {
-		console.log('$watchAll install', _.has(Vue, '$watchAll'));
-		console.log('FIXME')
-		return;
-		Vue.prototype.$watchAll = function(props, callback, options) {
-			var settings = {
-				needAll: false,
-				needAllLock: true,
-				preventLoops: true,
-				immediate: false,
-				...options,
-			};
+	install: function(app, options) {
+		app.mixin({
+			methods: {
+				$watchAll: function(props, callback, options) {
+					var settings = {
+						needAll: false,
+						needAllLock: true,
+						preventLoops: true,
+						immediate: false,
+						...options,
+					};
 
-			// Remap handler based on the settings {{{
-			var handler;
-			if (settings.needAll) { // Remap handler with extra behaviour that checks all properties first
-				var seenAll = false; // Whether at some point we have seen all values
-				handler = ()=> {
-					if (settings.needAllLock && seenAll) return callback.apply(this, arguments);
-					if (settings.preventLoops && this.$duringWatchAll) return; // Already updating
-					if (settings.preventLoops) this.$duringWatchAll = true;
-					if (props.some(p => !this.$hasPath(p))) { // Not ready yet
-						this.$duringWatchAll = false;
-						return;
-					} else {
-						seenAll = true;
+					// Remap handler based on the settings {{{
+					var handler;
+					if (settings.needAll) { // Remap handler with extra behaviour that checks all properties first
+						var seenAll = false; // Whether at some point we have seen all values
+						handler = ()=> {
+							if (settings.needAllLock && seenAll) return callback.apply(this, arguments);
+							if (settings.preventLoops && this.$duringWatchAll) return; // Already updating
+							if (settings.preventLoops) this.$duringWatchAll = true;
+							if (props.some(p => !this.$hasPath(p))) { // Not ready yet
+								this.$duringWatchAll = false;
+								return;
+							} else {
+								seenAll = true;
+							}
+							callback.apply(this, arguments);
+							if (settings.preventLoops) this.$duringWatchAll = false;
+						};
+					} else { // No special treatment - just pass the callback
+						handler = callback
 					}
-					callback.apply(this, arguments);
-					if (settings.preventLoops) this.$duringWatchAll = false;
-				};
-			} else { // No special treatment - just pass the callback
-				handler = callback
-			}
-			// }}}
-				
-			// Attach watcher to every named prop
-			props.forEach(prop => this.$watch(prop, handler.bind(null, prop)));
+					// }}}
+						
+					// Attach watcher to every named prop
+					props.forEach(prop => this.$watch(prop, handler.bind(null, prop)));
 
-			// Run handler immediately if needed
-			if (settings.immediate) handler();
-		};
+					// Run handler immediately if needed
+					if (settings.immediate) handler();
+				}
+			}
+		});
 	}
 };

@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgHeading', {
+export default app.mgComponent('mgHeading', {
 	meta: {
 		title: 'Heading',
 		icon: 'far fa-heading',

@@ -1,8 +1,8 @@
 import MacGyver from './macgyver.js';
-import ServiceEmit from './services/emit.js';
-import ServiceSetpath from './services/setPath.js';
-import ServiceWatchall from './services/watchAll.js';
-import ComponentForm from './components/mgForm.js';
+import VueEmit from './services/emit.js';
+import VueSetPath from '@momsfriendlydevco/vue-setpath';
+import VueWatchall from './services/watchAll.js';
+//import ComponentForm from './components/mgForm.vue';
 
 /**
 * Main MacGyver plugin
@@ -10,8 +10,7 @@ import ComponentForm from './components/mgForm.js';
 * @var {Object}
 */
 export default {
-	install: function (Vue, options) {
-		console.log('VueMacgyver install');
+	install: function (app, options) {
 		var $macgyver = MacGyver;
 
 		/**
@@ -37,7 +36,7 @@ export default {
 
 
 		// Absorb various methods from a Vue prototype
-		var vInstance = new Vue();
+		var vInstance = new app();
 		['$on', '$off', '$once', '$emit'].forEach(method => $macgyver[method] = vInstance[method].bind(vInstance));
 
 
@@ -45,7 +44,7 @@ export default {
 		if ($macgyver.utils.global.axios) $macgyver.$http = $macgyver.utils.global.axios;
 
 
-		Vue.mgComponent = function(name, component) {
+		app.mgComponent = function(name, component) {
 			if ($macgyver.widgets[name]) throw new Error(`Cannot redeclare MacGyver component "${name}"`);
 			if (!name.startsWith('mg')) throw new Error(`All MacGyver components must be prefixed with "mg", given "${name}"`);
 
@@ -226,16 +225,16 @@ export default {
 				]),
 			};
 
-			return Vue.component(name, vueComponent);
+			return app.component(name, vueComponent);
 		};
 
-		Vue.prototype.$macgyver = $macgyver;
+		app.prototype.$macgyver = $macgyver;
 
-		Vue.use(ServiceEmit);
-		Vue.use(ServiceSetpath);
-		Vue.use(ServiceWatchall);
+		app.use(VueEmit);
+		app.use(VueSetPath);
+		app.use(VueWatchall);
 
-		Vue.use(ComponentForm);
+		//Vue.use(ComponentForm);
 
 		//Vue.use('./services/setPath.vue');
 		//Vue.use('./services/watchAll.vue');
@@ -247,7 +246,7 @@ export default {
 		// Import all MacGyver components
 		// NOTE: These are defined as dynamic imports as we need window.macgyver to be a accessible
 
-	//	import('./components/mgAlert.vue');
+		//import('./components/mgAlert.vue');
 		//import('./components/mgChoiceAutocomplete.vue');
 		//import('./components/mgButton.vue');
 		//import('./components/mgCheckBox.vue');
@@ -268,7 +267,7 @@ export default {
 		//import('./components/mgEmail.vue');
 		//import('./components/mgError.vue');
 		//import('./components/mgFormEditor.vue');
-		//import('./components/mgForm.vue');
+		import('./components/mgForm.vue');
 		////... import('./components/mgGridDashboard.vue');
 		//import('./components/mgGrid.vue');
 		//import('./components/mgHeading.vue');

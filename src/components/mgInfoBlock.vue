@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgInfoBlock', {
+export default app.mgComponent('mgInfoBlock', {
 	meta: {
 		title: 'Info Block',
 		icon: 'far fa-info-square',

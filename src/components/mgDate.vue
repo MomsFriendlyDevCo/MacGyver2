@@ -1,7 +1,7 @@
 <script>
 import moment from 'moment';
 
-export default Vue.mgComponent('mgDate', {
+export default app.mgComponent('mgDate', {
 	meta: {
 		title: 'Date selection',
 		icon: 'far fa-calendar',

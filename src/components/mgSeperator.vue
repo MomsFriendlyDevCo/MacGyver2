@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgSeperator', {
+export default app.mgComponent('mgSeperator', {
 	meta: {
 		title: 'Seperator',
 		icon: 'far fa-minus',

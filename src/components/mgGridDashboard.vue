@@ -5,7 +5,7 @@
 <script>
 Vue.component(window['VueGridLayout']);
 
-export default Vue.mgComponent('mgGridDashboard', {
+export default app.mgComponent('mgGridDashboard', {
 	meta: {
 		title: 'Grid layout',
 		icon: 'far fa-chess-board',

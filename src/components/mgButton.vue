@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgButton', {
+export default app.mgComponent('mgButton', {
 	meta: {
 		title: 'Button',
 		icon: 'far fa-mouse-pointer',

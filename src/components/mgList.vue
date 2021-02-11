@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgList', {
+export default app.mgComponent('mgList', {
 	meta: {
 		title: 'List',
 		icon: 'far fa-list-ul',
@@ -45,7 +45,7 @@ export default Vue.mgComponent('mgList', {
 <template>
 	<table class="table table-bordered mg-list">
 		<tbody>
-			<tr v-for="(row, rowIndex) in data">
+			<tr v-for="(row, rowIndex) in data" :key="rowIndex">
 				<td v-if="$props.numbered" class="row-number-cell">{{rowIndex + 1 | number}}</td>
 				<td>
 					<input :value="row" @change="changeItem(rowIndex, $event.srcElement.value)" type="text" class="form-control"/>
@@ -59,7 +59,7 @@ export default Vue.mgComponent('mgList', {
 			<tr>
 				<td v-if="$props.numbered" class="row-number-cell">
 					<a v-if="!$props.allowDelete" @click="addItem()" :class="newItem ? $props.addButtonActiveClass : $props.addButtonInactiveClass"/>
-					<i v-else class="far fa-asterisk"></i>
+					<i v-if="$props.allowDelete" class="far fa-asterisk"></i>
 				</td>
 				<td :colspan="$props.allowDelete ? 1 : 2">
 					<input @keyup.enter="addItem()" v-model="newItem" type="text" class="form-control"/>

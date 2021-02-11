@@ -4,7 +4,7 @@ import "vue-select/dist/vue-select.css";
 
 Vue.component("v-select", VueSelect);
 
-export default Vue.mgComponent("mgChoiceAutocomplete", {
+export default app.mgComponent("mgChoiceAutocomplete", {
 	meta: {
 		title: "Autocomplete",
 		icon: "far fa-chevron-circle-down",

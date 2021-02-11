@@ -1,7 +1,9 @@
 <script>
+/*
+// FIXME: Parcel errors with vue2-editor
 import {VueEditor} from 'vue2-editor';
 
-export default Vue.mgComponent('mgWysiwyg', {
+export default app.mgComponent('mgWysiwyg', {
 	meta: {
 		title: 'WYSIWYG editor',
 		icon: 'far fa-atlas',
@@ -20,12 +22,13 @@ export default Vue.mgComponent('mgWysiwyg', {
 		});
 	},
 });
+*/
 </script>
 
 <template>
-	<vue-editor
+	<!--vue-editor
 		v-model="data"
 		:placeholder="$props.placeholder"
 		class="mg-wysiwyg"
-	/>
+	/-->
 </template>

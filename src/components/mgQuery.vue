@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgQuery', {
+export default app.mgComponent('mgQuery', {
 	meta: {
 		title: 'Query',
 		icon: 'far fa-filter',

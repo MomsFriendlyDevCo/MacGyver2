@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgTextArea', {
+export default app.mgComponent('mgTextArea', {
 	meta: {
 		title: 'Multi-line text',
 		icon: 'fa fa-align-justify',

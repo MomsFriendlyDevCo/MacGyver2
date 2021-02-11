@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgTable', {
+export default app.mgComponent('mgTable', {
 	meta: {
 		title: 'Table layout',
 		icon: 'far fa-table',

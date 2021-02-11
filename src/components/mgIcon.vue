@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgIcon', {
+export default app.mgComponent('mgIcon', {
 	meta: {
 		title: 'Icon',
 		icon: 'far fa-flag',
@@ -64,7 +64,7 @@ export default Vue.mgComponent('mgIcon', {
 			:class="data ? [data, $props.classActive || $props.className] : [$props.iconFallback, $props.classInactive || $props.className]"
 		/>
 		<mg-choice-dropdown
-			v-else-if="$props.interface == 'dropdown'"
+			v-if="$props.interface == 'dropdown'"
 			enum-source="url"
 			:enum-url="{
 				url: $props.iconFeed,
@@ -81,7 +81,7 @@ export default Vue.mgComponent('mgIcon', {
 			@change="data = $event"
 		/>
 		<mg-error
-			v-else
+			v-if="$props.interface !== 'modal' && $props.interface !== 'dropdown'"
 			error-text="Unknown mgIcon interface"
 		/>
 	</div>

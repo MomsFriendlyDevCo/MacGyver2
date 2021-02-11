@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgChoiceCheckbox', {
+export default app.mgComponent('mgChoiceCheckbox', {
 	meta: {
 		title: 'Checkbox multiple-choice',
 		icon: 'far fa-list',

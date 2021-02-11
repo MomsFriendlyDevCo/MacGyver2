@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgCheckBox', {
+export default app.mgComponent('mgCheckBox', {
 	meta: {
 		title: 'Check Box',
 		icon: 'far fa-check-square',

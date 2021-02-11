@@ -11,7 +11,7 @@ import 'vue-select/dist/vue-select.css';
 
 Vue.component('v-select', VueSelect);
 
-export default Vue.mgComponent('mgChoiceTags', {
+export default app.mgComponent('mgChoiceTags', {
 	meta: {
 		title: 'Dropdown multiple-choice',
 		icon: 'far fa-tags',

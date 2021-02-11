@@ -1,8 +1,8 @@
 <script>
 import InputFacade from 'vue-input-facade';
-Vue.use(InputFacade);
+app.use(InputFacade);
 
-export default Vue.mgComponent('mgText', {
+export default app.mgComponent('mgText', {
 	meta: {
 		title: 'Text',
 		icon: 'far fa-edit',
@@ -98,7 +98,7 @@ export default Vue.mgComponent('mgText', {
 			v-facade="$props.mask"
 		/>
 		<datalist v-if="datalist" :id="`mg-text-datalist-${_uid}`">
-			<option v-for="item in datalist" :value="item.title">
+			<option v-for="item in datalist" :value="item.title" :key="item.id">
 				{{item.title}}
 			</option>
 		</datalist>

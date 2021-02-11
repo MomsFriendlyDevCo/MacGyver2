@@ -80,8 +80,8 @@ methods.hasListeners = function(msg) {
 };
 
 export default {
-	install: function(Vue, options) {
-		Vue.mixin({
+	install: function(app, options) {
+		app.mixin({
 			beforeCreate() {
 				this.$emit = this.$emit.bind(this); // Rebind $emit to this vm so we get the right context
 

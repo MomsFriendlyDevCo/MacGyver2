@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgAlert', {
+export default app.mgComponent('mgAlert', {
 	meta: {
 		title: 'Alert Box',
 		icon: 'far fa-exclamation-triangle',

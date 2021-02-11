@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgPermissions', {
+export default app.mgComponent('mgPermissions', {
 	meta: {
 		title: 'Permissions',
 		icon: 'far fa-key',

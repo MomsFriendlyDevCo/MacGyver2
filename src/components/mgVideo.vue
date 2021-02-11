@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgVideo', {
+export default app.mgComponent('mgVideo', {
 	meta: {
 		title: 'Video',
 		icon: 'far fa-film',
@@ -43,7 +43,7 @@ export default Vue.mgComponent('mgVideo', {
 			No video URL provided
 		</div>
 		<iframe
-			v-else-if="videoResource.type == 'youTube'"
+			v-if="videoResource.type == 'youTube'"
 			width="100%"
 			height="100%"
 			:src="videoResource.url"
@@ -52,7 +52,7 @@ export default Vue.mgComponent('mgVideo', {
 			allowfullscreen
 		/>
 		<div
-			v-else
+			v-if="videoResource.type !== 'none' && videoResource.type !== 'youTube'"
 			class="alert alert-warning" 
 		>
 			Unsupported video URL

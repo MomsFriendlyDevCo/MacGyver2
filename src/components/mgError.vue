@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgError', {
+export default app.mgComponent('mgError', {
 	meta: {
 		title: 'Error display',
 		icon: 'far fa-exclamation-circle',

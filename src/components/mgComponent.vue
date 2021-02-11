@@ -5,7 +5,7 @@
 *
 * @param {Object} config The MacGyver component config - this is a simple object containing all prototype $props mappings
 */
-export default Vue.component('mgComponent', {
+export default app.mgComponent('mgComponent', {
 	inject: ['$mgForm'],
 	data() { return {
 		data: undefined,

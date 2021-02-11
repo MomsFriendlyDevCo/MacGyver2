@@ -2,7 +2,7 @@
 import InputFacade from 'vue-input-facade';
 Vue.use(InputFacade);
 
-export default Vue.mgComponent('mgPassword', {
+export default app.mgComponent('mgPassword', {
 	meta: {
 		title: 'Password',
 		icon: 'far fa-edit',

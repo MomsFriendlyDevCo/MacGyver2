@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/MomsFriendlyDevCo/macgyver#readme",
   "dependencies": {
+    "@momsfriendlydevco/vue-setpath": "0.0.1",
     "bootstrap": "^4.4.1",
     "globby": "^11.0.2",
     "gulp-block-head": "^1.2.1",
@@ -39,7 +40,8 @@
     "@babel/preset-env": "^7.12.1",
     "@fortawesome/fontawesome-free": "^5.12.0",
     "@momsfriendlydevco/gulpy": "^1.4.1",
-    "axios": "^0.19.2",
+    "@vue/component-compiler-utils": "^3.2.0",
+    "axios": "^0.21.1",
     "babel-plugin-lodash": "^3.3.4",
     "chai": "^4.2.0",
     "del": "^5.1.0",
@@ -62,8 +64,6 @@
     "vue-router": "^3.1.5",
     "vue-swatches": "^1.0.4",
     "vue-template-compiler": "^2.6.12",
-    "webpack": "^5.21.2",
-    "webpack-stream": "^6.1.2",
     "yaml": "^1.7.2"
   },
   "optionalDependencies": {

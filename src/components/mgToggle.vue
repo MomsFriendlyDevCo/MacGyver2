@@ -1,8 +1,10 @@
 <script>
+/*
+// FIXME: Parcel errors with vue-js-toggle-button
 import ToggleButton from 'vue-js-toggle-button';
 Vue.use(ToggleButton);
 
-export default Vue.mgComponent('mgToggle', {
+export default app.mgComponent('mgToggle', {
 	meta: {
 		title: 'Toggle Switch',
 		icon: 'far fa-toggle-on',
@@ -26,17 +28,18 @@ export default Vue.mgComponent('mgToggle', {
 		},
 	},
 });
+*/
 </script>
 
 <template>
-	<toggle-button
+	<!--toggle-button
 		class="mg-toggle"
 		:value="data"
 		:color="{checked: $props.onColor, unchecked: $props.offColor, disabled: $props.disabledColor}"
 		:labels="{checked: $props.onText, unchecked: $props.offText}"
 		:switchColor="$props.switchColor"
 		@change="changeHandler"
-	/>
+	/-->
 </template>
 
 <style>

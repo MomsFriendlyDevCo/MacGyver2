@@ -4,7 +4,7 @@
 </import>
 
 <script>
-module.exports = Vue.mgComponent('mgInfoChart', {
+module.exports = app.mgComponent('mgInfoChart', {
 	meta: {
 		title: 'Info Chart',
 		icon: 'far fa-chart-bar',

@@ -1,5 +1,5 @@
 <script>
-export default Vue.mgComponent('mgChoicePopup', {
+export default app.mgComponent('mgChoicePopup', {
 	meta: {
 		title: 'Choice Popup',
 		icon: 'fas fa-window-maximize',
