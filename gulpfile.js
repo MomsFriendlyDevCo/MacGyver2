@@ -123,7 +123,7 @@ gulp.task('build:node', ()=>
 */
 gulp.task('build:vue', ()=>
 	rollup.rollup({
-		input: './src/entrypoint-vue.js',
+		input: './src/index.js',
 		cache: cache.macgyverVue || false,
 		inlineDynamicImports: true,
 		external: [ // Don't include these in the Bundle as they are included elsewhere
@@ -146,14 +146,18 @@ gulp.task('build:vue', ()=>
 				extensions: ['.js', '.vue'],
 			}),
 			require('rollup-plugin-babel')({
-				presets: ['@babel/env'],
+				presets: [
+					['@babel/env', {exclude: ['proposal-dynamic-import']}]
+				],
 				plugins: [
 					['@babel/plugin-proposal-pipeline-operator', {proposal: 'fsharp'}],
 					'@babel/plugin-proposal-throw-expressions',
+					'@babel/plugin-syntax-dynamic-import',
 					'lodash',
 				],
 				exclude: 'node_modules/**',
 			}),
+			/*
 			require('rollup-plugin-node-globals')({
 				baseDir: false,
 				buffer: false,
@@ -162,6 +166,7 @@ gulp.task('build:vue', ()=>
 				global: false,
 				process: true,
 			}),
+			*/
 			require('rollup-plugin-inject')({
 				include: '**/*.js',
 				exclude: 'node_modules/**',
