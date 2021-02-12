@@ -228,12 +228,13 @@ export default {
 			return app.component(name, vueComponent);
 		};
 
-		app.prototype.$macgyver = $macgyver;
-
+		
 		app.use(VueEmit);
 		app.use(VueSetPath);
 		app.use(VueWatchall);
-
+		
+		//app.prototype.$macgyver = $macgyver;
+		app.service('$macgyver', () => $macgyver);
 		//Vue.use(ComponentForm);
 
 		// Import all MacGyver components
@@ -253,8 +254,8 @@ export default {
 		//import('./components/mgChoiceTree.vue');
 		//import('./components/mgCode.vue');
 		//import('./components/mgColor.vue');
-		//import('./components/mgComponent.vue');
-		//import('./components/mgContainer.vue');
+		import('./components/mgComponent.vue');
+		import('./components/mgContainer.vue');
 		//import('./components/mgDate.vue');
 		//import('./components/mgDatetime.vue');
 		//import('./components/mgEmail.vue');
@@ -279,7 +280,7 @@ export default {
 		//import('./components/mgSeperator.vue');
 		//import('./components/mgTable.vue');
 		//import('./components/mgTextArea.vue');
-		//import('./components/mgText.vue');
+		import('./components/mgText.vue');
 		//import('./components/mgTime.vue');
 		//import('./components/mgToggle.vue');
 		//import('./components/mgUrl.vue');
