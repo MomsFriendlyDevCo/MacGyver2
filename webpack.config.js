@@ -114,10 +114,12 @@ module.exports = {
   */
   optimization: {
     //splitChunks: false,
-    runtimeChunk: 'single',
+    // FIXME: Putting them together breaks export default
+    //runtimeChunk: 'single',
     //runtimeChunk: true,
   },
   externals: {
+    /*
     '@momsfriendlydevco/vue-setpath': {
       commonjs: '@momsfriendlydevco/vue-setpath',
       commonjs2: '@momsfriendlydevco/vue-setpath',
@@ -129,11 +131,14 @@ module.exports = {
       amd: 'lodash',
       root: '_',
     },
+    */
+    /*
     'vue-input-facade': {
       commonjs: 'vue-input-facade',
       commonjs2: 'vue-input-facade',
       amd: 'vue-input-facade',
     },
+    */
     //components: /^components\/.+$/,
     //services: /^services\/.+$/,
   },

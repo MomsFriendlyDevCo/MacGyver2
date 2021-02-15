@@ -2,7 +2,7 @@
   "name": "@momsfriendlydevco/macgyver",
   "version": "2.0.0",
   "description": "Dynamic form widgets for Vue",
-  "main": "dist/runtime.js",
+  "main": "dist/main.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MomsFriendlyDevCo/macgyver.git"
@@ -86,6 +86,7 @@
       [
         "@babel/preset-env",
         {
+          "exclude": ["proposal-dynamic-import"],
           "targets": {
             "browsers": "last 2 versions"
           }
@@ -99,7 +100,8 @@
           "proposal": "fsharp"
         }
       ],
-      "@babel/plugin-proposal-throw-expressions"
+      "@babel/plugin-proposal-throw-expressions",
+      "@babel/plugin-syntax-dynamic-import"
     ]
   }
 }
