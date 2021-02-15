@@ -2,15 +2,13 @@ const { VueLoaderPlugin } = require("vue-loader");
 const path = require("path");
 
 module.exports = {
-  //entry: './src/index.js',
   entry: {
     main: './src/index.js',
   },
   output: {
     path: path.resolve(__dirname, "dist"),
     //filename: 'main.js',
-    //library: 'VueMacgyver',
-    //libraryTarget: 'commonjs2'
+    //publicPath: '/dist',
     library: 'VueMacgyver',
     libraryTarget: 'umd'
   },
@@ -114,4 +112,29 @@ module.exports = {
     extensions: [".js", ".vue"],
   },
   */
+  optimization: {
+    //splitChunks: false,
+    runtimeChunk: 'single',
+    //runtimeChunk: true,
+  },
+  externals: {
+    '@momsfriendlydevco/vue-setpath': {
+      commonjs: '@momsfriendlydevco/vue-setpath',
+      commonjs2: '@momsfriendlydevco/vue-setpath',
+      amd: '@momsfriendlydevco/vue-setpath',
+    },
+    lodash: {
+      commonjs: 'lodash',
+      commonjs2: 'lodash',
+      amd: 'lodash',
+      root: '_',
+    },
+    'vue-input-facade': {
+      commonjs: 'vue-input-facade',
+      commonjs2: 'vue-input-facade',
+      amd: 'vue-input-facade',
+    },
+    //components: /^components\/.+$/,
+    //services: /^services\/.+$/,
+  },
 };

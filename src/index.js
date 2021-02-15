@@ -229,7 +229,7 @@ export default {
 			return app.component(name, vueComponent);
 		};
 
-		
+		console.log('VueEmit', VueEmit);
 		app.use(VueEmit);
 		app.use(VueSetPath);
 		app.use(VueWatchall);

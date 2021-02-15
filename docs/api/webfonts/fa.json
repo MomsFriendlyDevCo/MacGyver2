@@ -65,13 +65,6 @@
 		]
 	},
 	{
-		"id": "adobe",
-		"class": "fab fa-adobe",
-		"varients": [
-			"fab fa-adobe"
-		]
-	},
-	{
 		"id": "adversal",
 		"class": "fab fa-adversal",
 		"varients": [
@@ -595,6 +588,20 @@
 		]
 	},
 	{
+		"id": "bacteria",
+		"class": "fa fa-bacteria",
+		"varients": [
+			"fa fa-bacteria"
+		]
+	},
+	{
+		"id": "bacterium",
+		"class": "fa fa-bacterium",
+		"varients": [
+			"fa fa-bacterium"
+		]
+	},
+	{
 		"id": "bahai",
 		"class": "fa fa-bahai",
 		"varients": [
@@ -1036,6 +1043,13 @@
 		"class": "fa fa-box-open",
 		"varients": [
 			"fa fa-box-open"
+		]
+	},
+	{
+		"id": "box-tissue",
+		"class": "fa fa-box-tissue",
+		"varients": [
+			"fa fa-box-tissue"
 		]
 	},
 	{
@@ -1919,6 +1933,13 @@
 		]
 	},
 	{
+		"id": "cloudflare",
+		"class": "fab fa-cloudflare",
+		"varients": [
+			"fab fa-cloudflare"
+		]
+	},
+	{
 		"id": "cloudscale",
 		"class": "fab fa-cloudscale",
 		"varients": [
@@ -2403,6 +2424,13 @@
 		]
 	},
 	{
+		"id": "dailymotion",
+		"class": "fab fa-dailymotion",
+		"varients": [
+			"fab fa-dailymotion"
+		]
+	},
+	{
 		"id": "dashcube",
 		"class": "fab fa-dashcube",
 		"varients": [
@@ -2421,6 +2449,13 @@
 		"class": "fa fa-deaf",
 		"varients": [
 			"fa fa-deaf"
+		]
+	},
+	{
+		"id": "deezer",
+		"class": "fab fa-deezer",
+		"varients": [
+			"fab fa-deezer"
 		]
 	},
 	{
@@ -2603,6 +2638,13 @@
 		"class": "fab fa-discourse",
 		"varients": [
 			"fab fa-discourse"
+		]
+	},
+	{
+		"id": "disease",
+		"class": "fa fa-disease",
+		"varients": [
+			"fa fa-disease"
 		]
 	},
 	{
@@ -2843,6 +2885,13 @@
 		"class": "fab fa-edge",
 		"varients": [
 			"fab fa-edge"
+		]
+	},
+	{
+		"id": "edge-legacy",
+		"class": "fab fa-edge-legacy",
+		"varients": [
+			"fab fa-edge-legacy"
 		]
 	},
 	{
@@ -3149,6 +3198,13 @@
 		"class": "fa fa-fast-forward",
 		"varients": [
 			"fa fa-fast-forward"
+		]
+	},
+	{
+		"id": "faucet",
+		"class": "fa fa-faucet",
+		"varients": [
+			"fa fa-faucet"
 		]
 	},
 	{
@@ -4013,6 +4069,13 @@
 		]
 	},
 	{
+		"id": "google-pay",
+		"class": "fab fa-google-pay",
+		"varients": [
+			"fab fa-google-pay"
+		]
+	},
+	{
 		"id": "google-play",
 		"class": "fab fa-google-play",
 		"varients": [
@@ -4244,6 +4307,13 @@
 		]
 	},
 	{
+		"id": "guilded",
+		"class": "fab fa-guilded",
+		"varients": [
+			"fab fa-guilded"
+		]
+	},
+	{
 		"id": "guitar",
 		"class": "fa fa-guitar",
 		"varients": [
@@ -4321,10 +4391,24 @@
 		]
 	},
 	{
+		"id": "hand-holding-medical",
+		"class": "fa fa-hand-holding-medical",
+		"varients": [
+			"fa fa-hand-holding-medical"
+		]
+	},
+	{
 		"id": "hand-holding-usd",
 		"class": "fa fa-hand-holding-usd",
 		"varients": [
 			"fa fa-hand-holding-usd"
+		]
+	},
+	{
+		"id": "hand-holding-water",
+		"class": "fa fa-hand-holding-water",
+		"varients": [
+			"fa fa-hand-holding-water"
 		]
 	},
 	{
@@ -4415,6 +4499,13 @@
 		]
 	},
 	{
+		"id": "hand-sparkles",
+		"class": "fa fa-hand-sparkles",
+		"varients": [
+			"fa fa-hand-sparkles"
+		]
+	},
+	{
 		"id": "hand-spock",
 		"class": "fa fa-hand-spock",
 		"varients": [
@@ -4437,11 +4528,32 @@
 		]
 	},
 	{
+		"id": "hands-wash",
+		"class": "fa fa-hands-wash",
+		"varients": [
+			"fa fa-hands-wash"
+		]
+	},
+	{
 		"id": "handshake",
 		"class": "fa fa-handshake",
 		"varients": [
 			"fa fa-handshake",
 			"far fa-handshake"
+		]
+	},
+	{
+		"id": "handshake-alt-slash",
+		"class": "fa fa-handshake-alt-slash",
+		"varients": [
+			"fa fa-handshake-alt-slash"
+		]
+	},
+	{
+		"id": "handshake-slash",
+		"class": "fa fa-handshake-slash",
+		"varients": [
+			"fa fa-handshake-slash"
 		]
 	},
 	{
@@ -4492,6 +4604,34 @@
 		"varients": [
 			"fa fa-hdd",
 			"far fa-hdd"
+		]
+	},
+	{
+		"id": "head-side-cough",
+		"class": "fa fa-head-side-cough",
+		"varients": [
+			"fa fa-head-side-cough"
+		]
+	},
+	{
+		"id": "head-side-cough-slash",
+		"class": "fa fa-head-side-cough-slash",
+		"varients": [
+			"fa fa-head-side-cough-slash"
+		]
+	},
+	{
+		"id": "head-side-mask",
+		"class": "fa fa-head-side-mask",
+		"varients": [
+			"fa fa-head-side-mask"
+		]
+	},
+	{
+		"id": "head-side-virus",
+		"class": "fa fa-head-side-virus",
+		"varients": [
+			"fa fa-head-side-virus"
 		]
 	},
 	{
@@ -4594,6 +4734,13 @@
 		]
 	},
 	{
+		"id": "hive",
+		"class": "fab fa-hive",
+		"varients": [
+			"fab fa-hive"
+		]
+	},
+	{
 		"id": "hockey-puck",
 		"class": "fa fa-hockey-puck",
 		"varients": [
@@ -4665,6 +4812,13 @@
 		]
 	},
 	{
+		"id": "hospital-user",
+		"class": "fa fa-hospital-user",
+		"varients": [
+			"fa fa-hospital-user"
+		]
+	},
+	{
 		"id": "hot-tub",
 		"class": "fa fa-hot-tub",
 		"varients": [
@@ -4726,6 +4880,13 @@
 		"class": "fa fa-house-damage",
 		"varients": [
 			"fa fa-house-damage"
+		]
+	},
+	{
+		"id": "house-user",
+		"class": "fa fa-house-user",
+		"varients": [
+			"fa fa-house-user"
 		]
 	},
 	{
@@ -4887,10 +5048,31 @@
 		]
 	},
 	{
+		"id": "innosoft",
+		"class": "fab fa-innosoft",
+		"varients": [
+			"fab fa-innosoft"
+		]
+	},
+	{
 		"id": "instagram",
 		"class": "fab fa-instagram",
 		"varients": [
 			"fab fa-instagram"
+		]
+	},
+	{
+		"id": "instagram-square",
+		"class": "fab fa-instagram-square",
+		"varients": [
+			"fab fa-instagram-square"
+		]
+	},
+	{
+		"id": "instalod",
+		"class": "fab fa-instalod",
+		"varients": [
+			"fab fa-instalod"
 		]
 	},
 	{
@@ -5161,6 +5343,13 @@
 		"class": "fa fa-laptop-code",
 		"varients": [
 			"fa fa-laptop-code"
+		]
+	},
+	{
+		"id": "laptop-house",
+		"class": "fa fa-laptop-house",
+		"varients": [
+			"fa fa-laptop-house"
 		]
 	},
 	{
@@ -5442,6 +5631,20 @@
 		"class": "fa fa-luggage-cart",
 		"varients": [
 			"fa fa-luggage-cart"
+		]
+	},
+	{
+		"id": "lungs",
+		"class": "fa fa-lungs",
+		"varients": [
+			"fa fa-lungs"
+		]
+	},
+	{
+		"id": "lungs-virus",
+		"class": "fa fa-lungs-virus",
+		"varients": [
+			"fa fa-lungs-virus"
 		]
 	},
 	{
@@ -5842,6 +6045,13 @@
 		]
 	},
 	{
+		"id": "mixer",
+		"class": "fab fa-mixer",
+		"varients": [
+			"fab fa-mixer"
+		]
+	},
+	{
 		"id": "mizuni",
 		"class": "fab fa-mizuni",
 		"varients": [
@@ -6096,6 +6306,13 @@
 		"varients": [
 			"fa fa-object-ungroup",
 			"far fa-object-ungroup"
+		]
+	},
+	{
+		"id": "octopus-deploy",
+		"class": "fab fa-octopus-deploy",
+		"varients": [
+			"fab fa-octopus-deploy"
 		]
 	},
 	{
@@ -6402,6 +6619,13 @@
 		]
 	},
 	{
+		"id": "people-arrows",
+		"class": "fa fa-people-arrows",
+		"varients": [
+			"fa fa-people-arrows"
+		]
+	},
+	{
 		"id": "people-carry",
 		"class": "fa fa-people-carry",
 		"varients": [
@@ -6413,6 +6637,13 @@
 		"class": "fa fa-pepper-hot",
 		"varients": [
 			"fa fa-pepper-hot"
+		]
+	},
+	{
+		"id": "perbyte",
+		"class": "fab fa-perbyte",
+		"varients": [
+			"fab fa-perbyte"
 		]
 	},
 	{
@@ -6626,6 +6857,13 @@
 		]
 	},
 	{
+		"id": "plane-slash",
+		"class": "fa fa-plane-slash",
+		"varients": [
+			"fa fa-plane-slash"
+		]
+	},
+	{
 		"id": "play",
 		"class": "fa fa-play",
 		"varients": [
@@ -6800,6 +7038,20 @@
 		"class": "fa fa-project-diagram",
 		"varients": [
 			"fa fa-project-diagram"
+		]
+	},
+	{
+		"id": "pump-medical",
+		"class": "fa fa-pump-medical",
+		"varients": [
+			"fa fa-pump-medical"
+		]
+	},
+	{
+		"id": "pump-soap",
+		"class": "fa fa-pump-soap",
+		"varients": [
+			"fa fa-pump-soap"
 		]
 	},
 	{
@@ -7246,6 +7498,13 @@
 		]
 	},
 	{
+		"id": "rust",
+		"class": "fab fa-rust",
+		"varients": [
+			"fab fa-rust"
+		]
+	},
+	{
 		"id": "sad-cry",
 		"class": "fa fa-sad-cry",
 		"varients": [
@@ -7474,6 +7733,13 @@
 		]
 	},
 	{
+		"id": "shield-virus",
+		"class": "fa fa-shield-virus",
+		"varients": [
+			"fa fa-shield-virus"
+		]
+	},
+	{
 		"id": "ship",
 		"class": "fa fa-ship",
 		"varients": [
@@ -7499,6 +7765,13 @@
 		"class": "fa fa-shoe-prints",
 		"varients": [
 			"fa fa-shoe-prints"
+		]
+	},
+	{
+		"id": "shopify",
+		"class": "fab fa-shopify",
+		"varients": [
+			"fab fa-shopify"
 		]
 	},
 	{
@@ -7597,6 +7870,13 @@
 		"class": "fab fa-simplybuilt",
 		"varients": [
 			"fab fa-simplybuilt"
+		]
+	},
+	{
+		"id": "sink",
+		"class": "fa fa-sink",
+		"varients": [
+			"fa fa-sink"
 		]
 	},
 	{
@@ -7818,6 +8098,13 @@
 		"class": "fa fa-snowplow",
 		"varients": [
 			"fa fa-snowplow"
+		]
+	},
+	{
+		"id": "soap",
+		"class": "fa fa-soap",
+		"varients": [
+			"fa fa-soap"
 		]
 	},
 	{
@@ -8211,6 +8498,13 @@
 		]
 	},
 	{
+		"id": "stopwatch-20",
+		"class": "fa fa-stopwatch-20",
+		"varients": [
+			"fa fa-stopwatch-20"
+		]
+	},
+	{
 		"id": "store",
 		"class": "fa fa-store",
 		"varients": [
@@ -8222,6 +8516,20 @@
 		"class": "fa fa-store-alt",
 		"varients": [
 			"fa fa-store-alt"
+		]
+	},
+	{
+		"id": "store-alt-slash",
+		"class": "fa fa-store-alt-slash",
+		"varients": [
+			"fa fa-store-alt-slash"
+		]
+	},
+	{
+		"id": "store-slash",
+		"class": "fa fa-store-slash",
+		"varients": [
+			"fa fa-store-slash"
 		]
 	},
 	{
@@ -8719,6 +9027,13 @@
 		]
 	},
 	{
+		"id": "tiktok",
+		"class": "fab fa-tiktok",
+		"varients": [
+			"fab fa-tiktok"
+		]
+	},
+	{
 		"id": "times",
 		"class": "fa fa-times",
 		"varients": [
@@ -8781,6 +9096,13 @@
 		"class": "fa fa-toilet-paper",
 		"varients": [
 			"fa fa-toilet-paper"
+		]
+	},
+	{
+		"id": "toilet-paper-slash",
+		"class": "fa fa-toilet-paper-slash",
+		"varients": [
+			"fa fa-toilet-paper-slash"
 		]
 	},
 	{
@@ -9079,6 +9401,13 @@
 		]
 	},
 	{
+		"id": "uncharted",
+		"class": "fab fa-uncharted",
+		"varients": [
+			"fab fa-uncharted"
+		]
+	},
+	{
 		"id": "underline",
 		"class": "fa fa-underline",
 		"varients": [
@@ -9146,6 +9475,13 @@
 		"class": "fa fa-unlock-alt",
 		"varients": [
 			"fa fa-unlock-alt"
+		]
+	},
+	{
+		"id": "unsplash",
+		"class": "fab fa-unsplash",
+		"varients": [
+			"fab fa-unsplash"
 		]
 	},
 	{
@@ -9361,6 +9697,13 @@
 		]
 	},
 	{
+		"id": "users-slash",
+		"class": "fa fa-users-slash",
+		"varients": [
+			"fa fa-users-slash"
+		]
+	},
+	{
 		"id": "usps",
 		"class": "fab fa-usps",
 		"varients": [
@@ -9421,6 +9764,20 @@
 		"class": "fa fa-venus-mars",
 		"varients": [
 			"fa fa-venus-mars"
+		]
+	},
+	{
+		"id": "vest",
+		"class": "fa fa-vest",
+		"varients": [
+			"fa fa-vest"
+		]
+	},
+	{
+		"id": "vest-patches",
+		"class": "fa fa-vest-patches",
+		"varients": [
+			"fa fa-vest-patches"
 		]
 	},
 	{
@@ -9512,6 +9869,27 @@
 		"class": "fab fa-vine",
 		"varients": [
 			"fab fa-vine"
+		]
+	},
+	{
+		"id": "virus",
+		"class": "fa fa-virus",
+		"varients": [
+			"fa fa-virus"
+		]
+	},
+	{
+		"id": "virus-slash",
+		"class": "fa fa-virus-slash",
+		"varients": [
+			"fa fa-virus-slash"
+		]
+	},
+	{
+		"id": "viruses",
+		"class": "fa fa-viruses",
+		"varients": [
+			"fa fa-viruses"
 		]
 	},
 	{
@@ -9610,6 +9988,13 @@
 		"class": "fa fa-warehouse",
 		"varients": [
 			"fa fa-warehouse"
+		]
+	},
+	{
+		"id": "watchman-monitoring",
+		"class": "fab fa-watchman-monitoring",
+		"varients": [
+			"fab fa-watchman-monitoring"
 		]
 	},
 	{
@@ -9789,6 +10174,13 @@
 		"class": "fab fa-wizards-of-the-coast",
 		"varients": [
 			"fab fa-wizards-of-the-coast"
+		]
+	},
+	{
+		"id": "wodu",
+		"class": "fab fa-wodu",
+		"varients": [
+			"fab fa-wodu"
 		]
 	},
 	{

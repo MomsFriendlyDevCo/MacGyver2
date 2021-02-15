@@ -2,7 +2,7 @@
   "name": "@momsfriendlydevco/macgyver",
   "version": "2.0.0",
   "description": "Dynamic form widgets for Vue",
-  "main": "dist/main.js",
+  "main": "dist/runtime.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MomsFriendlyDevCo/macgyver.git"
@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/MomsFriendlyDevCo/macgyver#readme",
   "scripts": {
-    "build": "webpack --mode production",
+    "build": "webpack --mode development",
     "start": "webpack-dev-server --mode development"
   },
   "dependencies": {
