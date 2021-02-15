@@ -9,6 +9,7 @@ import VueWatchall from './services/watchAll.js';
 * This service requires {$http, $toast} to be available on the prototype
 * @var {Object}
 */
+// TODO: Could use pattern like VueRouter and define a VueMacgyver Class.
 export default {
 	install: function (app, options) {
 		var $macgyver = MacGyver;
@@ -232,10 +233,10 @@ export default {
 		app.use(VueEmit);
 		app.use(VueSetPath);
 		app.use(VueWatchall);
-		
-		//app.prototype.$macgyver = $macgyver;
-		app.service('$macgyver', () => $macgyver);
-		//Vue.use(ComponentForm);
+
+		Object.defineProperty(app.prototype, '$macgyver', {
+			get () { return $macgyver }
+		});
 
 		// Import all MacGyver components
 		// NOTE: These are defined as dynamic imports as we need window.macgyver to be a accessible

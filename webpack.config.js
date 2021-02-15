@@ -2,11 +2,17 @@ const { VueLoaderPlugin } = require("vue-loader");
 const path = require("path");
 
 module.exports = {
+  //entry: './src/index.js',
   entry: {
-    macgyver: "./src/index.js",
+    main: './src/index.js',
   },
   output: {
     path: path.resolve(__dirname, "dist"),
+    //filename: 'main.js',
+    //library: 'VueMacgyver',
+    //libraryTarget: 'commonjs2'
+    library: 'VueMacgyver',
+    libraryTarget: 'umd'
   },
   module: {
     rules: [
@@ -100,10 +106,12 @@ module.exports = {
     }),
     */
   ],
+  /*
   resolve: {
     alias: {
       //vue$: "vue/dist/vue.runtime.esm.js",
     },
     extensions: [".js", ".vue"],
   },
+  */
 };
