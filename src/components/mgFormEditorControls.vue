@@ -1,14 +1,10 @@
 <script lang="js">
-//export default {
-//	install: function(app, options) {
 export default app.component('mgFormEditorControls', {
-			inject: ['$mgFormEditor'],
-			props: {
-				config: {type: Object, required: true},
-			},
-		});
-//	}
-//};
+	inject: ['$mgFormEditor'],
+	props: {
+		config: {type: Object, required: true},
+	},
+});
 </script>
 
 <template>

@@ -1,29 +1,25 @@
 <script lang="js">
-//export default {
-//	install: function(app, options) {
 export default app.mgComponent('mgPlaceholder', {
-			meta: {
-				title: 'Placeholder',
-				icon: 'far fa-construction',
-				category: 'General Decoration',
-			},
-			props: {
-				text: {type: 'mgText'},
-				height: {type: 'mgNumber', default: '100%'},
-				style: {
-					type: 'mgChoiceButtons',
-					default: 'mg-placeholder-box',
-					iconSelected: 'far fa-fw fa-check',
-					iconDefault: 'far fa-fw',
-					enum: [
-						{id: 'mg-placeholder-box', title: 'Lined box'},
-						{id: 'mg-placeholder-construction', title: 'Construction area'},
-					],
-				},
-			},
-		});
-//	}
-//};
+	meta: {
+		title: 'Placeholder',
+		icon: 'far fa-construction',
+		category: 'General Decoration',
+	},
+	props: {
+		text: {type: 'mgText'},
+		height: {type: 'mgNumber', default: '100%'},
+		style: {
+			type: 'mgChoiceButtons',
+			default: 'mg-placeholder-box',
+			iconSelected: 'far fa-fw fa-check',
+			iconDefault: 'far fa-fw',
+			enum: [
+				{id: 'mg-placeholder-box', title: 'Lined box'},
+				{id: 'mg-placeholder-construction', title: 'Construction area'},
+			],
+		},
+	},
+});
 </script>
 
 <template>

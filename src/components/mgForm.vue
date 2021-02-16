@@ -23,200 +23,196 @@
 * @emits mgContainer.mouseEnter Emitted as `(container, specPath, event)` on the native mouseEnter event of a component within a container
 * @emits mgContainer.mouseLeave Emitted as `(container, specPath, event)` on the native mouseLeave event of a component within a container
 */
-//export default {
-//	install: function(app, options) {
 export default app.component('mgForm', {
-			provide() { return {
-				$mgForm: this,
-			}},
-			data() { return {
-				id: undefined, // Set on create
-				editing: false, // Set by mgFormEditor when its this components parent
-				errors: [], // array <Object> {error}
-				spec: undefined, // Calculated version of config after its been though $macgyver.compileSpec()
-				formData: {}, // Calculated version of $props.data after default population
-				inRefresh: false, // Whether we are doing a refresh from the top-down, prevents recursive refreshing
-			}},
-			props: {
-				form: String, // Optional overriding form ID
-				config: [Object, Array], // Can be a single object, array of objects or shorthand style
-				data: Object,
+	provide() { return {
+		$mgForm: this,
+	}},
+	data() { return {
+		id: undefined, // Set on create
+		editing: false, // Set by mgFormEditor when its this components parent
+		errors: [], // array <Object> {error}
+		spec: undefined, // Calculated version of config after its been though $macgyver.compileSpec()
+		formData: {}, // Calculated version of $props.data after default population
+		inRefresh: false, // Whether we are doing a refresh from the top-down, prevents recursive refreshing
+	}},
+	props: {
+		form: String, // Optional overriding form ID
+		config: [Object, Array], // Can be a single object, array of objects or shorthand style
+		data: Object,
 
-				populateDefaults: {type: Boolean, default: true},
-				onAction: Function,
-				actionsFallback: {type: Boolean, default: true},
-				actions: { // Object of functions e.g. `{customFunc: ()=> {}}`
-					type: [Function, Object],
-					validator: v => _.isFunction(v) || _.every(v => _.isFunction(v)),
-				},
-			},
-			created() {
-				this.id = this.id || this.$props.form || this.$macgyver.nextId();
-			},
-			mounted() {
-				this.$watch('$props.config', ()=> {
-					// console.log('mgForm config clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
-					this.rebuild();
-				}, {immediate: true, deep: true});
+		populateDefaults: {type: Boolean, default: true},
+		onAction: Function,
+		actionsFallback: {type: Boolean, default: true},
+		actions: { // Object of functions e.g. `{customFunc: ()=> {}}`
+			type: [Function, Object],
+			validator: v => _.isFunction(v) || _.every(v => _.isFunction(v)),
+		},
+	},
+	created() {
+		this.id = this.id || this.$props.form || this.$macgyver.nextId();
+	},
+	mounted() {
+		this.$watch('$props.config', ()=> {
+			// console.log('mgForm config clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
+			this.rebuild();
+		}, {immediate: true, deep: true});
 
-				this.$watch('$props.data', ()=> {
-					// console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
-					this.rebuildData();
-				}, {immediate: true, deep: true});
+		this.$watch('$props.data', ()=> {
+			// console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));
+			this.rebuildData();
+		}, {immediate: true, deep: true});
 
-				this.$on('mgChange', data => {
-					if (this.inRefresh) return;
-					this.$macgyver.utils.setPath(this.formData, data.path, data.value);
-					this.$emit('changeItem', data);
+		this.$on('mgChange', data => {
+			if (this.inRefresh) return;
+			this.$macgyver.utils.setPath(this.formData, data.path, data.value);
+			this.$emit('changeItem', data);
 
-					this.$emit('change', {...this.formData}); // Has to be a shallow clone so we break the reference and Vue updates
-					this.refreshShowIfs();
-				});
-
-				this.$on('mgErrors', errors => this.errors = errors);
-				// this.$on('mgForm.rebuild', ()=> this.rebuild()); // FIXME: Needed after new mgForm config clobber detection?
-			},
-			methods: {
-				/**
-				* Force the form to rebuild its config
-				*/
-				rebuild() {
-					this.id = this.id || this.$props.form || this.$macgyver.nextId();
-					// console.log(`Rebuild form config for form "${this.id}"`);
-
-					this.spec = this.$macgyver.compileSpec(this.$props.config);
-					if (!this.spec || !this.spec.spec) throw new Error('Invalid Macgyver form spec');
-				},
-
-
-				/**
-				* Force the form to rebuild its data set
-				*/
-				rebuildData() {
-					if (this.inRefresh) return;
-					this.inRefresh = true;
-
-					this.formData = this.$props.data ? _.cloneDeep(this.$props.data) : {};
-
-					if (this.$props.populateDefaults) this.assignDefaults();
-					this.refreshShowIfs();
-					this.$emit.down('mgRefreshForm');
-					this.$nextTick(()=> // Wait one tick for all attempts to recall this function recursively to exhaust
-						this.inRefresh = false
-					);
-				},
-
-
-				/**
-				* Force recomputation of show via showIf values
-				*/
-				refreshShowIfs() {
-					if (!this.spec) return;
-					this.spec.showIfs.forEach(widget =>
-						widget.show = this.$macgyver.utils.evalMatch(widget.showIf, this.formData)
-					);
-				},
-
-
-				/**
-				* Assign initial defaults if a value is not in the data object
-				*/
-				assignDefaults() {
-					if (!this.spec) return;
-					_.defaultsDeep(this.formData, this.getPrototype());
-					this.$emit('change', this.formData);
-				},
-
-
-				/**
-				* Compute the data prototype of the form
-				* This is an empty object with all the defaults populated
-				* @returns {Object} A prototype data object with all defaults populated
-				* @see $macgyver.forms.getPrototype()
-				*/
-				getPrototype() {
-					if (!this.id) return {}; // Form not yet ready
-					return this.$macgyver.forms.getPrototype(this.spec.spec);
-				},
-
-
-				/**
-				* Execute a function within a form
-				* The default behaviour of this function is documented within the function
-				* @param {string|function} action The action(s) to execute
-				* @param {*} [context] The context of the action, defaults to the form component
-				* @param {*} [params...] Additional parameters to execute
-				* @emits mgRun Event fired at the form level only with a single object of the form `{action, params}`. Use the form property handleActions to specify if the form should handle or trap the event to override
-				*/
-				run(action, context, ...params) {
-					// 0. See if what we've been passed is already a function {{{
-					if (typeof action == 'function') {
-						return action.call(context ?? this);
-					}
-					// }}}
-
-					// 1. Emit mgRun to parents and see if they want to handle it {{{
-					var handled = false;
-					this.$emit.up.call(context ?? this, 'mgRun', {action, params}, isHandled => {
-						if (isHandled) handled = true;
-					});
-					if (handled) return;
-					// }}}
-
-					// 2. Use FORM.$props.onAction(action) and see if returns truthy {{{
-					if (this.$props.onAction && this.$props.onAction.call(context ?? this, action, ...params)) return;
-					// }}}
-
-					// 3a. Does FORM.$props.actions exist and is a function which will handle everything? {{{
-					if (this.$props.actions && _.isFunction(this.$props.actions)) {
-						this.$props.actions.call(context ?? this, action);
-						return;
-					}
-					// }}}
-
-					// 3b. Does FORM.$props.actions[action] exist and if so whether it returns truthy {{{
-					var [junk, actionReadable, actionArgs] = /^([a-z0-9\_]*?)(\(.*\))?$/i.exec(action) || [];
-					if (actionReadable && this.$props.actions && this.$props.actions[actionReadable]) {
-						// Collapse strings to functions
-						var func = _.isString(this.$props.actions[actionReadable]) ? this[actionReadable]
-							: this.$props.actions[actionReadable];
-
-						// Tidy up actionArgs
-						actionArgs = (actionArgs || '')
-							.replace(/^\(/, '') // Remove preceeding '('
-							.replace(/\)$/, '') // Remove succeeding ')'
-							.split(',')
-							.map(i => i && JSON.parse(i.replace(/'/g, '"')));
-
-						if (func.call(context ?? this, ...actionArgs, ...params)) return;
-					}
-					// }}}
-
-					// 4. If all else failed and FORM.$props.actionsFallback is true - handle it via vm.$eval {{{
-					this.$macgyver.$eval.call(context ?? this, action, ...params);
-					// }}}
-				},
-
-
-				/**
-				* Find a VueComponent instance from a specPath
-				* @param {string|array} specPath The specPath to search for
-				* @param {boolean} [throws=true] Throw an error if the path cannot be found (avoid downstream checking if the specPath is valid)
-				* @returns {VueComponent} Either the found VueComponent or `false` if not found
-				*/
-				getComponentBySpecPath(specPath, throws = true) {
-					var found = false;
-					this.$emit.down('mgIdentify', widget => {
-						if (!found && widget.$props.$specPath == specPath)
-							found = widget;
-					});
-					if (!found && throws) throw new Error(`Cannot edit component by non-existant specPath "${specPath}"`);
-					return found;
-				},
-			},
+			this.$emit('change', {...this.formData}); // Has to be a shallow clone so we break the reference and Vue updates
+			this.refreshShowIfs();
 		});
-//	}
-//};
+
+		this.$on('mgErrors', errors => this.errors = errors);
+		// this.$on('mgForm.rebuild', ()=> this.rebuild()); // FIXME: Needed after new mgForm config clobber detection?
+	},
+	methods: {
+		/**
+		* Force the form to rebuild its config
+		*/
+		rebuild() {
+			this.id = this.id || this.$props.form || this.$macgyver.nextId();
+			// console.log(`Rebuild form config for form "${this.id}"`);
+
+			this.spec = this.$macgyver.compileSpec(this.$props.config);
+			if (!this.spec || !this.spec.spec) throw new Error('Invalid Macgyver form spec');
+		},
+
+
+		/**
+		* Force the form to rebuild its data set
+		*/
+		rebuildData() {
+			if (this.inRefresh) return;
+			this.inRefresh = true;
+
+			this.formData = this.$props.data ? _.cloneDeep(this.$props.data) : {};
+
+			if (this.$props.populateDefaults) this.assignDefaults();
+			this.refreshShowIfs();
+			this.$emit.down('mgRefreshForm');
+			this.$nextTick(()=> // Wait one tick for all attempts to recall this function recursively to exhaust
+				this.inRefresh = false
+			);
+		},
+
+
+		/**
+		* Force recomputation of show via showIf values
+		*/
+		refreshShowIfs() {
+			if (!this.spec) return;
+			this.spec.showIfs.forEach(widget =>
+				widget.show = this.$macgyver.utils.evalMatch(widget.showIf, this.formData)
+			);
+		},
+
+
+		/**
+		* Assign initial defaults if a value is not in the data object
+		*/
+		assignDefaults() {
+			if (!this.spec) return;
+			_.defaultsDeep(this.formData, this.getPrototype());
+			this.$emit('change', this.formData);
+		},
+
+
+		/**
+		* Compute the data prototype of the form
+		* This is an empty object with all the defaults populated
+		* @returns {Object} A prototype data object with all defaults populated
+		* @see $macgyver.forms.getPrototype()
+		*/
+		getPrototype() {
+			if (!this.id) return {}; // Form not yet ready
+			return this.$macgyver.forms.getPrototype(this.spec.spec);
+		},
+
+
+		/**
+		* Execute a function within a form
+		* The default behaviour of this function is documented within the function
+		* @param {string|function} action The action(s) to execute
+		* @param {*} [context] The context of the action, defaults to the form component
+		* @param {*} [params...] Additional parameters to execute
+		* @emits mgRun Event fired at the form level only with a single object of the form `{action, params}`. Use the form property handleActions to specify if the form should handle or trap the event to override
+		*/
+		run(action, context, ...params) {
+			// 0. See if what we've been passed is already a function {{{
+			if (typeof action == 'function') {
+				return action.call(context ?? this);
+			}
+			// }}}
+
+			// 1. Emit mgRun to parents and see if they want to handle it {{{
+			var handled = false;
+			this.$emit.up.call(context ?? this, 'mgRun', {action, params}, isHandled => {
+				if (isHandled) handled = true;
+			});
+			if (handled) return;
+			// }}}
+
+			// 2. Use FORM.$props.onAction(action) and see if returns truthy {{{
+			if (this.$props.onAction && this.$props.onAction.call(context ?? this, action, ...params)) return;
+			// }}}
+
+			// 3a. Does FORM.$props.actions exist and is a function which will handle everything? {{{
+			if (this.$props.actions && _.isFunction(this.$props.actions)) {
+				this.$props.actions.call(context ?? this, action);
+				return;
+			}
+			// }}}
+
+			// 3b. Does FORM.$props.actions[action] exist and if so whether it returns truthy {{{
+			var [junk, actionReadable, actionArgs] = /^([a-z0-9\_]*?)(\(.*\))?$/i.exec(action) || [];
+			if (actionReadable && this.$props.actions && this.$props.actions[actionReadable]) {
+				// Collapse strings to functions
+				var func = _.isString(this.$props.actions[actionReadable]) ? this[actionReadable]
+					: this.$props.actions[actionReadable];
+
+				// Tidy up actionArgs
+				actionArgs = (actionArgs || '')
+					.replace(/^\(/, '') // Remove preceeding '('
+					.replace(/\)$/, '') // Remove succeeding ')'
+					.split(',')
+					.map(i => i && JSON.parse(i.replace(/'/g, '"')));
+
+				if (func.call(context ?? this, ...actionArgs, ...params)) return;
+			}
+			// }}}
+
+			// 4. If all else failed and FORM.$props.actionsFallback is true - handle it via vm.$eval {{{
+			this.$macgyver.$eval.call(context ?? this, action, ...params);
+			// }}}
+		},
+
+
+		/**
+		* Find a VueComponent instance from a specPath
+		* @param {string|array} specPath The specPath to search for
+		* @param {boolean} [throws=true] Throw an error if the path cannot be found (avoid downstream checking if the specPath is valid)
+		* @returns {VueComponent} Either the found VueComponent or `false` if not found
+		*/
+		getComponentBySpecPath(specPath, throws = true) {
+			var found = false;
+			this.$emit.down('mgIdentify', widget => {
+				if (!found && widget.$props.$specPath == specPath)
+					found = widget;
+			});
+			if (!found && throws) throw new Error(`Cannot edit component by non-existant specPath "${specPath}"`);
+			return found;
+		},
+	},
+});
 </script>
 
 <template>

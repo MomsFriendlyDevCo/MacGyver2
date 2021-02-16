@@ -1,18 +1,14 @@
 <script lang="js">
-//export default {
-//	install: function(app, options) {
 export default app.mgComponent('mgHeading', {
-			meta: {
-				title: 'Heading',
-				icon: 'far fa-heading',
-				category: 'General Decoration',
-			},
-			props: {
-				text: {type: 'mgText'},
-			},
-		});
-//	}
-//};
+	meta: {
+		title: 'Heading',
+		icon: 'far fa-heading',
+		category: 'General Decoration',
+	},
+	props: {
+		text: {type: 'mgText'},
+	},
+});
 </script>
 
 <template>

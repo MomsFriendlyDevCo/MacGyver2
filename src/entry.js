@@ -1,4 +1,6 @@
 export { default } from './index';
+
+// TODO: Separate entry points so as to not bloat main package with unused components?
 export { default as mgAlert } from './components/mgAlert';
 export { default as mgButton } from './components/mgButton';
 export { default as mgCheckBox } from './components/mgCheckBox';
@@ -20,7 +22,6 @@ export { default as mgEmail } from './components/mgEmail';
 export { default as mgError } from './components/mgError';
 export { default as mgForm } from './components/mgForm';
 export { default as mgFormEditor } from './components/mgFormEditor';
-//export { default as mgFormEditorControls } from './components/mgFormEditorControls';
 //export { default as mgGridDashboard } from './components/mgGridDashboard';
 export { default as mgGrid } from './components/mgGrid';
 export { default as mgHeading } from './components/mgHeading';
