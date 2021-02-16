@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgAlert', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgAlert', {
 			meta: {
 				title: 'Alert Box',
 				icon: 'far fa-exclamation-triangle',
@@ -24,8 +24,8 @@ export default {
 				},
 			},
 		});
-	}
-}; 
+//	}
+//}; 
 </script>
 
 <template>

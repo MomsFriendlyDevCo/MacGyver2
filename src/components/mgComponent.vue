@@ -5,9 +5,9 @@
 *
 * @param {Object} config The MacGyver component config - this is a simple object containing all prototype $props mappings
 */
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgComponent', {
+//export default {
+//	install: function(app, options) {
+export default app.component('mgComponent', {
 			inject: ['$mgForm'],
 			data() { return {
 				data: undefined,
@@ -34,6 +34,6 @@ export default {
 				});
 			},
 		});
-	}
-};
+//	}
+//};
 </script>

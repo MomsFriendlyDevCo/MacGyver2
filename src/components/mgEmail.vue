@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgEmail', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgEmail', {
 			meta: {
 				title: 'Email address',
 				icon: 'far fa-at',
@@ -24,8 +24,8 @@ export default {
 				});
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

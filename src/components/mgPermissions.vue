@@ -1,8 +1,8 @@
 <script lang="js">
 // FIXME: Is this more of an app level component?
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgPermissions', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgPermissions', {
 			meta: {
 				title: 'Permissions',
 				icon: 'far fa-key',
@@ -54,8 +54,8 @@ export default {
 				},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

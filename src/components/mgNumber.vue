@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgNumber', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgNumber', {
 			meta: {
 				title: 'Number',
 				icon: 'far fa-sort-numeric-down',
@@ -49,8 +49,8 @@ export default {
 				},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

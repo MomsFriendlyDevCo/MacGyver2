@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgTable', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgTable', {
 			meta: {
 				title: 'Table layout',
 				icon: 'far fa-table',
@@ -78,8 +78,8 @@ export default {
 				},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

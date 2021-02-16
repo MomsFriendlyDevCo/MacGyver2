@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgUrl', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgUrl', {
 			meta: {
 				title: 'URL',
 				icon: 'far fa-globe',
@@ -24,8 +24,8 @@ export default {
 				});
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

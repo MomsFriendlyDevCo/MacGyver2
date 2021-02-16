@@ -23,9 +23,9 @@
 * @emits mgContainer.mouseEnter Emitted as `(container, specPath, event)` on the native mouseEnter event of a component within a container
 * @emits mgContainer.mouseLeave Emitted as `(container, specPath, event)` on the native mouseLeave event of a component within a container
 */
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgForm', {
+//export default {
+//	install: function(app, options) {
+export default app.component('mgForm', {
 			provide() { return {
 				$mgForm: this,
 			}},
@@ -215,8 +215,8 @@ export default {
 				},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgError', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgError', {
 			meta: {
 				title: 'Error display',
 				icon: 'far fa-exclamation-circle',
@@ -11,8 +11,8 @@ export default {
 				text: {type: 'mgText'},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

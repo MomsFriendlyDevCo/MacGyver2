@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgPlaceholder', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgPlaceholder', {
 			meta: {
 				title: 'Placeholder',
 				icon: 'far fa-construction',
@@ -22,8 +22,8 @@ export default {
 				},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgVideo', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgVideo', {
 			meta: {
 				title: 'Video',
 				icon: 'far fa-film',
@@ -34,8 +34,8 @@ export default {
 				},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

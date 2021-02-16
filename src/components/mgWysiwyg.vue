@@ -3,8 +3,8 @@
 // FIXME: Parcel errors with vue2-editor
 import {VueEditor} from 'vue2-editor';
 
-export default {
-	install: function(app, options) {
+//export default {
+//	install: function(app, options) {
 		app.mgComponent('mgWysiwyg', {
 			meta: {
 				title: 'WYSIWYG editor',

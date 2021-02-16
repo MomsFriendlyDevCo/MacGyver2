@@ -1,11 +1,11 @@
 <script lang="js">
 import InputFacade from 'vue-input-facade';
 
-export default {
-	install: function(app, options) {
+//export default {
+//	install: function(app, options) {
 		app.use(InputFacade);
 
-		app.mgComponent('mgText', {
+export default app.mgComponent('mgText', {
 			meta: {
 				title: 'Text',
 				icon: 'far fa-edit',
@@ -85,8 +85,8 @@ export default {
 				}
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

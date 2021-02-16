@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgCode', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgCode', {
 			meta: {
 				title: 'Code Editor',
 				icon: 'fal fa-code',
@@ -90,8 +90,8 @@ export default {
 				});
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <style>

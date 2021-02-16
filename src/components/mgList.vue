@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgList', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgList', {
 			meta: {
 				title: 'List',
 				icon: 'far fa-list-ul',
@@ -42,8 +42,8 @@ export default {
 				},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

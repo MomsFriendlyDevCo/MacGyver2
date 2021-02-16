@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgTextArea', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgTextArea', {
 			meta: {
 				title: 'Multi-line text',
 				icon: 'fa fa-align-justify',
@@ -23,8 +23,8 @@ export default {
 				});
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

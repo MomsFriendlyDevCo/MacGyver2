@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgCheckBox', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgCheckBox', {
 			meta: {
 				title: 'Check Box',
 				icon: 'far fa-check-square',
@@ -11,8 +11,8 @@ export default {
 				formatClass: 'text-center',
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

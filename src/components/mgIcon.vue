@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgIcon', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgIcon', {
 			meta: {
 				title: 'Icon',
 				icon: 'far fa-flag',
@@ -55,8 +55,8 @@ export default {
 				},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

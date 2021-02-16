@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgHeading', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgHeading', {
 			meta: {
 				title: 'Heading',
 				icon: 'far fa-heading',
@@ -11,8 +11,8 @@ export default {
 				text: {type: 'mgText'},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

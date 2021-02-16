@@ -1,9 +1,9 @@
 <script lang="js">
 import moment from 'moment';
 
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgTime', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgTime', {
 			meta: {
 				title: 'Time selection',
 				icon: 'far fa-calendar',
@@ -46,8 +46,8 @@ export default {
 				});
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

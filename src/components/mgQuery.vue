@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgQuery', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgQuery', {
 			meta: {
 				title: 'Query',
 				icon: 'far fa-filter',
@@ -215,8 +215,8 @@ export default {
 				//},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

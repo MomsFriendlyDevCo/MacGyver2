@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		 app.mgComponent('mgInfoBlock', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgInfoBlock', {
 			meta: {
 				title: 'Info Block',
 				icon: 'far fa-info-square',
@@ -62,8 +62,8 @@ export default {
 				}, {immediate: true});
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgChoicePopup', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgChoicePopup', {
 			meta: {
 				title: 'Choice Popup',
 				icon: 'fas fa-window-maximize',
@@ -98,8 +98,8 @@ export default {
 				},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

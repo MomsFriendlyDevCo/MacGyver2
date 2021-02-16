@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgChoiceRadio', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgChoiceRadio', {
 			meta: {
 				title: 'Radio multiple-choice',
 				icon: 'far fa-list-ul',
@@ -45,8 +45,8 @@ export default {
 				},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

@@ -8,11 +8,11 @@
 import VueSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
 
-export default {
-	install: function(app, options) {
+//export default {
+//	install: function(app, options) {
 		app.component('v-select', VueSelect);
 
-		app.mgComponent('mgChoiceTags', {
+export default app.mgComponent('mgChoiceTags', {
 			meta: {
 				title: 'Dropdown multiple-choice',
 				icon: 'far fa-tags',
@@ -119,8 +119,8 @@ export default {
 				},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

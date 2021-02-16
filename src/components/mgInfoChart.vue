@@ -2,9 +2,9 @@
 import Chart from 'chartjs';
 import 'chartjs-plugin-colorschemes/dist/chartjs-plugin-colorschemes.js';
 
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgInfoChart', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgInfoChart', {
 			meta: {
 				title: 'Info Chart',
 				icon: 'far fa-chart-bar',
@@ -42,8 +42,8 @@ export default {
 				},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

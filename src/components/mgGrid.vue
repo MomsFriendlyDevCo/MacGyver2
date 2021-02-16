@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgGrid', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgGrid', {
 			meta: {
 				title: 'Grid layout',
 				icon: 'far fa-grip-horizontal',
@@ -11,8 +11,8 @@ export default {
 				items: {type: 'mgUnknown', default: []},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

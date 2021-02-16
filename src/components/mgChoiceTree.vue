@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgChoiceTree', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgChoiceTree', {
 			meta: {
 				title: 'Choice Tree',
 				icon: 'fas fa-stream',
@@ -139,8 +139,8 @@ export default {
 				return h('div', {class: this.$props.classWrapper}, [renderBranch(this.enumIter, true)]);
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <style>

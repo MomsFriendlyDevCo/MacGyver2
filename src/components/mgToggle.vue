@@ -3,8 +3,8 @@
 // FIXME: Parcel errors with vue-js-toggle-button
 import ToggleButton from 'vue-js-toggle-button';
 
-export default {
-	install: function(app, options) {
+//export default {
+//	install: function(app, options) {
 		app.use(ToggleButton);
 
 		app.mgComponent('mgToggle', {

@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgButton', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgButton', {
 			meta: {
 				title: 'Button',
 				icon: 'far fa-mouse-pointer',
@@ -16,8 +16,8 @@ export default {
 				className: {type: 'mgText', advanced: true, default: 'btn btn-light'},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

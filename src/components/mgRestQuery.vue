@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgRestQuery', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgRestQuery', {
 			meta: {
 				title: 'ReST Query',
 				icon: 'far fa-database',
@@ -51,8 +51,8 @@ export default {
 				},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

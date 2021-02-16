@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgChoiceButtons', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgChoiceButtons', {
 			meta: {
 				title: 'Choice Buttons',
 				icon: 'fas fa-ellipsis-h',
@@ -55,8 +55,8 @@ export default {
 				},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

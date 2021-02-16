@@ -2,11 +2,11 @@
 import VueSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 
-export default {
-	install: function(app, options) {
+//export default {
+//	install: function(app, options) {
 		app.component("v-select", VueSelect);
 
-		app.mgComponent("mgChoiceAutocomplete", {
+export default app.mgComponent("mgChoiceAutocomplete", {
 			meta: {
 				title: "Autocomplete",
 				icon: "far fa-chevron-circle-down",
@@ -164,8 +164,8 @@ export default {
 				},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

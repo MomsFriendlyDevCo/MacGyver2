@@ -1,7 +1,7 @@
 <script lang="js">
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgHtml', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgHtml', {
 			meta: {
 				title: 'Static HTML',
 				icon: 'fab fa-html5',
@@ -15,8 +15,8 @@ export default {
 				text: {type: 'mgCode', syntax: 'html'},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

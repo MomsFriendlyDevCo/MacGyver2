@@ -2,9 +2,9 @@
 import Swatches from 'vue-swatches';
 import 'vue-swatches/dist/vue-swatches.min.css';
 
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgColor', {
+//export default {
+//	install: function(app, options) {
+export default app.mgComponent('mgColor', {
 			meta: {
 				title: 'Color',
 				icon: 'far fa-paint-roller',
@@ -34,8 +34,8 @@ export default {
 				},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

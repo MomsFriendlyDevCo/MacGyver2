@@ -17,11 +17,11 @@ import mgFormEditorControls from './mgFormEditorControls';
 * @emits change Emitted as `(config)` on any item configuration change. WARNING, subscribing to this involves an entire deep copy of the config structure, subscribe to changeItem if possible
 * @emits changeItem Emitted as `({path, value})` when a single config item changes, inexpensive compared to `change`
 */
-export default {
-	install: function(app, options) {
+//export default {
+//	install: function(app, options) {
 		app.use(mgFormEditorControls);
 
-		app.mgComponent('mgFormEditor', {
+export default app.component('mgFormEditor', {
 			provide() { return {
 				$mgFormEditor: this,
 			}},
@@ -634,8 +634,8 @@ export default {
 				// }}}
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>

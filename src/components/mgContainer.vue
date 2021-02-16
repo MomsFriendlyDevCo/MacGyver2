@@ -3,9 +3,9 @@
 * MacGyver component loader
 * This is a meta component that loads other dynamic components as an array
 */
-export default {
-	install: function(app, options) {
-		app.mgComponent('mgContainer', {
+//export default 
+//	install: function(app, options) {
+export default app.mgComponent('mgContainer', {
 			inject: {
 				$mgForm: {from: '$mgForm'},
 				$mgFormEditor: {from: '$mgFormEditor', default: false},
@@ -139,8 +139,8 @@ export default {
 				},
 			},
 		});
-	}
-};
+//	}
+//};
 </script>
 
 <template>
