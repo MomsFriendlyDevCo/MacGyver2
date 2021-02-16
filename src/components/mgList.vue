@@ -1,45 +1,49 @@
-<script>
-export default app.mgComponent('mgList', {
-	meta: {
-		title: 'List',
-		icon: 'far fa-list-ul',
-		category: 'Simple Inputs',
-		preferId: true,
-		format: v => (v || []).join(', '),
-	},
-	data() { return {
-		newItem: '',
-	}},
-	props: {
-		allowDelete: {type: 'mgToggle', default: true},
-		min: {type: 'mgNumber', title: 'Minimum number of items'},
-		max: {type: 'mgNumber', title: 'Maximum number of items'},
-		required: {type: 'mgToggle', default: false},
-		numbered: {type: 'mgToggle', default: true},
-		addButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},
-		addButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},
-	},
-	created() {
-		this.$on('mgValidate', reply => {
-			if (this.$props.required && (!this.data || !this.data.length)) return reply(`${this.$props.title} is required`);
-			if (this.$props.min && _.isString(this.data) && this.data.length < this.$props.min) return reply(`${this.$props.title} must have at least ${this.$props.min} items`);
-			if (this.$props.max && _.isString(this.data) && this.data.length > this.$props.max) return reply(`${this.$props.title} must have at most ${this.$props.max} items`);
+<script lang="js">
+export default {
+	install: function(app, options) {
+		app.mgComponent('mgList', {
+			meta: {
+				title: 'List',
+				icon: 'far fa-list-ul',
+				category: 'Simple Inputs',
+				preferId: true,
+				format: v => (v || []).join(', '),
+			},
+			data() { return {
+				newItem: '',
+			}},
+			props: {
+				allowDelete: {type: 'mgToggle', default: true},
+				min: {type: 'mgNumber', title: 'Minimum number of items'},
+				max: {type: 'mgNumber', title: 'Maximum number of items'},
+				required: {type: 'mgToggle', default: false},
+				numbered: {type: 'mgToggle', default: true},
+				addButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},
+				addButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},
+			},
+			created() {
+				this.$on('mgValidate', reply => {
+					if (this.$props.required && (!this.data || !this.data.length)) return reply(`${this.$props.title} is required`);
+					if (this.$props.min && _.isString(this.data) && this.data.length < this.$props.min) return reply(`${this.$props.title} must have at least ${this.$props.min} items`);
+					if (this.$props.max && _.isString(this.data) && this.data.length > this.$props.max) return reply(`${this.$props.title} must have at most ${this.$props.max} items`);
+				});
+			},
+			methods: {
+				addItem() {
+					if (!_.isArray(this.data)) this.data = [];
+					this.data.push(this.newItem);
+					this.newItem = '';
+				},
+				changeItem(index, value) {
+					this.$set(this.data, index, value);
+				},
+				removeItem(index) {
+					this.data = this.data.filter((x, i) => i != index);
+				},
+			},
 		});
-	},
-	methods: {
-		addItem() {
-			if (!_.isArray(this.data)) this.data = [];
-			this.data.push(this.newItem);
-			this.newItem = '';
-		},
-		changeItem(index, value) {
-			this.$set(this.data, index, value);
-		},
-		removeItem(index) {
-			this.data = this.data.filter((x, i) => i != index);
-		},
-	},
-});
+	}
+};
 </script>
 
 <template>

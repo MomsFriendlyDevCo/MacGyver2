@@ -1,10 +1,14 @@
-<script>
-export default Vue.component('mgFormEditorControls', {
-	inject: ['$mgFormEditor'],
-	props: {
-		config: {type: Object, required: true},
-	},
-});
+<script lang="js">
+export default {
+	install: function(app, options) {
+		app.mgComponent('mgFormEditorControls', {
+			inject: ['$mgFormEditor'],
+			props: {
+				config: {type: Object, required: true},
+			},
+		});
+	}
+};
 </script>
 
 <template>

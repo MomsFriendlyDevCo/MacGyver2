@@ -1,54 +1,58 @@
-<script>
-export default app.mgComponent('mgRestQuery', {
-	meta: {
-		title: 'ReST Query',
-		icon: 'far fa-database',
-		category: 'Data display',
-	},
-	props: {
-		className: {type: 'mgText', advanced: true},
-		classActive: {type: 'mgText', default: 'btn btn-primary', advanced: true},
-		classInactive: {type: 'mgText', default: 'btn btn-light', advanced: true},
-		iconActive: {type: 'mgIcon', default: 'fa fa-database', advanced: true},
-		iconInactive: {type: 'mgIcon', default: 'far fa-plus', advanced: true},
-		textActive: {type: 'mgText', default: 'Edit query', advanced: true},
-		textInactive: {type: 'mgText', default: 'Add query', advanced: true},
-	},
-	computed: {
-		codeDisplay() {
-			if (!this.data) return '';
-			return '<pre class="pre-sm">'
-				+ JSON.stringify(this.data, null, '\t')
-					.replace(/\n/g, '<br/>')
-			+ '</pre>';
-		},
-	},
-	created() {
-		this.$on('mgValidate', reply => {
-			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
+<script lang="js">
+export default {
+	install: function(app, options) {
+		app.mgComponent('mgRestQuery', {
+			meta: {
+				title: 'ReST Query',
+				icon: 'far fa-database',
+				category: 'Data display',
+			},
+			props: {
+				className: {type: 'mgText', advanced: true},
+				classActive: {type: 'mgText', default: 'btn btn-primary', advanced: true},
+				classInactive: {type: 'mgText', default: 'btn btn-light', advanced: true},
+				iconActive: {type: 'mgIcon', default: 'fa fa-database', advanced: true},
+				iconInactive: {type: 'mgIcon', default: 'far fa-plus', advanced: true},
+				textActive: {type: 'mgText', default: 'Edit query', advanced: true},
+				textInactive: {type: 'mgText', default: 'Add query', advanced: true},
+			},
+			computed: {
+				codeDisplay() {
+					if (!this.data) return '';
+					return '<pre class="pre-sm">'
+						+ JSON.stringify(this.data, null, '\t')
+							.replace(/\n/g, '<br/>')
+					+ '</pre>';
+				},
+			},
+			created() {
+				this.$on('mgValidate', reply => {
+					if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
+				});
+			},
+			methods: {
+				editQuery() {
+					Promise.resolve()
+						.then(res => this.$prompt.macgyver({
+							title: 'Edit query',
+							// buttons: [], // We assume closing the dialog resolves so no need for buttons
+							form: [
+								{
+									id: 'query',
+									type: 'mgCode',
+									showTitle: false,
+								},
+							],
+							data: {
+								query: this.data,
+							},
+						}))
+						.then(form => this.data = JSON.parse(form.query));
+				},
+			},
 		});
-	},
-	methods: {
-		editQuery() {
-			Promise.resolve()
-				.then(res => this.$prompt.macgyver({
-					title: 'Edit query',
-					// buttons: [], // We assume closing the dialog resolves so no need for buttons
-					form: [
-						{
-							id: 'query',
-							type: 'mgCode',
-							showTitle: false,
-						},
-					],
-					data: {
-						query: this.data,
-					},
-				}))
-				.then(form => this.data = JSON.parse(form.query));
-		},
-	},
-});
+	}
+};
 </script>
 
 <template>

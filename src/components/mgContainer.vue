@@ -1,142 +1,146 @@
-<script>
+<script lang="js">
 /**
 * MacGyver component loader
 * This is a meta component that loads other dynamic components as an array
 */
-export default app.mgComponent('mgContainer', {
-	inject: {
-		$mgForm: {from: '$mgForm'},
-		$mgFormEditor: {from: '$mgFormEditor', default: false},
-	},
-	meta: {
-		title: 'Container layout',
-		icon: 'far fa-th-large',
-		category: 'Layout',
-		preferId: false,
-	},
-	props: {
-		layout: {
-			type: 'mgChoiceRadio',
-			title: 'Layout profile',
-			help: 'How to layout child elements',
-			default: 'form',
-			enum: [
-				{id: 'form', title: 'Simple form layout'},
-				{id: 'formFloating', title: 'Form with floating labels'},
-				{id: 'card', title: 'Card based layout'},
-				{id: 'columns', title: 'Vertical column layout'},
-				{id: 'query', title: 'Query constructor'},
-			],
-		},
-		formClass: {
-			type: 'mgChoiceDropdown',
-			title: 'Form style',
-			showIf: {layout: {$in: ['form', 'card']}},
-			default: 'normal',
-			enum: [
-				{id: 'normal', title: 'Normal'},
-				{id: 'titles-above', title: 'Titles above'},
-			],
-		},
-		title: {type: 'mgText', showIf: {layout: 'card'}},
-		showTitles: {type: 'mgToggle', default: true, help: 'Show titles for fields', showIf: {layout: {$in: ['form', 'card']}}},
-		columnHeaders: {type: 'mgToggle', default: false, help: 'Show column headers', showIf: "layout == 'columns'"},
-		collapsable: {type: 'mgToggle', default: false, help: 'This card can be hidden', showIf: "layout == 'card'"},
-		collapsed: {type: 'mgToggle', default: false, help: 'This card is collapsed by default', showIf: "layout == 'card'"},
-		border: {type: 'mgToggle', default: true, help: 'Show a border around the container', showIf: "layout == 'columns'"},
-		verbs: {
-			type: 'mgTable',
-			advanced: true,
-			showIf: "layout == 'card'",
-			items: [
-				{id: 'icon', type: 'mgIcon'},
-				{id: 'tooltip', type: 'mgText'},
-				{id: 'class', type: 'mgText'},
-				{id: 'action', type: 'mgText'},
-			],
-		},
+export default {
+	install: function(app, options) {
+		app.mgComponent('mgContainer', {
+			inject: {
+				$mgForm: {from: '$mgForm'},
+				$mgFormEditor: {from: '$mgFormEditor', default: false},
+			},
+			meta: {
+				title: 'Container layout',
+				icon: 'far fa-th-large',
+				category: 'Layout',
+				preferId: false,
+			},
+			props: {
+				layout: {
+					type: 'mgChoiceRadio',
+					title: 'Layout profile',
+					help: 'How to layout child elements',
+					default: 'form',
+					enum: [
+						{id: 'form', title: 'Simple form layout'},
+						{id: 'formFloating', title: 'Form with floating labels'},
+						{id: 'card', title: 'Card based layout'},
+						{id: 'columns', title: 'Vertical column layout'},
+						{id: 'query', title: 'Query constructor'},
+					],
+				},
+				formClass: {
+					type: 'mgChoiceDropdown',
+					title: 'Form style',
+					showIf: {layout: {$in: ['form', 'card']}},
+					default: 'normal',
+					enum: [
+						{id: 'normal', title: 'Normal'},
+						{id: 'titles-above', title: 'Titles above'},
+					],
+				},
+				title: {type: 'mgText', showIf: {layout: 'card'}},
+				showTitles: {type: 'mgToggle', default: true, help: 'Show titles for fields', showIf: {layout: {$in: ['form', 'card']}}},
+				columnHeaders: {type: 'mgToggle', default: false, help: 'Show column headers', showIf: "layout == 'columns'"},
+				collapsable: {type: 'mgToggle', default: false, help: 'This card can be hidden', showIf: "layout == 'card'"},
+				collapsed: {type: 'mgToggle', default: false, help: 'This card is collapsed by default', showIf: "layout == 'card'"},
+				border: {type: 'mgToggle', default: true, help: 'Show a border around the container', showIf: "layout == 'columns'"},
+				verbs: {
+					type: 'mgTable',
+					advanced: true,
+					showIf: "layout == 'card'",
+					items: [
+						{id: 'icon', type: 'mgIcon'},
+						{id: 'tooltip', type: 'mgText'},
+						{id: 'class', type: 'mgText'},
+						{id: 'action', type: 'mgText'},
+					],
+				},
 
-		items: {type: 'mgAlert', vueType: 'array', text: 'Use the editor to define child widgets'}, // Child items
-	},
-	childProps: {
-		help: {type: 'mgText', title: 'Help text', help: 'Optional help text for the item - just like what you are reading now'},
-		showTitle: {type: 'mgToggle', default: true, title: 'Show Title', help: 'Whether to show the side title for this element'},
-		title: {type: 'mgText', title: 'Title'},
-		rowClass: {type: 'mgChoiceDropdown', title: 'Styling', help: 'Additional styling to apply to the widget', default: '', advanced: true, enum: [
-			{id: '', title: 'Normal'},
-			{id: 'mgContainerRowLarge', title: 'Large text'},
-		]},
-		onChange: {type: 'string', title: 'Change action', help: 'Action to trigger when the value of this component changes', advanced: true},
-		show: {type: 'mgToggle', default: true, advanced: true, help: 'Whether the item is visible by default'},
-		showIf: {type: 'mgCode', syntax: 'text', advanced: true, help: 'A simple equality expression or Sift object to deteremine visibility'},
-	},
-	data() { return {
-		highlights: {}, // Lookup of extra classes to add to widgets, each key is the array offset of the widget within this container, the value is an array of classes to add
-		localData: {}, // Lookup of immediate child data values, used when `$props.layout == 'formFloating'`
-	}},
-	mounted() {
-		if (this.$props.collapsable) {
-			var $card = $(this.$el).find('.card').first();
+				items: {type: 'mgAlert', vueType: 'array', text: 'Use the editor to define child widgets'}, // Child items
+			},
+			childProps: {
+				help: {type: 'mgText', title: 'Help text', help: 'Optional help text for the item - just like what you are reading now'},
+				showTitle: {type: 'mgToggle', default: true, title: 'Show Title', help: 'Whether to show the side title for this element'},
+				title: {type: 'mgText', title: 'Title'},
+				rowClass: {type: 'mgChoiceDropdown', title: 'Styling', help: 'Additional styling to apply to the widget', default: '', advanced: true, enum: [
+					{id: '', title: 'Normal'},
+					{id: 'mgContainerRowLarge', title: 'Large text'},
+				]},
+				onChange: {type: 'string', title: 'Change action', help: 'Action to trigger when the value of this component changes', advanced: true},
+				show: {type: 'mgToggle', default: true, advanced: true, help: 'Whether the item is visible by default'},
+				showIf: {type: 'mgCode', syntax: 'text', advanced: true, help: 'A simple equality expression or Sift object to deteremine visibility'},
+			},
+			data() { return {
+				highlights: {}, // Lookup of extra classes to add to widgets, each key is the array offset of the widget within this container, the value is an array of classes to add
+				localData: {}, // Lookup of immediate child data values, used when `$props.layout == 'formFloating'`
+			}},
+			mounted() {
+				if (this.$props.collapsable) {
+					var $card = $(this.$el).find('.card').first();
 
-			$card.find('.card-header').first().on('click', ()=> {
-				var $body = $(this.$el).find('.card-body');
-				if ($card.hasClass('card-collapsed')) {
-					$body.slideDown({complete: ()=> $card.removeClass('card-collapsed')});
-				} else {
-					$body.slideUp({complete: ()=> $card.addClass('card-collapsed')});
+					$card.find('.card-header').first().on('click', ()=> {
+						var $body = $(this.$el).find('.card-body');
+						if ($card.hasClass('card-collapsed')) {
+							$body.slideDown({complete: ()=> $card.removeClass('card-collapsed')});
+						} else {
+							$body.slideUp({complete: ()=> $card.addClass('card-collapsed')});
+						}
+					});
 				}
-			});
-		}
 
-		if (this.$props.layout == 'formFloating') {
-			// When in floating mode we need to keep track of child data so we copy its value into our `localData` object lookup
-			this.$mgForm.$on('changeItem', v => { // Bind to parent form handler
-				if (this.$props.items.some(item => item.$dataPath == v.path)) { // Is this widget one of our immediate children?
-					this.$set(this.localData, v.path, v.value); // Copy its data against our local copy
+				if (this.$props.layout == 'formFloating') {
+					// When in floating mode we need to keep track of child data so we copy its value into our `localData` object lookup
+					this.$mgForm.$on('changeItem', v => { // Bind to parent form handler
+						if (this.$props.items.some(item => item.$dataPath == v.path)) { // Is this widget one of our immediate children?
+							this.$set(this.localData, v.path, v.value); // Copy its data against our local copy
+						}
+					});
 				}
-			});
-		}
-	},
-	methods: {
-		/**
-		* Emit an event passing this container as a scope
-		* This is really just a wrapper to be able to pass this VueComponent to mgContainer.* emitters
-		* @param {string} eventName Event to emit
-		* @param {string} specPath The widget specPath
-		* @param {number} widgetIndex The widget sending the message
-		*/
-		componentEvent(eventName, specPath, widgetIndex, vueEvent) {
-			this.$mgForm.$emit(eventName, this, specPath, widgetIndex, vueEvent);
-		},
+			},
+			methods: {
+				/**
+				* Emit an event passing this container as a scope
+				* This is really just a wrapper to be able to pass this VueComponent to mgContainer.* emitters
+				* @param {string} eventName Event to emit
+				* @param {string} specPath The widget specPath
+				* @param {number} widgetIndex The widget sending the message
+				*/
+				componentEvent(eventName, specPath, widgetIndex, vueEvent) {
+					this.$mgForm.$emit(eventName, this, specPath, widgetIndex, vueEvent);
+				},
 
 
-		/**
-		* Find the child index by its component
-		* This works like findIndex only with Magyver components, ignoring all non-mg children when computing the index
-		* @param {VueComponent} child The child offset to find
-		* @returns {number} The offset of the component or boolean `false`
-		*/
-		findChildIndex(child) {
-			var result = _(this.$refs)
-				.map(v => v[0]) // Dynamic refs always end up as an array of 1 item, so unpack that
-				.reduce((t, v, i) => {
-					if (t.found) { // Already found the child
-						return t;
-					} else if (v._uid == child._uid) { // Found by direct UID
-						return {...t, found: true};
-					} else if (v.$children && v.$children.length == 1 && v.$children[0]._uid == child._uid) { // Check into mgComponent wrappers
-						return {...t, found: true};
-					} else if (v.$mgForm) { // Is an mgComponent {
-						return {...t, mgIndex: t.mgIndex + 1};
-					} else { // Implied else - regular Vue component - skip incrementing when calculating the offset
-						return t;
-					}
-				}, {found: false, mgIndex: 0});
+				/**
+				* Find the child index by its component
+				* This works like findIndex only with Magyver components, ignoring all non-mg children when computing the index
+				* @param {VueComponent} child The child offset to find
+				* @returns {number} The offset of the component or boolean `false`
+				*/
+				findChildIndex(child) {
+					var result = _(this.$refs)
+						.map(v => v[0]) // Dynamic refs always end up as an array of 1 item, so unpack that
+						.reduce((t, v, i) => {
+							if (t.found) { // Already found the child
+								return t;
+							} else if (v._uid == child._uid) { // Found by direct UID
+								return {...t, found: true};
+							} else if (v.$children && v.$children.length == 1 && v.$children[0]._uid == child._uid) { // Check into mgComponent wrappers
+								return {...t, found: true};
+							} else if (v.$mgForm) { // Is an mgComponent {
+								return {...t, mgIndex: t.mgIndex + 1};
+							} else { // Implied else - regular Vue component - skip incrementing when calculating the offset
+								return t;
+							}
+						}, {found: false, mgIndex: 0});
 
-			return (result.found ? result.mgIndex : false);
-		},
-	},
-});
+					return (result.found ? result.mgIndex : false);
+				},
+			},
+		});
+	}
+};
 </script>
 
 <template>

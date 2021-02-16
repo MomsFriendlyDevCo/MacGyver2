@@ -1,37 +1,41 @@
-<script>
-export default app.mgComponent('mgVideo', {
-	meta: {
-		title: 'Video',
-		icon: 'far fa-film',
-		category: 'Media',
-		preferId: true,
-	},
-	props: {
-		url: {type: 'mgUrl'},
-		width: {type: 'mgText', default: '100%'},
-		height: {type: 'mgText', default: '315px'},
-		autoPlay: {type: 'mgToggle', default: false},
-		showControls: {type: 'mgToggle', default: true},
-		loop: {type: 'mgToggle', default: false},
-	},
-	computed: {
-		videoResource() {
-			if (!this.$props.url) {
-				return {type: 'none'};
-			} else if (/^https?:\/\/(www\.)?youtube\.com/.test(this.$props.url)) {
-				return {
-					type: 'youTube',
-					url: this.$props.url
-						+ `?autoplay=${this.$props.autoPlay ? '1' : '0'}`
-						+ `&controls=${this.$props.showControls ? '1' : '0'}`
-						+ `&loop=${this.$props.loop ? '1' : '0'}`
-				}
-			} else {
-				return {type: 'unknown'};
-			}
-		},
-	},
-});
+<script lang="js">
+export default {
+	install: function(app, options) {
+		app.mgComponent('mgVideo', {
+			meta: {
+				title: 'Video',
+				icon: 'far fa-film',
+				category: 'Media',
+				preferId: true,
+			},
+			props: {
+				url: {type: 'mgUrl'},
+				width: {type: 'mgText', default: '100%'},
+				height: {type: 'mgText', default: '315px'},
+				autoPlay: {type: 'mgToggle', default: false},
+				showControls: {type: 'mgToggle', default: true},
+				loop: {type: 'mgToggle', default: false},
+			},
+			computed: {
+				videoResource() {
+					if (!this.$props.url) {
+						return {type: 'none'};
+					} else if (/^https?:\/\/(www\.)?youtube\.com/.test(this.$props.url)) {
+						return {
+							type: 'youTube',
+							url: this.$props.url
+								+ `?autoplay=${this.$props.autoPlay ? '1' : '0'}`
+								+ `&controls=${this.$props.showControls ? '1' : '0'}`
+								+ `&loop=${this.$props.loop ? '1' : '0'}`
+						}
+					} else {
+						return {type: 'unknown'};
+					}
+				},
+			},
+		});
+	}
+};
 </script>
 
 <template>

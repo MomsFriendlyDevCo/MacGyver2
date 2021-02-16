@@ -1,14 +1,18 @@
-<script>
-export default app.mgComponent('mgCheckBox', {
-	meta: {
-		title: 'Check Box',
-		icon: 'far fa-check-square',
-		category: 'Simple Inputs',
-		preferId: true,
-		format: v => v ? 'Yes' : 'No',
-		formatClass: 'text-center',
-	},
-});
+<script lang="js">
+export default {
+	install: function(app, options) {
+		app.mgComponent('mgCheckBox', {
+			meta: {
+				title: 'Check Box',
+				icon: 'far fa-check-square',
+				category: 'Simple Inputs',
+				preferId: true,
+				format: v => v ? 'Yes' : 'No',
+				formatClass: 'text-center',
+			},
+		});
+	}
+};
 </script>
 
 <template>

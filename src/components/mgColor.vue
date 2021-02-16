@@ -1,37 +1,41 @@
-<script>
+<script lang="js">
 import Swatches from 'vue-swatches';
 import 'vue-swatches/dist/vue-swatches.min.css';
 
-export default app.mgComponent('mgColor', {
-	meta: {
-		title: 'Color',
-		icon: 'far fa-paint-roller',
-		category: 'Simple Inputs',
-		preferId: true,
-		shorthand: ['color', 'hue', 'swatch'],
-	},
-	props: {
-		required: {type: 'mgToggle', default: false},
-		colorSet: {type: 'mgChoiceDropdown', enum: [{id: 'basic', title: 'Basic'}, {id: 'material-light', title: 'Material'}, {id: 'text-advanced', title: 'Full swatch'}], default: 'text-advanced'},
-		interface: {type: 'mgChoiceDropdown', default: 'input', enum: ['input', 'colorOnly']},
-		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
-		popoverSide: {type: 'mgChoiceButtons', enum: ['left', 'right'], advanced: true},
-	},
-	components: {Swatches},
-	created() {
-		this.$on('mgValidate', reply => {
-			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
+export default {
+	install: function(app, options) {
+		app.mgComponent('mgColor', {
+			meta: {
+				title: 'Color',
+				icon: 'far fa-paint-roller',
+				category: 'Simple Inputs',
+				preferId: true,
+				shorthand: ['color', 'hue', 'swatch'],
+			},
+			props: {
+				required: {type: 'mgToggle', default: false},
+				colorSet: {type: 'mgChoiceDropdown', enum: [{id: 'basic', title: 'Basic'}, {id: 'material-light', title: 'Material'}, {id: 'text-advanced', title: 'Full swatch'}], default: 'text-advanced'},
+				interface: {type: 'mgChoiceDropdown', default: 'input', enum: ['input', 'colorOnly']},
+				placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
+				popoverSide: {type: 'mgChoiceButtons', enum: ['left', 'right'], advanced: true},
+			},
+			components: {Swatches},
+			created() {
+				this.$on('mgValidate', reply => {
+					if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
+				});
+			},
+			methods: {
+				change(e) {
+					var value = e.target.value;
+					if (value && /^#[0-9A-F]+$/i.test(value)) {
+						this.data = value;
+					}
+				},
+			},
 		});
-	},
-	methods: {
-		change(e) {
-			var value = e.target.value;
-			if (value && /^#[0-9A-F]+$/i.test(value)) {
-				this.data = value;
-			}
-		},
-	},
-});
+	}
+};
 </script>
 
 <template>

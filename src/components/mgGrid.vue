@@ -1,14 +1,18 @@
-<script>
-export default app.mgComponent('mgGrid', {
-	meta: {
-		title: 'Grid layout',
-		icon: 'far fa-grip-horizontal',
-		category: 'Layout',
-	},
-	props: {
-		items: {type: 'mgUnknown', default: []},
-	},
-});
+<script lang="js">
+export default {
+	install: function(app, options) {
+		app.mgComponent('mgGrid', {
+			meta: {
+				title: 'Grid layout',
+				icon: 'far fa-grip-horizontal',
+				category: 'Layout',
+			},
+			props: {
+				items: {type: 'mgUnknown', default: []},
+			},
+		});
+	}
+};
 </script>
 
 <template>

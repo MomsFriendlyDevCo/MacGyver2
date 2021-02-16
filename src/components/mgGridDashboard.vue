@@ -1,48 +1,55 @@
-<import>
-./node_modules/vue-grid-layout/dist/vue-grid-layout.umd.js
-</import>
+<script lang="js">
+import VueGridLayout from 'vue-grid-layout';
+//import 'vue-grid-layout/dist/vue-grid-layout.umd.js';
 
-<script>
-Vue.component(window['VueGridLayout']);
+export default {
+	install: function(app, options) {
+		app.component(VueGridLayout);
 
-export default app.mgComponent('mgGridDashboard', {
-	meta: {
-		title: 'Grid layout',
-		icon: 'far fa-chess-board',
-		category: 'Layout',
-	},
-	data() { return {
-		gridLayout: [],
-	}},
-	props: {
-		columns: {type: 'mgNumber', default: 12, advanced: true},
-		items: {type: 'mgUnknown', default: []}, // Each item also needs X, Y, W, H (W/H are block sizes not absolutes)
-		rowHeight: {type: 'mgNumber', default: 30, advanced: true},
-		marginHorizontal: {type: 'mgNumber', default: 10, advanced: true},
-		marginVertical: {type: 'mgNumber', default: 10, advanced: true},
-		defaultWidth: {type: 'mgNumber', default: 4, advanced: true},
-		defaultHeight: {type: 'mgNumber', default: 4, advanced: true},
-	},
-	watch: {
-		'$props.items': {
-			immediate: true,
-			handler() {
-				// NOTE: This will TRY to allocate widgets in a logical left -> right order using the defaultWidth + defaultHeight allocations
-				//       Since I'm not Einstein and this is an NP incomplete problem it will do so ignoring any existing blocks
-				//       Obviously this is only intended for the intial setup, with the user configuring the blocks after that
-				//       - MC 2019-01-02
-				this.$set(this, 'gridLayout', this.$props.items.map((item, index) => ({
-					i: index,
-					x: Math.floor((index * this.$props.defaultWidth) % this.$props.columns), // Overflow when we hit the end of a column
-					y: Math.floor((index * this.$props.defaultWidth) / this.$props.columns),
-					w: this.$props.defaultWidth,
-					h: this.$props.defaultHeight,
-					...item,
-				})));
+		app.mgComponent('mgGridDashboard', {
+			meta: {
+				title: 'Grid layout',
+				icon: 'far fa-chess-board',
+				category: 'Layout',
 			},
-		},
-	},
-});
+			data() { return {
+				gridLayout: [],
+			}},
+			props: {
+				columns: {type: 'mgNumber', default: 12, advanced: true},
+				items: {type: 'mgUnknown', default: []}, // Each item also needs X, Y, W, H (W/H are block sizes not absolutes)
+				rowHeight: {type: 'mgNumber', default: 30, advanced: true},
+				marginHorizontal: {type: 'mgNumber', default: 10, advanced: true},
+				marginVertical: {type: 'mgNumber', default: 10, advanced: true},
+				defaultWidth: {type: 'mgNumber', default: 4, advanced: true},
+				defaultHeight: {type: 'mgNumber', default: 4, advanced: true},
+			},
+			watch: {
+				'$props.items': {
+					immediate: true,
+					handler() {
+						// NOTE: This will TRY to allocate widgets in a logical left -> right order using the defaultWidth + defaultHeight allocations
+						//       Since I'm not Einstein and this is an NP incomplete problem it will do so ignoring any existing blocks
+						//       Obviously this is only intended for the intial setup, with the user configuring the blocks after that
+						//       - MC 2019-01-02
+						this.$set(this, 'gridLayout', this.$props.items.map((item, index) => ({
+							i: index,
+							x: Math.floor((index * this.$props.defaultWidth) % this.$props.columns), // Overflow when we hit the end of a column
+							y: Math.floor((index * this.$props.defaultWidth) / this.$props.columns),
+							w: this.$props.defaultWidth,
+							h: this.$props.defaultHeight,
+							...item,
+						})));
+					},
+				},
+			},
+		});
+	}
+};
+
+
+
+export default 
 </script>
 
 <template>

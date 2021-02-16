@@ -1,18 +1,22 @@
-<script>
-export default app.mgComponent('mgHtml', {
-	meta: {
-		title: 'Static HTML',
-		icon: 'fab fa-html5',
-		category: 'General Decoration',
-	},
-	inject: {
-		$mgForm: {from: '$mgForm'},
-		$mgFormEditor: {from: '$mgFormEditor', default: false},
-	},
-	props: {
-		text: {type: 'mgCode', syntax: 'html'},
-	},
-});
+<script lang="js">
+export default {
+	install: function(app, options) {
+		app.mgComponent('mgHtml', {
+			meta: {
+				title: 'Static HTML',
+				icon: 'fab fa-html5',
+				category: 'General Decoration',
+			},
+			inject: {
+				$mgForm: {from: '$mgForm'},
+				$mgFormEditor: {from: '$mgFormEditor', default: false},
+			},
+			props: {
+				text: {type: 'mgCode', syntax: 'html'},
+			},
+		});
+	}
+};
 </script>
 
 <template>

@@ -2,11 +2,11 @@ import MacGyver from './macgyver.js';
 import VueEmit from './services/emit.js';
 import VueSetPath from '@momsfriendlydevco/vue-setpath';
 import VueWatchall from './services/watchAll.js';
-//import ComponentForm from './components/mgForm.vue';
 
 /**
 * Main MacGyver plugin
 * This service requires {$http, $toast} to be available on the prototype
+* TODO: Bring in $http and $toast as plugin mixin?
 * @var {Object}
 */
 // TODO: Could use pattern like VueRouter and define a VueMacgyver Class.
@@ -43,7 +43,6 @@ export default {
 
 		// Auto-bind to Axios if its defined
 		if ($macgyver.utils.global.axios) $macgyver.$http = $macgyver.utils.global.axios;
-
 
 		app.mgComponent = function(name, component) {
 			if ($macgyver.widgets[name]) throw new Error(`Cannot redeclare MacGyver component "${name}"`);
@@ -229,65 +228,11 @@ export default {
 			return app.component(name, vueComponent);
 		};
 
-		console.log('VueEmit', VueEmit);
 		app.use(VueEmit);
 		app.use(VueSetPath);
 		app.use(VueWatchall);
 
-		Object.defineProperty(app.prototype, '$macgyver', {
-			get () { return $macgyver }
-		});
-
-		// Import all MacGyver components
-		// NOTE: These are defined as dynamic imports as we need window.macgyver to be a accessible
-
-		//import('./components/mgAlert.vue');
-		//import('./components/mgChoiceAutocomplete.vue');
-		//import('./components/mgButton.vue');
-		//import('./components/mgCheckBox.vue');
-		//import('./components/mgChoiceButtons.vue');
-		//import('./components/mgChoiceCheckbox.vue');
-		//import('./components/mgChoiceDropdown.vue');
-		//import('./components/mgChoiceList.vue');
-		//import('./components/mgChoicePopup.vue'); // FIXME: Needs $prompt
-		//import('./components/mgChoiceRadio.vue');
-		//import('./components/mgChoiceTags.vue');
-		//import('./components/mgChoiceTree.vue');
-		//import('./components/mgCode.vue');
-		//import('./components/mgColor.vue');
-		import('./components/mgComponent.vue');
-		import('./components/mgContainer.vue');
-		//import('./components/mgDate.vue');
-		//import('./components/mgDatetime.vue');
-		//import('./components/mgEmail.vue');
-		//import('./components/mgError.vue');
-		//import('./components/mgFormEditor.vue');
-		import('./components/mgForm.vue');
-		////... import('./components/mgGridDashboard.vue');
-		//import('./components/mgGrid.vue');
-		//import('./components/mgHeading.vue');
-		//import('./components/mgHtml.vue');
-		//import('./components/mgIcon.vue'); // Not in showcase
-		//import('./components/mgInfoBlock.vue'); // Not in showcase
-		////... import('./components/mgInfoChart.vue');
-		//import('./components/mgLabel.vue');
-		//import('./components/mgList.vue');
-		//import('./components/mgNumber.vue');
-		//import('./components/mgPassword.vue');
-		//import('./components/mgPermissions.vue');
-		//import('./components/mgPlaceholder.vue');
-		//import('./components/mgQuery.vue');
-		//import('./components/mgRestQuery.vue'); // FIXME: Needs $prompt
-		//import('./components/mgSeperator.vue');
-		//import('./components/mgTable.vue');
-		//import('./components/mgTextArea.vue');
-		import('./components/mgText.vue');
-		//import('./components/mgTime.vue');
-		//import('./components/mgToggle.vue');
-		//import('./components/mgUrl.vue');
-		//import('./components/mgVideo.vue');
-		//import('./components/mgWysiwyg.vue');
-
+		app.prototype.$macgyver = $macgyver;
 
 		// TODO: Vue3
 		//app.provide('macgyver', options)

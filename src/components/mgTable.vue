@@ -1,81 +1,85 @@
-<script>
-export default app.mgComponent('mgTable', {
-	meta: {
-		title: 'Table layout',
-		icon: 'far fa-table',
-		category: 'Layout',
-	},
-	data() { return {
-		newRow: {},
-		// TODO: Is this really needed? Perhaps when `url` is specified?
-		isAdding: false,
-		data: [],
-	}},
-	props: {
-		url: {type: 'mgUrl', relative: true, help: 'Data feed to populate the table'},
-		allowAdd: {type: 'mgToggle', title: 'Allow Row Addition', default: true},
-		allowDelete: {type: 'mgToggle', title: 'Allow Row Deletion', default: true},
-		textEmpty: {type: 'mgText', title: 'No data message', default: 'No data'},
-		items: {
-			type: 'mgAlert',
-			vueType: 'array',
-			text: 'Use the editor to define child widgets',
-			default: () => [
-				// FIXME: Defaults are not initialised
-				{id: 'col1', title: 'Col 1', type: 'mgText', default: '1'},
-				{id: 'col2', title: 'Col 2', type: 'mgText', default: '2'},
-			],
-		},
-		addButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},
-		addButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},
-		rowNumbers: {type: 'mgToggle', help: 'Show the row number at the beginning of each row', default: true},
-	},
-	childProps: {
-		showTitle: {type: 'mgToggle', default: false, title: 'Show Title'},
-	},
-	created() {
-		this.$debugging = true;
-	},
-	mounted() {
-		this.$watch('$props.url', ()=> {
-			if (!this.$props.url) return;
-			this.$macgyver.utils.fetch(this.$props.url, {type: 'array'})
-				.then(data => this.$set(this.$props, 'data', data))
-		}, {immediate: true});
-	},
-	watch: {
-		data: {
-			immediate: true,
-			handler() {
-				// Ensure that data is always an array
-				if (!_.isArray(this.data)) this.data = [];
+<script lang="js">
+export default {
+	install: function(app, options) {
+		app.mgComponent('mgTable', {
+			meta: {
+				title: 'Table layout',
+				icon: 'far fa-table',
+				category: 'Layout',
 			},
-		},
-	},
-	// To ensure reactivity to array of objects https://stackoverflow.com/a/56793403/2438830
-	computed: {
-		outerKey() {
-			return this.data && this.data.length;
-		}
-	},
-	methods: {
-		createRow(offset) { // Offset is the row to create after - i.e. array position splice
-			this.$debug('createRow', offset, this.$data.newRow);
-			this.isAdding = true;
-			if (typeof offset === 'undefined') {
-				this.data.push(this.$data.newRow);
-			} else {
-				this.data.splice(offset, 0, this.$data.newRow);
-			}
-			this.$data.newRow = {};
-			this.isAdding = false;
-		},
-		deleteRow(offset) {
-			this.$debug('deleteRow', offset);
-			this.data.splice(offset, 1);
-		},
-	},
-});
+			data() { return {
+				newRow: {},
+				// TODO: Is this really needed? Perhaps when `url` is specified?
+				isAdding: false,
+				data: [],
+			}},
+			props: {
+				url: {type: 'mgUrl', relative: true, help: 'Data feed to populate the table'},
+				allowAdd: {type: 'mgToggle', title: 'Allow Row Addition', default: true},
+				allowDelete: {type: 'mgToggle', title: 'Allow Row Deletion', default: true},
+				textEmpty: {type: 'mgText', title: 'No data message', default: 'No data'},
+				items: {
+					type: 'mgAlert',
+					vueType: 'array',
+					text: 'Use the editor to define child widgets',
+					default: () => [
+						// FIXME: Defaults are not initialised
+						{id: 'col1', title: 'Col 1', type: 'mgText', default: '1'},
+						{id: 'col2', title: 'Col 2', type: 'mgText', default: '2'},
+					],
+				},
+				addButtonActiveClass: {type: 'mgText', default: 'btn btn-block btn-success fa fa-plus', advanced: true},
+				addButtonInactiveClass: {type: 'mgText', default: 'btn btn-block btn-disabled fa fa-plus', advanced: true},
+				rowNumbers: {type: 'mgToggle', help: 'Show the row number at the beginning of each row', default: true},
+			},
+			childProps: {
+				showTitle: {type: 'mgToggle', default: false, title: 'Show Title'},
+			},
+			created() {
+				this.$debugging = true;
+			},
+			mounted() {
+				this.$watch('$props.url', ()=> {
+					if (!this.$props.url) return;
+					this.$macgyver.utils.fetch(this.$props.url, {type: 'array'})
+						.then(data => this.$set(this.$props, 'data', data))
+				}, {immediate: true});
+			},
+			watch: {
+				data: {
+					immediate: true,
+					handler() {
+						// Ensure that data is always an array
+						if (!_.isArray(this.data)) this.data = [];
+					},
+				},
+			},
+			// To ensure reactivity to array of objects https://stackoverflow.com/a/56793403/2438830
+			computed: {
+				outerKey() {
+					return this.data && this.data.length;
+				}
+			},
+			methods: {
+				createRow(offset) { // Offset is the row to create after - i.e. array position splice
+					this.$debug('createRow', offset, this.$data.newRow);
+					this.isAdding = true;
+					if (typeof offset === 'undefined') {
+						this.data.push(this.$data.newRow);
+					} else {
+						this.data.splice(offset, 0, this.$data.newRow);
+					}
+					this.$data.newRow = {};
+					this.isAdding = false;
+				},
+				deleteRow(offset) {
+					this.$debug('deleteRow', offset);
+					this.data.splice(offset, 1);
+				},
+			},
+		});
+	}
+};
 </script>
 
 <template>

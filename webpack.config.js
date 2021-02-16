@@ -1,9 +1,10 @@
 const { VueLoaderPlugin } = require("vue-loader");
+//const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const path = require("path");
 
 module.exports = {
   entry: {
-    main: './src/index.js',
+    main: './src/entry.js',
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -92,6 +93,7 @@ module.exports = {
   },
   plugins: [
     new VueLoaderPlugin(),
+    //new BundleAnalyzerPlugin(),
     /*
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
@@ -104,14 +106,10 @@ module.exports = {
     }),
     */
   ],
-  /*
   resolve: {
-    alias: {
-      //vue$: "vue/dist/vue.runtime.esm.js",
-    },
     extensions: [".js", ".vue"],
-  },
-  */
+  //},
+  /*
   optimization: {
     //splitChunks: false,
     // FIXME: Putting them together breaks export default
@@ -131,8 +129,12 @@ module.exports = {
       amd: 'lodash',
       root: '_',
     },
-    */
-    /*
+    moment: {
+      commonjs: 'moment',
+      commonjs2: 'moment',
+      amd: 'moment',
+      root: 'moment',
+    },
     'vue-input-facade': {
       commonjs: 'vue-input-facade',
       commonjs2: 'vue-input-facade',

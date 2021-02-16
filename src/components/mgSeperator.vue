@@ -1,11 +1,15 @@
-<script>
-export default app.mgComponent('mgSeperator', {
-	meta: {
-		title: 'Seperator',
-		icon: 'far fa-minus',
-		category: 'General Decoration',
-	},
-});
+<script lang="js">
+export default {
+	install: function(app, options) {
+		app.mgComponent('mgSeperator', {
+			meta: {
+				title: 'Seperator',
+				icon: 'far fa-minus',
+				category: 'General Decoration',
+			},
+		});
+	}
+};
 </script>
 
 <template>
