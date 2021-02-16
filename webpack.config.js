@@ -24,7 +24,6 @@ module.exports = {
               [
                 "@babel/preset-env",
                 {
-                  "exclude": ["proposal-dynamic-import"],
                   "targets": {
                     "browsers": "last 2 versions"
                   }
@@ -38,8 +37,7 @@ module.exports = {
                   "proposal": "fsharp"
                 }
               ],
-              "@babel/plugin-proposal-throw-expressions",
-              "@babel/plugin-syntax-dynamic-import"
+              "@babel/plugin-proposal-throw-expressions"
             ]
           }
         },
