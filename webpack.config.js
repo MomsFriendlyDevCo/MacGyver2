@@ -72,6 +72,7 @@ module.exports = {
       commonjs2: '@momsfriendlydevco/vue-setpath',
       amd: '@momsfriendlydevco/vue-setpath',
     },
+    */
     lodash: {
       commonjs: 'lodash',
       commonjs2: 'lodash',
@@ -84,6 +85,7 @@ module.exports = {
       amd: 'moment',
       root: 'moment',
     },
+    /*
     'vue-input-facade': {
       commonjs: 'vue-input-facade',
       commonjs2: 'vue-input-facade',
