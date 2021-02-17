@@ -1,15 +1,15 @@
-const { VueLoaderPlugin } = require("vue-loader");
-//const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const { VueLoaderPlugin } = require('vue-loader');
+//const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const path = require("path");
+const path = require('path');
 
 module.exports = {
   entry: {
     main: './src/entry.js',
   },
   output: {
+    globalObject: 'this',
     path: path.resolve(__dirname, "dist"),
-    library: 'VueMacgyver',
     libraryTarget: 'umd'
   },
   module: {
