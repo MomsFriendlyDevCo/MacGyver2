@@ -1,5 +1,8 @@
 export { default } from './index';
 
+// TODO: Export internal service for test visibility.
+//export { default  as MacGyver} from './macgyver.js';
+
 // TODO: Separate entry points so as to not bloat main package with unused components?
 export { default as mgAlert } from './components/mgAlert';
 export { default as mgButton } from './components/mgButton';

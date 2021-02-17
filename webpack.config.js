@@ -5,7 +5,8 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    main: './src/entry.js',
+    main: './src/entrypoint-vue.js',
+    macgyver: './src/entrypoint-node.js', 
   },
   output: {
     globalObject: 'this',
