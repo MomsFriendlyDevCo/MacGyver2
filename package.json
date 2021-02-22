@@ -22,7 +22,8 @@
   "homepage": "https://github.com/MomsFriendlyDevCo/macgyver#readme",
   "scripts": {
     "build": "webpack --mode production",
-    "build:dev": "webpack --mode development"
+    "build:dev": "webpack --mode development",
+    "test": "mocha"
   },
   "dependencies": {
     "@momsfriendlydevco/vue-setpath": "0.0.1",
@@ -54,6 +55,7 @@
     "express": "^4.17.1",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
+    "gulp-block-head": "^1.2.1",
     "gulp-clean-css": "^4.2.0",
     "gulp-concat": "^2.6.1",
     "gulp-nodemon": "^2.4.2",
@@ -62,8 +64,21 @@
     "gulp-replace": "^1.0.0",
     "gulp-uglify": "^3.0.2",
     "gulp-watch": "^5.0.1",
-    "mocha": "^7.0.0",
+    "mocha": "^7.2.0",
+    "mocha-webpack": "^2.0.0-beta.0",
+    "parcel-bundler": "^1.12.4",
     "popper.js": "^1.16.1",
+    "rollup": "^1.29.1",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-includepaths": "^0.2.3",
+    "rollup-plugin-inject": "^3.0.2",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-node-globals": "^1.4.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-scss": "^2.1.0",
+    "rollup-plugin-uglify": "^6.0.4",
+    "rollup-plugin-vue": "^5.1.6",
     "sift": "^11.0.10",
     "vue": "^2.6.12",
     "vue-loader": "^15.9.6",
@@ -71,7 +86,7 @@
     "vue-style-loader": "^4.1.2",
     "vue-swatches": "^1.0.4",
     "vue-template-compiler": "^2.6.12",
-    "webpack": "^5.21.2",
+    "webpack": "^5.22.0",
     "webpack-bundle-analyzer": "^4.4.0",
     "webpack-cli": "^4.5.0",
     "webpack-dev-server": "^3.11.2",
@@ -86,9 +101,6 @@
       [
         "@babel/preset-env",
         {
-          "exclude": [
-            "proposal-dynamic-import"
-          ],
           "targets": {
             "browsers": "last 2 versions"
           }
@@ -102,8 +114,7 @@
           "proposal": "fsharp"
         }
       ],
-      "@babel/plugin-proposal-throw-expressions",
-      "@babel/plugin-syntax-dynamic-import"
+      "@babel/plugin-proposal-throw-expressions"
     ]
   }
 }
