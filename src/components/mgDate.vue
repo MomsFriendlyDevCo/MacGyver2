@@ -22,7 +22,7 @@ export default app.mgComponent('mgDate', {
 		required: {type: 'mgToggle', default: false},
 	},
 	created() {
-		this.$debugging = true;
+		this.$debugging = false;
 
 		this.$on('mgValidate', reply => {
 			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
