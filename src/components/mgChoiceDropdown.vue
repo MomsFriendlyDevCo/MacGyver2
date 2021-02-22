@@ -46,6 +46,8 @@ export default app.mgComponent('mgChoiceDropdown', {
 		focus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},
 	},
 	created() {
+		this.$debugging = false;
+
 		this.$on('mgValidate', reply => {
 			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
 		});
@@ -119,27 +121,38 @@ export default app.mgComponent('mgChoiceDropdown', {
 </script>
 
 <template>
-	<v-select
-		ref="select"
-		:value="selected"
-		label="title"
-		:options="enumIter"
-		:placeholder="$props.placeholder"
-		:clearable="!$props.required"
-		:get-option-key="getOptionKey"
-		:get-option-label="getOptionLabel"
-		@input="changeHandler"
-	>
-		<template #selected-option="option">
-			<!-- TODO: getOptionIcon -->
-			<i v-if="option.icon" :class="option.icon" />
-			{{ getOptionLabel(option) }}
-		</template>
-		<template #option="option">
-			<i v-if="option.icon" :class="option.icon" />
-			{{ getOptionLabel(option) }}
-		</template>
-	</v-select>
+	<div class="mg-choice-dropdown">
+		<v-select
+			ref="select"
+			:value="selected"
+			label="title"
+			:options="enumIter"
+			:placeholder="$props.placeholder"
+			:clearable="!$props.required"
+			:get-option-key="getOptionKey"
+			:get-option-label="getOptionLabel"
+			@input="changeHandler"
+		>
+			<template #selected-option="option">
+				<!-- TODO: getOptionIcon -->
+				<i v-if="option.icon" :class="option.icon" />
+				{{ getOptionLabel(option) }}
+			</template>
+			<template #option="option">
+				<i v-if="option.icon" :class="option.icon" />
+				{{ getOptionLabel(option) }}
+			</template>
+		</v-select>
+
+		<div v-if="this.$debugging" class="card">
+			<div class="card-header">
+				Raw data
+			</div>
+			<div class="card-body">
+				<pre>{{$data}}</pre>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style>
