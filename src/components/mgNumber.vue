@@ -20,7 +20,7 @@ export default app.mgComponent('mgNumber', {
 		required: {type: 'mgToggle', default: false},
 		disabled: {type: 'mgToggle', default: false},
 		readonly: {type: 'mgToggle', default: false},
-		interface: {type: 'mgChoiceDropdown', title: 'Interface', help: 'How to allow number input', default: 'bumpers', enum: [
+		interface: {type: 'mgChoiceDropdown', title: 'Interface', help: 'How to allow number input', default: 'input', enum: [
 			{id: 'bumpers', title: 'Number input with buttons'},
 			{id: 'slider', title: 'Slider bar'},
 			{id: 'input', title: 'Number input box only'},
