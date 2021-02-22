@@ -18,6 +18,8 @@ export default app.mgComponent('mgNumber', {
 		step: {type: 'mgNumber', title: 'Value to increment / decrement by'},
 		placeholder: {type: 'mgNumber', help: 'Ghost text to display when there is no value'},
 		required: {type: 'mgToggle', default: false},
+		disabled: {type: 'mgToggle', default: false},
+		readonly: {type: 'mgToggle', default: false},
 		interface: {type: 'mgChoiceDropdown', title: 'Interface', help: 'How to allow number input', default: 'bumpers', enum: [
 			{id: 'bumpers', title: 'Number input with buttons'},
 			{id: 'slider', title: 'Slider bar'},
@@ -52,17 +54,47 @@ export default app.mgComponent('mgNumber', {
 <template>
 	<div class="mg-number" :class="`mg-number-${$props.interface}`">
 		<div v-if="$props.interface == 'slider'">
-			<input v-model="data" type="range" class="form-control" :placeholder="$props.placeholder" :min="$props.min" :max="$props.max" :step="$props.step"/>
+			<input
+				v-model="data"
+				type="range"
+				class="form-control"
+				:placeholder="$props.placeholder"
+				:min="$props.min"
+				:max="$props.max"
+				:step="$props.step"
+				:disabled="$props.disabled"
+				:readonly="$props.readonly"
+			/>
 			<label class="mg-number-slider-value">{{(data || '?') | number}}</label>
 		</div>
 		<div v-else-if="$props.interface == 'bumpers'" class="input-group">
 			<a @click="add(-1)" class="hidden-print" :class="$props.bumperDownClass"></a>
-			<input v-model="data" type="number" class="form-control" :placeholder="$props.placeholder" :min="$props.min" :max="$props.max" :step="$props.step"/>
+			<input
+				v-model="data"
+				type="number"
+				class="form-control"
+				:placeholder="$props.placeholder"
+				:min="$props.min"
+				:max="$props.max"
+				:step="$props.step"
+				:disabled="$props.disabled"
+				:readonly="$props.readonly"
+			/>
 			<a @click="add(1)" class="hidden-print" :class="$props.bumperUpClass"></a>
 		</div>
 		<div v-else-if="$props.interface == 'input'" class="input-group">
 			<div v-if="$props.prefix" :class="$props.prefixClass">{{$props.prefix}}</div>
-			<input v-model="data" type="number" class="form-control" :placeholder="$props.placeholder" :min="$props.min" :max="$props.max" :step="$props.step"/>
+			<input
+				v-model="data"
+				type="number"
+				class="form-control"
+				:placeholder="$props.placeholder"
+				:min="$props.min"
+				:max="$props.max"
+				:step="$props.step"
+				:disabled="$props.disabled"
+				:readonly="$props.readonly"
+			/>
 			<div v-if="$props.suffix" :class="$props.suffixClass">{{$props.suffix}}</div>
 		</div>
 		<div v-else class="alert alert-warning">
