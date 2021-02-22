@@ -22,7 +22,7 @@ export default app.mgComponent('mgDate', {
 		required: {type: 'mgToggle', default: false},
 	},
 	created() {
-		this.$debugging = false;
+		this.$debugging = true;
 
 		this.$on('mgValidate', reply => {
 			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
@@ -35,6 +35,7 @@ export default app.mgComponent('mgDate', {
 		});
 
 		this.$watch('data', ()=> {
+			if (!this.data) return;
 			this.formData = moment(this.data).format(moment.HTML5_FMT.DATE);
 		}, { immediate: true });
 
