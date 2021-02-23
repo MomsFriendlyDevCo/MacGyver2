@@ -167,7 +167,7 @@ export default app.mgComponent('mgChoiceDropdown', {
 }
 
 /* Wider spacing for clear button */
-.v-select .dropdown-toggle .clear {
+.v-select .dropdown-toggle .vs__clear {
 	margin-right: 10px;
 }
 
