@@ -34,7 +34,7 @@ export default app.mgComponent('mgTable', {
 		showTitle: {type: 'mgToggle', default: false, title: 'Show Title'},
 	},
 	created() {
-		this.$debugging = true;
+		this.$debugging = false;
 	},
 	mounted() {
 		this.$watch('$props.url', ()=> {
