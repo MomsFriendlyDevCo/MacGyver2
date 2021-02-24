@@ -22,7 +22,7 @@ export default app.component('mgFormEditorControls', {
 			<!-- FIXME: Not yet working <a @click="$mgFormEditor.dragWidget($props.config.$specPath)" class="far fa-arrows-alt" v-tooltip="'Move widget'"/> -->
 			<a @click="$mgFormEditor.moveWidget($props.config.$specPath, 'up')" class="far fa-arrow-up" v-tooltip="'Move widget up'"/>
 			<a @click="$mgFormEditor.moveWidget($props.config.$specPath, 'down')" class="far fa-arrow-down" v-tooltip="'Move widget down'"/>
-			<a @click.stop="$mgFormEditor.removeWidget($props.config.$specPath)" class="far fa-trash danger" v-tooltip="'Delete widget'"/>
+			<a @click.stop="$mgFormEditor.removeWidget($props.config.$specPath)" class="fas fa-trash danger" v-tooltip="'Delete widget'"/>
 		</div>
 	</div>
 </template>

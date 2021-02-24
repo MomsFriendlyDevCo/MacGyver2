@@ -131,7 +131,7 @@ export default app.mgComponent('mgTable', {
 								<li v-if="$props.allowAdd"><a @click="createRow(rowNumber)"><i class="fas fa-arrow-circle-up"></i> Add row above</a></li>
 								<li v-if="$props.allowAdd"><a @click="createRow(rowNumber)"><i class="fas fa-arrow-circle-down"></i> Add row below</a></li>
 								<li v-if="$props.allowDelete" class="dropdown-divider"></li>
-								<li v-if="$props.allowDelete" class="dropdown-item-danger"><a @click="deleteRow(rowNumber)"><i class="far fa-trash"></i> Delete</a></li>
+								<li v-if="$props.allowDelete" class="dropdown-item-danger"><a @click="deleteRow(rowNumber)"><i class="fas fa-trash"></i> Delete</a></li>
 							</ul>
 						</div>
 					</td>

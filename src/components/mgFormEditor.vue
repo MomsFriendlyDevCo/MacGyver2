@@ -243,7 +243,7 @@ export default app.component('mgFormEditor', {
 								showTitle: false,
 								rowClass: 'aside-actions',
 								items: [
-									{type: 'mgButton', action: 'deleteWidget', class: 'btn btn-link btn-link-danger btn-xs', icon: 'far fa-trash', tooltip: 'Delete this widget'},
+									{type: 'mgButton', action: 'deleteWidget', class: 'btn btn-link btn-link-danger btn-xs', icon: 'fas fa-trash', tooltip: 'Delete this widget'},
 									{type: 'mgButton', action: 'setMode', text: '', class: 'btn btn-link btn-xs', icon: 'far fa-times'},
 								],
 							},
