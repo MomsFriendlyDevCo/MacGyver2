@@ -71,6 +71,7 @@ export default app.mgComponent('mgTable', {
 			this.isAdding = false;
 		},
 		deleteRow(offset) {
+			// TODO: Add confirmation dialog?
 			this.$debug('deleteRow', offset);
 			this.data.splice(offset, 1);
 		},
