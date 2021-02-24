@@ -126,7 +126,7 @@ export default app.mgComponent('mgTable', {
 					</td>
 					<td v-if="$props.allowAdd || $props.allowDelete" class="btn-context">
 						<div class="btn-group">
-							<a class="btn btn-context" data-toggle="dropdown"><i class="far fa-ellipsis-v"></i></a>
+							<a class="btn btn-context" data-toggle="dropdown"><i class="fas fa-ellipsis-v"></i></a>
 							<ul class="dropdown-menu pull-right">
 								<li v-if="$props.allowAdd"><a @click="createRow(rowNumber)"><i class="far fa-arrow-circle-up"></i> Add row above</a></li>
 								<li v-if="$props.allowAdd"><a @click="createRow(rowNumber)"><i class="far fa-arrow-circle-down"></i> Add row below</a></li>
