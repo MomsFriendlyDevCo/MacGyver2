@@ -1,12 +1,33 @@
-const { VueLoaderPlugin } = require('vue-loader');
-//const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const path = require('path');
+import { VueLoaderPlugin } from 'vue-loader';
+//import BundleAnalyzerPlugin from 'webpack-bundle-analyzer';
+import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 
-module.exports = {
+import glob from 'glob';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+export default {
   entry: {
-    main: './src/entrypoint-vue.js',
-    macgyver: './src/entrypoint-node.js', 
+    ...glob.sync('./src/components/*.vue')
+      .reduce((obj, el) => {
+        obj[`components/${path.parse(el).name}`] = el;
+        return obj;
+      }, {}),
+    'components': {
+      import: './src/components.js',
+      filename: 'components.js',
+      dependOn: glob.sync('./src/components/*.vue')
+        .map(el => `components/${path.parse(el).name}`),
+    },
+    'macgyver': './src/macgyver.js',
+    'vue-macgyver': {
+      import: './src/vue-macgyver.js',
+      filename: 'vue-macgyver.js',
+      dependOn: 'macgyver',
+    },
   },
   output: {
     globalObject: 'this',

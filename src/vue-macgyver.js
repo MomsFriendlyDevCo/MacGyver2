@@ -1,7 +1,7 @@
 import MacGyver from './macgyver.js';
-import VueEmit from './services/emit.js';
+import VueEmit from './libs/emit.js';
 import VueSetPath from '@momsfriendlydevco/vue-setpath';
-import VueWatchall from './services/watchAll.js';
+import VueWatchall from './libs/watchAll.js';
 
 /**
 * Main MacGyver plugin
@@ -10,8 +10,10 @@ import VueWatchall from './services/watchAll.js';
 * @var {Object}
 */
 // TODO: Could use pattern like VueRouter and define a VueMacgyver Class.
-export default {
-	install: function (app, options) {
+//export default {
+//	install: function (app, options) {
+export class VueMacgyver {
+	install(app, options) {			
 		var $macgyver = MacGyver;
 
 		/**

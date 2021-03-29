@@ -2,7 +2,16 @@
   "name": "@momsfriendlydevco/macgyver",
   "version": "2.0.0",
   "description": "Dynamic form widgets for Vue",
-  "main": "dist/main.js",
+  "main": "./dist/macgyver.js",
+  "exports": {
+    ".": {
+      "node": "./dist/macgyver.js",
+      "default": "./dist/vue-macgyver.js"
+    },
+    "./components": "./dist/components.js",
+    "./components/*": "./dist/components/*.js"
+  },
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MomsFriendlyDevCo/macgyver.git"
@@ -28,10 +37,13 @@
   "dependencies": {
     "@momsfriendlydevco/vue-setpath": "0.0.1",
     "bootstrap": "^4.4.1",
+    "chartjs": "^0.3.24",
+    "chartjs-plugin-colorschemes": "^0.4.0",
     "globby": "^11.0.2",
     "jquery": "^3.4.1",
     "lodash": "^4.17.15",
     "moment": "^2.27.0",
+    "vue-grid-layout": "^2.3.12",
     "vue-input-facade": "^1.1.5",
     "vue-select": "^3.11.2",
     "vue2-editor": "^2.10.2"
