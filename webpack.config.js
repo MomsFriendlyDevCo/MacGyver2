@@ -16,6 +16,7 @@ export default {
         obj[`components/${path.parse(el).name}`] = el;
         return obj;
       }, {}),
+    // TODO: Alternative? `'components': ['./src/components.js', ...glob.sync('./src/components/*.vue').map(el => `components/${path.parse(el).name}`)]`
     'components': {
       import: './src/components.js',
       filename: 'components.js',
@@ -23,6 +24,7 @@ export default {
         .map(el => `components/${path.parse(el).name}`),
     },
     'macgyver': './src/macgyver.js',
+    // TODO: Alternative? `'vue-macgyver': ['./src/vue-macgyver.js', 'macgyver']`
     'vue-macgyver': {
       import: './src/vue-macgyver.js',
       filename: 'vue-macgyver.js',
