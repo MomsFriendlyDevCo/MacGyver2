@@ -10,6 +10,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default {
+  experiments: {
+    outputModule: true,
+  },
   entry: {
     ...glob.sync('./src/components/*.vue')
       .reduce((obj, el) => {
@@ -32,9 +35,20 @@ export default {
     },
   },
   output: {
-    globalObject: 'this',
+    globalObject: 'global',
     path: path.resolve(__dirname, "dist"),
-    libraryTarget: 'umd'
+    library: {
+      type: 'module',
+    },
+    /*
+    library: {
+      name: 'Macgyver',
+      //type: 'var',
+      type: 'umd',
+    },
+    */
+    //libraryExport: 'default',
+    //libraryTarget: 'umd'
   },
   module: {
     rules: [
@@ -95,18 +109,23 @@ export default {
       amd: '@momsfriendlydevco/vue-setpath',
     },
     */
+    /*
     lodash: {
       commonjs: 'lodash',
       commonjs2: 'lodash',
       amd: 'lodash',
       root: '_',
     },
+    */
+    /*
+    // FIXME: library.type: 'module' incompatible
     moment: {
       commonjs: 'moment',
       commonjs2: 'moment',
       amd: 'moment',
       root: 'moment',
     },
+    /*
     /*
     'vue-input-facade': {
       commonjs: 'vue-input-facade',

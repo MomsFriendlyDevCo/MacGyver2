@@ -1,7 +1,7 @@
-const _ = require('lodash');
-const expect = require('chai').expect;
+import _ from 'lodash';
+import {expect} from 'chai';
 
-const macgyver = require('../dist/macgyver').MacGyver;
+import macgyver from '@momsfriendlydevco/macgyver';
 
 describe('Basic sanity checks', ()=> {
 
