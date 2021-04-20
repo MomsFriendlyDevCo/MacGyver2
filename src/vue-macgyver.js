@@ -1,7 +1,15 @@
-import MacGyver from './macgyver.js';
-import VueEmit from './libs/emit.js';
+//import MacGyver from './macgyver.js';
+
+//const Macgyver = require('./macgyver.js').default;
+
+//import { Macgyver } from './macgyver.js';
+//import * as Macgyver from './macgyver.js';
+import Macgyver from './macgyver.js';
+//import Macgyver from '@momsfriendlydevco/macgyver/utils';
+
+import VueEmit from '@momsfriendlydevco/vue-emit';
 import VueSetPath from '@momsfriendlydevco/vue-setpath';
-import VueWatchall from './libs/watchAll.js';
+import VueWatchall from '@momsfriendlydevco/vue-watchall';
 
 /**
 * Main MacGyver plugin
@@ -10,11 +18,16 @@ import VueWatchall from './libs/watchAll.js';
 * @var {Object}
 */
 // TODO: Could use pattern like VueRouter and define a VueMacgyver Class.
+
+export default class VueMacgyver {
+	static install(app, options) {
+
 //export default {
 //	install: function (app, options) {
-export class VueMacgyver {
-	install(app, options) {			
-		var $macgyver = MacGyver;
+//export default class VueMacgyver {
+//export class VueMacgyver {
+//	install(app, options) {			
+		var $macgyver = Macgyver;
 
 		/**
 		* Axios compatible HTTP fetcher

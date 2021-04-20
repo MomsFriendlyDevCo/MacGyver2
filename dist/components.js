@@ -6,17 +6,7 @@
  * or disable the default devtool with "devtool: false".
  * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
  */
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else {
-		var a = factory();
-		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
-	}
-})(this, function() {
-return (this["webpackChunk_momsfriendlydevco_macgyver"] = this["webpackChunk_momsfriendlydevco_macgyver"] || []).push([["components"],{
+(global["webpackChunk_momsfriendlydevco_macgyver"] = global["webpackChunk_momsfriendlydevco_macgyver"] || []).push([["components"],{
 
 /***/ "./src/components.js":
 /*!***************************!*\
@@ -30,5 +20,52 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ })
 
 },
-0,[["./src/components.js","components/mgAlert","components/mgButton","components/mgCheckBox","components/mgChoiceAutocomplete","components/mgChoiceButtons","components/mgChoiceCheckbox","components/mgChoiceDropdown","components/mgChoiceList","components/mgChoicePopup","components/mgChoiceRadio","components/mgChoiceTags","components/mgChoiceTree","components/mgCode","components/mgColor","components/mgComponent","components/mgContainer","components/mgDate","components/mgDatetime","components/mgEmail","components/mgError","components/mgForm","components/mgFormEditor","components/mgFormEditorControls","components/mgGrid","components/mgGridDashboard","components/mgHeading","components/mgHtml","components/mgIcon","components/mgInfoBlock","components/mgInfoChart","components/mgLabel","components/mgList","components/mgNumber","components/mgPassword","components/mgPermissions","components/mgPlaceholder","components/mgQuery","components/mgRestQuery","components/mgSeperator","components/mgTable","components/mgText","components/mgTextArea","components/mgTime","components/mgToggle","components/mgUrl","components/mgVideo","components/mgWysiwyg"]]]);
-});
+/******/ __webpack_require__ => { // webpackRuntimeModules
+/******/ "use strict";
+/******/ 
+/******/ var __webpack_exec__ = (moduleId) => (__webpack_require__(__webpack_require__.s = moduleId))
+/******/ __webpack_require__.O(0, ["components/mgButton","components/mgCheckBox","components/mgChoiceAutocomplete","components/mgChoiceButtons","components/mgChoiceCheckbox","components/mgChoiceDropdown","components/mgChoiceList","components/mgChoicePopup","components/mgChoiceRadio","components/mgChoiceTags","components/mgChoiceTree","components/mgCode","components/mgColor","components/mgComponent","components/mgContainer","components/mgDate","components/mgDatetime","components/mgEmail","components/mgError","components/mgForm","components/mgFormEditor","components/mgFormEditorControls","components/mgGrid","components/mgGridDashboard","components/mgHeading","components/mgHtml","components/mgIcon","components/mgInfoBlock","components/mgInfoChart","components/mgLabel","components/mgList","components/mgNumber","components/mgPassword","components/mgPermissions","components/mgPlaceholder","components/mgQuery","components/mgRestQuery","components/mgSeperator","components/mgTable","components/mgText","components/mgTextArea","components/mgTime","components/mgToggle","components/mgUrl","components/mgVideo","components/mgWysiwyg"], () => (__webpack_exec__("./src/components.js")));
+/******/ var __webpack_exports__ = __webpack_require__.O();
+/******/ var __webpack_exports__mgAlert = __webpack_exports__.mgAlert;
+/******/ var __webpack_exports__mgButton = __webpack_exports__.mgButton;
+/******/ var __webpack_exports__mgCheckBox = __webpack_exports__.mgCheckBox;
+/******/ var __webpack_exports__mgChoiceButtons = __webpack_exports__.mgChoiceButtons;
+/******/ var __webpack_exports__mgChoiceCheckbox = __webpack_exports__.mgChoiceCheckbox;
+/******/ var __webpack_exports__mgChoiceDropdown = __webpack_exports__.mgChoiceDropdown;
+/******/ var __webpack_exports__mgChoiceList = __webpack_exports__.mgChoiceList;
+/******/ var __webpack_exports__mgChoicePopup = __webpack_exports__.mgChoicePopup;
+/******/ var __webpack_exports__mgChoiceRadio = __webpack_exports__.mgChoiceRadio;
+/******/ var __webpack_exports__mgChoiceTags = __webpack_exports__.mgChoiceTags;
+/******/ var __webpack_exports__mgChoiceTree = __webpack_exports__.mgChoiceTree;
+/******/ var __webpack_exports__mgCode = __webpack_exports__.mgCode;
+/******/ var __webpack_exports__mgColor = __webpack_exports__.mgColor;
+/******/ var __webpack_exports__mgComponent = __webpack_exports__.mgComponent;
+/******/ var __webpack_exports__mgContainer = __webpack_exports__.mgContainer;
+/******/ var __webpack_exports__mgDate = __webpack_exports__.mgDate;
+/******/ var __webpack_exports__mgDatetime = __webpack_exports__.mgDatetime;
+/******/ var __webpack_exports__mgEmail = __webpack_exports__.mgEmail;
+/******/ var __webpack_exports__mgError = __webpack_exports__.mgError;
+/******/ var __webpack_exports__mgForm = __webpack_exports__.mgForm;
+/******/ var __webpack_exports__mgFormEditor = __webpack_exports__.mgFormEditor;
+/******/ var __webpack_exports__mgGrid = __webpack_exports__.mgGrid;
+/******/ var __webpack_exports__mgHeading = __webpack_exports__.mgHeading;
+/******/ var __webpack_exports__mgIcon = __webpack_exports__.mgIcon;
+/******/ var __webpack_exports__mgInfoBlock = __webpack_exports__.mgInfoBlock;
+/******/ var __webpack_exports__mgLabel = __webpack_exports__.mgLabel;
+/******/ var __webpack_exports__mgList = __webpack_exports__.mgList;
+/******/ var __webpack_exports__mgNumber = __webpack_exports__.mgNumber;
+/******/ var __webpack_exports__mgPassword = __webpack_exports__.mgPassword;
+/******/ var __webpack_exports__mgPlaceholder = __webpack_exports__.mgPlaceholder;
+/******/ var __webpack_exports__mgQuery = __webpack_exports__.mgQuery;
+/******/ var __webpack_exports__mgRestQuery = __webpack_exports__.mgRestQuery;
+/******/ var __webpack_exports__mgSeperator = __webpack_exports__.mgSeperator;
+/******/ var __webpack_exports__mgTable = __webpack_exports__.mgTable;
+/******/ var __webpack_exports__mgText = __webpack_exports__.mgText;
+/******/ var __webpack_exports__mgTextArea = __webpack_exports__.mgTextArea;
+/******/ var __webpack_exports__mgTime = __webpack_exports__.mgTime;
+/******/ var __webpack_exports__mgToggle = __webpack_exports__.mgToggle;
+/******/ var __webpack_exports__mgUrl = __webpack_exports__.mgUrl;
+/******/ var __webpack_exports__mgVideo = __webpack_exports__.mgVideo;
+/******/ export { __webpack_exports__mgAlert as mgAlert, __webpack_exports__mgButton as mgButton, __webpack_exports__mgCheckBox as mgCheckBox, __webpack_exports__mgChoiceButtons as mgChoiceButtons, __webpack_exports__mgChoiceCheckbox as mgChoiceCheckbox, __webpack_exports__mgChoiceDropdown as mgChoiceDropdown, __webpack_exports__mgChoiceList as mgChoiceList, __webpack_exports__mgChoicePopup as mgChoicePopup, __webpack_exports__mgChoiceRadio as mgChoiceRadio, __webpack_exports__mgChoiceTags as mgChoiceTags, __webpack_exports__mgChoiceTree as mgChoiceTree, __webpack_exports__mgCode as mgCode, __webpack_exports__mgColor as mgColor, __webpack_exports__mgComponent as mgComponent, __webpack_exports__mgContainer as mgContainer, __webpack_exports__mgDate as mgDate, __webpack_exports__mgDatetime as mgDatetime, __webpack_exports__mgEmail as mgEmail, __webpack_exports__mgError as mgError, __webpack_exports__mgForm as mgForm, __webpack_exports__mgFormEditor as mgFormEditor, __webpack_exports__mgGrid as mgGrid, __webpack_exports__mgHeading as mgHeading, __webpack_exports__mgIcon as mgIcon, __webpack_exports__mgInfoBlock as mgInfoBlock, __webpack_exports__mgLabel as mgLabel, __webpack_exports__mgList as mgList, __webpack_exports__mgNumber as mgNumber, __webpack_exports__mgPassword as mgPassword, __webpack_exports__mgPlaceholder as mgPlaceholder, __webpack_exports__mgQuery as mgQuery, __webpack_exports__mgRestQuery as mgRestQuery, __webpack_exports__mgSeperator as mgSeperator, __webpack_exports__mgTable as mgTable, __webpack_exports__mgText as mgText, __webpack_exports__mgTextArea as mgTextArea, __webpack_exports__mgTime as mgTime, __webpack_exports__mgToggle as mgToggle, __webpack_exports__mgUrl as mgUrl, __webpack_exports__mgVideo as mgVideo };
+/******/ }
+]);

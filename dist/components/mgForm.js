@@ -6,27 +6,38 @@
  * or disable the default devtool with "devtool: false".
  * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
  */
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else {
-		var a = factory();
-		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
-	}
-})(this, function() {
-return /******/ (() => { // webpackBootstrap
-/******/ 	var __webpack_modules__ = ({
+/******/ var __webpack_modules__ = ({
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-1[0].rules[0].use!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/mgForm.vue?vue&type=script&lang=js&":
-/*!*************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-1[0].rules[0].use!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/mgForm.vue?vue&type=script&lang=js& ***!
-  \*************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/dist/runtime/api.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/css-loader/dist/runtime/api.js ***!
+  \*****************************************************/
+/***/ ((module) => {
+
+"use strict";
+eval("\n/*\n  MIT License http://www.opensource.org/licenses/mit-license.php\n  Author Tobias Koppers @sokra\n*/\n// css base code, injected by the css-loader\n// eslint-disable-next-line func-names\n\nmodule.exports = function (cssWithMappingToString) {\n  var list = []; // return the list of modules as css string\n\n  list.toString = function toString() {\n    return this.map(function (item) {\n      var content = cssWithMappingToString(item);\n\n      if (item[2]) {\n        return \"@media \".concat(item[2], \" {\").concat(content, \"}\");\n      }\n\n      return content;\n    }).join(\"\");\n  }; // import a list of modules into the list\n  // eslint-disable-next-line func-names\n\n\n  list.i = function (modules, mediaQuery, dedupe) {\n    if (typeof modules === \"string\") {\n      // eslint-disable-next-line no-param-reassign\n      modules = [[null, modules, \"\"]];\n    }\n\n    var alreadyImportedModules = {};\n\n    if (dedupe) {\n      for (var i = 0; i < this.length; i++) {\n        // eslint-disable-next-line prefer-destructuring\n        var id = this[i][0];\n\n        if (id != null) {\n          alreadyImportedModules[id] = true;\n        }\n      }\n    }\n\n    for (var _i = 0; _i < modules.length; _i++) {\n      var item = [].concat(modules[_i]);\n\n      if (dedupe && alreadyImportedModules[item[0]]) {\n        // eslint-disable-next-line no-continue\n        continue;\n      }\n\n      if (mediaQuery) {\n        if (!item[2]) {\n          item[2] = mediaQuery;\n        } else {\n          item[2] = \"\".concat(mediaQuery, \" and \").concat(item[2]);\n        }\n      }\n\n      list.push(item);\n    }\n  };\n\n  return list;\n};\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./node_modules/css-loader/dist/runtime/api.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/mgForm.vue?vue&type=script&lang=js&":
+/*!****************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/mgForm.vue?vue&type=script&lang=js& ***!
+  \****************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nfunction _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }\n\nfunction _nonIterableSpread() { throw new TypeError(\"Invalid attempt to spread non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\"); }\n\nfunction _iterableToArray(iter) { if (typeof Symbol !== \"undefined\" && Symbol.iterator in Object(iter)) return Array.from(iter); }\n\nfunction _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }\n\nfunction _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }\n\nfunction _nonIterableRest() { throw new TypeError(\"Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\"); }\n\nfunction _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === \"string\") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === \"Object\" && o.constructor) n = o.constructor.name; if (n === \"Map\" || n === \"Set\") return Array.from(o); if (n === \"Arguments\" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }\n\nfunction _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }\n\nfunction _iterableToArrayLimit(arr, i) { if (typeof Symbol === \"undefined\" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i[\"return\"] != null) _i[\"return\"](); } finally { if (_d) throw _e; } } return _arr; }\n\nfunction _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }\n\nfunction ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }\n\nfunction _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }\n\nfunction _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }\n\n/**\n* The top level MacGyver form\n* @param {string} [form] Unique form name\n* @param {Object|Array} config The MacGyver form object either in long form nested array structure or short form object (which is converted)\n* @param {boolean} [populateDefaults=true] Apply initial defaults to the data when the config is ready, if false you can call vm.assignDefaults() manually if needed\n* @param {boolean} [actionsFallback=true] Use vm.$eval as a runner when no action listener is found\n* @param {Object|function} [actions] Actions subscribers as an object as a lookup list of action definition string keys and their firable function. Subscriber functions are called with the context as `(...params)`. If the value is a function it is called as the raw contents of the action.\n* @param {Object} [data] The data binding\n*\n* @emits change Emitted as `(data)` whenever any data changes\n* @emits changeItem Emitted as `({path, value})` when any single item changes\n* @emits onAction Emitted as `({action, params})` when any action is fired\n* @emits mgComponent.click Emitted as `(component, event)` on native clicks of a component\n* @emits mgComponent.mouseDown Emitted as `(component, event)` on the native mouseDown event of a component\n* @emits mgComponent.mouseUp Emitted as `(component, event)` on the native mouseUp event of a component\n* @emits mgComponent.mouseMove Emitted as `(component, event)` on the native mouseMove event of a component\n* @emits mgComponent.mouseEnter Emitted as `(component, event)` on the native mouseEnter event of a component\n* @emits mgComponent.mouseLeave Emitted as `(component, event)` on the native mouseLeave event of a component\n* @emits mgComponent.mouseOver Emitted as `(component, event)` on the native mouseOver event of a component\n* @emits mgComponent.mouseOut Emitted as `(component, event)` on the native mouseOut event of a component\n* @emits mgContainer.click Emitted as `(container, specPath, event)` on the native click event of a component within a container\n* @emits mgContainer.mouseEnter Emitted as `(container, specPath, event)` on the native mouseEnter event of a component within a container\n* @emits mgContainer.mouseLeave Emitted as `(container, specPath, event)` on the native mouseLeave event of a component within a container\n*/\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (app.component('mgForm', {\n  provide: function provide() {\n    return {\n      $mgForm: this\n    };\n  },\n  data: function data() {\n    return {\n      id: undefined,\n      // Set on create\n      editing: false,\n      // Set by mgFormEditor when its this components parent\n      errors: [],\n      // array <Object> {error}\n      spec: undefined,\n      // Calculated version of config after its been though $macgyver.compileSpec()\n      formData: {},\n      // Calculated version of $props.data after default population\n      inRefresh: false // Whether we are doing a refresh from the top-down, prevents recursive refreshing\n\n    };\n  },\n  props: {\n    form: String,\n    // Optional overriding form ID\n    config: [Object, Array],\n    // Can be a single object, array of objects or shorthand style\n    data: Object,\n    populateDefaults: {\n      type: Boolean,\n      default: true\n    },\n    onAction: Function,\n    actionsFallback: {\n      type: Boolean,\n      default: true\n    },\n    actions: {\n      // Object of functions e.g. `{customFunc: ()=> {}}`\n      type: [Function, Object],\n      validator: function validator(v) {\n        return _.isFunction(v) || _.every(function (v) {\n          return _.isFunction(v);\n        });\n      }\n    }\n  },\n  created: function created() {\n    this.id = this.id || this.$props.form || this.$macgyver.nextId();\n  },\n  mounted: function mounted() {\n    var _this = this;\n\n    this.$watch('$props.config', function () {\n      // console.log('mgForm config clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));\n      _this.rebuild();\n    }, {\n      immediate: true,\n      deep: true\n    });\n    this.$watch('$props.data', function () {\n      // console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));\n      _this.rebuildData();\n    }, {\n      immediate: true,\n      deep: true\n    });\n    this.$on('mgChange', function (data) {\n      if (_this.inRefresh) return;\n\n      _this.$macgyver.utils.setPath(_this.formData, data.path, data.value);\n\n      _this.$emit('changeItem', data);\n\n      _this.$emit('change', _objectSpread({}, _this.formData)); // Has to be a shallow clone so we break the reference and Vue updates\n\n\n      _this.refreshShowIfs();\n    });\n    this.$on('mgErrors', function (errors) {\n      return _this.errors = errors;\n    }); // this.$on('mgForm.rebuild', ()=> this.rebuild()); // FIXME: Needed after new mgForm config clobber detection?\n  },\n  methods: {\n    /**\n    * Force the form to rebuild its config\n    */\n    rebuild: function rebuild() {\n      this.id = this.id || this.$props.form || this.$macgyver.nextId(); // console.log(`Rebuild form config for form \"${this.id}\"`);\n\n      this.spec = this.$macgyver.compileSpec(this.$props.config);\n      if (!this.spec || !this.spec.spec) throw new Error('Invalid Macgyver form spec');\n    },\n\n    /**\n    * Force the form to rebuild its data set\n    */\n    rebuildData: function rebuildData() {\n      var _this2 = this;\n\n      if (this.inRefresh) return;\n      this.inRefresh = true;\n      this.formData = this.$props.data ? _.cloneDeep(this.$props.data) : {};\n      if (this.$props.populateDefaults) this.assignDefaults();\n      this.refreshShowIfs();\n      this.$emit.down('mgRefreshForm');\n      this.$nextTick(function () {\n        return (// Wait one tick for all attempts to recall this function recursively to exhaust\n          _this2.inRefresh = false\n        );\n      });\n    },\n\n    /**\n    * Force recomputation of show via showIf values\n    */\n    refreshShowIfs: function refreshShowIfs() {\n      var _this3 = this;\n\n      if (!this.spec) return;\n      this.spec.showIfs.forEach(function (widget) {\n        return widget.show = _this3.$macgyver.utils.evalMatch(widget.showIf, _this3.formData);\n      });\n    },\n\n    /**\n    * Assign initial defaults if a value is not in the data object\n    */\n    assignDefaults: function assignDefaults() {\n      if (!this.spec) return;\n\n      _.defaultsDeep(this.formData, this.getPrototype());\n\n      this.$emit('change', this.formData);\n    },\n\n    /**\n    * Compute the data prototype of the form\n    * This is an empty object with all the defaults populated\n    * @returns {Object} A prototype data object with all defaults populated\n    * @see $macgyver.forms.getPrototype()\n    */\n    getPrototype: function getPrototype() {\n      if (!this.id) return {}; // Form not yet ready\n\n      return this.$macgyver.forms.getPrototype(this.spec.spec);\n    },\n\n    /**\n    * Execute a function within a form\n    * The default behaviour of this function is documented within the function\n    * @param {string|function} action The action(s) to execute\n    * @param {*} [context] The context of the action, defaults to the form component\n    * @param {*} [params...] Additional parameters to execute\n    * @emits mgRun Event fired at the form level only with a single object of the form `{action, params}`. Use the form property handleActions to specify if the form should handle or trap the event to override\n    */\n    run: function run(action, context) {\n      var _this$$props$onAction, _this$$macgyver$$eval;\n\n      // 0. See if what we've been passed is already a function {{{\n      if (typeof action == 'function') {\n        return action.call(context !== null && context !== void 0 ? context : this);\n      } // }}}\n      // 1. Emit mgRun to parents and see if they want to handle it {{{\n\n\n      var handled = false;\n\n      for (var _len = arguments.length, params = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {\n        params[_key - 2] = arguments[_key];\n      }\n\n      this.$emit.up.call(context !== null && context !== void 0 ? context : this, 'mgRun', {\n        action: action,\n        params: params\n      }, function (isHandled) {\n        if (isHandled) handled = true;\n      });\n      if (handled) return; // }}}\n      // 2. Use FORM.$props.onAction(action) and see if returns truthy {{{\n\n      if (this.$props.onAction && (_this$$props$onAction = this.$props.onAction).call.apply(_this$$props$onAction, [context !== null && context !== void 0 ? context : this, action].concat(params))) return; // }}}\n      // 3a. Does FORM.$props.actions exist and is a function which will handle everything? {{{\n\n      if (this.$props.actions && _.isFunction(this.$props.actions)) {\n        this.$props.actions.call(context !== null && context !== void 0 ? context : this, action);\n        return;\n      } // }}}\n      // 3b. Does FORM.$props.actions[action] exist and if so whether it returns truthy {{{\n\n\n      var _ref = /^([a-z0-9\\_]*?)(\\(.*\\))?$/i.exec(action) || [],\n          _ref2 = _slicedToArray(_ref, 3),\n          junk = _ref2[0],\n          actionReadable = _ref2[1],\n          actionArgs = _ref2[2];\n\n      if (actionReadable && this.$props.actions && this.$props.actions[actionReadable]) {\n        // Collapse strings to functions\n        var func = _.isString(this.$props.actions[actionReadable]) ? this[actionReadable] : this.$props.actions[actionReadable]; // Tidy up actionArgs\n\n        actionArgs = (actionArgs || '').replace(/^\\(/, '') // Remove preceeding '('\n        .replace(/\\)$/, '') // Remove succeeding ')'\n        .split(',').map(function (i) {\n          return i && JSON.parse(i.replace(/'/g, '\"'));\n        });\n        if (func.call.apply(func, [context !== null && context !== void 0 ? context : this].concat(_toConsumableArray(actionArgs), params))) return;\n      } // }}}\n      // 4. If all else failed and FORM.$props.actionsFallback is true - handle it via vm.$eval {{{\n\n\n      (_this$$macgyver$$eval = this.$macgyver.$eval).call.apply(_this$$macgyver$$eval, [context !== null && context !== void 0 ? context : this, action].concat(params)); // }}}\n\n    },\n\n    /**\n    * Find a VueComponent instance from a specPath\n    * @param {string|array} specPath The specPath to search for\n    * @param {boolean} [throws=true] Throw an error if the path cannot be found (avoid downstream checking if the specPath is valid)\n    * @returns {VueComponent} Either the found VueComponent or `false` if not found\n    */\n    getComponentBySpecPath: function getComponentBySpecPath(specPath) {\n      var throws = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;\n      var found = false;\n      this.$emit.down('mgIdentify', function (widget) {\n        if (!found && widget.$props.$specPath == specPath) found = widget;\n      });\n      if (!found && throws) throw new Error(\"Cannot edit component by non-existant specPath \\\"\".concat(specPath, \"\\\"\"));\n      return found;\n    }\n  }\n}));\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./src/components/mgForm.vue?./node_modules/babel-loader/lib/index.js??clonedRuleSet-1%5B0%5D.rules%5B0%5D.use!./node_modules/vue-loader/lib/index.js??vue-loader-options");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nfunction _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }\n\nfunction _nonIterableSpread() { throw new TypeError(\"Invalid attempt to spread non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\"); }\n\nfunction _iterableToArray(iter) { if (typeof Symbol !== \"undefined\" && Symbol.iterator in Object(iter)) return Array.from(iter); }\n\nfunction _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }\n\nfunction _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }\n\nfunction _nonIterableRest() { throw new TypeError(\"Invalid attempt to destructure non-iterable instance.\\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.\"); }\n\nfunction _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === \"string\") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === \"Object\" && o.constructor) n = o.constructor.name; if (n === \"Map\" || n === \"Set\") return Array.from(o); if (n === \"Arguments\" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }\n\nfunction _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }\n\nfunction _iterableToArrayLimit(arr, i) { if (typeof Symbol === \"undefined\" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i[\"return\"] != null) _i[\"return\"](); } finally { if (_d) throw _e; } } return _arr; }\n\nfunction _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }\n\nfunction ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }\n\nfunction _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }\n\nfunction _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }\n\n/**\n* The top level MacGyver form\n* @param {string} [form] Unique form name\n* @param {Object|Array} config The MacGyver form object either in long form nested array structure or short form object (which is converted)\n* @param {boolean} [populateDefaults=true] Apply initial defaults to the data when the config is ready, if false you can call vm.assignDefaults() manually if needed\n* @param {boolean} [actionsFallback=true] Use vm.$eval as a runner when no action listener is found\n* @param {Object|function} [actions] Actions subscribers as an object as a lookup list of action definition string keys and their firable function. Subscriber functions are called with the context as `(...params)`. If the value is a function it is called as the raw contents of the action.\n* @param {Object} [data] The data binding\n*\n* @emits change Emitted as `(data)` whenever any data changes\n* @emits changeItem Emitted as `({path, value})` when any single item changes\n* @emits onAction Emitted as `({action, params})` when any action is fired\n* @emits mgComponent.click Emitted as `(component, event)` on native clicks of a component\n* @emits mgComponent.mouseDown Emitted as `(component, event)` on the native mouseDown event of a component\n* @emits mgComponent.mouseUp Emitted as `(component, event)` on the native mouseUp event of a component\n* @emits mgComponent.mouseMove Emitted as `(component, event)` on the native mouseMove event of a component\n* @emits mgComponent.mouseEnter Emitted as `(component, event)` on the native mouseEnter event of a component\n* @emits mgComponent.mouseLeave Emitted as `(component, event)` on the native mouseLeave event of a component\n* @emits mgComponent.mouseOver Emitted as `(component, event)` on the native mouseOver event of a component\n* @emits mgComponent.mouseOut Emitted as `(component, event)` on the native mouseOut event of a component\n* @emits mgContainer.click Emitted as `(container, specPath, event)` on the native click event of a component within a container\n* @emits mgContainer.mouseEnter Emitted as `(container, specPath, event)` on the native mouseEnter event of a component within a container\n* @emits mgContainer.mouseLeave Emitted as `(container, specPath, event)` on the native mouseLeave event of a component within a container\n*/\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (app.component('mgForm', {\n  provide: function provide() {\n    return {\n      $mgForm: this\n    };\n  },\n  data: function data() {\n    return {\n      id: undefined,\n      // Set on create\n      editing: false,\n      // Set by mgFormEditor when its this components parent\n      errors: [],\n      // array <Object> {error}\n      spec: undefined,\n      // Calculated version of config after its been though $macgyver.compileSpec()\n      formData: {},\n      // Calculated version of $props.data after default population\n      inRefresh: false // Whether we are doing a refresh from the top-down, prevents recursive refreshing\n\n    };\n  },\n  props: {\n    form: String,\n    // Optional overriding form ID\n    config: [Object, Array],\n    // Can be a single object, array of objects or shorthand style\n    data: Object,\n    populateDefaults: {\n      type: Boolean,\n      default: true\n    },\n    onAction: Function,\n    actionsFallback: {\n      type: Boolean,\n      default: true\n    },\n    actions: {\n      // Object of functions e.g. `{customFunc: ()=> {}}`\n      type: [Function, Object],\n      validator: function validator(v) {\n        return _.isFunction(v) || _.every(function (v) {\n          return _.isFunction(v);\n        });\n      }\n    }\n  },\n  created: function created() {\n    this.id = this.id || this.$props.form || this.$macgyver.nextId();\n  },\n  mounted: function mounted() {\n    var _this = this;\n\n    this.$watch('$props.config', function () {\n      // console.log('mgForm config clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));\n      _this.rebuild();\n    }, {\n      immediate: true,\n      deep: true\n    });\n    this.$watch('$props.data', function () {\n      // console.log('mgForm data clobber', this.id, JSON.parse(JSON.stringify(this.$props.config)));\n      _this.rebuildData();\n    }, {\n      immediate: true,\n      deep: true\n    });\n    this.$on('mgChange', function (data) {\n      if (_this.inRefresh) return;\n\n      _this.$macgyver.utils.setPath(_this.formData, data.path, data.value);\n\n      _this.$emit('changeItem', data);\n\n      _this.$emit('change', _objectSpread({}, _this.formData)); // Has to be a shallow clone so we break the reference and Vue updates\n\n\n      _this.refreshShowIfs();\n    });\n    this.$on('mgErrors', function (errors) {\n      return _this.errors = errors;\n    }); // this.$on('mgForm.rebuild', ()=> this.rebuild()); // FIXME: Needed after new mgForm config clobber detection?\n  },\n  methods: {\n    /**\n    * Force the form to rebuild its config\n    */\n    rebuild: function rebuild() {\n      this.id = this.id || this.$props.form || this.$macgyver.nextId(); // console.log(`Rebuild form config for form \"${this.id}\"`);\n\n      this.spec = this.$macgyver.compileSpec(this.$props.config);\n      if (!this.spec || !this.spec.spec) throw new Error('Invalid Macgyver form spec');\n    },\n\n    /**\n    * Force the form to rebuild its data set\n    */\n    rebuildData: function rebuildData() {\n      var _this2 = this;\n\n      if (this.inRefresh) return;\n      this.inRefresh = true;\n      this.formData = this.$props.data ? _.cloneDeep(this.$props.data) : {};\n      if (this.$props.populateDefaults) this.assignDefaults();\n      this.refreshShowIfs();\n      this.$emit.down('mgRefreshForm');\n      this.$nextTick(function () {\n        return (// Wait one tick for all attempts to recall this function recursively to exhaust\n          _this2.inRefresh = false\n        );\n      });\n    },\n\n    /**\n    * Force recomputation of show via showIf values\n    */\n    refreshShowIfs: function refreshShowIfs() {\n      var _this3 = this;\n\n      if (!this.spec) return;\n      this.spec.showIfs.forEach(function (widget) {\n        return widget.show = _this3.$macgyver.utils.evalMatch(widget.showIf, _this3.formData);\n      });\n    },\n\n    /**\n    * Assign initial defaults if a value is not in the data object\n    */\n    assignDefaults: function assignDefaults() {\n      if (!this.spec) return;\n\n      _.defaultsDeep(this.formData, this.getPrototype());\n\n      this.$emit('change', this.formData);\n    },\n\n    /**\n    * Compute the data prototype of the form\n    * This is an empty object with all the defaults populated\n    * @returns {Object} A prototype data object with all defaults populated\n    * @see $macgyver.forms.getPrototype()\n    */\n    getPrototype: function getPrototype() {\n      if (!this.id) return {}; // Form not yet ready\n\n      return this.$macgyver.forms.getPrototype(this.spec.spec);\n    },\n\n    /**\n    * Execute a function within a form\n    * The default behaviour of this function is documented within the function\n    * @param {string|function} action The action(s) to execute\n    * @param {*} [context] The context of the action, defaults to the form component\n    * @param {*} [params...] Additional parameters to execute\n    * @emits mgRun Event fired at the form level only with a single object of the form `{action, params}`. Use the form property handleActions to specify if the form should handle or trap the event to override\n    */\n    run: function run(action, context) {\n      var _this$$props$onAction, _this$$macgyver$$eval;\n\n      // 0. See if what we've been passed is already a function {{{\n      if (typeof action == 'function') {\n        return action.call(context !== null && context !== void 0 ? context : this);\n      } // }}}\n      // 1. Emit mgRun to parents and see if they want to handle it {{{\n\n\n      var handled = false;\n\n      for (var _len = arguments.length, params = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {\n        params[_key - 2] = arguments[_key];\n      }\n\n      this.$emit.up.call(context !== null && context !== void 0 ? context : this, 'mgRun', {\n        action: action,\n        params: params\n      }, function (isHandled) {\n        if (isHandled) handled = true;\n      });\n      if (handled) return; // }}}\n      // 2. Use FORM.$props.onAction(action) and see if returns truthy {{{\n\n      if (this.$props.onAction && (_this$$props$onAction = this.$props.onAction).call.apply(_this$$props$onAction, [context !== null && context !== void 0 ? context : this, action].concat(params))) return; // }}}\n      // 3a. Does FORM.$props.actions exist and is a function which will handle everything? {{{\n\n      if (this.$props.actions && _.isFunction(this.$props.actions)) {\n        this.$props.actions.call(context !== null && context !== void 0 ? context : this, action);\n        return;\n      } // }}}\n      // 3b. Does FORM.$props.actions[action] exist and if so whether it returns truthy {{{\n\n\n      var _ref = /^([a-z0-9\\_]*?)(\\(.*\\))?$/i.exec(action) || [],\n          _ref2 = _slicedToArray(_ref, 3),\n          junk = _ref2[0],\n          actionReadable = _ref2[1],\n          actionArgs = _ref2[2];\n\n      if (actionReadable && this.$props.actions && this.$props.actions[actionReadable]) {\n        // Collapse strings to functions\n        var func = _.isString(this.$props.actions[actionReadable]) ? this[actionReadable] : this.$props.actions[actionReadable]; // Tidy up actionArgs\n\n        actionArgs = (actionArgs || '').replace(/^\\(/, '') // Remove preceeding '('\n        .replace(/\\)$/, '') // Remove succeeding ')'\n        .split(',').map(function (i) {\n          return i && JSON.parse(i.replace(/'/g, '\"'));\n        });\n        if (func.call.apply(func, [context !== null && context !== void 0 ? context : this].concat(_toConsumableArray(actionArgs), params))) return;\n      } // }}}\n      // 4. If all else failed and FORM.$props.actionsFallback is true - handle it via vm.$eval {{{\n\n\n      (_this$$macgyver$$eval = this.$macgyver.$eval).call.apply(_this$$macgyver$$eval, [context !== null && context !== void 0 ? context : this, action].concat(params)); // }}}\n\n    },\n\n    /**\n    * Find a VueComponent instance from a specPath\n    * @param {string|array} specPath The specPath to search for\n    * @param {boolean} [throws=true] Throw an error if the path cannot be found (avoid downstream checking if the specPath is valid)\n    * @returns {VueComponent} Either the found VueComponent or `false` if not found\n    */\n    getComponentBySpecPath: function getComponentBySpecPath(specPath) {\n      var throws = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;\n      var found = false;\n      this.$emit.down('mgIdentify', function (widget) {\n        if (!found && widget.$props.$specPath == specPath) found = widget;\n      });\n      if (!found && throws) throw new Error(\"Cannot edit component by non-existant specPath \\\"\".concat(specPath, \"\\\"\"));\n      return found;\n    }\n  }\n}));\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./src/components/mgForm.vue?./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js??vue-loader-options");
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/lib/listToStyles.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/vue-style-loader/lib/listToStyles.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ listToStyles)\n/* harmony export */ });\n/**\n * Translates the list format produced by css-loader into something\n * easier to manipulate.\n */\nfunction listToStyles(parentId, list) {\n  var styles = [];\n  var newStyles = {};\n\n  for (var i = 0; i < list.length; i++) {\n    var item = list[i];\n    var id = item[0];\n    var css = item[1];\n    var media = item[2];\n    var sourceMap = item[3];\n    var part = {\n      id: parentId + ':' + i,\n      css: css,\n      media: media,\n      sourceMap: sourceMap\n    };\n\n    if (!newStyles[id]) {\n      styles.push(newStyles[id] = {\n        id: id,\n        parts: [part]\n      });\n    } else {\n      newStyles[id].parts.push(part);\n    }\n  }\n\n  return styles;\n}\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./node_modules/vue-style-loader/lib/listToStyles.js?");
 
 /***/ }),
 
@@ -38,17 +49,6 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 "use strict";
 eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ \"./node_modules/css-loader/dist/runtime/api.js\");\n/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);\n// Imports\n\nvar ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});\n// Module\n___CSS_LOADER_EXPORT___.push([module.id, \"\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n/* Add missing Bootstrap color variables */\\n.mg-form {\\n\\t--btn-default-bg: #e9ecef;\\n\\t--btn-default-fg: #495057;\\n}\\n\", \"\"]);\n// Exports\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);\n\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./src/components/mgForm.vue?./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js??vue-loader-options");
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/dist/runtime/api.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/css-loader/dist/runtime/api.js ***!
-  \*****************************************************/
-/***/ ((module) => {
-
-"use strict";
-eval("\n\n/*\n  MIT License http://www.opensource.org/licenses/mit-license.php\n  Author Tobias Koppers @sokra\n*/\n// css base code, injected by the css-loader\n// eslint-disable-next-line func-names\nmodule.exports = function (cssWithMappingToString) {\n  var list = []; // return the list of modules as css string\n\n  list.toString = function toString() {\n    return this.map(function (item) {\n      var content = cssWithMappingToString(item);\n\n      if (item[2]) {\n        return \"@media \".concat(item[2], \" {\").concat(content, \"}\");\n      }\n\n      return content;\n    }).join(\"\");\n  }; // import a list of modules into the list\n  // eslint-disable-next-line func-names\n\n\n  list.i = function (modules, mediaQuery, dedupe) {\n    if (typeof modules === \"string\") {\n      // eslint-disable-next-line no-param-reassign\n      modules = [[null, modules, \"\"]];\n    }\n\n    var alreadyImportedModules = {};\n\n    if (dedupe) {\n      for (var i = 0; i < this.length; i++) {\n        // eslint-disable-next-line prefer-destructuring\n        var id = this[i][0];\n\n        if (id != null) {\n          alreadyImportedModules[id] = true;\n        }\n      }\n    }\n\n    for (var _i = 0; _i < modules.length; _i++) {\n      var item = [].concat(modules[_i]);\n\n      if (dedupe && alreadyImportedModules[item[0]]) {\n        // eslint-disable-next-line no-continue\n        continue;\n      }\n\n      if (mediaQuery) {\n        if (!item[2]) {\n          item[2] = mediaQuery;\n        } else {\n          item[2] = \"\".concat(mediaQuery, \" and \").concat(item[2]);\n        }\n      }\n\n      list.push(item);\n    }\n  };\n\n  return list;\n};\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./node_modules/css-loader/dist/runtime/api.js?");
 
 /***/ }),
 
@@ -70,7 +70,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_1_0_rules_0_use_node_modules_vue_loader_lib_index_js_vue_loader_options_mgForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../node_modules/babel-loader/lib/index.js??clonedRuleSet-1[0].rules[0].use!../../node_modules/vue-loader/lib/index.js??vue-loader-options!./mgForm.vue?vue&type=script&lang=js& */ \"./node_modules/babel-loader/lib/index.js??clonedRuleSet-1[0].rules[0].use!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/mgForm.vue?vue&type=script&lang=js&\");\n /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_1_0_rules_0_use_node_modules_vue_loader_lib_index_js_vue_loader_options_mgForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__.default); \n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./src/components/mgForm.vue?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_mgForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../node_modules/babel-loader/lib/index.js!../../node_modules/vue-loader/lib/index.js??vue-loader-options!./mgForm.vue?vue&type=script&lang=js& */ \"./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/mgForm.vue?vue&type=script&lang=js&\");\n /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_mgForm_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__.default); \n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./src/components/mgForm.vue?");
 
 /***/ }),
 
@@ -124,7 +124,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
   \***********************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("// style-loader: Adds some css to the DOM by adding a <style> tag\n\n// load the styles\nvar content = __webpack_require__(/*! !!../../node_modules/css-loader/dist/cjs.js!../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../node_modules/vue-loader/lib/index.js??vue-loader-options!./mgForm.vue?vue&type=style&index=0&lang=css& */ \"./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/mgForm.vue?vue&type=style&index=0&lang=css&\");\nif(typeof content === 'string') content = [[module.id, content, '']];\nif(content.locals) module.exports = content.locals;\n// add the styles to the DOM\nvar add = __webpack_require__(/*! !../../node_modules/vue-style-loader/lib/addStylesClient.js */ \"./node_modules/vue-style-loader/lib/addStylesClient.js\").default\nvar update = add(\"51443e2b\", content, false, {});\n// Hot Module Replacement\nif(false) {}\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./src/components/mgForm.vue?./node_modules/vue-style-loader/index.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js??vue-loader-options");
+eval("// style-loader: Adds some css to the DOM by adding a <style> tag\n\n// load the styles\nvar content = __webpack_require__(/*! !!../../node_modules/css-loader/dist/cjs.js!../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../node_modules/vue-loader/lib/index.js??vue-loader-options!./mgForm.vue?vue&type=style&index=0&lang=css& */ \"./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/mgForm.vue?vue&type=style&index=0&lang=css&\");\nif(content.__esModule) content = content.default;\nif(typeof content === 'string') content = [[module.id, content, '']];\nif(content.locals) module.exports = content.locals;\n// add the styles to the DOM\nvar add = __webpack_require__(/*! !../../node_modules/vue-style-loader/lib/addStylesClient.js */ \"./node_modules/vue-style-loader/lib/addStylesClient.js\").default\nvar update = add(\"51443e2b\", content, false, {});\n// Hot Module Replacement\nif(false) {}\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./src/components/mgForm.vue?./node_modules/vue-style-loader/index.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js??vue-loader-options");
 
 /***/ }),
 
@@ -137,93 +137,167 @@ eval("// style-loader: Adds some css to the DOM by adding a <style> tag\n\n// lo
 "use strict";
 eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ addStylesClient)\n/* harmony export */ });\n/* harmony import */ var _listToStyles__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./listToStyles */ \"./node_modules/vue-style-loader/lib/listToStyles.js\");\n/*\n  MIT License http://www.opensource.org/licenses/mit-license.php\n  Author Tobias Koppers @sokra\n  Modified by Evan You @yyx990803\n*/\n\n\n\nvar hasDocument = typeof document !== 'undefined'\n\nif (typeof DEBUG !== 'undefined' && DEBUG) {\n  if (!hasDocument) {\n    throw new Error(\n    'vue-style-loader cannot be used in a non-browser environment. ' +\n    \"Use { target: 'node' } in your Webpack config to indicate a server-rendering environment.\"\n  ) }\n}\n\n/*\ntype StyleObject = {\n  id: number;\n  parts: Array<StyleObjectPart>\n}\n\ntype StyleObjectPart = {\n  css: string;\n  media: string;\n  sourceMap: ?string\n}\n*/\n\nvar stylesInDom = {/*\n  [id: number]: {\n    id: number,\n    refs: number,\n    parts: Array<(obj?: StyleObjectPart) => void>\n  }\n*/}\n\nvar head = hasDocument && (document.head || document.getElementsByTagName('head')[0])\nvar singletonElement = null\nvar singletonCounter = 0\nvar isProduction = false\nvar noop = function () {}\nvar options = null\nvar ssrIdKey = 'data-vue-ssr-id'\n\n// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>\n// tags it will allow on a page\nvar isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\\b/.test(navigator.userAgent.toLowerCase())\n\nfunction addStylesClient (parentId, list, _isProduction, _options) {\n  isProduction = _isProduction\n\n  options = _options || {}\n\n  var styles = (0,_listToStyles__WEBPACK_IMPORTED_MODULE_0__.default)(parentId, list)\n  addStylesToDom(styles)\n\n  return function update (newList) {\n    var mayRemove = []\n    for (var i = 0; i < styles.length; i++) {\n      var item = styles[i]\n      var domStyle = stylesInDom[item.id]\n      domStyle.refs--\n      mayRemove.push(domStyle)\n    }\n    if (newList) {\n      styles = (0,_listToStyles__WEBPACK_IMPORTED_MODULE_0__.default)(parentId, newList)\n      addStylesToDom(styles)\n    } else {\n      styles = []\n    }\n    for (var i = 0; i < mayRemove.length; i++) {\n      var domStyle = mayRemove[i]\n      if (domStyle.refs === 0) {\n        for (var j = 0; j < domStyle.parts.length; j++) {\n          domStyle.parts[j]()\n        }\n        delete stylesInDom[domStyle.id]\n      }\n    }\n  }\n}\n\nfunction addStylesToDom (styles /* Array<StyleObject> */) {\n  for (var i = 0; i < styles.length; i++) {\n    var item = styles[i]\n    var domStyle = stylesInDom[item.id]\n    if (domStyle) {\n      domStyle.refs++\n      for (var j = 0; j < domStyle.parts.length; j++) {\n        domStyle.parts[j](item.parts[j])\n      }\n      for (; j < item.parts.length; j++) {\n        domStyle.parts.push(addStyle(item.parts[j]))\n      }\n      if (domStyle.parts.length > item.parts.length) {\n        domStyle.parts.length = item.parts.length\n      }\n    } else {\n      var parts = []\n      for (var j = 0; j < item.parts.length; j++) {\n        parts.push(addStyle(item.parts[j]))\n      }\n      stylesInDom[item.id] = { id: item.id, refs: 1, parts: parts }\n    }\n  }\n}\n\nfunction createStyleElement () {\n  var styleElement = document.createElement('style')\n  styleElement.type = 'text/css'\n  head.appendChild(styleElement)\n  return styleElement\n}\n\nfunction addStyle (obj /* StyleObjectPart */) {\n  var update, remove\n  var styleElement = document.querySelector('style[' + ssrIdKey + '~=\"' + obj.id + '\"]')\n\n  if (styleElement) {\n    if (isProduction) {\n      // has SSR styles and in production mode.\n      // simply do nothing.\n      return noop\n    } else {\n      // has SSR styles but in dev mode.\n      // for some reason Chrome can't handle source map in server-rendered\n      // style tags - source maps in <style> only works if the style tag is\n      // created and inserted dynamically. So we remove the server rendered\n      // styles and inject new ones.\n      styleElement.parentNode.removeChild(styleElement)\n    }\n  }\n\n  if (isOldIE) {\n    // use singleton mode for IE9.\n    var styleIndex = singletonCounter++\n    styleElement = singletonElement || (singletonElement = createStyleElement())\n    update = applyToSingletonTag.bind(null, styleElement, styleIndex, false)\n    remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true)\n  } else {\n    // use multi-style-tag mode in all other cases\n    styleElement = createStyleElement()\n    update = applyToTag.bind(null, styleElement)\n    remove = function () {\n      styleElement.parentNode.removeChild(styleElement)\n    }\n  }\n\n  update(obj)\n\n  return function updateStyle (newObj /* StyleObjectPart */) {\n    if (newObj) {\n      if (newObj.css === obj.css &&\n          newObj.media === obj.media &&\n          newObj.sourceMap === obj.sourceMap) {\n        return\n      }\n      update(obj = newObj)\n    } else {\n      remove()\n    }\n  }\n}\n\nvar replaceText = (function () {\n  var textStore = []\n\n  return function (index, replacement) {\n    textStore[index] = replacement\n    return textStore.filter(Boolean).join('\\n')\n  }\n})()\n\nfunction applyToSingletonTag (styleElement, index, remove, obj) {\n  var css = remove ? '' : obj.css\n\n  if (styleElement.styleSheet) {\n    styleElement.styleSheet.cssText = replaceText(index, css)\n  } else {\n    var cssNode = document.createTextNode(css)\n    var childNodes = styleElement.childNodes\n    if (childNodes[index]) styleElement.removeChild(childNodes[index])\n    if (childNodes.length) {\n      styleElement.insertBefore(cssNode, childNodes[index])\n    } else {\n      styleElement.appendChild(cssNode)\n    }\n  }\n}\n\nfunction applyToTag (styleElement, obj) {\n  var css = obj.css\n  var media = obj.media\n  var sourceMap = obj.sourceMap\n\n  if (media) {\n    styleElement.setAttribute('media', media)\n  }\n  if (options.ssrId) {\n    styleElement.setAttribute(ssrIdKey, obj.id)\n  }\n\n  if (sourceMap) {\n    // https://developer.chrome.com/devtools/docs/javascript-debugging\n    // this makes source maps inside style tags work properly in Chrome\n    css += '\\n/*# sourceURL=' + sourceMap.sources[0] + ' */'\n    // http://stackoverflow.com/a/26603875\n    css += '\\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + ' */'\n  }\n\n  if (styleElement.styleSheet) {\n    styleElement.styleSheet.cssText = css\n  } else {\n    while (styleElement.firstChild) {\n      styleElement.removeChild(styleElement.firstChild)\n    }\n    styleElement.appendChild(document.createTextNode(css))\n  }\n}\n\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./node_modules/vue-style-loader/lib/addStylesClient.js?");
 
-/***/ }),
-
-/***/ "./node_modules/vue-style-loader/lib/listToStyles.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/vue-style-loader/lib/listToStyles.js ***!
-  \***********************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ listToStyles)\n/* harmony export */ });\n/**\n * Translates the list format produced by css-loader into something\n * easier to manipulate.\n */\nfunction listToStyles (parentId, list) {\n  var styles = []\n  var newStyles = {}\n  for (var i = 0; i < list.length; i++) {\n    var item = list[i]\n    var id = item[0]\n    var css = item[1]\n    var media = item[2]\n    var sourceMap = item[3]\n    var part = {\n      id: parentId + ':' + i,\n      css: css,\n      media: media,\n      sourceMap: sourceMap\n    }\n    if (!newStyles[id]) {\n      styles.push(newStyles[id] = { id: id, parts: [part] })\n    } else {\n      newStyles[id].parts.push(part)\n    }\n  }\n  return styles\n}\n\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./node_modules/vue-style-loader/lib/listToStyles.js?");
-
 /***/ })
 
-/******/ 	});
+/******/ });
 /************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		if(__webpack_module_cache__[moduleId]) {
-/******/ 			return __webpack_module_cache__[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			id: moduleId,
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
+/******/ // The module cache
+/******/ var __webpack_module_cache__ = {};
+/******/ 
+/******/ // The require function
+/******/ function __webpack_require__(moduleId) {
+/******/ 	// Check if module is in cache
+/******/ 	var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 	if (cachedModule !== undefined) {
+/******/ 		return cachedModule.exports;
 /******/ 	}
-/******/ 	
+/******/ 	// Create a new module (and put it into the cache)
+/******/ 	var module = __webpack_module_cache__[moduleId] = {
+/******/ 		id: moduleId,
+/******/ 		// no module.loaded needed
+/******/ 		exports: {}
+/******/ 	};
+/******/ 
+/******/ 	// Execute the module function
+/******/ 	__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 
+/******/ 	// Return the exports of the module
+/******/ 	return module.exports;
+/******/ }
+/******/ 
+/******/ // expose the modules object (__webpack_modules__)
+/******/ __webpack_require__.m = __webpack_modules__;
+/******/ 
 /************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__webpack_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ /* webpack/runtime/chunk loaded */
+/******/ (() => {
+/******/ 	var deferred = [];
+/******/ 	__webpack_require__.O = (result, chunkIds, fn, priority) => {
+/******/ 		if(chunkIds) {
+/******/ 			priority = priority || 0;
+/******/ 			for(var i = deferred.length; i > 0 && deferred[i - 1][2] > priority; i--) deferred[i] = deferred[i - 1];
+/******/ 			deferred[i] = [chunkIds, fn, priority];
+/******/ 			return;
+/******/ 		}
+/******/ 		var notFulfilled = Infinity;
+/******/ 		for (var i = 0; i < deferred.length; i++) {
+/******/ 			var [chunkIds, fn, priority] = deferred[i];
+/******/ 			var fulfilled = true;
+/******/ 			for (var j = 0; j < chunkIds.length; j++) {
+/******/ 				if ((priority & 1 === 0 || notFulfilled >= priority) && Object.keys(__webpack_require__.O).every((key) => (__webpack_require__.O[key](chunkIds[j])))) {
+/******/ 					chunkIds.splice(j--, 1);
+/******/ 				} else {
+/******/ 					fulfilled = false;
+/******/ 					if(priority < notFulfilled) notFulfilled = priority;
 /******/ 				}
 /******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			if(fulfilled) {
+/******/ 				deferred.splice(i--, 1)
+/******/ 				result = fn();
 /******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
+/******/ 		}
+/******/ 		return result;
+/******/ 	};
+/******/ })();
+/******/ 
+/******/ /* webpack/runtime/compat get default export */
+/******/ (() => {
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = (module) => {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			() => (module['default']) :
+/******/ 			() => (module);
+/******/ 		__webpack_require__.d(getter, { a: getter });
+/******/ 		return getter;
+/******/ 	};
+/******/ })();
+/******/ 
+/******/ /* webpack/runtime/define property getters */
+/******/ (() => {
+/******/ 	// define getter functions for harmony exports
+/******/ 	__webpack_require__.d = (exports, definition) => {
+/******/ 		for(var key in definition) {
+/******/ 			if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 				Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 			}
+/******/ 		}
+/******/ 	};
+/******/ })();
+/******/ 
+/******/ /* webpack/runtime/hasOwnProperty shorthand */
+/******/ (() => {
+/******/ 	__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ })();
+/******/ 
+/******/ /* webpack/runtime/make namespace object */
+/******/ (() => {
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = (exports) => {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/ })();
+/******/ 
+/******/ /* webpack/runtime/jsonp chunk loading */
+/******/ (() => {
+/******/ 	// no baseURI
 /******/ 	
+/******/ 	// object to store loaded and loading chunks
+/******/ 	// undefined = chunk not loaded, null = chunk preloaded/prefetched
+/******/ 	// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
+/******/ 	var installedChunks = {
+/******/ 		"components/mgForm": 0
+/******/ 	};
+/******/ 	
+/******/ 	// no chunk on demand loading
+/******/ 	
+/******/ 	// no prefetching
+/******/ 	
+/******/ 	// no preloaded
+/******/ 	
+/******/ 	// no HMR
+/******/ 	
+/******/ 	// no HMR manifest
+/******/ 	
+/******/ 	__webpack_require__.O.j = (chunkId) => (installedChunks[chunkId] === 0);
+/******/ 	
+/******/ 	// install a JSONP callback for chunk loading
+/******/ 	var webpackJsonpCallback = (parentChunkLoadingFunction, data) => {
+/******/ 		var [chunkIds, moreModules, runtime] = data;
+/******/ 		// add "moreModules" to the modules object,
+/******/ 		// then flag all "chunkIds" as loaded and fire callback
+/******/ 		var moduleId, chunkId, i = 0;
+/******/ 		for(moduleId in moreModules) {
+/******/ 			if(__webpack_require__.o(moreModules, moduleId)) {
+/******/ 				__webpack_require__.m[moduleId] = moreModules[moduleId];
+/******/ 			}
+/******/ 		}
+/******/ 		if(runtime) runtime(__webpack_require__);
+/******/ 		if(parentChunkLoadingFunction) parentChunkLoadingFunction(data);
+/******/ 		for(;i < chunkIds.length; i++) {
+/******/ 			chunkId = chunkIds[i];
+/******/ 			if(__webpack_require__.o(installedChunks, chunkId) && installedChunks[chunkId]) {
+/******/ 				installedChunks[chunkId][0]();
+/******/ 			}
+/******/ 			installedChunks[chunkIds[i]] = 0;
+/******/ 		}
+/******/ 		__webpack_require__.O();
+/******/ 	}
+/******/ 	
+/******/ 	var chunkLoadingGlobal = global["webpackChunk_momsfriendlydevco_macgyver"] = global["webpackChunk_momsfriendlydevco_macgyver"] || [];
+/******/ 	chunkLoadingGlobal.forEach(webpackJsonpCallback.bind(null, 0));
+/******/ 	chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
+/******/ })();
+/******/ 
 /************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./src/components/mgForm.vue");
-/******/ 	
-/******/ 	return __webpack_exports__;
-/******/ })()
-;
-});
+/******/ 
+/******/ // startup
+/******/ // Load entry module and return exports
+/******/ // This entry module is referenced by other modules so it can't be inlined
+/******/ var __webpack_exports__ = __webpack_require__("./src/components/mgForm.vue");
+/******/ __webpack_exports__ = __webpack_require__.O(__webpack_exports__);
+/******/ var __webpack_exports__default = __webpack_exports__.default;
+/******/ export { __webpack_exports__default as default };
+/******/ 

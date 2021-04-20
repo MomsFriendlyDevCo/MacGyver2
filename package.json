@@ -2,12 +2,9 @@
   "name": "@momsfriendlydevco/macgyver",
   "version": "2.0.0",
   "description": "Dynamic form widgets for Vue",
-  "main": "./dist/macgyver.js",
   "exports": {
-    ".": {
-      "node": "./dist/macgyver.js",
-      "default": "./dist/vue-macgyver.js"
-    },
+    ".": "./dist/vue-macgyver.js",
+    "./utils": "./dist/macgyver.js",
     "./components": "./dist/components.js",
     "./components/*": "./dist/components/*.js"
   },
@@ -35,7 +32,9 @@
     "test": "mocha"
   },
   "dependencies": {
+    "@momsfriendlydevco/vue-emit": "file:../vue-emit",
     "@momsfriendlydevco/vue-setpath": "0.0.1",
+    "@momsfriendlydevco/vue-watchall": "file:../vue-watchall",
     "bootstrap": "^4.4.1",
     "chartjs": "^0.3.24",
     "chartjs-plugin-colorschemes": "^0.4.0",
@@ -51,6 +50,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.13.10",
+    "@babel/plugin-proposal-export-default-from": "^7.12.13",
     "@babel/plugin-proposal-optional-chaining": "^7.13.8",
     "@babel/plugin-proposal-pipeline-operator": "^7.12.13",
     "@babel/plugin-proposal-throw-expressions": "^7.12.13",
@@ -114,7 +114,8 @@
           "proposal": "fsharp"
         }
       ],
-      "@babel/plugin-proposal-throw-expressions"
+      "@babel/plugin-proposal-throw-expressions",
+      "@babel/plugin-proposal-export-default-from"
     ]
   }
 }

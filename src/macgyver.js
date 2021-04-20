@@ -5,6 +5,7 @@
 
 import _ from 'lodash';
 import sift from 'sift';
+
 var $macgyver = {};
 
 /**
@@ -697,4 +698,8 @@ $macgyver.utils.incrementId = str => {
 };
 
 
+//module.exports = $macgyver;
+
+// FIXME: Exporting an object relies on compile-time side-effects
 export default $macgyver;
+//export { $macgyver as Macgyver };

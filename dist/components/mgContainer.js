@@ -6,27 +6,38 @@
  * or disable the default devtool with "devtool: false".
  * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
  */
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else {
-		var a = factory();
-		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
-	}
-})(this, function() {
-return /******/ (() => { // webpackBootstrap
-/******/ 	var __webpack_modules__ = ({
+/******/ var __webpack_modules__ = ({
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-1[0].rules[0].use!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/mgContainer.vue?vue&type=script&lang=js&":
-/*!******************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-1[0].rules[0].use!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/mgContainer.vue?vue&type=script&lang=js& ***!
-  \******************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/dist/runtime/api.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/css-loader/dist/runtime/api.js ***!
+  \*****************************************************/
+/***/ ((module) => {
+
+"use strict";
+eval("\n/*\n  MIT License http://www.opensource.org/licenses/mit-license.php\n  Author Tobias Koppers @sokra\n*/\n// css base code, injected by the css-loader\n// eslint-disable-next-line func-names\n\nmodule.exports = function (cssWithMappingToString) {\n  var list = []; // return the list of modules as css string\n\n  list.toString = function toString() {\n    return this.map(function (item) {\n      var content = cssWithMappingToString(item);\n\n      if (item[2]) {\n        return \"@media \".concat(item[2], \" {\").concat(content, \"}\");\n      }\n\n      return content;\n    }).join(\"\");\n  }; // import a list of modules into the list\n  // eslint-disable-next-line func-names\n\n\n  list.i = function (modules, mediaQuery, dedupe) {\n    if (typeof modules === \"string\") {\n      // eslint-disable-next-line no-param-reassign\n      modules = [[null, modules, \"\"]];\n    }\n\n    var alreadyImportedModules = {};\n\n    if (dedupe) {\n      for (var i = 0; i < this.length; i++) {\n        // eslint-disable-next-line prefer-destructuring\n        var id = this[i][0];\n\n        if (id != null) {\n          alreadyImportedModules[id] = true;\n        }\n      }\n    }\n\n    for (var _i = 0; _i < modules.length; _i++) {\n      var item = [].concat(modules[_i]);\n\n      if (dedupe && alreadyImportedModules[item[0]]) {\n        // eslint-disable-next-line no-continue\n        continue;\n      }\n\n      if (mediaQuery) {\n        if (!item[2]) {\n          item[2] = mediaQuery;\n        } else {\n          item[2] = \"\".concat(mediaQuery, \" and \").concat(item[2]);\n        }\n      }\n\n      list.push(item);\n    }\n  };\n\n  return list;\n};\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./node_modules/css-loader/dist/runtime/api.js?");
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/mgContainer.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/mgContainer.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nfunction ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }\n\nfunction _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }\n\nfunction _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }\n\n/**\n* MacGyver component loader\n* This is a meta component that loads other dynamic components as an array\n*/\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (app.mgComponent('mgContainer', {\n  inject: {\n    $mgForm: {\n      from: '$mgForm'\n    },\n    $mgFormEditor: {\n      from: '$mgFormEditor',\n      default: false\n    }\n  },\n  meta: {\n    title: 'Container layout',\n    icon: 'far fa-th-large',\n    category: 'Layout',\n    preferId: false\n  },\n  props: {\n    layout: {\n      type: 'mgChoiceRadio',\n      title: 'Layout profile',\n      help: 'How to layout child elements',\n      default: 'form',\n      enum: [{\n        id: 'form',\n        title: 'Simple form layout'\n      }, {\n        id: 'formFloating',\n        title: 'Form with floating labels'\n      }, {\n        id: 'card',\n        title: 'Card based layout'\n      }, {\n        id: 'columns',\n        title: 'Vertical column layout'\n      }, {\n        id: 'query',\n        title: 'Query constructor'\n      }]\n    },\n    formClass: {\n      type: 'mgChoiceDropdown',\n      title: 'Form style',\n      showIf: {\n        layout: {\n          $in: ['form', 'card']\n        }\n      },\n      default: 'normal',\n      enum: [{\n        id: 'normal',\n        title: 'Normal'\n      }, {\n        id: 'titles-above',\n        title: 'Titles above'\n      }]\n    },\n    title: {\n      type: 'mgText',\n      showIf: {\n        layout: 'card'\n      }\n    },\n    showTitles: {\n      type: 'mgToggle',\n      default: true,\n      help: 'Show titles for fields',\n      showIf: {\n        layout: {\n          $in: ['form', 'card']\n        }\n      }\n    },\n    columnHeaders: {\n      type: 'mgToggle',\n      default: false,\n      help: 'Show column headers',\n      showIf: \"layout == 'columns'\"\n    },\n    collapsable: {\n      type: 'mgToggle',\n      default: false,\n      help: 'This card can be hidden',\n      showIf: \"layout == 'card'\"\n    },\n    collapsed: {\n      type: 'mgToggle',\n      default: false,\n      help: 'This card is collapsed by default',\n      showIf: \"layout == 'card'\"\n    },\n    border: {\n      type: 'mgToggle',\n      default: true,\n      help: 'Show a border around the container',\n      showIf: \"layout == 'columns'\"\n    },\n    verbs: {\n      type: 'mgTable',\n      advanced: true,\n      showIf: \"layout == 'card'\",\n      items: [{\n        id: 'icon',\n        type: 'mgIcon'\n      }, {\n        id: 'tooltip',\n        type: 'mgText'\n      }, {\n        id: 'class',\n        type: 'mgText'\n      }, {\n        id: 'action',\n        type: 'mgText'\n      }]\n    },\n    items: {\n      type: 'mgAlert',\n      vueType: 'array',\n      text: 'Use the editor to define child widgets'\n    } // Child items\n\n  },\n  childProps: {\n    help: {\n      type: 'mgText',\n      title: 'Help text',\n      help: 'Optional help text for the item - just like what you are reading now'\n    },\n    showTitle: {\n      type: 'mgToggle',\n      default: true,\n      title: 'Show Title',\n      help: 'Whether to show the side title for this element'\n    },\n    title: {\n      type: 'mgText',\n      title: 'Title'\n    },\n    rowClass: {\n      type: 'mgChoiceDropdown',\n      title: 'Styling',\n      help: 'Additional styling to apply to the widget',\n      default: '',\n      advanced: true,\n      enum: [{\n        id: '',\n        title: 'Normal'\n      }, {\n        id: 'mgContainerRowLarge',\n        title: 'Large text'\n      }]\n    },\n    onChange: {\n      type: 'string',\n      title: 'Change action',\n      help: 'Action to trigger when the value of this component changes',\n      advanced: true\n    },\n    show: {\n      type: 'mgToggle',\n      default: true,\n      advanced: true,\n      help: 'Whether the item is visible by default'\n    },\n    showIf: {\n      type: 'mgCode',\n      syntax: 'text',\n      advanced: true,\n      help: 'A simple equality expression or Sift object to deteremine visibility'\n    }\n  },\n  data: function data() {\n    return {\n      highlights: {},\n      // Lookup of extra classes to add to widgets, each key is the array offset of the widget within this container, the value is an array of classes to add\n      localData: {} // Lookup of immediate child data values, used when `$props.layout == 'formFloating'`\n\n    };\n  },\n  mounted: function mounted() {\n    var _this = this;\n\n    if (this.$props.collapsable) {\n      var $card = $(this.$el).find('.card').first();\n      $card.find('.card-header').first().on('click', function () {\n        var $body = $(_this.$el).find('.card-body');\n\n        if ($card.hasClass('card-collapsed')) {\n          $body.slideDown({\n            complete: function complete() {\n              return $card.removeClass('card-collapsed');\n            }\n          });\n        } else {\n          $body.slideUp({\n            complete: function complete() {\n              return $card.addClass('card-collapsed');\n            }\n          });\n        }\n      });\n    }\n\n    if (this.$props.layout == 'formFloating') {\n      // When in floating mode we need to keep track of child data so we copy its value into our `localData` object lookup\n      this.$mgForm.$on('changeItem', function (v) {\n        // Bind to parent form handler\n        if (_this.$props.items.some(function (item) {\n          return item.$dataPath == v.path;\n        })) {\n          // Is this widget one of our immediate children?\n          _this.$set(_this.localData, v.path, v.value); // Copy its data against our local copy\n\n        }\n      });\n    }\n  },\n  methods: {\n    /**\n    * Emit an event passing this container as a scope\n    * This is really just a wrapper to be able to pass this VueComponent to mgContainer.* emitters\n    * @param {string} eventName Event to emit\n    * @param {string} specPath The widget specPath\n    * @param {number} widgetIndex The widget sending the message\n    */\n    componentEvent: function componentEvent(eventName, specPath, widgetIndex, vueEvent) {\n      this.$mgForm.$emit(eventName, this, specPath, widgetIndex, vueEvent);\n    },\n\n    /**\n    * Find the child index by its component\n    * This works like findIndex only with Magyver components, ignoring all non-mg children when computing the index\n    * @param {VueComponent} child The child offset to find\n    * @returns {number} The offset of the component or boolean `false`\n    */\n    findChildIndex: function findChildIndex(child) {\n      var result = _(this.$refs).map(function (v) {\n        return v[0];\n      }) // Dynamic refs always end up as an array of 1 item, so unpack that\n      .reduce(function (t, v, i) {\n        if (t.found) {\n          // Already found the child\n          return t;\n        } else if (v._uid == child._uid) {\n          // Found by direct UID\n          return _objectSpread(_objectSpread({}, t), {}, {\n            found: true\n          });\n        } else if (v.$children && v.$children.length == 1 && v.$children[0]._uid == child._uid) {\n          // Check into mgComponent wrappers\n          return _objectSpread(_objectSpread({}, t), {}, {\n            found: true\n          });\n        } else if (v.$mgForm) {\n          // Is an mgComponent {\n          return _objectSpread(_objectSpread({}, t), {}, {\n            mgIndex: t.mgIndex + 1\n          });\n        } else {\n          // Implied else - regular Vue component - skip incrementing when calculating the offset\n          return t;\n        }\n      }, {\n        found: false,\n        mgIndex: 0\n      });\n\n      return result.found ? result.mgIndex : false;\n    }\n  }\n}));\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./src/components/mgContainer.vue?./node_modules/babel-loader/lib/index.js??clonedRuleSet-1%5B0%5D.rules%5B0%5D.use!./node_modules/vue-loader/lib/index.js??vue-loader-options");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\nfunction ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }\n\nfunction _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }\n\nfunction _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }\n\n/**\n* MacGyver component loader\n* This is a meta component that loads other dynamic components as an array\n*/\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (app.mgComponent('mgContainer', {\n  inject: {\n    $mgForm: {\n      from: '$mgForm'\n    },\n    $mgFormEditor: {\n      from: '$mgFormEditor',\n      default: false\n    }\n  },\n  meta: {\n    title: 'Container layout',\n    icon: 'far fa-th-large',\n    category: 'Layout',\n    preferId: false\n  },\n  props: {\n    layout: {\n      type: 'mgChoiceRadio',\n      title: 'Layout profile',\n      help: 'How to layout child elements',\n      default: 'form',\n      enum: [{\n        id: 'form',\n        title: 'Simple form layout'\n      }, {\n        id: 'formFloating',\n        title: 'Form with floating labels'\n      }, {\n        id: 'card',\n        title: 'Card based layout'\n      }, {\n        id: 'columns',\n        title: 'Vertical column layout'\n      }, {\n        id: 'query',\n        title: 'Query constructor'\n      }]\n    },\n    formClass: {\n      type: 'mgChoiceDropdown',\n      title: 'Form style',\n      showIf: {\n        layout: {\n          $in: ['form', 'card']\n        }\n      },\n      default: 'normal',\n      enum: [{\n        id: 'normal',\n        title: 'Normal'\n      }, {\n        id: 'titles-above',\n        title: 'Titles above'\n      }]\n    },\n    title: {\n      type: 'mgText',\n      showIf: {\n        layout: 'card'\n      }\n    },\n    showTitles: {\n      type: 'mgToggle',\n      default: true,\n      help: 'Show titles for fields',\n      showIf: {\n        layout: {\n          $in: ['form', 'card']\n        }\n      }\n    },\n    columnHeaders: {\n      type: 'mgToggle',\n      default: false,\n      help: 'Show column headers',\n      showIf: \"layout == 'columns'\"\n    },\n    collapsable: {\n      type: 'mgToggle',\n      default: false,\n      help: 'This card can be hidden',\n      showIf: \"layout == 'card'\"\n    },\n    collapsed: {\n      type: 'mgToggle',\n      default: false,\n      help: 'This card is collapsed by default',\n      showIf: \"layout == 'card'\"\n    },\n    border: {\n      type: 'mgToggle',\n      default: true,\n      help: 'Show a border around the container',\n      showIf: \"layout == 'columns'\"\n    },\n    verbs: {\n      type: 'mgTable',\n      advanced: true,\n      showIf: \"layout == 'card'\",\n      items: [{\n        id: 'icon',\n        type: 'mgIcon'\n      }, {\n        id: 'tooltip',\n        type: 'mgText'\n      }, {\n        id: 'class',\n        type: 'mgText'\n      }, {\n        id: 'action',\n        type: 'mgText'\n      }]\n    },\n    items: {\n      type: 'mgAlert',\n      vueType: 'array',\n      text: 'Use the editor to define child widgets'\n    } // Child items\n\n  },\n  childProps: {\n    help: {\n      type: 'mgText',\n      title: 'Help text',\n      help: 'Optional help text for the item - just like what you are reading now'\n    },\n    showTitle: {\n      type: 'mgToggle',\n      default: true,\n      title: 'Show Title',\n      help: 'Whether to show the side title for this element'\n    },\n    title: {\n      type: 'mgText',\n      title: 'Title'\n    },\n    rowClass: {\n      type: 'mgChoiceDropdown',\n      title: 'Styling',\n      help: 'Additional styling to apply to the widget',\n      default: '',\n      advanced: true,\n      enum: [{\n        id: '',\n        title: 'Normal'\n      }, {\n        id: 'mgContainerRowLarge',\n        title: 'Large text'\n      }]\n    },\n    onChange: {\n      type: 'string',\n      title: 'Change action',\n      help: 'Action to trigger when the value of this component changes',\n      advanced: true\n    },\n    show: {\n      type: 'mgToggle',\n      default: true,\n      advanced: true,\n      help: 'Whether the item is visible by default'\n    },\n    showIf: {\n      type: 'mgCode',\n      syntax: 'text',\n      advanced: true,\n      help: 'A simple equality expression or Sift object to deteremine visibility'\n    }\n  },\n  data: function data() {\n    return {\n      highlights: {},\n      // Lookup of extra classes to add to widgets, each key is the array offset of the widget within this container, the value is an array of classes to add\n      localData: {} // Lookup of immediate child data values, used when `$props.layout == 'formFloating'`\n\n    };\n  },\n  mounted: function mounted() {\n    var _this = this;\n\n    if (this.$props.collapsable) {\n      var $card = $(this.$el).find('.card').first();\n      $card.find('.card-header').first().on('click', function () {\n        var $body = $(_this.$el).find('.card-body');\n\n        if ($card.hasClass('card-collapsed')) {\n          $body.slideDown({\n            complete: function complete() {\n              return $card.removeClass('card-collapsed');\n            }\n          });\n        } else {\n          $body.slideUp({\n            complete: function complete() {\n              return $card.addClass('card-collapsed');\n            }\n          });\n        }\n      });\n    }\n\n    if (this.$props.layout == 'formFloating') {\n      // When in floating mode we need to keep track of child data so we copy its value into our `localData` object lookup\n      this.$mgForm.$on('changeItem', function (v) {\n        // Bind to parent form handler\n        if (_this.$props.items.some(function (item) {\n          return item.$dataPath == v.path;\n        })) {\n          // Is this widget one of our immediate children?\n          _this.$set(_this.localData, v.path, v.value); // Copy its data against our local copy\n\n        }\n      });\n    }\n  },\n  methods: {\n    /**\n    * Emit an event passing this container as a scope\n    * This is really just a wrapper to be able to pass this VueComponent to mgContainer.* emitters\n    * @param {string} eventName Event to emit\n    * @param {string} specPath The widget specPath\n    * @param {number} widgetIndex The widget sending the message\n    */\n    componentEvent: function componentEvent(eventName, specPath, widgetIndex, vueEvent) {\n      this.$mgForm.$emit(eventName, this, specPath, widgetIndex, vueEvent);\n    },\n\n    /**\n    * Find the child index by its component\n    * This works like findIndex only with Magyver components, ignoring all non-mg children when computing the index\n    * @param {VueComponent} child The child offset to find\n    * @returns {number} The offset of the component or boolean `false`\n    */\n    findChildIndex: function findChildIndex(child) {\n      var result = _(this.$refs).map(function (v) {\n        return v[0];\n      }) // Dynamic refs always end up as an array of 1 item, so unpack that\n      .reduce(function (t, v, i) {\n        if (t.found) {\n          // Already found the child\n          return t;\n        } else if (v._uid == child._uid) {\n          // Found by direct UID\n          return _objectSpread(_objectSpread({}, t), {}, {\n            found: true\n          });\n        } else if (v.$children && v.$children.length == 1 && v.$children[0]._uid == child._uid) {\n          // Check into mgComponent wrappers\n          return _objectSpread(_objectSpread({}, t), {}, {\n            found: true\n          });\n        } else if (v.$mgForm) {\n          // Is an mgComponent {\n          return _objectSpread(_objectSpread({}, t), {}, {\n            mgIndex: t.mgIndex + 1\n          });\n        } else {\n          // Implied else - regular Vue component - skip incrementing when calculating the offset\n          return t;\n        }\n      }, {\n        found: false,\n        mgIndex: 0\n      });\n\n      return result.found ? result.mgIndex : false;\n    }\n  }\n}));\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./src/components/mgContainer.vue?./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js??vue-loader-options");
+
+/***/ }),
+
+/***/ "./node_modules/vue-style-loader/lib/listToStyles.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/vue-style-loader/lib/listToStyles.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ listToStyles)\n/* harmony export */ });\n/**\n * Translates the list format produced by css-loader into something\n * easier to manipulate.\n */\nfunction listToStyles(parentId, list) {\n  var styles = [];\n  var newStyles = {};\n\n  for (var i = 0; i < list.length; i++) {\n    var item = list[i];\n    var id = item[0];\n    var css = item[1];\n    var media = item[2];\n    var sourceMap = item[3];\n    var part = {\n      id: parentId + ':' + i,\n      css: css,\n      media: media,\n      sourceMap: sourceMap\n    };\n\n    if (!newStyles[id]) {\n      styles.push(newStyles[id] = {\n        id: id,\n        parts: [part]\n      });\n    } else {\n      newStyles[id].parts.push(part);\n    }\n  }\n\n  return styles;\n}\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./node_modules/vue-style-loader/lib/listToStyles.js?");
 
 /***/ }),
 
@@ -38,17 +49,6 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 
 "use strict";
 eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../node_modules/css-loader/dist/runtime/api.js */ \"./node_modules/css-loader/dist/runtime/api.js\");\n/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);\n// Imports\n\nvar ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});\n// Module\n___CSS_LOADER_EXPORT___.push([module.id, \"\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n\\n/* formClass > .titles-above {{{ */\\n.mg-container.titles-above > .form-group,\\n.mg-container.titles-above > .form-group,\\n.mg-container.titles-above > .card > .card-body > .form-group,\\n.mg-container.titles-above > .card > .card-body > .form-group {\\n\\tdisplay: block;\\n}\\n.mg-container.titles-above > .form-group > .col-form-label,\\n.mg-container.titles-above > .form-group > .col-form-value,\\n.mg-container.titles-above > .card > .card-body > .form-group > .col-form-label,\\n.mg-container.titles-above > .card > .card-body > .form-group > .col-form-value {\\n\\twidth: 100%;\\n\\tmax-width: none;\\n}\\n/* }}} */\\n\\n/* Card layout {{{ */\\n/* Collapsable card {{{ */\\n.mg-container.card.card-collapsable {\\n\\ttransition: all 0.2s ease-in;\\n}\\n.mg-container.card.card-collapsable .card-header {\\n\\tcursor: pointer;\\n}\\n.mg-container.card.card-collapsable .card-header::after {\\n\\tfont-family: \\\"Font Awesome 5 Pro\\\";\\n\\tcontent: '\\\\f054';\\n\\tfloat: right;\\n\\ttransition: transform 0.4s;\\n}\\n.mg-container.card.card-collapsable:not(.card-collapsed) .card-header::after {\\n\\ttransform: rotate(90deg);\\n}\\n\\n\\n/* Collapsed card {{{ */\\n.mg-container.card.card-collapsable.card-collapsed {\\n\\tbox-shadow: none;\\n\\tborder-bottom: none;\\n\\tmargin-bottom: 0px;\\n}\\n.mg-container.card.card-collapsable.card-collapsed .card-body {\\n\\tdisplay: none;\\n}\\n/* }}} */\\n/* }}} */\\n\\n/* Card verbs {{{ */\\n.mg-container.card .card-header .card-verbs {\\n\\tposition: absolute;\\n\\tright: 15px;\\n\\ttop: 10px;\\n\\tfont-size: 20px;\\n}\\n.mg-container.card .card-header .card-verbs > a {\\n\\tcolor: #999;\\n\\tpadding: 5px;\\n}\\n.mg-container.card .card-header .card-verbs > a:hover {\\n\\tcolor: #000;\\n}\\n/* }}} */\\n/* }}} */\\n\\n/* formFloating {{{ */\\n.mgContainer-formFloating > .col-12 {\\n\\tposition: relative;\\n\\tline-height: 14px;\\n\\tmargin: 0 0px;\\n\\tdisplay: inline-block;\\n\\twidth: 100%;\\n}\\n.mgContainer-formFloating > .col-12 > .control-input {\\n\\theight: 45px;\\n\\tpadding-top: 8px;\\n\\tpadding-bottom: 2px;\\n\\tpadding-left: 2px;\\n\\tpadding-right: 12px;\\n\\tfont-size: 15px;\\n\\tline-height: 1.42857143;\\n\\tcolor: #333333;\\n\\tbackground-color: #ffffff;\\n\\tbackground-image: none;\\n\\toutline: none;\\n\\t/* border: 1px solid rgba(120, 120, 120, 0.5);\\n\\t*/\\n\\tborder: none;\\n\\tborder-bottom: 1px solid #bbb;\\n\\t-moz-box-shadow: none;\\n\\t-webkit-box-shadow: none;\\n\\tbox-shadow: none;\\n\\tborder-radius: 0;\\n\\tposition: relative;\\n}\\n.mgContainer-formFloating > .col-12 > .control-input.blank + .col-form-label {\\n\\ttransform: translateY(0px);\\n\\tcolor: #bbb;\\n\\tfont-size: 15px;\\n\\tfont-weight: 100;\\n\\topacity: 1;\\n}\\n.mgContainer-formFloating > .col-12 > .control-input.control-input:focus + .col-form-label {\\n\\ttransform: translateY(-21px);\\n\\tcolor: #66afe9;\\n\\tfont-size: 14px;\\n\\topacity: 1;\\n\\tfont-weight: 100;\\n\\tbackground-color: white;\\n}\\n.mgContainer-formFloating > .col-12 > .col-form-label {\\n\\tcolor: #aaa;\\n\\tdisplay: inline-block;\\n\\tfont-size: 12px;\\n\\tposition: absolute;\\n\\tz-index: 2;\\n\\tleft: 2px;\\n\\ttop: 16px;\\n\\tpadding: 0 0px;\\n\\tpointer-events: none;\\n\\tbackground: white;\\n\\ttransition: all 300ms ease;\\n\\ttransform: translateY(-21px);\\n\\tfont-weight: 500;\\n}\\n/* }}} */\\n\\n/* Columns layout {{{ */\\n.mg-container.mg-container-columns-no-border th,\\n.mg-container.mg-container-columns-no-border td {\\n\\tpadding: 5px;\\n}\\n/* }}} */\\n\\n/* Query layout {{{ */\\n.mg-container.mg-container-query .row {\\n\\tdisplay: block;\\n}\\n.mg-container.mg-container-query .col {\\n\\tdisplay: inline-flex;\\n\\twidth: 200px;\\n\\theight: 35px;\\n\\tmin-width: 200px;\\n\\tmargin-left: 30px;\\n\\tmargin-bottom: 10px;\\n\\tmax-width: 400px;\\n\\tposition: relative;\\n\\talign-items: center;\\n\\tbox-shadow: 1px 3px 5px 0px rgba(50, 50, 50, 0.75);\\n\\tborder-radius: 3px;\\n\\tcolor: #FFF;\\n\\theight: 38px;\\n\\tpadding: 5px 15px;\\n\\tbackground: #FFF;\\n}\\n\\n/* Query > Background color scale {{{ */\\n.mg-container.mg-container-query .col:nth-child(1) {\\n\\tbackground: #104E8B;\\n}\\n.mg-container.mg-container-query .col:nth-child(2) {\\n\\tbackground: #1874CD;\\n}\\n.mg-container.mg-container-query .col:nth-child(3) {\\n\\tbackground: #1C86EE;\\n}\\n/* }}} */\\n\\n/* Query > Connecting lines {{{ */\\n/* Vertical */\\n.mg-container.mg-container-query .row::before {\\n\\tbackground-color: #CCC;\\n\\tcontent: '';\\n\\tdisplay: block;\\n\\tposition: absolute;\\n\\twidth: 4px;\\n\\ttop: 17px;\\n\\tbottom: 30px;\\n}\\n\\n/* Horizontal */\\n.mg-container.mg-container-query .col::before {\\n\\tleft: -30px;\\n\\theight: 4px;\\n\\ttop: calc(50% - 2px);\\n\\twidth: 30px;\\n\\tbackground-color: #CCC;\\n\\tcontent: '';\\n\\tdisplay: block;\\n\\tposition: absolute;\\n}\\n/* }}} */\\n\\n/* Query > Basic Inputs {{{ */\\n.mg-container.mg-container-query .col input {\\n\\tbackground: transparent;\\n\\tborder: 1px solid transparent;\\n\\tcolor: #FFF;\\n\\theight: 1.8em;\\n\\tborder-radius: 0px;\\n}\\n.mg-container.mg-container-query .col input[type=text] {\\n\\tborder-bottom: 1px solid #CCC;\\n}\\n.mg-container.mg-container-query .col input[type=number] {\\n\\ttext-align: center;\\n}\\n.mg-container.mg-container-query .col input:focus {\\n\\tbox-shadow: none;\\n\\tborder: 1px solid #CCC;\\n}\\n/* }}} */\\n\\n/* Query > Buttons {{{ */\\n.mg-container.mg-container-query .col .btn {\\n\\tbox-shadow: none;\\n\\tpadding: 1px 5px;\\n\\tbackground: transparent;\\n\\tborder: 1px solid #003e7b;\\n}\\n.mg-container.mg-container-query .col .btn,\\n.mg-container.mg-container-query .col svg {\\n\\topacity: 0.2;\\n\\ttransition: opacity 0.5s;\\n}\\n.mg-container.mg-container-query .row:hover .col .btn,\\n.mg-container.mg-container-query .row:hover .col svg {\\n\\topacity: 1;\\n}\\n.mg-container.mg-container-query .col .vs__clear {\\n\\tdisplay: none;\\n}\\n/* }}} */\\n\\n/* Query > Dropdowns {{{ */\\n.mg-container.mg-container-query .v-select {\\n\\twidth: 100%;\\n}\\n.mg-container.mg-container-query .v-select,\\n.mg-container.mg-container-query .v-select .vs--searchable .vs__dropdown-toggle,\\n.mg-container.mg-container-query .v-select .vs__selected,\\n.mg-container.mg-container-query .v-select input,\\n.mg-container.mg-container-query .v-select .vs__actions {\\n\\tcursor: pointer !important;\\n}\\n.mg-container.mg-container-query .v-select .vs__dropdown-toggle {\\n\\tborder: none;\\n}\\n.mg-container.mg-container-query .col .v-select .vs__selected {\\n\\tcolor: #FFF;\\n}\\n.mg-container.mg-container-query .col .v-select .vs__selected {\\n\\ttop: 3px;\\n}\\n.mg-container.mg-container-query .col .v-select .vs__actions svg,\\n.mg-container.mg-container-query .col .v-select .vs__deselect {\\n\\tstroke: #FFF;\\n\\tfill: #FFF;\\n}\\n.mg-container.mg-container-query .col .v-select.mg-choice-tags .vs__selected-options .vs__selected {\\n\\tbackground-color: #5bc0de;\\n\\tborder-radius: 10px;\\n\\tcolor: #fff;\\n\\tdisplay: inline-block;\\n\\tfont-size: 12px;\\n\\tline-height: 1rem;\\n\\tmin-width: 10px;\\n\\tpadding: 1px 10px;\\n\\ttext-align: center;\\n\\tvertical-align: middle;\\n\\twhite-space: nowrap;\\n\\tborder: none;\\n}\\n/* }}} */\\n\\n/* Query > Toggle {{{ */\\n.mg-container.mg-container-query .col .vue-js-switch {\\n\\tmargin: auto;\\n\\theight: 10px;\\n\\ttop: -5px;\\n}\\n/* }}} */\\n/* }}} */\\n\\n/* Misc utility types {{{ */\\n.mg-form .help-block {\\n\\tfont-size: 80%;\\n\\tcolor: #6c757d !important;\\n}\\n/* }}} */\\n\", \"\"]);\n// Exports\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);\n\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./src/components/mgContainer.vue?./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js??vue-loader-options");
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/dist/runtime/api.js":
-/*!*****************************************************!*\
-  !*** ./node_modules/css-loader/dist/runtime/api.js ***!
-  \*****************************************************/
-/***/ ((module) => {
-
-"use strict";
-eval("\n\n/*\n  MIT License http://www.opensource.org/licenses/mit-license.php\n  Author Tobias Koppers @sokra\n*/\n// css base code, injected by the css-loader\n// eslint-disable-next-line func-names\nmodule.exports = function (cssWithMappingToString) {\n  var list = []; // return the list of modules as css string\n\n  list.toString = function toString() {\n    return this.map(function (item) {\n      var content = cssWithMappingToString(item);\n\n      if (item[2]) {\n        return \"@media \".concat(item[2], \" {\").concat(content, \"}\");\n      }\n\n      return content;\n    }).join(\"\");\n  }; // import a list of modules into the list\n  // eslint-disable-next-line func-names\n\n\n  list.i = function (modules, mediaQuery, dedupe) {\n    if (typeof modules === \"string\") {\n      // eslint-disable-next-line no-param-reassign\n      modules = [[null, modules, \"\"]];\n    }\n\n    var alreadyImportedModules = {};\n\n    if (dedupe) {\n      for (var i = 0; i < this.length; i++) {\n        // eslint-disable-next-line prefer-destructuring\n        var id = this[i][0];\n\n        if (id != null) {\n          alreadyImportedModules[id] = true;\n        }\n      }\n    }\n\n    for (var _i = 0; _i < modules.length; _i++) {\n      var item = [].concat(modules[_i]);\n\n      if (dedupe && alreadyImportedModules[item[0]]) {\n        // eslint-disable-next-line no-continue\n        continue;\n      }\n\n      if (mediaQuery) {\n        if (!item[2]) {\n          item[2] = mediaQuery;\n        } else {\n          item[2] = \"\".concat(mediaQuery, \" and \").concat(item[2]);\n        }\n      }\n\n      list.push(item);\n    }\n  };\n\n  return list;\n};\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./node_modules/css-loader/dist/runtime/api.js?");
 
 /***/ }),
 
@@ -70,7 +70,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_1_0_rules_0_use_node_modules_vue_loader_lib_index_js_vue_loader_options_mgContainer_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../node_modules/babel-loader/lib/index.js??clonedRuleSet-1[0].rules[0].use!../../node_modules/vue-loader/lib/index.js??vue-loader-options!./mgContainer.vue?vue&type=script&lang=js& */ \"./node_modules/babel-loader/lib/index.js??clonedRuleSet-1[0].rules[0].use!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/mgContainer.vue?vue&type=script&lang=js&\");\n /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_clonedRuleSet_1_0_rules_0_use_node_modules_vue_loader_lib_index_js_vue_loader_options_mgContainer_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__.default); \n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./src/components/mgContainer.vue?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var _node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_mgContainer_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../node_modules/babel-loader/lib/index.js!../../node_modules/vue-loader/lib/index.js??vue-loader-options!./mgContainer.vue?vue&type=script&lang=js& */ \"./node_modules/babel-loader/lib/index.js!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/mgContainer.vue?vue&type=script&lang=js&\");\n /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_babel_loader_lib_index_js_node_modules_vue_loader_lib_index_js_vue_loader_options_mgContainer_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__.default); \n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./src/components/mgContainer.vue?");
 
 /***/ }),
 
@@ -124,7 +124,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
   \****************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("// style-loader: Adds some css to the DOM by adding a <style> tag\n\n// load the styles\nvar content = __webpack_require__(/*! !!../../node_modules/css-loader/dist/cjs.js!../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../node_modules/vue-loader/lib/index.js??vue-loader-options!./mgContainer.vue?vue&type=style&index=0&lang=css& */ \"./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/mgContainer.vue?vue&type=style&index=0&lang=css&\");\nif(typeof content === 'string') content = [[module.id, content, '']];\nif(content.locals) module.exports = content.locals;\n// add the styles to the DOM\nvar add = __webpack_require__(/*! !../../node_modules/vue-style-loader/lib/addStylesClient.js */ \"./node_modules/vue-style-loader/lib/addStylesClient.js\").default\nvar update = add(\"4eac2421\", content, false, {});\n// Hot Module Replacement\nif(false) {}\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./src/components/mgContainer.vue?./node_modules/vue-style-loader/index.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js??vue-loader-options");
+eval("// style-loader: Adds some css to the DOM by adding a <style> tag\n\n// load the styles\nvar content = __webpack_require__(/*! !!../../node_modules/css-loader/dist/cjs.js!../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../node_modules/vue-loader/lib/index.js??vue-loader-options!./mgContainer.vue?vue&type=style&index=0&lang=css& */ \"./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js??vue-loader-options!./src/components/mgContainer.vue?vue&type=style&index=0&lang=css&\");\nif(content.__esModule) content = content.default;\nif(typeof content === 'string') content = [[module.id, content, '']];\nif(content.locals) module.exports = content.locals;\n// add the styles to the DOM\nvar add = __webpack_require__(/*! !../../node_modules/vue-style-loader/lib/addStylesClient.js */ \"./node_modules/vue-style-loader/lib/addStylesClient.js\").default\nvar update = add(\"4eac2421\", content, false, {});\n// Hot Module Replacement\nif(false) {}\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./src/components/mgContainer.vue?./node_modules/vue-style-loader/index.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/vue-loader/lib/index.js??vue-loader-options");
 
 /***/ }),
 
@@ -137,93 +137,167 @@ eval("// style-loader: Adds some css to the DOM by adding a <style> tag\n\n// lo
 "use strict";
 eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ addStylesClient)\n/* harmony export */ });\n/* harmony import */ var _listToStyles__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./listToStyles */ \"./node_modules/vue-style-loader/lib/listToStyles.js\");\n/*\n  MIT License http://www.opensource.org/licenses/mit-license.php\n  Author Tobias Koppers @sokra\n  Modified by Evan You @yyx990803\n*/\n\n\n\nvar hasDocument = typeof document !== 'undefined'\n\nif (typeof DEBUG !== 'undefined' && DEBUG) {\n  if (!hasDocument) {\n    throw new Error(\n    'vue-style-loader cannot be used in a non-browser environment. ' +\n    \"Use { target: 'node' } in your Webpack config to indicate a server-rendering environment.\"\n  ) }\n}\n\n/*\ntype StyleObject = {\n  id: number;\n  parts: Array<StyleObjectPart>\n}\n\ntype StyleObjectPart = {\n  css: string;\n  media: string;\n  sourceMap: ?string\n}\n*/\n\nvar stylesInDom = {/*\n  [id: number]: {\n    id: number,\n    refs: number,\n    parts: Array<(obj?: StyleObjectPart) => void>\n  }\n*/}\n\nvar head = hasDocument && (document.head || document.getElementsByTagName('head')[0])\nvar singletonElement = null\nvar singletonCounter = 0\nvar isProduction = false\nvar noop = function () {}\nvar options = null\nvar ssrIdKey = 'data-vue-ssr-id'\n\n// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>\n// tags it will allow on a page\nvar isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\\b/.test(navigator.userAgent.toLowerCase())\n\nfunction addStylesClient (parentId, list, _isProduction, _options) {\n  isProduction = _isProduction\n\n  options = _options || {}\n\n  var styles = (0,_listToStyles__WEBPACK_IMPORTED_MODULE_0__.default)(parentId, list)\n  addStylesToDom(styles)\n\n  return function update (newList) {\n    var mayRemove = []\n    for (var i = 0; i < styles.length; i++) {\n      var item = styles[i]\n      var domStyle = stylesInDom[item.id]\n      domStyle.refs--\n      mayRemove.push(domStyle)\n    }\n    if (newList) {\n      styles = (0,_listToStyles__WEBPACK_IMPORTED_MODULE_0__.default)(parentId, newList)\n      addStylesToDom(styles)\n    } else {\n      styles = []\n    }\n    for (var i = 0; i < mayRemove.length; i++) {\n      var domStyle = mayRemove[i]\n      if (domStyle.refs === 0) {\n        for (var j = 0; j < domStyle.parts.length; j++) {\n          domStyle.parts[j]()\n        }\n        delete stylesInDom[domStyle.id]\n      }\n    }\n  }\n}\n\nfunction addStylesToDom (styles /* Array<StyleObject> */) {\n  for (var i = 0; i < styles.length; i++) {\n    var item = styles[i]\n    var domStyle = stylesInDom[item.id]\n    if (domStyle) {\n      domStyle.refs++\n      for (var j = 0; j < domStyle.parts.length; j++) {\n        domStyle.parts[j](item.parts[j])\n      }\n      for (; j < item.parts.length; j++) {\n        domStyle.parts.push(addStyle(item.parts[j]))\n      }\n      if (domStyle.parts.length > item.parts.length) {\n        domStyle.parts.length = item.parts.length\n      }\n    } else {\n      var parts = []\n      for (var j = 0; j < item.parts.length; j++) {\n        parts.push(addStyle(item.parts[j]))\n      }\n      stylesInDom[item.id] = { id: item.id, refs: 1, parts: parts }\n    }\n  }\n}\n\nfunction createStyleElement () {\n  var styleElement = document.createElement('style')\n  styleElement.type = 'text/css'\n  head.appendChild(styleElement)\n  return styleElement\n}\n\nfunction addStyle (obj /* StyleObjectPart */) {\n  var update, remove\n  var styleElement = document.querySelector('style[' + ssrIdKey + '~=\"' + obj.id + '\"]')\n\n  if (styleElement) {\n    if (isProduction) {\n      // has SSR styles and in production mode.\n      // simply do nothing.\n      return noop\n    } else {\n      // has SSR styles but in dev mode.\n      // for some reason Chrome can't handle source map in server-rendered\n      // style tags - source maps in <style> only works if the style tag is\n      // created and inserted dynamically. So we remove the server rendered\n      // styles and inject new ones.\n      styleElement.parentNode.removeChild(styleElement)\n    }\n  }\n\n  if (isOldIE) {\n    // use singleton mode for IE9.\n    var styleIndex = singletonCounter++\n    styleElement = singletonElement || (singletonElement = createStyleElement())\n    update = applyToSingletonTag.bind(null, styleElement, styleIndex, false)\n    remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true)\n  } else {\n    // use multi-style-tag mode in all other cases\n    styleElement = createStyleElement()\n    update = applyToTag.bind(null, styleElement)\n    remove = function () {\n      styleElement.parentNode.removeChild(styleElement)\n    }\n  }\n\n  update(obj)\n\n  return function updateStyle (newObj /* StyleObjectPart */) {\n    if (newObj) {\n      if (newObj.css === obj.css &&\n          newObj.media === obj.media &&\n          newObj.sourceMap === obj.sourceMap) {\n        return\n      }\n      update(obj = newObj)\n    } else {\n      remove()\n    }\n  }\n}\n\nvar replaceText = (function () {\n  var textStore = []\n\n  return function (index, replacement) {\n    textStore[index] = replacement\n    return textStore.filter(Boolean).join('\\n')\n  }\n})()\n\nfunction applyToSingletonTag (styleElement, index, remove, obj) {\n  var css = remove ? '' : obj.css\n\n  if (styleElement.styleSheet) {\n    styleElement.styleSheet.cssText = replaceText(index, css)\n  } else {\n    var cssNode = document.createTextNode(css)\n    var childNodes = styleElement.childNodes\n    if (childNodes[index]) styleElement.removeChild(childNodes[index])\n    if (childNodes.length) {\n      styleElement.insertBefore(cssNode, childNodes[index])\n    } else {\n      styleElement.appendChild(cssNode)\n    }\n  }\n}\n\nfunction applyToTag (styleElement, obj) {\n  var css = obj.css\n  var media = obj.media\n  var sourceMap = obj.sourceMap\n\n  if (media) {\n    styleElement.setAttribute('media', media)\n  }\n  if (options.ssrId) {\n    styleElement.setAttribute(ssrIdKey, obj.id)\n  }\n\n  if (sourceMap) {\n    // https://developer.chrome.com/devtools/docs/javascript-debugging\n    // this makes source maps inside style tags work properly in Chrome\n    css += '\\n/*# sourceURL=' + sourceMap.sources[0] + ' */'\n    // http://stackoverflow.com/a/26603875\n    css += '\\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + ' */'\n  }\n\n  if (styleElement.styleSheet) {\n    styleElement.styleSheet.cssText = css\n  } else {\n    while (styleElement.firstChild) {\n      styleElement.removeChild(styleElement.firstChild)\n    }\n    styleElement.appendChild(document.createTextNode(css))\n  }\n}\n\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./node_modules/vue-style-loader/lib/addStylesClient.js?");
 
-/***/ }),
-
-/***/ "./node_modules/vue-style-loader/lib/listToStyles.js":
-/*!***********************************************************!*\
-  !*** ./node_modules/vue-style-loader/lib/listToStyles.js ***!
-  \***********************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (/* binding */ listToStyles)\n/* harmony export */ });\n/**\n * Translates the list format produced by css-loader into something\n * easier to manipulate.\n */\nfunction listToStyles (parentId, list) {\n  var styles = []\n  var newStyles = {}\n  for (var i = 0; i < list.length; i++) {\n    var item = list[i]\n    var id = item[0]\n    var css = item[1]\n    var media = item[2]\n    var sourceMap = item[3]\n    var part = {\n      id: parentId + ':' + i,\n      css: css,\n      media: media,\n      sourceMap: sourceMap\n    }\n    if (!newStyles[id]) {\n      styles.push(newStyles[id] = { id: id, parts: [part] })\n    } else {\n      newStyles[id].parts.push(part)\n    }\n  }\n  return styles\n}\n\n\n//# sourceURL=webpack://@momsfriendlydevco/macgyver/./node_modules/vue-style-loader/lib/listToStyles.js?");
-
 /***/ })
 
-/******/ 	});
+/******/ });
 /************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		if(__webpack_module_cache__[moduleId]) {
-/******/ 			return __webpack_module_cache__[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			id: moduleId,
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
+/******/ // The module cache
+/******/ var __webpack_module_cache__ = {};
+/******/ 
+/******/ // The require function
+/******/ function __webpack_require__(moduleId) {
+/******/ 	// Check if module is in cache
+/******/ 	var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 	if (cachedModule !== undefined) {
+/******/ 		return cachedModule.exports;
 /******/ 	}
-/******/ 	
+/******/ 	// Create a new module (and put it into the cache)
+/******/ 	var module = __webpack_module_cache__[moduleId] = {
+/******/ 		id: moduleId,
+/******/ 		// no module.loaded needed
+/******/ 		exports: {}
+/******/ 	};
+/******/ 
+/******/ 	// Execute the module function
+/******/ 	__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 
+/******/ 	// Return the exports of the module
+/******/ 	return module.exports;
+/******/ }
+/******/ 
+/******/ // expose the modules object (__webpack_modules__)
+/******/ __webpack_require__.m = __webpack_modules__;
+/******/ 
 /************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__webpack_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ /* webpack/runtime/chunk loaded */
+/******/ (() => {
+/******/ 	var deferred = [];
+/******/ 	__webpack_require__.O = (result, chunkIds, fn, priority) => {
+/******/ 		if(chunkIds) {
+/******/ 			priority = priority || 0;
+/******/ 			for(var i = deferred.length; i > 0 && deferred[i - 1][2] > priority; i--) deferred[i] = deferred[i - 1];
+/******/ 			deferred[i] = [chunkIds, fn, priority];
+/******/ 			return;
+/******/ 		}
+/******/ 		var notFulfilled = Infinity;
+/******/ 		for (var i = 0; i < deferred.length; i++) {
+/******/ 			var [chunkIds, fn, priority] = deferred[i];
+/******/ 			var fulfilled = true;
+/******/ 			for (var j = 0; j < chunkIds.length; j++) {
+/******/ 				if ((priority & 1 === 0 || notFulfilled >= priority) && Object.keys(__webpack_require__.O).every((key) => (__webpack_require__.O[key](chunkIds[j])))) {
+/******/ 					chunkIds.splice(j--, 1);
+/******/ 				} else {
+/******/ 					fulfilled = false;
+/******/ 					if(priority < notFulfilled) notFulfilled = priority;
 /******/ 				}
 /******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			if(fulfilled) {
+/******/ 				deferred.splice(i--, 1)
+/******/ 				result = fn();
 /******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
+/******/ 		}
+/******/ 		return result;
+/******/ 	};
+/******/ })();
+/******/ 
+/******/ /* webpack/runtime/compat get default export */
+/******/ (() => {
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = (module) => {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			() => (module['default']) :
+/******/ 			() => (module);
+/******/ 		__webpack_require__.d(getter, { a: getter });
+/******/ 		return getter;
+/******/ 	};
+/******/ })();
+/******/ 
+/******/ /* webpack/runtime/define property getters */
+/******/ (() => {
+/******/ 	// define getter functions for harmony exports
+/******/ 	__webpack_require__.d = (exports, definition) => {
+/******/ 		for(var key in definition) {
+/******/ 			if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 				Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 			}
+/******/ 		}
+/******/ 	};
+/******/ })();
+/******/ 
+/******/ /* webpack/runtime/hasOwnProperty shorthand */
+/******/ (() => {
+/******/ 	__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ })();
+/******/ 
+/******/ /* webpack/runtime/make namespace object */
+/******/ (() => {
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = (exports) => {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/ })();
+/******/ 
+/******/ /* webpack/runtime/jsonp chunk loading */
+/******/ (() => {
+/******/ 	// no baseURI
 /******/ 	
+/******/ 	// object to store loaded and loading chunks
+/******/ 	// undefined = chunk not loaded, null = chunk preloaded/prefetched
+/******/ 	// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
+/******/ 	var installedChunks = {
+/******/ 		"components/mgContainer": 0
+/******/ 	};
+/******/ 	
+/******/ 	// no chunk on demand loading
+/******/ 	
+/******/ 	// no prefetching
+/******/ 	
+/******/ 	// no preloaded
+/******/ 	
+/******/ 	// no HMR
+/******/ 	
+/******/ 	// no HMR manifest
+/******/ 	
+/******/ 	__webpack_require__.O.j = (chunkId) => (installedChunks[chunkId] === 0);
+/******/ 	
+/******/ 	// install a JSONP callback for chunk loading
+/******/ 	var webpackJsonpCallback = (parentChunkLoadingFunction, data) => {
+/******/ 		var [chunkIds, moreModules, runtime] = data;
+/******/ 		// add "moreModules" to the modules object,
+/******/ 		// then flag all "chunkIds" as loaded and fire callback
+/******/ 		var moduleId, chunkId, i = 0;
+/******/ 		for(moduleId in moreModules) {
+/******/ 			if(__webpack_require__.o(moreModules, moduleId)) {
+/******/ 				__webpack_require__.m[moduleId] = moreModules[moduleId];
+/******/ 			}
+/******/ 		}
+/******/ 		if(runtime) runtime(__webpack_require__);
+/******/ 		if(parentChunkLoadingFunction) parentChunkLoadingFunction(data);
+/******/ 		for(;i < chunkIds.length; i++) {
+/******/ 			chunkId = chunkIds[i];
+/******/ 			if(__webpack_require__.o(installedChunks, chunkId) && installedChunks[chunkId]) {
+/******/ 				installedChunks[chunkId][0]();
+/******/ 			}
+/******/ 			installedChunks[chunkIds[i]] = 0;
+/******/ 		}
+/******/ 		__webpack_require__.O();
+/******/ 	}
+/******/ 	
+/******/ 	var chunkLoadingGlobal = global["webpackChunk_momsfriendlydevco_macgyver"] = global["webpackChunk_momsfriendlydevco_macgyver"] || [];
+/******/ 	chunkLoadingGlobal.forEach(webpackJsonpCallback.bind(null, 0));
+/******/ 	chunkLoadingGlobal.push = webpackJsonpCallback.bind(null, chunkLoadingGlobal.push.bind(chunkLoadingGlobal));
+/******/ })();
+/******/ 
 /************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__("./src/components/mgContainer.vue");
-/******/ 	
-/******/ 	return __webpack_exports__;
-/******/ })()
-;
-});
+/******/ 
+/******/ // startup
+/******/ // Load entry module and return exports
+/******/ // This entry module is referenced by other modules so it can't be inlined
+/******/ var __webpack_exports__ = __webpack_require__("./src/components/mgContainer.vue");
+/******/ __webpack_exports__ = __webpack_require__.O(__webpack_exports__);
+/******/ var __webpack_exports__default = __webpack_exports__.default;
+/******/ export { __webpack_exports__default as default };
+/******/ 

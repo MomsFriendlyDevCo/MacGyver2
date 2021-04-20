@@ -2,6 +2,7 @@ import _ from 'lodash';
 import {expect} from 'chai';
 import sift from 'sift';
 
+// TODO: If we instead directly import `./src/macgyver.js` then can be UMD module 
 import macgyver from '@momsfriendlydevco/macgyver';
 
 describe('$macgyver.eval', ()=> {

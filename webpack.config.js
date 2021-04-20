@@ -1,6 +1,7 @@
 import { VueLoaderPlugin } from 'vue-loader';
 //import BundleAnalyzerPlugin from 'webpack-bundle-analyzer';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
+import LodashPlugin from 'lodash-webpack-plugin';
 
 import glob from 'glob';
 import path from 'path';
@@ -39,6 +40,8 @@ export default {
     path: path.resolve(__dirname, "dist"),
     library: {
       type: 'module',
+      //type: 'module',
+      //export: 'default',
     },
     /*
     library: {
@@ -54,7 +57,9 @@ export default {
     rules: [
       {
         test: /\.js$/,
-        exclude: /node_modules/,
+        //exclude: /node_modules/,
+        loader: "babel-loader",
+        /*
         use: {
           loader: "babel-loader",
           options: {
@@ -79,6 +84,7 @@ export default {
             ]
           }
         },
+        */
       },
       {
         test: /\.vue$/,
@@ -97,6 +103,7 @@ export default {
     new VueLoaderPlugin(),
     //new BundleAnalyzerPlugin(),
     new CleanWebpackPlugin(),
+    new LodashPlugin(),
   ],
   resolve: {
     extensions: [".js", ".vue"],
