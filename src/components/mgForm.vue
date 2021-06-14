@@ -108,6 +108,7 @@ export default app.component('mgForm', {
 		/**
 		* Force recomputation of show via showIf values
 		*/
+		// FIXME: Fails on items nested within an mgTable.items array?
 		refreshShowIfs() {
 			if (!this.spec) return;
 			this.spec.showIfs.forEach(widget =>
