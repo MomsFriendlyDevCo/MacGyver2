@@ -109,6 +109,7 @@ export default app.mgComponent('mgTable', {
 						/-->
 
 						<!-- Works -->
+						<!-- FIXME: Missing show? v-if="col.show" -->
 						<mg-form
 							:config="col"
 							:data="row"
