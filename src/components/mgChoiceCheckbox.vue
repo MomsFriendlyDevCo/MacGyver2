@@ -5,6 +5,7 @@ export default app.mgComponent('mgChoiceCheckbox', {
 		icon: 'far fa-list',
 		category: 'Choice Selectors',
 		preferId: true,
+		// TODO: format function to output choices as CSV?
 	},
 	data() { return {
 		enumIter: [],
