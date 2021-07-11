@@ -29,6 +29,12 @@ export default app.mgComponent('mgChoiceDropdown', {
 			],
 		},
 		enumUrl: {type: 'mgUrl', vueType: ['string', 'object'], showIf: 'enumSource == "url"', help: 'Data feed URL to fetch choice values from'},
+		optionsPath: {
+			type: "mgText",
+			default: "",
+			help: "Path within data feed for options array",
+			showIf: 'enumSource == "url"',
+		},
 		optionKeyPath: {
 			type: "mgText",
 			default: "id",
@@ -54,7 +60,9 @@ export default app.mgComponent('mgChoiceDropdown', {
 
 		this.$watch('$props.enumUrl', ()=> {
 			if (!this.$props.enumUrl) return;
-			this.$macgyver.utils.fetch(this.$props.enumUrl, {type: 'array'})
+			this.$macgyver.utils.fetch(this.$props.enumUrl, {
+				type: 'raw',
+			})
 				.then(data => this.setEnum(data))
 		}, {immediate: true});
 
@@ -83,13 +91,13 @@ export default app.mgComponent('mgChoiceDropdown', {
 			this.enumIter = enumIter;
 
 			if (this.data) {
-				this.selected =
-					this.enumIter.find(
+				this.selected = _.get(this.enumIter, this.$props.optionsPath, this.enumIter)
+					.find(
 						(e) => this.getOptionKey(e) == this.data
 					) || this.data;
 			} else if (this.$props.default) {
-				this.selected =
-					this.enumIter.find(
+				this.selected = _.get(this.enumIter, this.$props.optionsPath, this.enumIter)
+					.find(
 						(e) => this.getOptionKey(e) == this.$props.default
 					) || this.$props.default;
 			}
@@ -126,7 +134,7 @@ export default app.mgComponent('mgChoiceDropdown', {
 			ref="select"
 			:value="selected"
 			label="title"
-			:options="enumIter"
+			:options="_.get(this.enumIter, this.$props.optionsPath, this.enumIter)"
 			:placeholder="$props.placeholder"
 			:clearable="!$props.required"
 			:get-option-key="getOptionKey"
