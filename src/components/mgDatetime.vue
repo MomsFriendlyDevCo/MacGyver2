@@ -19,6 +19,7 @@ export default app.mgComponent('mgDatetime', {
 	props: {
 		min: {type: 'mgDatetime', title: 'Earliest date'},
 		max: {type: 'mgDatetime', title: 'Latest date'},
+		step: {type: 'mgNumber', title: 'Step size', default: 60},
 		required: {type: 'mgToggle', default: false},
 	},
 	created() {
@@ -54,6 +55,7 @@ export default app.mgComponent('mgDatetime', {
 			class="form-control"
 			:max="$props.max"
 			:min="$props.min"
+			:step="$props.step"
 		/>
 
 		<div v-if="this.$debugging" class="card">
