@@ -1,5 +1,5 @@
-<script>
-export default Vue.mgComponent('mgCode', {
+<script lang="js">
+export default app.mgComponent('mgCode', {
 	meta: {
 		title: 'Code Editor',
 		icon: 'fal fa-code',

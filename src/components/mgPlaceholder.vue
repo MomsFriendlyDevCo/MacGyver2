@@ -1,5 +1,5 @@
-<script>
-export default Vue.mgComponent('mgPlaceholder', {
+<script lang="js">
+export default app.mgComponent('mgPlaceholder', {
 	meta: {
 		title: 'Placeholder',
 		icon: 'far fa-construction',

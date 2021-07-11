@@ -1,5 +1,5 @@
-<script>
-export default Vue.mgComponent('mgRestQuery', {
+<script lang="js">
+export default app.mgComponent('mgRestQuery', {
 	meta: {
 		title: 'ReST Query',
 		icon: 'far fa-database',

@@ -1,5 +1,5 @@
-<script>
-export default Vue.mgComponent('mgChoiceRadio', {
+<script lang="js">
+export default app.mgComponent('mgChoiceRadio', {
 	meta: {
 		title: 'Radio multiple-choice',
 		icon: 'far fa-list-ul',

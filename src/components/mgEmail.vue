@@ -1,5 +1,5 @@
-<script>
-export default Vue.mgComponent('mgEmail', {
+<script lang="js">
+export default app.mgComponent('mgEmail', {
 	meta: {
 		title: 'Email address',
 		icon: 'far fa-at',

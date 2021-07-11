@@ -1,11 +1,11 @@
-<script>
+<script lang="js">
 /**
 * Instance of a MacGyver widget
 * This is the parent of all other mg* components
 *
 * @param {Object} config The MacGyver component config - this is a simple object containing all prototype $props mappings
 */
-export default Vue.component('mgComponent', {
+export default app.component('mgComponent', {
 	inject: ['$mgForm'],
 	data() { return {
 		data: undefined,

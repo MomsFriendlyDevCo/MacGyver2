@@ -1,2 +1,1 @@
-import MacGyver from './macgyver.vue';
-export default MacGyver;
+export { default as MacGyver} from './macgyver.js';

@@ -1,10 +1,8 @@
-<import>
-./node_modules/chart.js/dist/Chart.js
-./node_modules/chartjs-plugin-colorschemes/dist/chartjs-plugin-colorschemes.js
-</import>
+<script lang="js">
+import Chart from 'chartjs';
+import 'chartjs-plugin-colorschemes/dist/chartjs-plugin-colorschemes.js';
 
-<script>
-module.exports = Vue.mgComponent('mgInfoChart', {
+export default app.mgComponent('mgInfoChart', {
 	meta: {
 		title: 'Info Chart',
 		icon: 'far fa-chart-bar',

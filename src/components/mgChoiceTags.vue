@@ -1,17 +1,16 @@
-<script>
+<script lang="js">
 /**
 * NOTE: Toggling deselection from the menu is not yet supported until
 *       https://github.com/sagalbot/vue-select/pull/877
 *       Has been merged
 *       - MC 2020-01-10
 */
-
 import VueSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
 
-Vue.component('v-select', VueSelect);
+app.component('v-select', VueSelect);
 
-export default Vue.mgComponent('mgChoiceTags', {
+export default app.mgComponent('mgChoiceTags', {
 	meta: {
 		title: 'Dropdown multiple-choice',
 		icon: 'far fa-tags',

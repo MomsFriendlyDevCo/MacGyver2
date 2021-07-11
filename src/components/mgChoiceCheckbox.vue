@@ -1,10 +1,11 @@
-<script>
-export default Vue.mgComponent('mgChoiceCheckbox', {
+<script lang="js">
+export default app.mgComponent('mgChoiceCheckbox', {
 	meta: {
 		title: 'Checkbox multiple-choice',
 		icon: 'far fa-list',
 		category: 'Choice Selectors',
 		preferId: true,
+		// TODO: format function to output choices as CSV?
 	},
 	data() { return {
 		enumIter: [],

@@ -1,8 +1,9 @@
-<script>
+<script lang="js">
 import InputFacade from 'vue-input-facade';
-Vue.use(InputFacade);
 
-export default Vue.mgComponent('mgText', {
+app.use(InputFacade);
+
+export default app.mgComponent('mgText', {
 	meta: {
 		title: 'Text',
 		icon: 'far fa-edit',
@@ -91,14 +92,14 @@ export default Vue.mgComponent('mgText', {
 			type="text"
 			class="form-control"
 			:autocomplete="$props.autoComplete"
-			:disabled="$props.disabled"
 			:placeholder="$props.placeholder"
+			:disabled="$props.disabled"
 			:readonly="$props.readonly"
 			:list="datalist ? `mg-text-datalist-${_uid}` : undefined"
 			v-facade="$props.mask"
 		/>
 		<datalist v-if="datalist" :id="`mg-text-datalist-${_uid}`">
-			<option v-for="item in datalist" :value="item.title">
+			<option v-for="item in datalist" :value="item.title" :key="item.id">
 				{{item.title}}
 			</option>
 		</datalist>

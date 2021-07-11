@@ -1,5 +1,6 @@
-<script>
-export default Vue.mgComponent('mgPermissions', {
+<script lang="js">
+// FIXME: Is this more of an app level component?\
+export default app.mgComponent('mgPermissions', {
 	meta: {
 		title: 'Permissions',
 		icon: 'far fa-key',

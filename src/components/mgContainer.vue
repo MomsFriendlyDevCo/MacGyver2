@@ -1,9 +1,9 @@
-<script>
+<script lang="js">
 /**
 * MacGyver component loader
 * This is a meta component that loads other dynamic components as an array
 */
-export default Vue.mgComponent('mgContainer', {
+export default app.mgComponent('mgContainer', {
 	inject: {
 		$mgForm: {from: '$mgForm'},
 		$mgFormEditor: {from: '$mgFormEditor', default: false},

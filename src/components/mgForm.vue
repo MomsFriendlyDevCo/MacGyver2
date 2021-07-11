@@ -1,4 +1,4 @@
-<script>
+<script lang="js">
 /**
 * The top level MacGyver form
 * @param {string} [form] Unique form name
@@ -23,7 +23,7 @@
 * @emits mgContainer.mouseEnter Emitted as `(container, specPath, event)` on the native mouseEnter event of a component within a container
 * @emits mgContainer.mouseLeave Emitted as `(container, specPath, event)` on the native mouseLeave event of a component within a container
 */
-export default Vue.component('mgForm', {
+export default app.component('mgForm', {
 	provide() { return {
 		$mgForm: this,
 	}},
@@ -108,6 +108,7 @@ export default Vue.component('mgForm', {
 		/**
 		* Force recomputation of show via showIf values
 		*/
+		// FIXME: Fails on items nested within an mgTable.items array?
 		refreshShowIfs() {
 			if (!this.spec) return;
 			this.spec.showIfs.forEach(widget =>

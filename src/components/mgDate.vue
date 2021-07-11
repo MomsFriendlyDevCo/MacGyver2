@@ -1,7 +1,7 @@
-<script>
+<script lang="js">
 import moment from 'moment';
 
-export default Vue.mgComponent('mgDate', {
+export default app.mgComponent('mgDate', {
 	meta: {
 		title: 'Date selection',
 		icon: 'far fa-calendar',
@@ -35,6 +35,7 @@ export default Vue.mgComponent('mgDate', {
 		});
 
 		this.$watch('data', ()=> {
+			if (!this.data) return;
 			this.formData = moment(this.data).format(moment.HTML5_FMT.DATE);
 		}, { immediate: true });
 

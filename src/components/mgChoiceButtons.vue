@@ -1,5 +1,5 @@
-<script>
-export default Vue.mgComponent('mgChoiceButtons', {
+<script lang="js">
+export default app.mgComponent('mgChoiceButtons', {
 	meta: {
 		title: 'Choice Buttons',
 		icon: 'fas fa-ellipsis-h',

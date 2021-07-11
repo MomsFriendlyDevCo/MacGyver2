@@ -1,5 +1,5 @@
-<script>
-export default Vue.mgComponent('mgTextArea', {
+<script lang="js">
+export default app.mgComponent('mgTextArea', {
 	meta: {
 		title: 'Multi-line text',
 		icon: 'fa fa-align-justify',
@@ -12,6 +12,8 @@ export default Vue.mgComponent('mgTextArea', {
 		lengthMax: {type: 'mgNumber', title: 'Maximum Length'},
 		placeholder: {type: 'mgTextArea', help: 'Ghost text to display when there is no value'},
 		required: {type: 'mgToggle', default: false},
+		disabled: {type: 'mgToggle', default: false},
+		readonly: {type: 'mgToggle', default: false},
 	},
 	created() {
 		this.$on('mgValidate', reply => {
@@ -28,6 +30,8 @@ export default Vue.mgComponent('mgTextArea', {
 		v-model="data"
 		class="form-control"
 		:placeholder="$props.placeholder"
+		:disabled="$props.disabled"
+		:readonly="$props.readonly"
 		:minlength="$props.lengthMin"
 		:maxlength="$props.lengthMin"
 		:rows="$props.rows"

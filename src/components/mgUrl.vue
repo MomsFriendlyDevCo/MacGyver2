@@ -1,5 +1,5 @@
-<script>
-export default Vue.mgComponent('mgUrl', {
+<script lang="js">
+export default app.mgComponent('mgUrl', {
 	meta: {
 		title: 'URL',
 		icon: 'far fa-globe',

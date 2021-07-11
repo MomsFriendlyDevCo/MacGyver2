@@ -1,10 +1,10 @@
-<script>
+<script lang="js">
 import VueSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
 
-Vue.component('v-select', VueSelect);
+app.component('v-select', VueSelect);
 
-export default Vue.mgComponent('mgChoiceDropdown', {
+export default app.mgComponent('mgChoiceDropdown', {
 	meta: {
 		title: 'Dropdown multiple-choice',
 		icon: 'far fa-chevron-circle-down',
@@ -29,6 +29,12 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 			],
 		},
 		enumUrl: {type: 'mgUrl', vueType: ['string', 'object'], showIf: 'enumSource == "url"', help: 'Data feed URL to fetch choice values from'},
+		optionsPath: {
+			type: "mgText",
+			default: "",
+			help: "Path within data feed for options array",
+			showIf: 'enumSource == "url"',
+		},
 		optionKeyPath: {
 			type: "mgText",
 			default: "id",
@@ -46,17 +52,21 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 		focus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},
 	},
 	created() {
+		this.$debugging = false;
+
 		this.$on('mgValidate', reply => {
 			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
 		});
 
 		this.$watch('$props.enumUrl', ()=> {
 			if (!this.$props.enumUrl) return;
-			this.$macgyver.utils.fetch(this.$props.enumUrl, {type: 'array'})
+			this.$macgyver.utils.fetch(this.$props.enumUrl, {
+				type: 'raw',
+			})
 				.then(data => this.setEnum(data))
 		}, {immediate: true});
 
-		this.$watch('$props.enum', ()=> {
+		this.$watchAll(['$props.enum', '$data.data'], ()=> {
 			if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
 				this.setEnum(this.$props.enum.map(i => ({id: _.camelCase(i), title: i})));
 			} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection
@@ -81,13 +91,13 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 			this.enumIter = enumIter;
 
 			if (this.data) {
-				this.selected =
-					this.enumIter.find(
+				this.selected = _.get(this.enumIter, this.$props.optionsPath, this.enumIter)
+					.find(
 						(e) => this.getOptionKey(e) == this.data
 					) || this.data;
 			} else if (this.$props.default) {
-				this.selected =
-					this.enumIter.find(
+				this.selected = _.get(this.enumIter, this.$props.optionsPath, this.enumIter)
+					.find(
 						(e) => this.getOptionKey(e) == this.$props.default
 					) || this.$props.default;
 			}
@@ -119,27 +129,38 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 </script>
 
 <template>
-	<v-select
-		ref="select"
-		:value="selected"
-		label="title"
-		:options="enumIter"
-		:placeholder="$props.placeholder"
-		:clearable="!$props.required"
-		:get-option-key="getOptionKey"
-		:get-option-label="getOptionLabel"
-		@input="changeHandler"
-	>
-		<template #selected-option="option">
-			<!-- TODO: getOptionIcon -->
-			<i v-if="option.icon" :class="option.icon" />
-			{{ getOptionLabel(option) }}
-		</template>
-		<template #option="option">
-			<i v-if="option.icon" :class="option.icon" />
-			{{ getOptionLabel(option) }}
-		</template>
-	</v-select>
+	<div class="mg-choice-dropdown">
+		<v-select
+			ref="select"
+			:value="selected"
+			label="title"
+			:options="_.get(this.enumIter, this.$props.optionsPath, this.enumIter)"
+			:placeholder="$props.placeholder"
+			:clearable="!$props.required"
+			:get-option-key="getOptionKey"
+			:get-option-label="getOptionLabel"
+			@input="changeHandler"
+		>
+			<template #selected-option="option">
+				<!-- TODO: getOptionIcon -->
+				<i v-if="option.icon" :class="option.icon" />
+				{{ getOptionLabel(option) }}
+			</template>
+			<template #option="option">
+				<i v-if="option.icon" :class="option.icon" />
+				{{ getOptionLabel(option) }}
+			</template>
+		</v-select>
+
+		<div v-if="this.$debugging" class="card">
+			<div class="card-header">
+				Raw data
+			</div>
+			<div class="card-body">
+				<pre>{{$data}}</pre>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style>
@@ -154,7 +175,7 @@ export default Vue.mgComponent('mgChoiceDropdown', {
 }
 
 /* Wider spacing for clear button */
-.v-select .dropdown-toggle .clear {
+.v-select .dropdown-toggle .vs__clear {
 	margin-right: 10px;
 }
 

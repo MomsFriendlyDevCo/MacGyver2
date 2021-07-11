@@ -1,6 +1,7 @@
-var _ = require('lodash');
-var expect = require('chai').expect;
-var macgyver = require('..');
+const _ = require('lodash');
+const expect = require('chai').expect;
+
+const macgyver = require('../dist/macgyver').MacGyver;
 
 describe('Basic sanity checks', ()=> {
 
@@ -9,8 +10,9 @@ describe('Basic sanity checks', ()=> {
 		expect(macgyver.widgets).to.be.an('object');
 
 		[
-			'fetch', 'flatten', 'compileSpec', 'register',
-			'forms.setConfig', 'forms.setData', 'forms.validate', 'forms.getPrototype', 'forms.run'
+			'utils.fetch', 
+			'flatten', 'compileSpec', 
+			'forms.setConfig', 'forms.setData', 'forms.validate', 'forms.getPrototype', 
 		].forEach(p => {
 			expect(macgyver).to.have.nested.property(p);
 			expect(_.get(macgyver, p)).to.be.a('function');

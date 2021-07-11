@@ -1,7 +1,8 @@
-var _ = require('lodash');
-var expect = require('chai').expect;
-var macgyver = require('..');
-var sift = require('sift');
+const _ = require('lodash');
+const expect = require('chai').expect;
+const sift = require('sift');
+
+const macgyver = require('../dist/macgyver').MacGyver;
 
 describe('$macgyver.eval', ()=> {
 

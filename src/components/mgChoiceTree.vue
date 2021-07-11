@@ -1,5 +1,5 @@
-<script>
-export default Vue.mgComponent('mgChoiceTree', {
+<script lang="js">
+export default app.mgComponent('mgChoiceTree', {
 	meta: {
 		title: 'Choice Tree',
 		icon: 'fas fa-stream',

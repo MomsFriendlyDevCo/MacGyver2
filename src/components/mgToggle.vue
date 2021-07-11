@@ -1,8 +1,8 @@
-<script>
-import ToggleButton from 'vue-js-toggle-button';
-Vue.use(ToggleButton);
+<script lang="js">
+import {ToggleButton} from 'vue-js-toggle-button';
+app.component('v-toggle', ToggleButton);
 
-export default Vue.mgComponent('mgToggle', {
+export default app.mgComponent('mgToggle', {
 	meta: {
 		title: 'Toggle Switch',
 		icon: 'far fa-toggle-on',
@@ -29,7 +29,7 @@ export default Vue.mgComponent('mgToggle', {
 </script>
 
 <template>
-	<toggle-button
+	<v-toggle
 		class="mg-toggle"
 		:value="data"
 		:color="{checked: $props.onColor, unchecked: $props.offColor, disabled: $props.disabledColor}"

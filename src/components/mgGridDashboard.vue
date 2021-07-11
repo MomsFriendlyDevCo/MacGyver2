@@ -1,11 +1,10 @@
-<import>
-./node_modules/vue-grid-layout/dist/vue-grid-layout.umd.js
-</import>
+<script lang="js">
+import VueGridLayout from 'vue-grid-layout';
+//import 'vue-grid-layout/dist/vue-grid-layout.umd.js';
 
-<script>
-Vue.component(window['VueGridLayout']);
+app.component(VueGridLayout);
 
-export default Vue.mgComponent('mgGridDashboard', {
+export default app.mgComponent('mgGridDashboard', {
 	meta: {
 		title: 'Grid layout',
 		icon: 'far fa-chess-board',

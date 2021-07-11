@@ -1,5 +1,5 @@
-<script>
-export default Vue.mgComponent('mgGrid', {
+<script lang="js">
+export default app.mgComponent('mgGrid', {
 	meta: {
 		title: 'Grid layout',
 		icon: 'far fa-grip-horizontal',

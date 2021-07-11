@@ -598,6 +598,7 @@ $macgyver.utils.evalMatch = (expression, env) => {
 * @example Set a deeply nested path, with arrays, assuming VM as the root node
 * $macgyver.utils.setPath('foo.1.bar', 123); // vm.$data.foo = [{bar: 123}]
 */
+// FIXME: Duplication. Both this and "vue-setpath" should depend on a parent "setpath" package.
 $macgyver.utils.setPath = (target, path, value, options) => {
 	// Argument mangling {{{
 	if (_.isString(target) || _.isArray(target) || value === undefined) { // called as (path, value)

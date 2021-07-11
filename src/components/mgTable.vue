@@ -1,5 +1,5 @@
-<script>
-export default Vue.mgComponent('mgTable', {
+<script lang="js">
+export default app.mgComponent('mgTable', {
 	meta: {
 		title: 'Table layout',
 		icon: 'far fa-table',
@@ -34,7 +34,7 @@ export default Vue.mgComponent('mgTable', {
 		showTitle: {type: 'mgToggle', default: false, title: 'Show Title'},
 	},
 	created() {
-		this.$debugging = true;
+		this.$debugging = false;
 	},
 	mounted() {
 		this.$watch('$props.url', ()=> {
@@ -71,6 +71,7 @@ export default Vue.mgComponent('mgTable', {
 			this.isAdding = false;
 		},
 		deleteRow(offset) {
+			// TODO: Add confirmation dialog?
 			this.$debug('deleteRow', offset);
 			this.data.splice(offset, 1);
 		},
@@ -108,6 +109,7 @@ export default Vue.mgComponent('mgTable', {
 						/-->
 
 						<!-- Works -->
+						<!-- FIXME: Missing show? v-if="col.show" -->
 						<mg-form
 							:config="col"
 							:data="row"
@@ -126,12 +128,12 @@ export default Vue.mgComponent('mgTable', {
 					</td>
 					<td v-if="$props.allowAdd || $props.allowDelete" class="btn-context">
 						<div class="btn-group">
-							<a class="btn btn-context" data-toggle="dropdown"><i class="far fa-ellipsis-v"></i></a>
+							<a class="btn btn-context" data-toggle="dropdown"><i class="fas fa-ellipsis-v"></i></a>
 							<ul class="dropdown-menu pull-right">
-								<li v-if="$props.allowAdd"><a @click="createRow(rowNumber)"><i class="far fa-arrow-circle-up"></i> Add row above</a></li>
-								<li v-if="$props.allowAdd"><a @click="createRow(rowNumber)"><i class="far fa-arrow-circle-down"></i> Add row below</a></li>
+								<li v-if="$props.allowAdd"><a @click="createRow(rowNumber)"><i class="fas fa-arrow-circle-up"></i> Add row above</a></li>
+								<li v-if="$props.allowAdd"><a @click="createRow(rowNumber)"><i class="fas fa-arrow-circle-down"></i> Add row below</a></li>
 								<li v-if="$props.allowDelete" class="dropdown-divider"></li>
-								<li v-if="$props.allowDelete" class="dropdown-item-danger"><a @click="deleteRow(rowNumber)"><i class="far fa-trash"></i> Delete</a></li>
+								<li v-if="$props.allowDelete" class="dropdown-item-danger"><a @click="deleteRow(rowNumber)"><i class="fas fa-trash"></i> Delete</a></li>
 							</ul>
 						</div>
 					</td>
@@ -140,7 +142,7 @@ export default Vue.mgComponent('mgTable', {
 					<td v-if="$props.rowNumbers" class="row-number">
 						<i class="far fa-asterisk"></i>
 					</td>
-					<td v-for="(col, colNumber) in $props.items" :key="col.id">
+					<td v-for="(col, colNumber) in $props.items" :key="col.id || colNumber">
 						<!-- Works -->
 						<!--mg-text
 							:value="newRow[col.$dataPath]"
