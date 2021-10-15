@@ -8,11 +8,13 @@ export default app.mgComponent('mgVideo', {
 	},
 	props: {
 		url: {type: 'mgUrl'},
+		altUrl: {type: 'mgUrl'},
 		width: {type: 'mgText', default: '100%'},
 		height: {type: 'mgText', default: '315px'},
 		autoPlay: {type: 'mgToggle', default: false},
 		showControls: {type: 'mgToggle', default: true},
 		loop: {type: 'mgToggle', default: false},
+		mute: {type: 'mgToggle', default: false},
 	},
 	computed: {
 		videoResource() {
@@ -25,7 +27,15 @@ export default app.mgComponent('mgVideo', {
 						+ `?autoplay=${this.$props.autoPlay ? '1' : '0'}`
 						+ `&controls=${this.$props.showControls ? '1' : '0'}`
 						+ `&loop=${this.$props.loop ? '1' : '0'}`
-				}
+				};
+			// TODO: What other video formats?
+			} else if (/\.mp4$/.test(this.$props.url)) {
+				return {
+					type: 'file',
+					url: this.$props.url,
+					altUrl: this.$props.altUrl,
+					contentType: 'video/mp4',
+				};
 			} else {
 				return {type: 'unknown'};
 			}
@@ -42,17 +52,29 @@ export default app.mgComponent('mgVideo', {
 		>
 			No video URL provided
 		</div>
+
 		<iframe
 			v-if="videoResource.type == 'youTube'"
+			:src="videoResource.url"
 			width="100%"
 			height="100%"
-			:src="videoResource.url"
 			frameborder="0"
 			allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
 			allowfullscreen
 		/>
+
+		<video v-if="videoResource.type == 'file'"
+			:autoplay="autoPlay"
+			:controls="showControls"
+			:loop="loop"
+			:mute="mute"
+		>
+			<source :type="videoResource.contentType" :src="videoResource.url"/>
+			<img v-if="videoResource.altUrl" :src="videoResource.altUrl"/>
+		</video>
+
 		<div
-			v-if="videoResource.type !== 'none' && videoResource.type !== 'youTube'"
+			v-if="videoResource.type !== 'none' && videoResource.type !== 'youTube' && videoResource.type !== 'file'"
 			class="alert alert-warning" 
 		>
 			Unsupported video URL
