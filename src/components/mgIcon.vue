@@ -7,7 +7,7 @@ export default app.mgComponent('mgIcon', {
 		preferId: true,
 	},
 	props: {
-		iconFallback: {type: 'mgIcon', default: 'far fa-info', help: 'The icon to use if non is selected'},
+		iconFallback: {type: 'mgIcon', default: 'far fa-info', help: 'The icon to use if none is selected'},
 		required: {type: 'mgToggle', default: false},
 		interface: {type: 'mgChoiceButtons', default: 'modal', enum: ['modal', 'dropdown']},
 		iconFeed: {type: 'mgText', default: '/api/webfonts/fa.json', advanced: true, help: 'The data source to import icon information', relative: true},
