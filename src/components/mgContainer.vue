@@ -33,6 +33,7 @@ export default app.mgComponent('mgContainer', {
 			title: 'Form style',
 			showIf: {layout: {$in: ['form', 'card']}},
 			default: 'normal',
+			// FIXME: Should this be restricted to an enum?
 			enum: [
 				{id: 'normal', title: 'Normal'},
 				{id: 'titles-above', title: 'Titles above'},

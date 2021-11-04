@@ -117,6 +117,7 @@ export default {
 								case 'mgCode':
 								case 'mgColor':
 								case 'mgEmail':
+								case 'mgHtml':
 								case 'mgIcon':
 								case 'mgPassword':
 								case 'mgRestQuery':

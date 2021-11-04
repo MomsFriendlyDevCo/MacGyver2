@@ -29,7 +29,7 @@ export { default as mgFormEditor } from './components/mgFormEditor';
 //export { default as mgGridDashboard } from './components/mgGridDashboard';
 export { default as mgGrid } from './components/mgGrid';
 export { default as mgHeading } from './components/mgHeading';
-//export { default as mgHtml } from './components/mgHtml';
+export { default as mgHtml } from './components/mgHtml';
 export { default as mgIcon } from './components/mgIcon'; // Not in showcase
 export { default as mgInfoBlock } from './components/mgInfoBlock'; // Not in showcase
 //export { default as mgInfoChart } from './components/mgInfoChart';
@@ -49,4 +49,4 @@ export { default as mgTime } from './components/mgTime';
 export { default as mgToggle } from './components/mgToggle';
 export { default as mgUrl } from './components/mgUrl';
 export { default as mgVideo } from './components/mgVideo';
-//export { default as mgWysiwyg } from './components/mgWysiwyg';
+export { default as mgWysiwyg } from './components/mgWysiwyg';
