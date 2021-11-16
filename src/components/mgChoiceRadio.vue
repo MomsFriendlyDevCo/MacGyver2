@@ -10,6 +10,9 @@ export default app.mgComponent('mgChoiceRadio', {
 		enumIter: [],
 	}},
 	props: {
+		id: {
+			type: 'mgString',
+		},
 		enum: {
 			type: 'mgTable',
 			title: 'List items',

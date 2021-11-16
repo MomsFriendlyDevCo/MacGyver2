@@ -14,6 +14,9 @@ export default app.mgComponent('mgQuery', {
 		}
 	}},
 	props: {
+		id: {
+			type: 'mgString',
+		},
 		//config: Object,
 		/**
 		* The spec is composed of an object lookup with the dotted notation path as the key and an object set of properties
