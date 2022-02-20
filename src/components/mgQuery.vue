@@ -1,4 +1,7 @@
 <script lang="js">
+import Debug from '@doop/debug';
+const $debug = Debug('mgQuery').enable(true);
+
 export default app.mgComponent('mgQuery', {
 	meta: {
 		title: 'Query',
@@ -52,7 +55,7 @@ export default app.mgComponent('mgQuery', {
 		},
 	},
 	created() {
-		this.$debugging = true;
+		this.$debug = $debug;
 
 		this.$watchAll([
 			'$props.url',
@@ -63,7 +66,7 @@ export default app.mgComponent('mgQuery', {
 		refresh() {
 			//this.data = {'$or': [{name: 'foo'}]};
 			this.data = { name: { '$eq': 'foo' }};
-			this.$debug('refresh', _.cloneDeep(this.data), _.cloneDeep(this.$props.spec));
+			$debug('refresh', _.cloneDeep(this.data), _.cloneDeep(this.$props.spec));
 			if (!_.isPlainObject(this.data)) this.data = {};
 			//if (!_.isPlainObject(this.$props.spec)) return;
 
@@ -73,7 +76,7 @@ export default app.mgComponent('mgQuery', {
 					id: key,
 					title: _.startCase(key),
 				}));
-			this.$debug('fieldsEnum', fieldsEnum);
+			$debug('fieldsEnum', fieldsEnum);
 
 			/**
 			* Populate enum values from a spec branch
@@ -225,7 +228,7 @@ export default app.mgComponent('mgQuery', {
 			:config="queryComponent"
 		/>
 		
-		<div v-if="this.$debugging" class="card">
+		<div v-if="this.$debug.$enabled" class="card">
 			<div class="card-header">
 				Raw data
 			</div>
@@ -234,7 +237,7 @@ export default app.mgComponent('mgQuery', {
 			</div>
 		</div>
 
-		<div v-if="this.$debugging" class="card">
+		<div v-if="this.$debug.$enabled" class="card">
 			<div class="card-header">
 				Raw spec
 			</div>

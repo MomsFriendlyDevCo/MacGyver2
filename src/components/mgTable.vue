@@ -1,4 +1,7 @@
 <script lang="js">
+import Debug from '@doop/debug';
+const $debug = Debug('mgTable').enable(true);
+
 export default app.mgComponent('mgTable', {
 	meta: {
 		title: 'Table layout',
@@ -34,7 +37,7 @@ export default app.mgComponent('mgTable', {
 		showTitle: {type: 'mgToggle', default: false, title: 'Show Title'},
 	},
 	created() {
-		this.$debugging = false;
+		$debug().enable(false);
 	},
 	mounted() {
 		this.$watch('$props.url', ()=> {
@@ -60,7 +63,7 @@ export default app.mgComponent('mgTable', {
 	},
 	methods: {
 		createRow(offset) { // Offset is the row to create after - i.e. array position splice
-			this.$debug('createRow', offset, this.$data.newRow);
+			$debug('createRow', offset, this.$data.newRow);
 			this.isAdding = true;
 			if (typeof offset === 'undefined') {
 				this.data.push(this.$data.newRow);
@@ -72,7 +75,7 @@ export default app.mgComponent('mgTable', {
 		},
 		deleteRow(offset) {
 			// TODO: Add confirmation dialog?
-			this.$debug('deleteRow', offset);
+			$debug('deleteRow', offset);
 			this.data.splice(offset, 1);
 		},
 	},

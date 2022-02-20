@@ -1,4 +1,7 @@
 <script lang="js">
+import Debug from '@doop/debug';
+const $debug = Debug('mgDate').enable(true);
+
 import moment from 'moment';
 
 export default app.mgComponent('mgDate', {
@@ -22,7 +25,7 @@ export default app.mgComponent('mgDate', {
 		required: {type: 'mgToggle', default: false},
 	},
 	created() {
-		this.$debugging = false;
+		this.$debug = $debug;
 
 		this.$on('mgValidate', reply => {
 			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
@@ -57,7 +60,7 @@ export default app.mgComponent('mgDate', {
 			:min="$props.min"
 		/>
 
-		<div v-if="this.$debugging" class="card">
+		<div v-if="this.$debug.$enabled" class="card">
 			<div class="card-header">
 				Raw data
 			</div>

@@ -1,4 +1,7 @@
 <script lang="js">
+import Debug from '@doop/debug';
+const $debug = Debug('mgChoiceDropdown').enable(true);
+
 import VueSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
 
@@ -52,7 +55,7 @@ export default app.mgComponent('mgChoiceDropdown', {
 		focus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},
 	},
 	created() {
-		this.$debugging = false;
+		this.$debug = $debug;
 
 		this.$on('mgValidate', reply => {
 			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
@@ -119,6 +122,9 @@ export default app.mgComponent('mgChoiceDropdown', {
 			return _.get(option, this.$props.optionKeyPath, '');
 		},
 	},
+	created() {
+		this.$debug = $debug;
+	},
 	mounted() {
 		if (this.$props.focus) {
 			// NOTE: Focus selection does NOT work if DevTools is open in Chome
@@ -152,7 +158,7 @@ export default app.mgComponent('mgChoiceDropdown', {
 			</template>
 		</v-select>
 
-		<div v-if="this.$debugging" class="card">
+		<div v-if="this.$debug.$enabled" class="card">
 			<div class="card-header">
 				Raw data
 			</div>

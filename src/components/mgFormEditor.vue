@@ -1,4 +1,7 @@
 <script lang="js">
+import Debug from '@doop/debug';
+const $debug = Debug('mgFormEditor').enable(true);
+
 import mgFormEditorControls from './mgFormEditorControls';
 
 /**
@@ -94,10 +97,8 @@ export default app.component('mgFormEditor', {
 			},
 		},
 	},
-	created() {
-		this.$debugging = true;
-	},
 	mounted() {
+		$debug('$refs', this.$refs);
 		/*
 		// Potential for highlighting components within nested mgContainer
 		this.$refs.form.$on('mgComponent.click', (component, e) => {
@@ -258,7 +259,7 @@ export default app.component('mgFormEditor', {
 						items: _.map(widget.props, (v, k) => _.set(v, 'id', k)),
 					},
 				]);
-				this.$debug('Set editConfig', this.editConfig);
+				$debug('Set editConfig', this.editConfig);
 
 				this.$set(this, 'editData',
 					_(widget.props)
@@ -267,7 +268,7 @@ export default app.component('mgFormEditor', {
 						.set('metaIcon', widget.meta.icon)
 						.value()
 				);
-				this.$debug('Set editData', this.editData);
+				$debug('Set editData', this.editData);
 			} else {
 				this.$macgyver.notify.warn(`Cannot edit unknown widget "${component.$props?.$type || 'Unknown type'}"`);
 				this.setMode();
