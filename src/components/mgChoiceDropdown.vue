@@ -32,6 +32,7 @@ export default app.mgComponent('mgChoiceDropdown', {
 			],
 		},
 		enumUrl: {type: 'mgUrl', vueType: ['string', 'object'], showIf: 'enumSource == "url"', help: 'Data feed URL to fetch choice values from'},
+		// FIXME: These are relevant for passed in `enum` options also?
 		optionsPath: {
 			type: "mgText",
 			default: "",
@@ -53,29 +54,6 @@ export default app.mgComponent('mgChoiceDropdown', {
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 		focus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},
-	},
-	created() {
-		this.$debug = $debug;
-
-		this.$on('mgValidate', reply => {
-			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
-		});
-
-		this.$watch('$props.enumUrl', ()=> {
-			if (!this.$props.enumUrl) return;
-			this.$macgyver.utils.fetch(this.$props.enumUrl, {
-				type: 'raw',
-			})
-				.then(data => this.setEnum(data))
-		}, {immediate: true});
-
-		this.$watchAll(['$props.enum', '$data.data'], ()=> {
-			if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
-				this.setEnum(this.$props.enum.map(i => ({id: _.camelCase(i), title: i})));
-			} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection
-				this.setEnum(this.$props.enum);
-			}
-		}, {immediate: true});
 	},
 	methods: {
 		changeHandler(e) {
@@ -124,6 +102,27 @@ export default app.mgComponent('mgChoiceDropdown', {
 	},
 	created() {
 		this.$debug = $debug;
+
+		this.$on('mgValidate', reply => {
+			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
+		});
+
+		this.$watch('$props.enumUrl', ()=> {
+			if (!this.$props.enumUrl) return;
+			this.$macgyver.utils.fetch(this.$props.enumUrl, {
+				type: 'raw',
+			})
+				.then(data => this.setEnum(data))
+		}, {immediate: true});
+
+		this.$watchAll(['$props.enum', '$data.data'], ()=> {
+			// FIXME: Could check `.every` for strings
+			if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
+				this.setEnum(this.$props.enum.map(i => ({id: _.camelCase(i), title: i})));
+			} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection
+				this.setEnum(this.$props.enum);
+			}
+		}, {immediate: true});
 	},
 	mounted() {
 		if (this.$props.focus) {
