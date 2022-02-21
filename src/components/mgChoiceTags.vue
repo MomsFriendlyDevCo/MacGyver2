@@ -64,6 +64,7 @@ export default app.mgComponent('mgChoiceTags', {
 		}, {immediate: true});
 
 		this.$watch('$props.enum', ()=> {
+			// FIXME: Could check `.every` for strings
 			if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
 				this.setEnum(this.$props.enum.map(i => ({id: _.camelCase(i), title: i})));
 			} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection

@@ -71,6 +71,7 @@ export default app.mgComponent('mgText', {
 	},
 	mounted() {
 		if (this.$props.focus) {
+			// FIXME: jQuery not defined? Only in build:dev mode?
 			var $el = $(this.$el);
 			var focusVisible = ()=> {
 				if ($el.is(':visible')) {

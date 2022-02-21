@@ -44,6 +44,7 @@ export default app.mgComponent('mgChoiceButtons', {
 		'$props.enum': {
 			immediate: true,
 			handler() {
+				// FIXME: Could check `.every` for strings
 				if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
 					this.enumIter = this.$props.enum.map(i => ({id: _.camelCase(i), title: i}));
 				} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection
