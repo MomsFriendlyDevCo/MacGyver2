@@ -6,7 +6,7 @@ const path = require('path');
 module.exports = {
   entry: {
     main: './src/entrypoint-vue.js',
-    macgyver: './src/entrypoint-node.js', 
+    macgyver: './src/entrypoint-node.js',
   },
   output: {
     globalObject: 'this',
@@ -31,16 +31,7 @@ module.exports = {
                 }
               ]
             ],
-            plugins: [
-              [
-                "@babel/plugin-proposal-pipeline-operator",
-                {
-                  "proposal": "fsharp"
-                }
-              ],
-              "@babel/plugin-proposal-throw-expressions"
-            ]
-          }
+          },
         },
       },
       {
