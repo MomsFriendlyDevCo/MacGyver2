@@ -11,9 +11,7 @@ export default app.mgComponent('mgChoiceCheckbox', {
 		enumIter: [],
 	}},
 	props: {
-		id: {
-			type: 'mgString',
-		},
+		id: {type: 'mgText'},
 		enum: {
 			type: 'mgList',
 			title: 'List items',
