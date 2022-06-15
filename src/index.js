@@ -1,7 +1,4 @@
 import MacGyver from './macgyver.js';
-import VueEmit from './services/emit.js';
-import VueSetPath from '@momsfriendlydevco/vue-setpath';
-import VueWatchall from './services/watchAll.js';
 
 /**
 * Main MacGyver plugin
@@ -228,10 +225,6 @@ export default {
 
 			return app.component(name, vueComponent);
 		};
-
-		app.use(VueEmit);
-		app.use(VueSetPath);
-		app.use(VueWatchall);
 
 		app.prototype.$macgyver = $macgyver;
 
