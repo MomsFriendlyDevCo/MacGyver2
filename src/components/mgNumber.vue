@@ -17,6 +17,7 @@ export default app.mgComponent('mgNumber', {
 		max: {type: 'mgNumber', title: 'Maximum value'},
 		step: {type: 'mgNumber', title: 'Value to increment / decrement by'},
 		placeholder: {type: 'mgNumber', help: 'Ghost text to display when there is no value'},
+		label: {type: 'mgText', help: 'Number input label'},
 		required: {type: 'mgToggle', default: false},
 		disabled: {type: 'mgToggle', default: false},
 		readonly: {type: 'mgToggle', default: false},
@@ -52,7 +53,9 @@ export default app.mgComponent('mgNumber', {
 </script>
 
 <template>
-	<div class="mg-number" :class="`mg-number-${$props.interface}`">
+	<label class="mg-number" :class="`mg-number-${$props.interface}`">
+		{{ $props.label }}
+
 		<div v-if="$props.interface == 'slider'">
 			<input
 				v-model="data"
@@ -100,7 +103,7 @@ export default app.mgComponent('mgNumber', {
 		<div v-else class="alert alert-warning">
 			Unknown mgNumber interface '{{$props.interface}}'
 		</div>
-	</div>
+	</label>
 </template>
 
 <style>

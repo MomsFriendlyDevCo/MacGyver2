@@ -20,6 +20,7 @@ export default app.mgComponent('mgDate', {
 		formData: undefined,
 	}},
 	props: {
+		label: {type: 'mgText', help: 'Date input label'},
 		min: {type: 'mgDate', title: 'Earliest date'},
 		max: {type: 'mgDate', title: 'Latest date'},
 		required: {type: 'mgToggle', default: false},
@@ -50,7 +51,9 @@ export default app.mgComponent('mgDate', {
 </script>
 
 <template>
-	<div class="mg-date">
+	<label class="mg-date">
+		{{ $props.label }}
+
 		<!-- TODO: Allow for read-only displays -->
 		<input
 			v-model="formData"
@@ -68,5 +71,5 @@ export default app.mgComponent('mgDate', {
 				<pre>{{$data}}</pre>
 			</div>
 		</div>
-	</div>
+	</label>
 </template>

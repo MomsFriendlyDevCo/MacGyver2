@@ -11,6 +11,7 @@ export default app.mgComponent('mgTextArea', {
 		lengthMin: {type: 'mgNumber', title: 'Minimum Length', min: 0},
 		lengthMax: {type: 'mgNumber', title: 'Maximum Length'},
 		placeholder: {type: 'mgTextArea', help: 'Ghost text to display when there is no value'},
+		label: {type: 'mgText', help: 'Textarea input label'},
 		required: {type: 'mgToggle', default: false},
 		disabled: {type: 'mgToggle', default: false},
 		readonly: {type: 'mgToggle', default: false},
@@ -26,15 +27,18 @@ export default app.mgComponent('mgTextArea', {
 </script>
 
 <template>
-	<textarea
-		v-model="data"
-		class="form-control"
-		:placeholder="$props.placeholder"
-		:disabled="$props.disabled"
-		:readonly="$props.readonly"
-		:minlength="$props.lengthMin"
-		:maxlength="$props.lengthMin"
-		:rows="$props.rows"
-		autocomplete="off"
-	/>
+	<label>
+		{{ $props.label }}
+		<textarea
+			v-model="data"
+			class="form-control"
+			:placeholder="$props.placeholder"
+			:disabled="$props.disabled"
+			:readonly="$props.readonly"
+			:minlength="$props.lengthMin"
+			:maxlength="$props.lengthMin"
+			:rows="$props.rows"
+			autocomplete="off"
+		/>
+	</label>
 </template>

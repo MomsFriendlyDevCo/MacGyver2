@@ -16,6 +16,7 @@ export default app.mgComponent('mgPassword', {
 		lengthMin: {type: 'mgNumber', title: 'Minimum Length', min: 0},
 		lengthMax: {type: 'mgNumber', title: 'Maximum Length'},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
+		label: {type: 'mgText', help: 'Password input label'},
 		required: {type: 'mgToggle', default: false},
 		mask: {type: 'mgText', help: 'Text input mask to restrict to, #=Number, S=Letter, X=Alpha-numeric, A=Alpha Uppercase, a=Alpha lowercase, \=Escape'},
 		focus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},
@@ -56,7 +57,8 @@ export default app.mgComponent('mgPassword', {
 </script>
 
 <template>
-	<div class="mg-password">
+	<label class="mg-password">
+		{{ $props.label }}
 		<input
 			v-model="data"
 			type="password"
@@ -65,5 +67,5 @@ export default app.mgComponent('mgPassword', {
 			:placeholder="$props.placeholder"
 			v-facade="$props.mask"
 		/>
-	</div>
+	</label>
 </template>

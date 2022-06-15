@@ -12,6 +12,7 @@ export default app.mgComponent('mgEmail', {
 	},
 	props: {
 		placeholder: {type: 'mgText', help: 'Ghost text to display when the text box has no value'},
+		label: {type: 'mgText', help: 'Email input label'},
 		required: {type: 'mgToggle', default: false},
 		disabled: {type: 'mgToggle', default: false},
 		readonly: {type: 'mgToggle', default: false},
@@ -25,7 +26,8 @@ export default app.mgComponent('mgEmail', {
 </script>
 
 <template>
-	<div class="mg-email">
+	<label class="mg-email">
+		{{ $props.label }}
 		<input
 			v-model="data"
 			type="email"
@@ -34,5 +36,5 @@ export default app.mgComponent('mgEmail', {
 			:placeholder="$props.placeholder"
 			:readonly="$props.readonly"
 		/>
-	</div>
+	</label>
 </template>

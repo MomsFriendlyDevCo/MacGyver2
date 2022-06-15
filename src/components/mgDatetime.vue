@@ -20,6 +20,7 @@ export default app.mgComponent('mgDatetime', {
 		formData: undefined,
 	}},
 	props: {
+		label: {type: 'mgText', help: 'Datetime input label'},
 		min: {type: 'mgDatetime', title: 'Earliest date'},
 		max: {type: 'mgDatetime', title: 'Latest date'},
 		step: {type: 'mgNumber', title: 'Step size', default: 60},
@@ -51,6 +52,8 @@ export default app.mgComponent('mgDatetime', {
 
 <template>
 	<div class="mg-datetime">
+		{{ $props.label }}
+
 		<!-- TODO: Allow for read-only displays -->
 		<input
 			v-model="formData"

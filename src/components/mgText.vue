@@ -16,6 +16,7 @@ export default app.mgComponent('mgText', {
 		lengthMin: {type: 'mgNumber', title: 'Minimum Length', min: 0},
 		lengthMax: {type: 'mgNumber', title: 'Maximum Length'},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
+		label: {type: 'mgText', help: 'Text input label'},
 		required: {type: 'mgToggle', default: false},
 		disabled: {type: 'mgToggle', default: false},
 		readonly: {type: 'mgToggle', default: false},
@@ -87,7 +88,8 @@ export default app.mgComponent('mgText', {
 </script>
 
 <template>
-	<div class="mg-text">
+	<label class="mg-text">
+		{{ $props.label }}
 		<input
 			v-model="data"
 			type="text"
@@ -104,5 +106,5 @@ export default app.mgComponent('mgText', {
 				{{item.title}}
 			</option>
 		</datalist>
-	</div>
+	</label>
 </template>
