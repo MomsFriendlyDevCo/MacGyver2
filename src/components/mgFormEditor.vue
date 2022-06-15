@@ -2,7 +2,7 @@
 import Debug from '@doop/debug';
 const $debug = Debug('mgFormEditor').enable(true);
 
-import mgFormEditorControls from './mgFormEditorControls';
+import './mgFormEditorControls';
 
 /**
 * mg-form-editor - Drag-and-drop form designer for MacGyver
@@ -20,15 +20,10 @@ import mgFormEditorControls from './mgFormEditorControls';
 * @emits change Emitted as `(config)` on any item configuration change. WARNING, subscribing to this involves an entire deep copy of the config structure, subscribe to changeItem if possible
 * @emits changeItem Emitted as `({path, value})` when a single config item changes, inexpensive compared to `change`
 */
-app.use(mgFormEditorControls);
-
 export default app.component('mgFormEditor', {
 	provide() { return {
 		$mgFormEditor: this,
 	}},
-	components: {
-		mgFormEditorControls,
-	},
 	data() { return {
 		mode: 'collapsed', // ENUM: collapsed, toc, editing, adding
 		id: this.$macgyver.nextId(), // ID of the editing form item
