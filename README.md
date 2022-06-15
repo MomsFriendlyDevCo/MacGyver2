@@ -9,6 +9,17 @@ It can function either as a simple set of powerful independent components or by 
 [LIVE DEMO](https://momsfriendlydevco.github.io/MacGyver2)
 
 
+Prerequisites
+-------------
+This package requires the following as pre-requisite dependencies in the parent:
+
+* [@momsfriendlydevco/vue-setpath](https://github.com/MomsFriendlyDevCo/vue-setpath)
+* [@doop/watch-all](https://github.com/MomsFriendlyDevCo/doop-watch-all)
+* [@doop/emit](https://github.com/MomsFriendlyDevCo/doop-emit)
+
+These are listed as `peerDependencies` in package.json.
+
+
 Example
 -------
 ```html
