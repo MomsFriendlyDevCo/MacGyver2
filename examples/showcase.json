@@ -106,6 +106,7 @@
 					"id": "demoCheckBox",
 					"type": "mgCheckBox",
 					"title": "Check box",
+					"text": "Checkbox text",
 					"default": true
 				},
 				{

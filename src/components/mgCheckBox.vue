@@ -8,11 +8,17 @@ export default app.mgComponent('mgCheckBox', {
 		format: v => v ? 'Yes' : 'No',
 		formatClass: 'text-center',
 	},
+	props: {
+		text: {type: 'mgText'},
+	},
 });
 </script>
 
 <template>
 	<div class="text-center">
-		<input v-model="data" type="checkbox"/>
+		<label>
+			<input v-model="data" type="checkbox"/>
+			<span>{{$props.text}}</span>
+		</label>
 	</div>
 </template>
