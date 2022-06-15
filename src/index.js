@@ -44,7 +44,7 @@ export default {
 		// Auto-bind to Axios if its defined
 		if ($macgyver.utils.global.axios) $macgyver.$http = $macgyver.utils.global.axios;
 
-		app.mgComponent = function(name, component) {
+		$macgyver.mgComponent = app.mgComponent = function(name, component) {
 			if ($macgyver.widgets[name]) throw new Error(`Cannot redeclare MacGyver component "${name}"`);
 			if (!name.startsWith('mg')) throw new Error(`All MacGyver components must be prefixed with "mg", given "${name}"`);
 
