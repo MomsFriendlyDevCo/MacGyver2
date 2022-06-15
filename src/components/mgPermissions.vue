@@ -35,12 +35,13 @@ export default app.mgComponent('mgPermissions', {
 							showTitle: false,
 							classWrapper: '',
 							sort: 'sortId',
-							enum: res.data
-								|> v => _.pickBy(v, (v, k) => k.startsWith('permissions.'))
-								|> v => _.map(v, (v, k) => ({
+							enum: _.chain(res.data)
+								.pickBy((v, k) => k.startsWith('permissions.'))
+								.map(v, (v, k) => ({
 									id: k.replace(/^permissions\./, ''),
 									title: Vue.filter('permissionCase')(k.replace(/^permissions\./, '')),
 								}))
+								.value()
 						},
 					],
 					data: {

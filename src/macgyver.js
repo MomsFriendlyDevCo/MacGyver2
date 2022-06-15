@@ -331,9 +331,10 @@ $macgyver.compileSpec = (spec, options) => {
 					text: `Unknown widget type "${widget.type}": ` + JSON.stringify(widget),
 				};
 			} else if (settings.widgetDefaults) { // Apply defaults to widget
-				Object.assign(widget, $macgyver.widgets[widget.type].config
-					|> v => _.pickBy(v, (v, k) => !_.has(widget, k) && _.has(v, 'default'))
-					|> v => _.mapValues(v, v => v.default)
+				Object.assign(widget, _.chain($macgyver.widgets[widget.type].config)
+					.pickBy((v, k) => !_.has(widget, k) && _.has(v, 'default'))
+					.mapValues(v => v.default)
+					.value()
 				);
 			}
 
@@ -554,7 +555,7 @@ $macgyver.utils.evalCompile = (expression, asFunc = true) => {
 				: ['<', '$lt'].includes(match.groups.operand) ? '$lt'
 				: ['>=', '$gte'].includes(match.groups.operand) ? '$gte'
 				: ['<=', '$lte'].includes(match.groups.operand) ? '$lte'
-				: throw new Error(`Unknown operand "${match.groups.operand}" while parsing expression "${expression}"`);
+				: (()=> {throw new Error(`Unknown operand "${match.groups.operand}" while parsing expression "${expression}"`)})()
 
 			obj = {[match.groups.left]: {[siftOperand]: match.groups.right}};
 		}
