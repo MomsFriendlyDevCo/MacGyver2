@@ -212,6 +212,25 @@ export default app.component('mgForm', {
 			if (!found && throws) throw new Error(`Cannot edit component by non-existant specPath "${specPath}"`);
 			return found;
 		},
+
+
+		/**
+		* Query all child elements and update the array of errors (if any)
+		* @returns {Boolean} A boolean indicating if the form validated
+		*/
+		validate() {
+			let newErrors = [];
+
+			this.$emit.down('mgValidate', res => {
+				console.log('mgValidate response', res);
+				typeof res == 'string' ? newErrors.push(res)
+				: Array.isArray(res) ? newErrors = newErrors.concat(res)
+				: (()=> { console.warn('Got error response', res); throw new Error(`Unhandled error response from component, see console`) })()
+			})
+
+			this.errors = newErrors;
+			return this.errors.length == 0;
+		},
 	},
 });
 </script>
