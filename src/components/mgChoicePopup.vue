@@ -11,6 +11,7 @@ export default app.mgComponent('mgChoicePopup', {
 		enumIter: [],
 	}},
 	props: {
+		title: {type: 'mgText'},
 		enum: {
 			type: 'mgTable',
 			title: 'List items',

@@ -11,6 +11,7 @@ export default app.mgComponent('mgEmail', {
 		},
 	},
 	props: {
+		title: {type: 'mgText'},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when the text box has no value'},
 		required: {type: 'mgToggle', default: false},
 		disabled: {type: 'mgToggle', default: false},

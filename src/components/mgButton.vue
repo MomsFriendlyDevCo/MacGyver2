@@ -7,6 +7,7 @@ export default app.mgComponent('mgButton', {
 		preferId: false,
 	},
 	props: {
+		title: {type: 'mgText'},
 		text: {type: 'mgText'},
 		icon: {type: 'mgIcon', default: 'far fa-check'},
 		tooltip: {type: 'mgText'},

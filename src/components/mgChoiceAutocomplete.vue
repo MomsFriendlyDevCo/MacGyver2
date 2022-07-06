@@ -19,6 +19,7 @@ export default app.mgComponent("mgChoiceAutocomplete", {
 		};
 	},
 	props: {
+		title: {type: 'mgText'},
 		enumSource: {
 			type: "mgChoiceButtons",
 			default: "list",

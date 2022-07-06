@@ -7,6 +7,7 @@ export default app.mgComponent('mgIcon', {
 		preferId: true,
 	},
 	props: {
+		title: {type: 'mgText'},
 		iconFallback: {type: 'mgIcon', default: 'far fa-info', help: 'The icon to use if none is selected'},
 		required: {type: 'mgToggle', default: false},
 		interface: {type: 'mgChoiceButtons', default: 'modal', enum: ['modal', 'dropdown']},

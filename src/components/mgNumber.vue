@@ -13,6 +13,7 @@ export default app.mgComponent('mgNumber', {
 		formatClass: 'text-right',
 	},
 	props: {
+		title: {type: 'mgText'},
 		min: {type: 'mgNumber', title: 'Minimum value'},
 		max: {type: 'mgNumber', title: 'Maximum value'},
 		step: {type: 'mgNumber', title: 'Value to increment / decrement by'},

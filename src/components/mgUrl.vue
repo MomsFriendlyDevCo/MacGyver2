@@ -12,6 +12,7 @@ export default app.mgComponent('mgUrl', {
 		shorthand: ['uri'],
 	},
 	props: {
+		title: {type: 'mgText'},
 		placeholder: {type: 'mgUrl', help: 'Ghost text to display when there is no value'},
 		required: {type: 'mgToggle', default: false},
 		relative: {type: 'mgToggle', help: 'Allow relative URL paths to the host'}, // FIXME: Not yet implemented

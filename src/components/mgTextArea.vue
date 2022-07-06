@@ -7,6 +7,7 @@ export default app.mgComponent('mgTextArea', {
 		preferId: true,
 	},
 	props: {
+		title: {type: 'mgText'},
 		rows: {type: 'mgNumber', title: 'Line height', default: 3},
 		lengthMin: {type: 'mgNumber', title: 'Minimum Length', min: 0},
 		lengthMax: {type: 'mgNumber', title: 'Maximum Length'},

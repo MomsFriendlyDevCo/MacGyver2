@@ -11,6 +11,7 @@ export default app.mgComponent('mgColor', {
 		shorthand: ['color', 'hue', 'swatch'],
 	},
 	props: {
+		title: {type: 'mgText'},
 		required: {type: 'mgToggle', default: false},
 		colorSet: {type: 'mgChoiceDropdown', enum: [{id: 'basic', title: 'Basic'}, {id: 'material-light', title: 'Material'}, {id: 'text-advanced', title: 'Full swatch'}], default: 'text-advanced'},
 		interface: {type: 'mgChoiceDropdown', default: 'input', enum: ['input', 'colorOnly']},

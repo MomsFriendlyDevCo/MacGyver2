@@ -21,6 +21,7 @@ export default app.mgComponent('mgTime', {
 		formData: undefined,
 	}},
 	props: {
+		title: {type: 'mgText'},
 		min: {type: 'mgTime', title: 'Earliest time'},
 		max: {type: 'mgTime', title: 'Latest time'},
 		required: {type: 'mgToggle', default: false},

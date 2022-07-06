@@ -6,6 +6,7 @@ export default app.mgComponent('mgRestQuery', {
 		category: 'Data display',
 	},
 	props: {
+		title: {type: 'mgText'},
 		className: {type: 'mgText', advanced: true},
 		classActive: {type: 'mgText', default: 'btn btn-primary', advanced: true},
 		classInactive: {type: 'mgText', default: 'btn btn-light', advanced: true},

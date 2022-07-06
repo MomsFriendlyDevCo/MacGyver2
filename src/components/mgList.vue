@@ -11,6 +11,7 @@ export default app.mgComponent('mgList', {
 		newItem: '',
 	}},
 	props: {
+		title: {type: 'mgText'},
 		allowDelete: {type: 'mgToggle', default: true},
 		min: {type: 'mgNumber', title: 'Minimum number of items'},
 		max: {type: 'mgNumber', title: 'Maximum number of items'},

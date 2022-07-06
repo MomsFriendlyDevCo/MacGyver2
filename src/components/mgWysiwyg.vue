@@ -11,6 +11,7 @@ export default app.mgComponent('mgWysiwyg', {
 	},
 	components: {VueEditor},
 	props: {
+		title: {type: 'mgText'},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
 		required: {type: 'mgToggle', default: false},
 	},

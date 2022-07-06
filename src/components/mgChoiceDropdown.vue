@@ -20,6 +20,7 @@ export default app.mgComponent('mgChoiceDropdown', {
 		enumIter: [],
 	}},
 	props: {
+		title: {type: 'mgText'},
 		enumSource: {type: 'mgChoiceButtons', default: 'list', enum: ['list', 'url'], default: 'list', help: 'Where to populate the list data from'},
 		enum: {
 			type: 'mgTable',

@@ -20,6 +20,7 @@ export default app.mgComponent('mgDate', {
 		formData: undefined,
 	}},
 	props: {
+		title: {type: 'mgText'},
 		min: {type: 'mgDate', title: 'Earliest date'},
 		max: {type: 'mgDate', title: 'Latest date'},
 		required: {type: 'mgToggle', default: false},

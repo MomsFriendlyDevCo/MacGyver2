@@ -10,6 +10,7 @@ export default app.mgComponent('mgChoiceButtons', {
 		enumIter: [],
 	}},
 	props: {
+		title: {type: 'mgText'},
 		enum: {
 			type: 'mgTable',
 			title: 'List items',
