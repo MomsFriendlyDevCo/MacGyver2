@@ -13,6 +13,7 @@ export default app.mgComponent('mgText', {
 		shorthand: ['string', 'str'],
 	},
 	props: {
+		title: {type: 'mgText'},
 		lengthMin: {type: 'mgNumber', title: 'Minimum Length', min: 0},
 		lengthMax: {type: 'mgNumber', title: 'Maximum Length'},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
@@ -89,15 +90,16 @@ export default app.mgComponent('mgText', {
 <template>
 	<div class="mg-text">
 		<input
-			v-model="data"
 			type="text"
 			class="form-control"
+			:value="data"
 			:autocomplete="$props.autoComplete"
 			:placeholder="$props.placeholder"
 			:disabled="$props.disabled"
 			:readonly="$props.readonly"
 			:list="datalist ? `mg-text-datalist-${_uid}` : undefined"
 			v-facade="$props.mask"
+			@input="data = $event.target.value"
 		/>
 		<datalist v-if="datalist" :id="`mg-text-datalist-${_uid}`">
 			<option v-for="item in datalist" :value="item.title" :key="item.id">
