@@ -13,7 +13,8 @@ export default app.component('mgComponent', {
 	props: {
 		config: {type: Object, required: true},
 	},
-	// TODO: Functional? Proxy?
+	// TODO: Functional? Proxy? "Functional do not have state", "$data" and "$props" would need to be passed directly through to the render handler
+	//functional: true,
 	render(h) {
 		if (!this.$macgyver.widgets[this.$props.config.type]) return h('mg-error', {props: {text: `Unknown widget type "${this.$props.config.type}"`}});
 
