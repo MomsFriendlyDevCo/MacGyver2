@@ -27,15 +27,17 @@ export default app.mgComponent('mgTextArea', {
 </script>
 
 <template>
-	<textarea
-		v-model="data"
-		class="form-control"
-		:placeholder="$props.placeholder"
-		:disabled="$props.disabled"
-		:readonly="$props.readonly"
-		:minlength="$props.lengthMin"
-		:maxlength="$props.lengthMax"
-		:rows="$props.rows"
-		autocomplete="off"
-	/>
+	<div class="mg-textarea">
+		<textarea
+			v-model="data"
+			class="form-control"
+			:placeholder="$props.placeholder"
+			:disabled="$props.disabled"
+			:readonly="$props.readonly"
+			:minlength="$props.lengthMin"
+			:maxlength="$props.lengthMax"
+			:rows="$props.rows"
+			autocomplete="off"
+		/>
+	</div>
 </template>
