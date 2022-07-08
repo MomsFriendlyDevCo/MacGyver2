@@ -34,7 +34,7 @@ export default app.mgComponent('mgTextArea', {
 		:disabled="$props.disabled"
 		:readonly="$props.readonly"
 		:minlength="$props.lengthMin"
-		:maxlength="$props.lengthMin"
+		:maxlength="$props.lengthMax"
 		:rows="$props.rows"
 		autocomplete="off"
 	/>
