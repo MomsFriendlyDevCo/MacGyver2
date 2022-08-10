@@ -54,6 +54,7 @@ export default app.mgComponent('mgChoiceList', {
 			:key="item.id"
 			class="list-group-item"
 			:class="data == item.id && 'active'"
+			tabindex="0"
 			@click="data = item.id"
 		>
 			<i v-if="item.icon" :class="item.icon"/>

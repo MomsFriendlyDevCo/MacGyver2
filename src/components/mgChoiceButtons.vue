@@ -66,6 +66,7 @@ export default app.mgComponent('mgChoiceButtons', {
 				? item.classActive || item.class || $props.itemClassActive
 				: item.classInactive || item.class || $props.itemClassInactive
 			"
+			tabindex="0"
 			v-tooltip="item.tooltip"
 			@click="select(item)"
 		>
