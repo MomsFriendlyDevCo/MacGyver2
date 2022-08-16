@@ -1,4 +1,9 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgChoiceAutocomplete').enable(false);
+
+import _ from 'lodash';
+
 import VueSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
 
@@ -80,6 +85,7 @@ export default app.mgComponent("mgChoiceAutocomplete", {
 		//this.$watch('$props.enumUrl', () => this.fetchEnum(), {immediate: true});
 
 		/*
+		// TODO: Support for array of strings disabled? Any reason?
 		this.$watch('$props.enum', ()=> {
 			// FIXME: Could check `.every` for strings
 			if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
@@ -97,11 +103,12 @@ export default app.mgComponent("mgChoiceAutocomplete", {
 		}
 	},
 	methods: {
-		changeHandler(e) {
-			console.log("changeHandler", e);
-			if (!e) return this.data = this.selected = null;
-			this.data = this.getOptionKey(e);
-			this.selected = e;
+		select(option) {
+			if (!option) return this.data = this.selected = null;
+
+			this.data = this.getOptionKey(option);
+			this.selected = option;
+			if (option.action) this.$mgForm.run(option.action);
 		},
 
 		/**
@@ -111,14 +118,12 @@ export default app.mgComponent("mgChoiceAutocomplete", {
 		* @param loading {Function} Toggle loading class
 		*/
 		searchHandler(search, loading) {
-			console.log("searchHandler", search);
 			// TODO: Debounce
 			loading(true);
 			this.fetchEnum(search).then(() => loading(false));
 		},
 
 		fetchEnum(query) {
-			console.log("fetchEnum", this.$props.enumUrl, query);
 			if (!this.$props.enumUrl || !query) return Promise.resolve();
 			return this.$macgyver.utils
 				.fetch(this.$props.enumUrl + query, { type: "array" })
@@ -177,7 +182,7 @@ export default app.mgComponent("mgChoiceAutocomplete", {
 		:get-option-key="getOptionKey"
 		:get-option-label="getOptionLabel"
 		@search="searchHandler"
-		@input="changeHandler"
+		@input="select"
 	>
 		<template #selected-option="option">
 			<!-- TODO: getOptionIcon -->

@@ -1,4 +1,8 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgInfoChart').enable(false);
+
+import _ from 'lodash';
 import Chart from 'chartjs';
 import 'chartjs-plugin-colorschemes/dist/chartjs-plugin-colorschemes.js';
 

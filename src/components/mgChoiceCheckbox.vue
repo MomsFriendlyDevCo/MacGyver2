@@ -1,4 +1,9 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgChoiceCheckbox').enable(false);
+
+import _ from 'lodash';
+
 export default app.mgComponent('mgChoiceCheckbox', {
 	meta: {
 		title: 'Checkbox multiple-choice',
@@ -26,6 +31,22 @@ export default app.mgComponent('mgChoiceCheckbox', {
 				],
 			},
 		},
+		// TODO: Support for "enumSource"/"enumUrl"
+		optionsPath: {
+			type: "mgText",
+			default: "",
+			help: "Path within data feed for options array",
+		},
+		optionKeyPath: {
+			type: "mgText",
+			default: "id",
+			help: "Path within data feed for options key",
+		},
+		optionLabelPath: {
+			type: "mgText",
+			default: "title",
+			help: "Path within data feed for options label",
+		},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 		sort: {
 			type: 'mgChoiceRadio',
@@ -39,29 +60,52 @@ export default app.mgComponent('mgChoiceCheckbox', {
 			],
 		},
 	},
+	computed: {
+		options() {
+			return _.get(this.enumIter, this.$props.optionsPath, this.enumIter);
+		},
+	},
+	methods: {
+		select(option) {
+			if (!option) return this.data = null;
+
+			if (!this.data) this.data = [];
+
+			if (this.data.some(i => i == option)) { // Checked
+				this.data = this.data.filter(i => i != this.getOptionKey(option));
+			} else {
+				this.data.push(this.getOptionKey(option));
+
+				if (this.$props.sort == 'sortId') {
+					this.data.sort();
+				} else if (this.$props.sort == 'sortTitle') {
+					this.data = _.sortBy(this.data, d => this.enum.find(item => this.getOptionKey(item) == d));
+				}
+			}
+			if (option.action) this.$mgForm.run(option.action);
+		},
+		/**
+		* Retrieve option label based on path specified in properties.
+		* @param {Object} option The selected option within enum
+		*/
+		getOptionLabel(option) {
+			return _.get(option, this.$props.optionLabelPath, '');
+		},
+
+		/**
+		* Retrieve option key based on path specified in properties.
+		* @param {Object} option The selected option within enum
+		*/
+		getOptionKey(option) {
+			return _.get(option, this.$props.optionKeyPath, '');
+		},
+	},
 	created() {
 		this.$on('mgValidate', reply => {
 			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
 		});
 
 		if (!_.isArray(this.data)) this.data = [];
-	},
-	methods: {
-		change(id) {
-			if (!this.data) this.data = [];
-
-			if (this.data.some(i => i == id)) { // Checked
-				this.data = this.data.filter(i => i != id);
-			} else {
-				this.data.push(id);
-
-				if (this.$props.sort == 'sortId') {
-					this.data.sort();
-				} else if (this.$props.sort == 'sortTitle') {
-					this.data = _.sortBy(this.data, i => this.enum.find(e => e.id == i));
-				}
-			}
-		},
 	},
 	watch: {
 		'$props.enum': {
@@ -81,15 +125,15 @@ export default app.mgComponent('mgChoiceCheckbox', {
 
 <template>
 	<div>
-		<div class="form-check" v-for="item in enumIter" :key="item.id">
+		<div class="form-check" v-for="option in options" :key="getOptionKey(option)">
 			<input
 				type="checkbox"
-				@change="change(item.id)"
-				:id="`mg-choice-checkbox-${$props.id}-${item.id}`"
-				:checked="data.includes(item.id)"
+				:id="`mg-choice-checkbox-${$props.id}-${getOptionKey(option)}`"
+				:checked="data.includes(getOptionKey(option))"
+				@change="select(option)"
 			/>
-			<label class="form-check-label" :for="`mg-choice-checkbox-${$props.id}-${item.id}`">
-				{{item.title}}
+			<label class="form-check-label" :for="`mg-choice-checkbox-${$props.id}-${getOptionKey(option)}`">
+				{{ getOptionLabel(option) }}
 			</label>
 		</div>
 	</div>

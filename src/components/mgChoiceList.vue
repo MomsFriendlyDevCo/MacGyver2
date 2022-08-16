@@ -1,4 +1,9 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgChoiceList').enable(false);
+
+import _ from 'lodash';
+
 export default app.mgComponent('mgChoiceList', {
 	meta: {
 		title: 'Radio multiple-choice',
@@ -15,11 +20,33 @@ export default app.mgComponent('mgChoiceList', {
 			title: 'List items',
 			default: [],
 			items: [
-				{id: 'title', type: 'mgText'},
-				{id: 'icon', type: 'mgIcon', interface: 'modal'},
+				{id: 'id', type: 'mgText', required: true},
+				{id: 'title', type: 'mgText', required: true},
+				{id: 'icon', type: 'mgIcon'}, // TODO: interface: modal?
 			],
 		},
+		// TODO: Support for "enumSource"/"enumUrl"
+		optionsPath: {
+			type: "mgText",
+			default: "",
+			help: "Path within data feed for options array",
+		},
+		optionKeyPath: {
+			type: "mgText",
+			default: "id",
+			help: "Path within data feed for options key",
+		},
+		optionLabelPath: {
+			type: "mgText",
+			default: "title",
+			help: "Path within data feed for options label",
+		},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
+	},
+	computed: {
+		options() {
+			return _.get(this.enumIter, this.$props.optionsPath, this.enumIter);
+		},
 	},
 	created() {
 		this.$on('mgValidate', reply => {
@@ -27,8 +54,27 @@ export default app.mgComponent('mgChoiceList', {
 		});
 	},
 	methods: {
-		select(id) {
-			this.data = id;
+		select(option) {
+			if (!option) return this.data = null;
+
+			this.data = this.getOptionKey(option);
+			if (option.action) this.$mgForm.run(option.action);
+		},
+
+		/**
+		* Retrieve option label based on path specified in properties.
+		* @param {Object} option The selected option within enum
+		*/
+		getOptionLabel(option) {
+			return _.get(option, this.$props.optionLabelPath, '');
+		},
+
+		/**
+		* Retrieve option key based on path specified in properties.
+		* @param {Object} option The selected option within enum
+		*/
+		getOptionKey(option) {
+			return _.get(option, this.$props.optionKeyPath, '');
 		},
 	},
 	watch: {
@@ -50,15 +96,15 @@ export default app.mgComponent('mgChoiceList', {
 <template>
 	<div class="mg-choice-list list-group">
 		<a
-			v-for="item in enumIter"
-			:key="item.id"
+			v-for="option in options"
+			:key="getOptionKey(option)"
 			class="list-group-item"
-			:class="data == item.id && 'active'"
+			:class="data == getOptionKey(option) && 'active'"
 			tabindex="0"
-			@click="data = item.id"
+			@click="select(option)"
 		>
-			<i v-if="item.icon" :class="item.icon"/>
-			{{item.title}}
+			<i v-if="option.icon" :class="option.icon"/>
+			{{ getOptionLabel(option) }}
 		</a>
 	</div>
 </template>

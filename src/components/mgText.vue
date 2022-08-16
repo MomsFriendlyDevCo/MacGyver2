@@ -1,4 +1,8 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgText').enable(false);
+
+import _ from 'lodash';
 import InputFacade from 'vue-input-facade';
 
 app.use(InputFacade);

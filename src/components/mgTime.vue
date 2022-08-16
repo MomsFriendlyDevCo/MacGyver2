@@ -1,7 +1,8 @@
 <script lang="js">
 import Debug from '@doop/debug';
-const $debug = Debug('mgTime').enable(true);
+const $debug = Debug('mgTime').enable(false);
 
+import _ from 'lodash';
 import moment from 'moment';
 
 export default app.mgComponent('mgTime', {

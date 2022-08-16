@@ -5,6 +5,8 @@ const $debug = Debug('mgChoiceDropdown').enable(true);
 import VueSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
 
+import _ from 'lodash';
+
 app.component('v-select', VueSelect);
 
 export default app.mgComponent('mgChoiceDropdown', {
@@ -33,34 +35,37 @@ export default app.mgComponent('mgChoiceDropdown', {
 			],
 		},
 		enumUrl: {type: 'mgUrl', vueType: ['string', 'object'], showIf: 'enumSource == "url"', help: 'Data feed URL to fetch choice values from'},
-		// FIXME: These are relevant for passed in `enum` options also?
 		optionsPath: {
 			type: "mgText",
 			default: "",
 			help: "Path within data feed for options array",
-			showIf: 'enumSource == "url"',
 		},
 		optionKeyPath: {
 			type: "mgText",
 			default: "id",
 			help: "Path within data feed for options key",
-			showIf: 'enumSource == "url"',
 		},
 		optionLabelPath: {
 			type: "mgText",
 			default: "title",
 			help: "Path within data feed for options label",
-			showIf: 'enumSource == "url"',
 		},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 		focus: {type: 'mgToggle', default: false, help: 'Auto-focus the element when it appears on screen'},
 	},
+	computed: {
+		options() {
+			return _.get(this.enumIter, this.$props.optionsPath, this.enumIter);
+		},
+	},
 	methods: {
-		changeHandler(e) {
-			if (!e) return this.data = this.selected = null;
-			this.data = this.getOptionKey(e);
-			this.selected = e;
+		select(option) {
+			if (!option) return this.data = this.selected = null;
+
+			this.data = this.getOptionKey(option);
+			this.selected = option;
+			if (option.action) this.$mgForm.run(option.action);
 		},
 
 		/**
@@ -140,12 +145,12 @@ export default app.mgComponent('mgChoiceDropdown', {
 			ref="select"
 			:value="selected"
 			label="title"
-			:options="_.get(this.enumIter, this.$props.optionsPath, this.enumIter)"
+			:options="options"
 			:placeholder="$props.placeholder"
 			:clearable="!$props.required"
 			:get-option-key="getOptionKey"
 			:get-option-label="getOptionLabel"
-			@input="changeHandler"
+			@input="select($event)"
 		>
 			<template #selected-option="option">
 				<!-- TODO: getOptionIcon -->
@@ -158,7 +163,7 @@ export default app.mgComponent('mgChoiceDropdown', {
 			</template>
 		</v-select>
 
-		<div v-if="this.$debug.$enabled" class="card">
+		<div v-if="$debug.$enabled" class="card">
 			<div class="card-header">
 				Raw data
 			</div>

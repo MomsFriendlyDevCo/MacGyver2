@@ -1,4 +1,9 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgTextArea').enable(false);
+
+import _ from 'lodash';
+
 export default app.mgComponent('mgTextArea', {
 	meta: {
 		title: 'Multi-line text',

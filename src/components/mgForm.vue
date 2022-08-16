@@ -1,4 +1,9 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgForm').enable(false);
+
+import _ from 'lodash';
+
 /**
 * The top level MacGyver form
 * @param {string} [form] Unique form name

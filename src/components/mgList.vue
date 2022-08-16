@@ -1,4 +1,9 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgList').enable(false);
+
+import _ from 'lodash';
+
 export default app.mgComponent('mgList', {
 	meta: {
 		title: 'List',

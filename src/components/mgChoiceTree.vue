@@ -1,4 +1,9 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgChoiceTree').enable(false);
+
+import _ from 'lodash';
+
 export default app.mgComponent('mgChoiceTree', {
 	meta: {
 		title: 'Choice Tree',
@@ -20,6 +25,8 @@ export default app.mgComponent('mgChoiceTree', {
 				// 'enum': FIXME: We can't recursively edit children yet
 			],
 		},
+		// TODO: Support for "enumSource"/"enumUrl"
+		// TODO: optionsPath/optionLabelPath/optionKeyPath -> getOptionLabel/getOptionKey?
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 		collapsable: {type: 'mgToggle', default: true, help: 'Allow branches to be closed'},
 		selectBranches: {type: 'mgToggle', default: false, help: 'Allow selection of tree branches rather than just end leaves'},

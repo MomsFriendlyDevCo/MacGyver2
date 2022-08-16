@@ -1,4 +1,9 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgCode').enable(false);
+
+import _ from 'lodash';
+
 export default app.mgComponent('mgCode', {
 	meta: {
 		title: 'Code Editor',

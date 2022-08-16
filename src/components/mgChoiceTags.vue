@@ -1,15 +1,20 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgChoiceTags').enable(false);
+
+import _ from 'lodash';
+
+import VueSelect from 'vue-select';
+import 'vue-select/dist/vue-select.css';
+
+app.component('v-select', VueSelect);
+
 /**
 * NOTE: Toggling deselection from the menu is not yet supported until
 *       https://github.com/sagalbot/vue-select/pull/877
 *       Has been merged
 *       - MC 2020-01-10
 */
-import VueSelect from 'vue-select';
-import 'vue-select/dist/vue-select.css';
-
-app.component('v-select', VueSelect);
-
 export default app.mgComponent('mgChoiceTags', {
 	meta: {
 		title: 'Dropdown multiple-choice',
@@ -74,10 +79,12 @@ export default app.mgComponent('mgChoiceTags', {
 		}, {immediate: true});
 	},
 	methods: {
-		changeHandler(e) {
-			if (!e) return this.data = this.selected = null;
-			this.data = this.getOptionKey(e);
-			this.selected = e;
+		select(option) {
+			if (!option) return this.data = this.selected = null;
+
+			this.data = this.getOptionKey(option);
+			this.selected = option;
+			if (option.action) this.$mgForm.run(option.action);
 		},
 
 		/**
@@ -134,7 +141,7 @@ export default app.mgComponent('mgChoiceTags', {
 		:multiple="true"
 		:get-option-key="getOptionKey"
 		:get-option-label="getOptionLabel"
-		@input="changeHandler"
+		@input="select($event)"
 	>
 		<template #option="option">
 			<i
