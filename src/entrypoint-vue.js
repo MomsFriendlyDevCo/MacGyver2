@@ -7,6 +7,7 @@ export { default } from './index';
 export { default as mgAlert } from './components/mgAlert';
 export { default as mgButton } from './components/mgButton';
 export { default as mgCheckBox } from './components/mgCheckBox';
+export { default as mgChoiceAutocomplete } from './components/mgChoiceAutocomplete';
 export { default as mgChoiceButtons } from './components/mgChoiceButtons';
 export { default as mgChoiceCheckbox } from './components/mgChoiceCheckbox';
 export { default as mgChoiceDropdown } from './components/mgChoiceDropdown';

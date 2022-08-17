@@ -1,12 +1,11 @@
 export default {
 	data() { return {
 		enumIter: [],
+		enumPrefetch: true, // Enable/disable monitoring of enumUrl and enum for changes
 	}},
 	props: {
 		enumSource: {
 			type: 'mgChoiceButtons',
-			foo: 'bar',
-			default: 'list',
 			enum: ['list', 'url'],
 			default: 'list',
 			help: 'Where to populate the list data from'
@@ -54,12 +53,45 @@ export default {
 		},
 	},
 	methods: {
+		// TODO: Default "select" and "setEnum" before custom overloads in components?\
+
+		/**
+		 * Lookup or fetch data and apply query
+		 * @param {String} query Filter data by search string
+		 * @returns {Promise}
+		 */
+		// TODO: Better name? It's not really fetch... search, filter...
+		getEnum(query = '') {
+			this.$debug('getEnum', this.$props.enumSource, query);
+			switch (this.$props.enumSource) {
+				case 'list':
+					return Promise.resolve(this.filterOptionsByLabel(query));
+				case 'url':
+					if (!this.$props.enumUrl) return Promise.resolve();
+
+					return this.$macgyver.utils
+						// FIXME: Appended straight on? No "?" or anything before it?
+						.fetch(this.$props.enumUrl + query, { type: 'array' })
+						.then(data => {
+							if (_.isFunction(this.setEnum)) {
+								this.setEnum(data);
+							} else {
+								this.enumIter = data;
+							}
+						});
+			}
+		},
+
 		/**
 		 * Search for an enum option given a key
 		 * @param {String, Number} key
 		 */
 		findOptionByKey(key) {
 			return this.options.find(option => this.getOptionKey(option) === key);
+		},
+
+		filterOptionsByLabel(label) {
+			return this.enumIter.filter(option => (!label || this.getOptionLabel(option).toLowerCase().startsWith(label.toLowerCase())))
 		},
 
 		/**
@@ -86,24 +118,22 @@ export default {
 			return _.get(option, this.$props.optionLabelPath, '');
 		},
 	},
-	created() {
-		this.$watch('$props.enumUrl', ()=> {
-			if (!this.$props.enumUrl) return;
-			this.$macgyver.utils.fetch(this.$props.enumUrl, {
-				type: 'raw',
-			})
-				.then(data => this.setEnum(data))
-		}, {immediate: true});
+	// NOTE: Mixin lifecycle callbacks run before component itself; "enumPrefetch = false" must be set in "created" to disable watcher being triggered immediately.
+	// FIXME: To configure this during "created" might require a factory pattern where this mixin is provided preconfiged based on args provided to the factory.
+	mounted() {
+		this.$watch('$props.enumUrl', () => {
+			if (this.$props.enumSource === 'url') this.getEnum();
+		}, {immediate: this.enumPrefetch});
 
+		// FIXME: Does this need to watch "$data.data"?
 		this.$watchAll(['$props.enum', '$data.data'], ()=> {
-			// FIXME: Could check `.every` for strings
-			if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
+			if (_.isArray(this.$props.enum) && this.$props.enum.every(_.isString)) { // Array of strings
 				if (_.isFunction(this.setEnum)) {
 					this.setEnum(this.$props.enum.map(i => ({id: _.camelCase(i), title: i})));
 				} else {
 					this.enumIter = this.$props.enum.map(i => ({id: _.camelCase(i), title: i}));
 				}
-			} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection
+			} else if (_.isArray(this.$props.enum) && this.$props.enum.every(_.isObject)) { // Collection
 				if (_.isFunction(this.setEnum)) {
 					this.setEnum(this.$props.enum);
 				} else {

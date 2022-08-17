@@ -22,7 +22,6 @@ export default app.mgComponent('mgChoiceDropdown', {
 	},
 	data() { return {
 		selected: [],
-		enumIter: [],
 	}},
 	props: {
 		title: {type: 'mgText'},
@@ -74,7 +73,6 @@ export default app.mgComponent('mgChoiceDropdown', {
 <template>
 	<div class="mg-choice-dropdown">
 		<v-select
-			ref="select"
 			:value="selected"
 			label="title"
 			:options="options"
