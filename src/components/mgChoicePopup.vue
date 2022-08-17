@@ -4,6 +4,8 @@
 
 import _ from 'lodash';
 
+// TODO: Integrate ChoiceEnum mixin
+
 export default app.mgComponent('mgChoicePopup', {
 	meta: {
 		title: 'Choice Popup',

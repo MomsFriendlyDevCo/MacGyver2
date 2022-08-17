@@ -3,49 +3,19 @@
 //const $debug = Debug('mgChoiceRadio').enable(false);
 
 import _ from 'lodash';
+import ChoiceEnum from '../mixins/ChoiceEnum.js';
 
 export default app.mgComponent('mgChoiceRadio', {
+	mixins: [ChoiceEnum],
 	meta: {
 		title: 'Radio multiple-choice',
 		icon: 'far fa-list-ul',
 		category: 'Choice Selectors',
 		preferId: true,
 	},
-	data() { return {
-		enumIter: [],
-	}},
 	props: {
 		id: {type: 'mgText'},
-		enum: {
-			type: 'mgTable',
-			title: 'List items',
-			items: [
-				{id: 'id', title: 'ID'},
-				{id: 'title', title: 'Title'},
-			],
-		},
-		// TODO: Support for "enumSource"/"enumUrl"
-		optionsPath: {
-			type: "mgText",
-			default: "",
-			help: "Path within data feed for options array",
-		},
-		optionKeyPath: {
-			type: "mgText",
-			default: "id",
-			help: "Path within data feed for options key",
-		},
-		optionLabelPath: {
-			type: "mgText",
-			default: "title",
-			help: "Path within data feed for options label",
-		},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
-	},
-	computed: {
-		options() {
-			return _.get(this.enumIter, this.$props.optionsPath, this.enumIter);
-		},
 	},
 	created() {
 		this.$on('mgValidate', reply => {
@@ -63,41 +33,12 @@ export default app.mgComponent('mgChoiceRadio', {
 			if (option.action) this.$mgForm.run(option.action);
 		},
 		*/
-
-		/**
-		* Retrieve option label based on path specified in properties.
-		* @param {Object} option The selected option within enum
-		*/
-		getOptionLabel(option) {
-			return _.get(option, this.$props.optionLabelPath, '');
-		},
-
-		/**
-		* Retrieve option key based on path specified in properties.
-		* @param {Object} option The selected option within enum
-		*/
-		getOptionKey(option) {
-			return _.get(option, this.$props.optionKeyPath, '');
-		},
-	},
-	watch: {
-		'$props.enum': {
-			immediate: true,
-			handler() {
-				// FIXME: Could check `.every` for strings
-				if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
-					this.enumIter = this.$props.enum.map(i => ({id: _.camelCase(i), title: i}));
-				} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection
-					this.enumIter = this.$props.enum;
-				}
-			},
-		},
 	},
 });
 </script>
 
 <template>
-	<div>
+	<div class="mg-choice-radio">
 		<div class="form-check" v-for="option in options" :key="getOptionKey(option)">
 			<input
 				v-model="data"
@@ -107,6 +48,7 @@ export default app.mgComponent('mgChoiceRadio', {
 				:id="`check-${$props.id}-${getOptionKey(option)}`"
 			/>
 			<label class="form-check-label" :for="`check-${$props.id}-${getOptionKey(option)}`">
+				<i v-if="getOptionIcon(option)" :class="getOptionIcon(option)" />
 				{{ getOptionLabel(option) }}
 			</label>
 		</div>

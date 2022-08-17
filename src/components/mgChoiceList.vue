@@ -3,8 +3,10 @@
 //const $debug = Debug('mgChoiceList').enable(false);
 
 import _ from 'lodash';
+import ChoiceEnum from '../mixins/ChoiceEnum.js';
 
 export default app.mgComponent('mgChoiceList', {
+	mixins: [ChoiceEnum],
 	meta: {
 		title: 'Radio multiple-choice',
 		icon: 'far fa-list-ol',
@@ -15,38 +17,7 @@ export default app.mgComponent('mgChoiceList', {
 		enumIter: [],
 	}},
 	props: {
-		enum: {
-			type: 'mgTable',
-			title: 'List items',
-			default: [],
-			items: [
-				{id: 'id', type: 'mgText', required: true},
-				{id: 'title', type: 'mgText', required: true},
-				{id: 'icon', type: 'mgIcon'}, // TODO: interface: modal?
-			],
-		},
-		// TODO: Support for "enumSource"/"enumUrl"
-		optionsPath: {
-			type: "mgText",
-			default: "",
-			help: "Path within data feed for options array",
-		},
-		optionKeyPath: {
-			type: "mgText",
-			default: "id",
-			help: "Path within data feed for options key",
-		},
-		optionLabelPath: {
-			type: "mgText",
-			default: "title",
-			help: "Path within data feed for options label",
-		},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
-	},
-	computed: {
-		options() {
-			return _.get(this.enumIter, this.$props.optionsPath, this.enumIter);
-		},
 	},
 	created() {
 		this.$on('mgValidate', reply => {
@@ -59,35 +30,6 @@ export default app.mgComponent('mgChoiceList', {
 
 			this.data = this.getOptionKey(option);
 			if (option.action) this.$mgForm.run(option.action);
-		},
-
-		/**
-		* Retrieve option label based on path specified in properties.
-		* @param {Object} option The selected option within enum
-		*/
-		getOptionLabel(option) {
-			return _.get(option, this.$props.optionLabelPath, '');
-		},
-
-		/**
-		* Retrieve option key based on path specified in properties.
-		* @param {Object} option The selected option within enum
-		*/
-		getOptionKey(option) {
-			return _.get(option, this.$props.optionKeyPath, '');
-		},
-	},
-	watch: {
-		'$props.enum': {
-			immediate: true,
-			handler() {
-				// FIXME: Could check `.every` for strings
-				if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
-					this.enumIter = this.$props.enum.map(i => ({id: _.camelCase(i), title: i}));
-				} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection
-					this.enumIter = this.$props.enum;
-				}
-			},
 		},
 	},
 });
@@ -103,7 +45,7 @@ export default app.mgComponent('mgChoiceList', {
 			tabindex="0"
 			@click="select(option)"
 		>
-			<i v-if="option.icon" :class="option.icon"/>
+			<i v-if="getOptionIcon(option)" :class="getOptionIcon(option)" />
 			{{ getOptionLabel(option) }}
 		</a>
 	</div>
