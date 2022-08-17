@@ -66,6 +66,8 @@ export default {
 			switch (this.$props.enumSource) {
 				case 'list':
 					return Promise.resolve(this.filterOptionsByLabel(query));
+
+				// FIXME: Previous undocumented behavour may have been to enable whenever "enumUrl" is provided
 				case 'url':
 					if (!this.$props.enumUrl) return Promise.resolve();
 
