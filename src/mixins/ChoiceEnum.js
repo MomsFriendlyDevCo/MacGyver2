@@ -30,17 +30,22 @@ export default {
 		optionsPath: {
 			type: "mgText",
 			default: "",
-			help: "Path within data feed for options array",
+			help: "Path within data for options array",
 		},
 		optionKeyPath: {
 			type: "mgText",
 			default: "id",
-			help: "Path within data feed for options key",
+			help: "Path within data for options key",
 		},
 		optionLabelPath: {
 			type: "mgText",
 			default: "title",
-			help: "Path within data feed for options label",
+			help: "Path within data for options label",
+		},
+		optionIconPath: {
+			type: "mgText",
+			default: "icon",
+			help: "Path within data for options icon",
 		},
 	},
 	computed: {
@@ -58,6 +63,14 @@ export default {
 		},
 
 		/**
+		* Retrieve option key based on path specified in properties.
+		* @param {Object} option The selected option within enum
+		*/
+		getOptionKey(option) {
+			return _.get(option, this.$props.optionKeyPath, '');
+		},
+
+		/**
 		* Retrieve option label based on path specified in properties.
 		* @param {Object} option The selected option within enum
 		*/
@@ -66,11 +79,11 @@ export default {
 		},
 
 		/**
-		* Retrieve option key based on path specified in properties.
+		* Retrieve option icon based on path specified in properties.
 		* @param {Object} option The selected option within enum
 		*/
-		getOptionKey(option) {
-			return _.get(option, this.$props.optionKeyPath, '');
+		getOptionIcon(option) {
+			return _.get(option, this.$props.optionLabelPath, '');
 		},
 	},
 	created() {

@@ -85,12 +85,11 @@ export default app.mgComponent('mgChoiceDropdown', {
 			@input="select($event)"
 		>
 			<template #selected-option="option">
-				<!-- TODO: getOptionIcon -->
-				<i v-if="option.icon" :class="option.icon" />
+				<i v-if="getOptionIcon(option)" :class="getOptionIcon(option)" />
 				{{ getOptionLabel(option) }}
 			</template>
 			<template #option="option">
-				<i v-if="option.icon" :class="option.icon" />
+				<i v-if="getOptionIcon(option)" :class="getOptionIcon(option)" />
 				{{ getOptionLabel(option) }}
 			</template>
 		</v-select>
