@@ -40,6 +40,7 @@ export default app.mgComponent('mgChoiceRadio', {
 <template>
 	<div class="mg-choice-radio">
 		<div class="form-check" v-for="option in options" :key="getOptionKey(option)">
+			<!-- TODO: _uid -->
 			<input
 				v-model="data"
 				type="radio"
