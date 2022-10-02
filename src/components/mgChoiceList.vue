@@ -18,6 +18,8 @@ export default app.mgComponent('mgChoiceList', {
 	}},
 	props: {
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
+		itemClassActive: {type: 'mgText', default: 'active', advanced: true},
+		itemClassInactive: {type: 'mgText', default: '', advanced: true},
 	},
 	created() {
 		this.$on('mgValidate', reply => {
@@ -41,8 +43,13 @@ export default app.mgComponent('mgChoiceList', {
 			v-for="option in options"
 			:key="getOptionKey(option)"
 			class="list-group-item"
-			:class="data == getOptionKey(option) && 'active'"
+			:class="getOptionKey(option) && data == getOptionKey(option)
+				? option.classActive || option.class || $props.itemClassActive
+				: option.classInactive || option.class || $props.itemClassInactive
+			"
 			tabindex="0"
+			v-tooltip="option.tooltip"
+			@keyup.space="select(option)"
 			@click="select(option)"
 		>
 			<i v-if="getOptionIcon(option)" :class="getOptionIcon(option)" />

@@ -224,7 +224,7 @@ export default app.component('mgForm', {
 		* @returns {Boolean} A boolean indicating if the form validated
 		*/
 		validate() {
-			let newErrors = [];
+			const newErrors = [];
 
 			this.$emit.down('mgValidate', res => {
 				console.log('mgValidate response', res);
@@ -241,7 +241,7 @@ export default app.component('mgForm', {
 </script>
 
 <template>
-	<div class="mg-form">
+	<form class="mg-form">
 		<div v-if="errors.length" class="alert alert-warning">
 			<ul>
 				<li v-for="err in errors">{{err.error}}</li>
@@ -252,7 +252,7 @@ export default app.component('mgForm', {
 			v-if="spec"
 			:config="spec.spec"
 		/>
-	</div>
+	</form>
 </template>
 
 <style>

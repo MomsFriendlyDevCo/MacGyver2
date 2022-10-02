@@ -69,9 +69,10 @@ export default app.mgComponent('mgText', {
 	},
 	created() {
 		this.$on('mgValidate', reply => {
-			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
-			if (this.$props.lengthMin && _.isString(this.data) && this.data.length < this.$props.lengthMin) return reply(`${this.$props.title} is too small (minimum length is ${this.$props.lengthMin})`);
-			if (this.$props.lengthMax && _.isString(this.data) && this.data.length > this.$props.lengthMax) return reply(`${this.$props.title} is too long (maximum length is ${this.$props.lengthMax})`);
+			// TODO: setCustomValidity
+			if (this.$props.required && !this.data) return cb(`${this.$props.title} is required`);
+			if (this.$props.lengthMin && _.isString(this.data) && this.data.length < this.$props.lengthMin) return cb(`${this.$props.title} is too small (minimum length is ${this.$props.lengthMin})`);
+			if (this.$props.lengthMax && _.isString(this.data) && this.data.length > this.$props.lengthMax) return cb(`${this.$props.title} is too long (maximum length is ${this.$props.lengthMax})`);
 		});
 	},
 	mounted() {
