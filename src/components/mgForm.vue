@@ -231,10 +231,10 @@ export default app.component('mgForm', {
 				typeof res == 'string' ? newErrors.push(res)
 				: Array.isArray(res) ? newErrors = newErrors.concat(res)
 				: (()=> { console.warn('Got error response', res); throw new Error(`Unhandled error response from component, see console`) })()
-			})
+			});
 
 			this.errors = newErrors;
-			return this.errors.length == 0;
+			return (this.errors.length == 0);
 		},
 	},
 });

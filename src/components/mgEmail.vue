@@ -20,6 +20,8 @@ export default app.mgComponent('mgEmail', {
 	created() {
 		this.$on('mgValidate', reply => {
 			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
+			if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(this.data)) return reply(`${this.$props.title} is not a valid email address`);
+			if ($(this.$el).children('input[type="email"]')[0].validity.typeMismatch) return reply(`${this.$props.title} is not a valid email address`);
 		});
 	},
 });
