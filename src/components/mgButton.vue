@@ -18,15 +18,15 @@ export default app.mgComponent('mgButton', {
 </script>
 
 <template>
-	<div class="mg-button" :class="$props.className">
-		<a
-			tabindex="0"
-			v-tooltip="$props.tooltip"
-			@keyup.enter="$mgForm.run($props.action)"
-			@click="$mgForm.run($props.action)"
-		>
-			<i v-if="$props.icon" :class="$props.icon"/>
-			{{$props.text}}
-		</a>
-	</div>
+	<a
+		class="mg-button"
+		:class="$props.className"
+		tabindex="0"
+		v-tooltip="$props.tooltip"
+		@keyup.enter="$mgForm.run($props.action)"
+		@click="$mgForm.run($props.action)"
+	>
+		<i v-if="$props.icon" :class="$props.icon"/>
+		{{$props.text}}
+	</a>
 </template>
