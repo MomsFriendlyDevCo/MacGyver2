@@ -20,7 +20,7 @@ export default app.mgComponent('mgQuery', {
 	}},
 	props: {
 		id: {
-			type: 'mgString',
+			type: 'mgText',
 		},
 		//config: Object,
 		/**
