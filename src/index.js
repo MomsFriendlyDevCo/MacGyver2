@@ -178,6 +178,7 @@ export default {
 						// }}}
 
 						// Read in initial data value {{{
+						// TODO: Required for mixin props also?
 						var refresher = ()=> {
 							// FIXME: Match empty strings also?
 							if (this.$props.value) { // Standalone value

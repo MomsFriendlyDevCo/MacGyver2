@@ -25,7 +25,7 @@ export default app.mgComponent('mgColor', {
 		});
 	},
 	methods: {
-		change(e) {
+		changeHandler(e) {
 			var value = e.target.value;
 			if (value && /^#[0-9A-F]+$/i.test(value)) {
 				this.data = value;
@@ -52,7 +52,7 @@ export default app.mgComponent('mgColor', {
 				type="text"
 				class="form-control"
 				:placeholder="$props.placeholder"
-				@input="change"
+				@input="changeHandler"
 			/>
 		</div>
 		<swatches
