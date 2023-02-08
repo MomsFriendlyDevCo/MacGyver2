@@ -91,15 +91,6 @@ export default app.mgComponent('mgChoiceDropdown', {
 				{{ getOptionLabel(option) }}
 			</template>
 		</v-select>
-
-		<div v-if="$debug.$enabled" class="card">
-			<div class="card-header">
-				Raw data
-			</div>
-			<div class="card-body">
-				<pre>{{$data}}</pre>
-			</div>
-		</div>
 	</div>
 </template>
 
