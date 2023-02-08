@@ -65,7 +65,7 @@
     "popper.js": "^1.16.1",
     "sift": "^16.0.0",
     "vue": "^2.6.12",
-    "vue-loader": "^15.9.6",
+    "vue-loader": "^15.10.1",
     "vue-router": "^3.1.5",
     "vue-style-loader": "^4.1.3",
     "vue-swatches": "^1.0.4",
@@ -82,8 +82,8 @@
   },
   "peerDependencies": {
     "@doop/emit": "^1.0.0",
-    "@momsfriendlydevco/vue-setpath": "^0.0.2",
-    "@doop/watch-all": "^1.0.0"
+    "@doop/watch-all": "^1.0.0",
+    "@momsfriendlydevco/vue-setpath": "^0.0.2"
   },
   "babel": {
     "presets": [
