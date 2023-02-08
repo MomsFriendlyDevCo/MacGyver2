@@ -7,20 +7,24 @@ export default app.mgComponent('mgButton', {
 		preferId: false,
 	},
 	props: {
+		title: {type: 'mgText'},
 		text: {type: 'mgText'},
 		icon: {type: 'mgIcon', default: 'far fa-check'},
 		tooltip: {type: 'mgText'},
 		action: {type: 'mgText', vueType: 'any'},
-		className: {type: 'mgText', advanced: true, default: 'btn btn-light'},
+		className: {type: 'mgText', advanced: true, default: 'btn btn-light'}, // TODO: Can we simply use "class" as a property?
 	},
 });
 </script>
 
 <template>
 	<a
+		class="mg-button"
 		:class="$props.className"
-		@click="$mgForm.run($props.action)"
+		tabindex="0"
 		v-tooltip="$props.tooltip"
+		@keyup.enter="$mgForm.run($props.action)"
+		@click="$mgForm.run($props.action)"
 	>
 		<i v-if="$props.icon" :class="$props.icon"/>
 		{{$props.text}}

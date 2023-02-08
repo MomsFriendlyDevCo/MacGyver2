@@ -1,5 +1,12 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgChoiceList').enable(false);
+
+import _ from 'lodash';
+import ChoiceEnum from '../mixins/ChoiceEnum.js';
+
 export default app.mgComponent('mgChoiceList', {
+	mixins: [ChoiceEnum],
 	meta: {
 		title: 'Radio multiple-choice',
 		icon: 'far fa-list-ol',
@@ -10,16 +17,9 @@ export default app.mgComponent('mgChoiceList', {
 		enumIter: [],
 	}},
 	props: {
-		enum: {
-			type: 'mgTable',
-			title: 'List items',
-			default: [],
-			items: [
-				{id: 'title', type: 'mgText'},
-				{id: 'icon', type: 'mgIcon', interface: 'modal'},
-			],
-		},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
+		itemClassActive: {type: 'mgText', default: 'active', advanced: true},
+		itemClassInactive: {type: 'mgText', default: '', advanced: true},
 	},
 	created() {
 		this.$on('mgValidate', reply => {
@@ -27,21 +27,11 @@ export default app.mgComponent('mgChoiceList', {
 		});
 	},
 	methods: {
-		select(id) {
-			this.data = id;
-		},
-	},
-	watch: {
-		'$props.enum': {
-			immediate: true,
-			handler() {
-				// FIXME: Could check `.every` for strings
-				if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
-					this.enumIter = this.$props.enum.map(i => ({id: _.camelCase(i), title: i}));
-				} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection
-					this.enumIter = this.$props.enum;
-				}
-			},
+		select(option) {
+			if (!option) return this.data = null;
+
+			this.data = this.getOptionKey(option);
+			if (option.action) this.$mgForm.run(option.action);
 		},
 	},
 });
@@ -50,14 +40,20 @@ export default app.mgComponent('mgChoiceList', {
 <template>
 	<div class="mg-choice-list list-group">
 		<a
-			v-for="item in enumIter"
-			:key="item.id"
+			v-for="option in options"
+			:key="getOptionKey(option)"
 			class="list-group-item"
-			:class="data == item.id && 'active'"
-			@click="data = item.id"
+			:class="getOptionKey(option) && data == getOptionKey(option)
+				? option.classActive || option.class || $props.itemClassActive
+				: option.classInactive || option.class || $props.itemClassInactive
+			"
+			tabindex="0"
+			v-tooltip="option.tooltip"
+			@keyup.space="select(option)"
+			@click="select(option)"
 		>
-			<i v-if="item.icon" :class="item.icon"/>
-			{{item.title}}
+			<i v-if="getOptionIcon(option)" :class="getOptionIcon(option)" />
+			{{ getOptionLabel(option) }}
 		</a>
 	</div>
 </template>

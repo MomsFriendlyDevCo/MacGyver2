@@ -1,4 +1,9 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgTextArea').enable(false);
+
+import _ from 'lodash';
+
 export default app.mgComponent('mgTextArea', {
 	meta: {
 		title: 'Multi-line text',
@@ -7,6 +12,7 @@ export default app.mgComponent('mgTextArea', {
 		preferId: true,
 	},
 	props: {
+		title: {type: 'mgText'},
 		rows: {type: 'mgNumber', title: 'Line height', default: 3},
 		lengthMin: {type: 'mgNumber', title: 'Minimum Length', min: 0},
 		lengthMax: {type: 'mgNumber', title: 'Maximum Length'},
@@ -26,15 +32,17 @@ export default app.mgComponent('mgTextArea', {
 </script>
 
 <template>
-	<textarea
-		v-model="data"
-		class="form-control"
-		:placeholder="$props.placeholder"
-		:disabled="$props.disabled"
-		:readonly="$props.readonly"
-		:minlength="$props.lengthMin"
-		:maxlength="$props.lengthMin"
-		:rows="$props.rows"
-		autocomplete="off"
-	/>
+	<div class="mg-textarea">
+		<textarea
+			v-model="data"
+			class="form-control"
+			:placeholder="$props.placeholder"
+			:disabled="$props.disabled"
+			:readonly="$props.readonly"
+			:minlength="$props.lengthMin"
+			:maxlength="$props.lengthMax"
+			:rows="$props.rows"
+			autocomplete="off"
+		/>
+	</div>
 </template>

@@ -1,4 +1,8 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgPassword').enable(false);
+
+import _ from 'lodash';
 import InputFacade from 'vue-input-facade';
 
 app.use(InputFacade);
@@ -13,6 +17,7 @@ export default app.mgComponent('mgPassword', {
 		shorthand: ['string', 'str'],
 	},
 	props: {
+		title: {type: 'mgText'},
 		lengthMin: {type: 'mgNumber', title: 'Minimum Length', min: 0},
 		lengthMax: {type: 'mgNumber', title: 'Maximum Length'},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},

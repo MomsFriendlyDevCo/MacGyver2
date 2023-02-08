@@ -2,6 +2,7 @@
 import Debug from '@doop/debug';
 const $debug = Debug('mgFormEditor').enable(true);
 
+import _ from 'lodash';
 import './mgFormEditorControls';
 
 /**

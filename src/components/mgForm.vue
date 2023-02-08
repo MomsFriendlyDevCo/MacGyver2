@@ -1,4 +1,9 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgForm').enable(false);
+
+import _ from 'lodash';
+
 /**
 * The top level MacGyver form
 * @param {string} [form] Unique form name
@@ -219,17 +224,17 @@ export default app.component('mgForm', {
 		* @returns {Boolean} A boolean indicating if the form validated
 		*/
 		validate() {
-			let newErrors = [];
+			const newErrors = [];
 
 			this.$emit.down('mgValidate', res => {
 				console.log('mgValidate response', res);
 				typeof res == 'string' ? newErrors.push(res)
 				: Array.isArray(res) ? newErrors = newErrors.concat(res)
 				: (()=> { console.warn('Got error response', res); throw new Error(`Unhandled error response from component, see console`) })()
-			})
+			});
 
 			this.errors = newErrors;
-			return this.errors.length == 0;
+			return (this.errors.length == 0);
 		},
 
 
@@ -261,7 +266,7 @@ export default app.component('mgForm', {
 </script>
 
 <template>
-	<div class="mg-form">
+	<form class="mg-form">
 		<div v-if="errors.length" class="alert alert-warning">
 			<ul>
 				<li v-for="err in errors">{{err.error}}</li>
@@ -272,7 +277,7 @@ export default app.component('mgForm', {
 			v-if="spec"
 			:config="spec.spec"
 		/>
-	</div>
+	</form>
 </template>
 
 <style>

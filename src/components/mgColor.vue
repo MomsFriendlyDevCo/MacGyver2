@@ -11,6 +11,7 @@ export default app.mgComponent('mgColor', {
 		shorthand: ['color', 'hue', 'swatch'],
 	},
 	props: {
+		title: {type: 'mgText'},
 		required: {type: 'mgToggle', default: false},
 		colorSet: {type: 'mgChoiceDropdown', enum: [{id: 'basic', title: 'Basic'}, {id: 'material-light', title: 'Material'}, {id: 'text-advanced', title: 'Full swatch'}], default: 'text-advanced'},
 		interface: {type: 'mgChoiceDropdown', default: 'input', enum: ['input', 'colorOnly']},
@@ -24,7 +25,7 @@ export default app.mgComponent('mgColor', {
 		});
 	},
 	methods: {
-		change(e) {
+		changeHandler(e) {
 			var value = e.target.value;
 			if (value && /^#[0-9A-F]+$/i.test(value)) {
 				this.data = value;
@@ -51,7 +52,7 @@ export default app.mgComponent('mgColor', {
 				type="text"
 				class="form-control"
 				:placeholder="$props.placeholder"
-				@input="change"
+				@input="changeHandler"
 			/>
 		</div>
 		<swatches

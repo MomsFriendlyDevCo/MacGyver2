@@ -1,4 +1,9 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgCode').enable(false);
+
+import _ from 'lodash';
+
 export default app.mgComponent('mgCode', {
 	meta: {
 		title: 'Code Editor',
@@ -7,6 +12,7 @@ export default app.mgComponent('mgCode', {
 		preferId: true,
 	},
 	props: {
+		title: {type: 'mgText'},
 		syntax: {type: 'mgChoiceDropdown', enum: ['text', 'json', 'javascript', 'html', 'css'], default: 'json'},
 		convert: {type: 'mgToggle', default: true, showIf: 'syntax == "json"', help: 'Convert data back to a native JS object'},
 		theme: {type: 'mgChoiceDropdown', enum: ['chrome'], advanced: true, default: 'chrome', help: 'The syntax color scheme to use'},

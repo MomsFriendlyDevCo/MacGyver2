@@ -1,75 +1,84 @@
 <script lang="js">
+import Debug from '@doop/debug';
+const $debug = Debug('mgChoiceButtons').enable(false);
+
+import _ from 'lodash';
+import ChoiceEnum from '../mixins/ChoiceEnum.js';
+
 export default app.mgComponent('mgChoiceButtons', {
+	mixins: [ChoiceEnum],
 	meta: {
 		title: 'Choice Buttons',
 		icon: 'fas fa-ellipsis-h',
 		category: 'Choice Selectors',
 		preferId: true,
 	},
-	data() { return {
-		enumIter: [],
-	}},
 	props: {
-		enum: {
-			type: 'mgTable',
-			title: 'List items',
-			items: [
-				{id: 'id', title: 'ID'},
-				{id: 'title', title: 'Title'},
-				{id: 'tooltip', title: 'Tooltip'},
-				{id: 'icon', title: 'Icon', type: 'mgIcon'},
-				{id: 'class', title: 'Classes'},
-				{id: 'classActive', title: 'Active Class'},
-				{id: 'classInactive', title: 'Inactive Class'},
-				// Implied: {id: 'action', title: 'Action on select', type: 'function'},
-			],
-		},
+		title: {type: 'mgText'},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
-		classWrapper: {type: 'mgText', default: 'btn-group', title: 'Group CSS class', advanced: true},
-		itemClassActive: {type: 'mgText', default: 'btn btn-primary', advanced: true},
+		classWrapper: {type: 'mgText', default: 'btn-group', title: 'Group CSS class', advanced: true}, // FIXME: Called "className" elsewhere, could simply be "class"?
+		itemClassActive: {type: 'mgText', default: 'btn btn-primary', advanced: true}, // FIXME: If using radio semantics when "checked" pseudo could be used instead
 		itemClassInactive: {type: 'mgText', default: 'btn btn-light', advanced: true},
 	},
 	created() {
 		this.$on('mgValidate', reply => {
+			// TODO: setCustomValidity
 			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
 		});
 	},
 	methods: {
-		select(item) {
-			this.data = item.id;
-			if (item.action) this.$mgForm.run(item.action);
-		},
-	},
-	watch: {
-		'$props.enum': {
-			immediate: true,
-			handler() {
-				// FIXME: Could check `.every` for strings
-				if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
-					this.enumIter = this.$props.enum.map(i => ({id: _.camelCase(i), title: i}));
-				} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection
-					this.enumIter = this.$props.enum;
-				}
-			},
+		select(option) {
+			if (!option) return this.data = null;
+
+			this.data = this.getOptionKey(option);
+			if (option.action) this.$mgForm.run(option.action);
 		},
 	},
 });
 </script>
 
 <template>
-	<div class="mg-choice-buttons" :class="$props.classWrapper">
+	<div class="mg-choice-buttons" :class="$props.classWrapper" role="group">
+		<!--
+		// TODO: Possible refactor to use inbuilt radio semantics
+		<div class="form-check form-check-inline">
+			<div v-for="option in options" :key="getOptionKey(option)">
+				<input
+					type="radio"
+					:name="_uid"
+					:id="`${_uid}-${getOptionKey(option)}`"
+					class="form-check-input"
+					:class="getOptionKey(option) && data == getOptionKey(option)
+						? option.classActive || option.class || $props.itemClassActive
+						: option.classInactive || option.class || $props.itemClassInactive
+					"
+					:value="getOptionKey(option)"
+					v-model="data"
+				/>
+				<label
+					class="form-check-label"
+					:for="`${_uid}-${getOptionKey(option)}`"
+					>
+					<i v-if="getOptionIcon(option)" :class="getOptionIcon(option)"/>
+					{{ getOptionLabel(option) }}
+				</label>
+			</div>
+		</div>
+		-->
 		<a
-			v-for="item in enumIter"
-			:key="item.id"
-			:class="item.id && data == item.id
-				? item.classActive || item.class || $props.itemClassActive
-				: item.classInactive || item.class || $props.itemClassInactive
+			v-for="option in options"
+			:key="getOptionKey(option)"
+			:class="getOptionKey(option) && data == getOptionKey(option)
+				? option.classActive || option.class || $props.itemClassActive
+				: option.classInactive || option.class || $props.itemClassInactive
 			"
-			v-tooltip="item.tooltip"
-			@click="select(item)"
+			tabindex="0"
+			v-tooltip="option.tooltip"
+			@keyup.space="select(option)"
+			@click="select(option)"
 		>
-			<i v-if="item.icon" :class="item.icon"/>
-			{{item.title}}
+			<i v-if="getOptionIcon(option)" :class="getOptionIcon(option)"/>
+			{{ getOptionLabel(option) }}
 		</a>
 	</div>
 </template>

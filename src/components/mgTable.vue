@@ -1,6 +1,8 @@
 <script lang="js">
 import Debug from '@doop/debug';
-const $debug = Debug('mgTable').enable(true);
+const $debug = Debug('mgTable').enable(false);
+
+import _ from 'lodash';
 
 export default app.mgComponent('mgTable', {
 	meta: {

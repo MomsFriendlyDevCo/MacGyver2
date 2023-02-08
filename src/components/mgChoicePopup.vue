@@ -1,4 +1,11 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgChoicePopup').enable(false);
+
+import _ from 'lodash';
+
+// TODO: Integrate ChoiceEnum mixin
+
 export default app.mgComponent('mgChoicePopup', {
 	meta: {
 		title: 'Choice Popup',
@@ -11,6 +18,7 @@ export default app.mgComponent('mgChoicePopup', {
 		enumIter: [],
 	}},
 	props: {
+		title: {type: 'mgText'},
 		enum: {
 			type: 'mgTable',
 			title: 'List items',
@@ -22,6 +30,22 @@ export default app.mgComponent('mgChoicePopup', {
 				{id: 'classInactive', title: 'Inactive Class'},
 			],
 		},
+		// TODO: Support for "enumSource"/"enumUrl"
+		optionsPath: {
+			type: "mgText",
+			default: "",
+			help: "Path within data feed for options array",
+		},
+		optionKeyPath: {
+			type: "mgText",
+			default: "id",
+			help: "Path within data feed for options key",
+		},
+		optionLabelPath: {
+			type: "mgText",
+			default: "title",
+			help: "Path within data feed for options label",
+		},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 		popupTitle: {type: 'mgText', default: 'Select item', advanced: true},
 		inactiveText: {type: 'mgText', default: 'Select item...', advanced: true},
@@ -30,19 +54,27 @@ export default app.mgComponent('mgChoicePopup', {
 		classActive: {type: 'mgText', default: 'btn btn-primary', advanced: true},
 		classInactive: {type: 'mgText', default: 'btn btn-default', advanced: true},
 	},
+	computed: {
+		options() {
+			return _.get(this.enumIter, this.$props.optionsPath, this.enumIter);
+		},
+	},
 	created() {
 		this.$on('mgValidate', reply => {
 			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
 		});
 	},
 	methods: {
-		select(id) {
+		showModal() {
 			this.$prompt.macgyver({
 				title: this.$props.popupTitle,
 				form: {
 					id: 'selected',
 					type: 'mgChoiceButtons',
-					enum: this.enumIter,
+					enum: this.options,
+					optionsPath: this.optionsPath,
+					optionKeyPath: this.optionKeyPath,
+					optionLabelPath: this.optionLabelPath,
 					classWrapper: 'list-group',
 					itemClassActive: 'list-group-item active',
 					itemClassInactive: 'list-group-item',
@@ -103,7 +135,7 @@ export default app.mgComponent('mgChoicePopup', {
 	<div class="mg-choice-popup">
 		<a
 			:class="data ? $props.classActive : $props.classInactive"
-			@click="select()"
+			@click="showModal()"
 		>
 			<i :class="data ? $props.iconActive : $props.iconInactive"></i>
 			{{this.data ? activeTitle : $props.inactiveText}}

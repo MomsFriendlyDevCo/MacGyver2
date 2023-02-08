@@ -1,6 +1,8 @@
 <script lang="js">
 import Debug from '@doop/debug';
-const $debug = Debug('mgQuery').enable(true);
+const $debug = Debug('mgQuery').enable(false);
+
+import _ from 'lodash';
 
 export default app.mgComponent('mgQuery', {
 	meta: {
@@ -18,7 +20,7 @@ export default app.mgComponent('mgQuery', {
 	}},
 	props: {
 		id: {
-			type: 'mgString',
+			type: 'mgText',
 		},
 		//config: Object,
 		/**

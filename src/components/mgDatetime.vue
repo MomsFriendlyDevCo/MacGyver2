@@ -1,7 +1,8 @@
 <script lang="js">
 import Debug from '@doop/debug';
-const $debug = Debug('mgDatetime').enable(true);
+const $debug = Debug('mgDatetime').enable(false);
 
+import _ from 'lodash';
 import moment from 'moment';
 
 export default app.mgComponent('mgDatetime', {
@@ -20,6 +21,7 @@ export default app.mgComponent('mgDatetime', {
 		formData: undefined,
 	}},
 	props: {
+		title: {type: 'mgText'},
 		min: {type: 'mgDatetime', title: 'Earliest date'},
 		max: {type: 'mgDatetime', title: 'Latest date'},
 		step: {type: 'mgNumber', title: 'Step size', default: 60},

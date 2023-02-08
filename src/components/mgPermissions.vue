@@ -1,4 +1,9 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgPermissions').enable(false);
+
+import _ from 'lodash';
+
 // FIXME: Is this more of an app level component?\
 export default app.mgComponent('mgPermissions', {
 	meta: {

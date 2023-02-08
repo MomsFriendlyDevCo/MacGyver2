@@ -1,4 +1,9 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgList').enable(false);
+
+import _ from 'lodash';
+
 export default app.mgComponent('mgList', {
 	meta: {
 		title: 'List',
@@ -11,6 +16,7 @@ export default app.mgComponent('mgList', {
 		newItem: '',
 	}},
 	props: {
+		title: {type: 'mgText'},
 		allowDelete: {type: 'mgToggle', default: true},
 		min: {type: 'mgNumber', title: 'Minimum number of items'},
 		max: {type: 'mgNumber', title: 'Maximum number of items'},

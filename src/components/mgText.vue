@@ -1,4 +1,8 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgText').enable(false);
+
+import _ from 'lodash';
 import InputFacade from 'vue-input-facade';
 
 app.use(InputFacade);
@@ -13,6 +17,7 @@ export default app.mgComponent('mgText', {
 		shorthand: ['string', 'str'],
 	},
 	props: {
+		title: {type: 'mgText'},
 		lengthMin: {type: 'mgNumber', title: 'Minimum Length', min: 0},
 		lengthMax: {type: 'mgNumber', title: 'Maximum Length'},
 		placeholder: {type: 'mgText', help: 'Ghost text to display when there is no value'},
@@ -64,6 +69,7 @@ export default app.mgComponent('mgText', {
 	},
 	created() {
 		this.$on('mgValidate', reply => {
+			// TODO: setCustomValidity
 			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
 			if (this.$props.lengthMin && _.isString(this.data) && this.data.length < this.$props.lengthMin) return reply(`${this.$props.title} is too small (minimum length is ${this.$props.lengthMin})`);
 			if (this.$props.lengthMax && _.isString(this.data) && this.data.length > this.$props.lengthMax) return reply(`${this.$props.title} is too long (maximum length is ${this.$props.lengthMax})`);
@@ -89,15 +95,16 @@ export default app.mgComponent('mgText', {
 <template>
 	<div class="mg-text">
 		<input
-			v-model="data"
 			type="text"
 			class="form-control"
+			:value="data"
 			:autocomplete="$props.autoComplete"
 			:placeholder="$props.placeholder"
 			:disabled="$props.disabled"
 			:readonly="$props.readonly"
 			:list="datalist ? `mg-text-datalist-${_uid}` : undefined"
 			v-facade="$props.mask"
+			@input="data = $event.target.value"
 		/>
 		<datalist v-if="datalist" :id="`mg-text-datalist-${_uid}`">
 			<option v-for="item in datalist" :value="item.title" :key="item.id">

@@ -1,5 +1,12 @@
 <script lang="js">
+import Debug from '@doop/debug';
+const $debug = Debug('mgChoiceCheckbox').enable(false);
+
+import _ from 'lodash';
+import ChoiceEnum from '../mixins/ChoiceEnum.js';
+
 export default app.mgComponent('mgChoiceCheckbox', {
+	mixins: [ChoiceEnum],
 	meta: {
 		title: 'Checkbox multiple-choice',
 		icon: 'far fa-list',
@@ -7,24 +14,9 @@ export default app.mgComponent('mgChoiceCheckbox', {
 		preferId: true,
 		// TODO: format function to output choices as CSV?
 	},
-	data() { return {
-		enumIter: [],
-	}},
 	props: {
+		title: {type: 'mgText'},
 		id: {type: 'mgText'},
-		enum: {
-			type: 'mgList',
-			title: 'List items',
-			enum: {
-				type: 'mgTable',
-				title: 'List items',
-				items: [
-					{id: 'id', title: 'ID'},
-					{id: 'title', title: 'Title'},
-					{id: 'tooltip', title: 'Tooltip'},
-				],
-			},
-		},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 		sort: {
 			type: 'mgChoiceRadio',
@@ -38,57 +30,51 @@ export default app.mgComponent('mgChoiceCheckbox', {
 			],
 		},
 	},
+	methods: {
+		select(option) {
+			if (!option) return this.data = null;
+
+			if (!this.data) this.data = [];
+
+			if (this.data.some(i => i == option)) { // Checked
+				this.data = this.data.filter(i => i != this.getOptionKey(option));
+			} else {
+				this.data.push(this.getOptionKey(option));
+
+				if (this.$props.sort == 'sortId') {
+					this.data.sort();
+				} else if (this.$props.sort == 'sortTitle') {
+					this.data = _.sortBy(this.data, d => this.enum.find(item => this.getOptionKey(item) == d));
+				}
+			}
+			if (option.action) this.$mgForm.run(option.action);
+		},
+	},
 	created() {
+		this.$debug = $debug;
+
 		this.$on('mgValidate', reply => {
 			if (this.$props.required && !this.data) return reply(`${this.$props.title} is required`);
 		});
 
 		if (!_.isArray(this.data)) this.data = [];
 	},
-	methods: {
-		change(id) {
-			if (!this.data) this.data = [];
-
-			if (this.data.some(i => i == id)) { // Checked
-				this.data = this.data.filter(i => i != id);
-			} else {
-				this.data.push(id);
-
-				if (this.$props.sort == 'sortId') {
-					this.data.sort();
-				} else if (this.$props.sort == 'sortTitle') {
-					this.data = _.sortBy(this.data, i => this.enum.find(e => e.id == i));
-				}
-			}
-		},
-	},
-	watch: {
-		'$props.enum': {
-			immediate: true,
-			handler() {
-				// FIXME: Could check `.every` for strings
-				if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
-					this.enumIter = this.$props.enum.map(i => ({id: _.camelCase(i), title: i}));
-				} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection
-					this.enumIter = this.$props.enum;
-				}
-			},
-		},
-	},
 });
 </script>
 
 <template>
-	<div>
-		<div class="form-check" v-for="item in enumIter" :key="item.id">
+	<div class="mg-choice-checkbox">
+		<div class="form-check" v-for="option in options" :key="getOptionKey(option)">
+			<!-- TODO: Replace id strings with _uid -->
 			<input
 				type="checkbox"
-				@change="change(item.id)"
-				:id="`mg-choice-checkbox-${$props.id}-${item.id}`"
-				:checked="data.includes(item.id)"
+				:id="`mg-choice-checkbox-${$props.id}-${getOptionKey(option)}`"
+				:checked="data.includes(getOptionKey(option))"
+				@change="select(option)"
 			/>
-			<label class="form-check-label" :for="`mg-choice-checkbox-${$props.id}-${item.id}`">
-				{{item.title}}
+			<label class="form-check-label" :for="`mg-choice-checkbox-${$props.id}-${getOptionKey(option)}`">
+				<i v-if="getOptionIcon(option)" :class="getOptionIcon(option)"/>
+				{{ getOptionLabel(option) }}
 			</label>
 		</div>
 	</div>

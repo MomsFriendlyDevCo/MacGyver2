@@ -1,24 +1,20 @@
 <script lang="js">
+//import Debug from '@doop/debug';
+//const $debug = Debug('mgChoiceRadio').enable(false);
+
+import _ from 'lodash';
+import ChoiceEnum from '../mixins/ChoiceEnum.js';
+
 export default app.mgComponent('mgChoiceRadio', {
+	mixins: [ChoiceEnum],
 	meta: {
 		title: 'Radio multiple-choice',
 		icon: 'far fa-list-ul',
 		category: 'Choice Selectors',
 		preferId: true,
 	},
-	data() { return {
-		enumIter: [],
-	}},
 	props: {
 		id: {type: 'mgText'},
-		enum: {
-			type: 'mgTable',
-			title: 'List items',
-			items: [
-				{id: 'id', title: 'ID'},
-				{id: 'title', title: 'Title'},
-			],
-		},
 		required: {type: 'mgToggle', default: false, help: 'One choice must be selected'},
 	},
 	created() {
@@ -27,38 +23,34 @@ export default app.mgComponent('mgChoiceRadio', {
 		});
 	},
 	methods: {
-		select(id) {
-			this.data = id;
+		/*
+		// TODO: Selection like others?
+		select(option) {
+			if (!option) return this.data = this.selected = null;
+
+			this.data = this.getOptionKey(option);
+			this.selected = option;
+			if (option.action) this.$mgForm.run(option.action);
 		},
-	},
-	watch: {
-		'$props.enum': {
-			immediate: true,
-			handler() {
-				// FIXME: Could check `.every` for strings
-				if (_.isArray(this.$props.enum) && _.isString(this.$props.enum[0])) { // Array of strings
-					this.enumIter = this.$props.enum.map(i => ({id: _.camelCase(i), title: i}));
-				} else if (_.isArray(this.$props.enum) && _.isObject(this.$props.enum[0])) { // Collection
-					this.enumIter = this.$props.enum;
-				}
-			},
-		},
+		*/
 	},
 });
 </script>
 
 <template>
-	<div>
-		<div class="form-check" v-for="item in enumIter" :key="item.id">
+	<div class="mg-choice-radio">
+		<div class="form-check" v-for="option in options" :key="getOptionKey(option)">
+			<!-- TODO: _uid -->
 			<input
 				v-model="data"
 				type="radio"
 				:name="$props.id"
-				:value="item.id"
-				:id="`check-${$props.id}-${item.id}`"
+				:value="getOptionKey(option)"
+				:id="`check-${$props.id}-${getOptionKey(option)}`"
 			/>
-			<label class="form-check-label" :for="`check-${$props.id}-${item.id}`">
-				{{item.title}}
+			<label class="form-check-label" :for="`check-${$props.id}-${getOptionKey(option)}`">
+				<i v-if="getOptionIcon(option)" :class="getOptionIcon(option)" />
+				{{ getOptionLabel(option) }}
 			</label>
 		</div>
 	</div>
