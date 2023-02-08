@@ -231,6 +231,31 @@ export default app.component('mgForm', {
 			this.errors = newErrors;
 			return this.errors.length == 0;
 		},
+
+
+		/**
+		* Set a data point by a path
+		* This is really just a wrapper for $setData with some properties filled in
+		* @param {String|Array<String>} path Dotted notation path (or array of segments) to set
+		* @param {*} value The new value to set
+		* @returns {*} The value set
+		*/
+		set(path, value) {
+			this.$emit('mgChange', {path, value});
+			return value;
+		},
+
+
+		/**
+		* Get a data point by a path
+		* This is really just a wrapper for $getData with some properties filled in
+		* @param {String|Array<String>} path Dotted notation path (or array of segments) to get
+		* @param {*} [fallback] Optional fallback if the data does not exist
+		* @returns {*} The value retrieved or fallback
+		*/
+		get(path, fallback) {
+			return this.$getPath(this.formData, path, fallback);
+		},
 	},
 });
 </script>
