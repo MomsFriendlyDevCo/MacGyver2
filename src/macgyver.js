@@ -602,7 +602,7 @@ $macgyver.utils.evalMatch = (expression, env) => {
 // FIXME: Duplication. Both this and "vue-setpath" should depend on a parent "setpath" package.
 $macgyver.utils.setPath = (target, path, value, options) => {
 	// Argument mangling {{{
-	if (_.isString(target) || _.isArray(target) || value === undefined) { // called as (path, value)
+	if (_.isString(target) || _.isArray(target)) { // called as (path, value)
 		[target, path, value, options] = [this, target, path, value];
 	} else if (!_.isObject(target)) {
 		throw new Error('Cannot use $setPath on non-object target');
