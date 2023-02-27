@@ -1,6 +1,4 @@
 <script lang="js">
-// TODO: Refactor to mgLayout and have another "mgForm" component (or add a config flag to "mgContainer") which exposes properties and handles "@submit"
-
 //import Debug from '@doop/debug';
 //const $debug = Debug('mgForm').enable(false);
 
@@ -270,7 +268,7 @@ export default app.component('mgForm', {
 </script>
 
 <template>
-	<div class="mg-form">
+	<form @submit.prevent="validate()" class="mg-form">
 		<div v-if="errors.length" class="alert alert-warning">
 			<ul>
 				<li v-for="err in errors">{{err.error}}</li>
@@ -281,7 +279,7 @@ export default app.component('mgForm', {
 			v-if="spec"
 			:config="spec.spec"
 		/>
-	</div>
+	</form>
 </template>
 
 <style>
