@@ -70,6 +70,7 @@ export default app.component('mgForm', {
 		this.$on('mgChange', data => {
 			if (this.inRefresh) return;
 			this.$macgyver.utils.setPath(this.formData, data.path, data.value);
+			// TODO: Should also emit change-item; Or $emit should.
 			this.$emit('changeItem', data);
 
 			this.$emit('change', {...this.formData}); // Has to be a shallow clone so we break the reference and Vue updates
@@ -128,6 +129,7 @@ export default app.component('mgForm', {
 		assignDefaults() {
 			if (!this.spec) return;
 			_.defaultsDeep(this.formData, this.getPrototype());
+			// TODO: Does not send "changeItem" for each element. Should it?
 			this.$emit('change', this.formData);
 		},
 
@@ -266,7 +268,7 @@ export default app.component('mgForm', {
 </script>
 
 <template>
-	<form class="mg-form">
+	<form @submit.prevent="validate()" class="mg-form">
 		<div v-if="errors.length" class="alert alert-warning">
 			<ul>
 				<li v-for="err in errors">{{err.error}}</li>
