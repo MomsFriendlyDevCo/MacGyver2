@@ -8,7 +8,7 @@ export default app.mgComponent('mgPlaceholder', {
 	props: {
 		text: {type: 'mgText'},
 		height: {type: 'mgNumber', default: '100%'},
-		style: {
+		layout: {
 			type: 'mgChoiceButtons',
 			default: 'mg-placeholder-box',
 			iconSelected: 'far fa-fw fa-check',
@@ -23,7 +23,7 @@ export default app.mgComponent('mgPlaceholder', {
 </script>
 
 <template>
-	<div class="mg-placeholder" :class="$props.style" :style="`height: ${$props.height || 'auto'}`">
+	<div class="mg-placeholder" :class="$props.layout" :style="`height: ${$props.height || 'auto'}`">
 		<div v-if="$props.text" class="mg-placeholder-text">
 			{{$props.text}}
 		</div>
