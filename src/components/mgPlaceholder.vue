@@ -7,7 +7,7 @@ export default app.mgComponent('mgPlaceholder', {
 	},
 	props: {
 		text: {type: 'mgText'},
-		height: {type: 'mgNumber', default: '100%'},
+		height: {type: 'mgText', default: '100%'},
 		layout: {
 			type: 'mgChoiceButtons',
 			default: 'mg-placeholder-box',
