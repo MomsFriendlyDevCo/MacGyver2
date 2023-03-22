@@ -99,12 +99,18 @@ export default app.component('mgFormEditor', {
 	},
 	computed: {
 		wrappedConfig() {
-			return {
-				type: 'mgContainer',
-				layout: 'card', // NOTE: Only "card" layout has mgContainer.click, mgContainer.mouseEnter, mgContainer.mouseLeave events attached
-				showTitles: true,
-				items: (_.isArray(this.$props.config)) ? this.$props.config : [this.$props.config],
-			};
+			// NOTE: Only "card" layout has mgContainer.click, mgContainer.mouseEnter, mgContainer.mouseLeave events attached
+			if (_.isObject(this.$props.config) && this.$props.config.type === 'mgContainer') {
+				this.$props.config.layout = 'card';
+				return this.$props.config;
+			} else {
+				return {
+					type: 'mgContainer',
+					layout: 'card',
+					showTitles: true,
+					items: (_.isArray(this.$props.config)) ? this.$props.config : [this.$props.config],
+				};
+			}
 		},
 	},
 	mounted() {
