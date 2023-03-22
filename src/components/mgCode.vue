@@ -1,10 +1,10 @@
 <script lang="js">
 import Debug from '@doop/debug';
-const $debug = Debug('mgCode').enable(true);
+const $debug = Debug('mgCode').enable(false);
 
 import _ from 'lodash';
 
-// TODO: Ace provides no sane imports
+// TODO: Ace provides no sane webpack compatible imports
 //import ace from 'ace-code';
 //import ace from 'ace-builds';
 //import 'ace-builds/webpack-resolver';
@@ -26,32 +26,43 @@ export default app.mgComponent('mgCode', {
 		theme: {type: 'mgChoiceDropdown', enum: ['chrome'], advanced: true, default: 'chrome', help: 'The syntax color scheme to use'},
 		height: {type: 'mgText', default: '400px', help: 'The size of the editing window as a valid CSS measurement', advanced: true},
 	},
-	methods: {
-		handleChange() {
-			return Promise.resolve()
-				.then(() => this.data = JSON.parse(this.formData))
-				.catch(this.$toast.catch);
-		},
-	},
 	beforeDestroy() {
 		// @see https://github.com/ajaxorg/ace/issues/5099
-		console.warn('TODO: ACE does not import properly with Webpack')
+		// TODO: ACE does not import properly with Webpack
 		return;
 
 		this.editor.destroy();
 		this.editor.container.remove();
 	},
+	created() {
+		this.$debug = $debug;
+	},
 	mounted() {
-
-
-		this.$watch('data', (newVal, oldVal)=> {
-			$debug('data', newVal, oldVal);
-			this.formData = JSON.stringify(this.data, null, 2);
+		this.$watch('data', ()=> {
+			//$debug('$watch.data', this.data);
+			if (this.$props.convert && this.$props.syntax == 'json') {
+				this.formData = JSON.stringify(this.data, null, 2);
+			} else {
+				this.formData = this.data;
+			}
 		}, {deep: true, immediate: true});
+
+		this.$watch('formData', ()=> {
+			//$debug('$watch.formData', this.formData);
+			try {
+				if (this.$props.convert && this.$props.syntax == 'json') {
+					this.data = JSON.parse(this.formData);
+				} else {
+					this.data = this.formData;
+				}
+			} catch(e) {
+				console.warn('Invalid syntax', e); // Silently fail
+			}
+		});
 
 
 		// @see https://github.com/ajaxorg/ace/issues/5099
-		console.warn('TODO: ACE does not import properly with Webpack')
+		// TODO: ACE does not import properly with Webpack
 		return;
 
 		$debug('ace', ace);
@@ -120,7 +131,7 @@ export default app.mgComponent('mgCode', {
 		}, {deep: true, immediate: true});
 	},
 	/*
-	// TODO: Revert to this pattern when ace works again
+	// TODO: ACE does not import properly with Webpack
 	render(h) {
 		return h('div', {
 			attrs: {
@@ -137,9 +148,19 @@ export default app.mgComponent('mgCode', {
 	<div class="mg-code">
 		<textarea
 			:style="`height: ${height}`"
-			:value="formData"
-			@input="handleChange"
+			v-model="formData"
 		/>
+
+		<div v-if="$debug.$enabled" class="card">
+			<div class="card-header">
+				Raw mgCode data
+				<i class="float-right fas fa-debug fa-lg" v-tooltip="'Only visible to users with the Debug permission'"/>
+			</div>
+			<div class="card-body">
+				<pre>{{$data}}</pre>
+				<pre>{{$props}}</pre>
+			</div>
+		</div>
 	</div>
 </template>
 

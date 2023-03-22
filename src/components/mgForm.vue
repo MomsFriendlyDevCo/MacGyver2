@@ -1,6 +1,6 @@
 <script lang="js">
-//import Debug from '@doop/debug';
-//const $debug = Debug('mgForm').enable(false);
+import Debug from '@doop/debug';
+const $debug = Debug('mgForm').enable(true);
 
 import _ from 'lodash';
 
@@ -129,7 +129,6 @@ export default app.component('mgForm', {
 		assignDefaults() {
 			if (!this.spec) return;
 			_.defaultsDeep(this.formData, this.getPrototype());
-			// TODO: Does not send "changeItem" for each element. Should it?
 			this.$emit('change', this.formData);
 		},
 

@@ -54,7 +54,7 @@ export default app.component('mgFormEditor', {
 				return [
 					{
 						type: 'mgButton',
-						action: "setMode()",
+						action: "setMode('collapsed')", // FIXME: For some reason when not sending 'collapsed' the default did not apply
 						class: 'btn btn-primary text-white px-2',
 						icon: 'fa fa-mouse-pointer fa-fw',
 						showTitle: false,
@@ -62,6 +62,7 @@ export default app.component('mgFormEditor', {
 						tooltip: 'Select widgets to edit',
 						//tooltip: "{content: 'Select widgets to edit', placement: 'left'}",
 					},
+					/*
 					{
 						type: 'mgButton',
 						action: "setMode('toc')",
@@ -71,6 +72,7 @@ export default app.component('mgFormEditor', {
 						tooltip: 'Select widgets to edit',
 						//tooltip: {content: 'Select widgets to edit', placement: 'left'},
 					},
+					*/
 					...(this.$prompt?.macgyver ? [{ // Include JSON editing if $prompt.macgyver() is available
 						type: 'mgButton',
 						action: "rawEdit()",
@@ -80,6 +82,7 @@ export default app.component('mgFormEditor', {
 						tooltip: 'Edit the form contents as JSON',
 						//tooltip: {content: 'Edit the form contents as JSON', placement: 'left'},
 					}] : []),
+					/*
 					{
 						type: 'mgButton',
 						action: "setMode('adding')",
@@ -89,12 +92,22 @@ export default app.component('mgFormEditor', {
 						tooltip: 'Add a new widget',
 						//tooltip: {content: 'Add a new widget', placement: 'left'},
 					},
+					*/
 				];
 			},
 		},
 	},
+	computed: {
+		wrappedConfig() {
+			return {
+				type: 'mgContainer',
+				layout: 'card', // NOTE: Only "card" layout has mgContainer.click, mgContainer.mouseEnter, mgContainer.mouseLeave events attached
+				showTitles: true,
+				items: (_.isArray(this.$props.config)) ? this.$props.config : [this.$props.config],
+			};
+		},
+	},
 	mounted() {
-		$debug('$refs', this.$refs);
 		/*
 		// Potential for highlighting components within nested mgContainer
 		this.$refs.form.$on('mgComponent.click', (component, e) => {
@@ -156,6 +169,7 @@ export default app.component('mgFormEditor', {
 		* @param {boolean} [clearHighlight=true] Also attempt to clear out any highlight and reset the aside panes
 		*/
 		setMode(mode = 'collapsed', clearHighlight = true) {
+			$debug('setMode', mode, clearHighlight);
 			// Deselect the existing item (if we have one)
 			if (this.editing && clearHighlight) {
 				this.setComponentHighlight(this.editing, []);
@@ -188,6 +202,7 @@ export default app.component('mgFormEditor', {
 		*/
 		setComponentHighlight(component, classes) {
 			if (!_.isArray(classes)) throw new Error('setComponentHighlight must be passed an array');
+			//$debug('setComponentHighlight', component, classes);
 
 			var container = false;
 			component.$emit.up('mgIdentify', component => {
@@ -208,7 +223,7 @@ export default app.component('mgFormEditor', {
 		* @param {VueComponent|string} component Either the VueComponent to edit or the specPath of the widget to edit
 		*/
 		editWidget(component) {
-			var component; // The Vue component from the widget path
+			$debug('editWidget', component);
 			if (!_.isObject(component) && !_.isString(component)) throw new Error('editWidget requires either a specPath or VueComponent');
 			if (_.isObject(component) && !component._uid) throw new Error('editWidget() requires a valid VueComponent object (or specPath string)');
 
@@ -280,7 +295,14 @@ export default app.component('mgFormEditor', {
 		* @emits changeItem Emitted as `{path, value}` for a single item mutation
 		*/
 		mutatePath(path, value) {
-			console.log('mutatePath', path, value);
+			// Strip out "mgContainer" from "wrappedConfig"
+			if (_.isArray(this.$props.config)) {
+				path = path.replace('items.', '');
+			} else {
+				path = path.replace('items.0.', '');
+			}
+
+			$debug('mutatePath', path, value);
 			// Only bother cloning the entire object if something is listening to 'change'
 			if (this.$emit.hasListeners('change')) {
 				var configCopy = _.cloneDeep(this.config);
@@ -302,7 +324,7 @@ export default app.component('mgFormEditor', {
 		* @emits changeItem Emitted as `{path, value}` for a single item mutation
 		*/
 		mutateSplice(path, index, remove, ...value) {
-			console.log('mutateSplice', path, index, remove);
+			$debug('mutateSplice', path, index, remove);
 			var configCopy = _.cloneDeep(this.config); // Copy entire object
 			var spliceContents = _.get(configCopy, path); // Extract path from nested object
 			if (!_.isArray(spliceContents)) throw new Error('Refusing to splice a non-array');
@@ -328,7 +350,7 @@ export default app.component('mgFormEditor', {
 		* @returns {Object} The inserted widget object (complete with ID if allocateId is specified)
 		*/
 		insertWidget(widget, options) {
-			console.log('insertWidget', widget, options);
+			$debug('insertWidget', widget, options);
 			var settings = {
 				specPath: undefined,
 				orientation: 'after',
@@ -523,7 +545,7 @@ export default app.component('mgFormEditor', {
 		generateConfigToc() {
 			var genTreeBranch = root =>
 				root.map(widget => ({
-					title: `${widget.type} #${widget.id}`,
+					title: `${widget.type} #${widget.id}`, // FIXME: Relies on "id" existing
 					icon: this.$macgyver.widgets[widget.type].icon,
 					enum: widget.items ? genTreeBranch(widget.items) : undefined,
 				}));
@@ -558,9 +580,6 @@ export default app.component('mgFormEditor', {
 						{
 							type: 'mgChoiceTree',
 							title: 'Layout tree',
-							change: item => {
-								console.log('TREE CLICK', item);
-							},
 							enum: genTreeBranch(
 								[ this.$macgyver.compileSpec(this.$props.config, {clone: false}).spec ]
 							),
@@ -679,7 +698,7 @@ export default app.component('mgFormEditor', {
 		<!-- Display form {{{ -->
 		<mg-form
 			ref="form"
-			:config="$props.config"
+			:config="wrappedConfig"
 			:data="$props.data"
 		/>
 		<!-- }}} -->

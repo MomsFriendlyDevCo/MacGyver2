@@ -1,4 +1,7 @@
 <script lang="js">
+import Debug from '@doop/debug';
+const $debug = Debug('mgContainer').enable(false);
+
 /**
 * MacGyver component loader
 * This is a meta component that loads other dynamic components as an array

@@ -1,6 +1,6 @@
 <script lang="js">
-//import Debug from '@doop/debug';
-//const $debug = Debug('mgChoiceTree').enable(false);
+import Debug from '@doop/debug';
+const $debug = Debug('mgChoiceTree').enable(true);
 
 import _ from 'lodash';
 
@@ -45,21 +45,19 @@ export default app.mgComponent('mgChoiceTree', {
 	},
 	methods: {
 		select(item) {
-			if (this.$props.collapsable && !item.isLeaf && !item.open) { // Item is closed - user probably wants it open
-				console.log('Toggle open (node is closed)');
+			$debug('select', this.$props, item);
+			if (this.$props.collapsable && !item.isLeaf) { // Item is not a leaf - user probably wants to toggle it's open state
+				$debug('Toggle open state');
 				item.isOpen = !item.isOpen;
-			} else if ((item.isLeaf || this.$props.selectBranches) && item.active != item.id) { // Item is selectable but not selected - user probably wants it selected
-				if (!this.$props.required && this.data == item.id) {
-					console.log('Deselect');
+			} else if (item.isLeaf || this.$props.selectBranches) { // Item is a selectable leaf or branch
+				if (!this.$props.required && this.data == item.id) { // FIXME: Relies on "id" existing
+					$debug('Deselect');
 					this.data = undefined;
 				} else {
-					console.log('Select');
+					$debug('Select');
 					this.data = item.id;
-					console.log('DATA', this.data);
+					$debug('DATA', this.data);
 				}
-			} else if (this.$props.collapsable && !item.isLeaf) { // No idea, but item is not a leaf, maybe the user wants to toggle it?
-				console.log('Toggle open');
-				item.open = !item.isOpen;
 			} else { // Give up
 				console.warn('FIXME: No idea what the user wants to do when clicking on item', item);
 			}

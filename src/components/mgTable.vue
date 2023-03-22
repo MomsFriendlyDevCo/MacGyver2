@@ -39,7 +39,7 @@ export default app.mgComponent('mgTable', {
 		showTitle: {type: 'mgToggle', default: false, title: 'Show Title'},
 	},
 	created() {
-		$debug().enable(false);
+		this.$debug = $debug;
 	},
 	mounted() {
 		this.$watch('$props.url', ()=> {
@@ -168,25 +168,16 @@ export default app.mgComponent('mgTable', {
 			</tbody>
 		</table>
 
-		<div v-if="$debugging" class="card">
+		<div v-if="$debug.$enabled" class="card">
 			<div class="card-header">
-				Raw data
+				Raw mgTable data
 				<i class="float-right fas fa-debug fa-lg" v-tooltip="'Only visible to users with the Debug permission'"/>
 			</div>
 			<div class="card-body">
 				<pre>{{$data}}</pre>
-			</div>
-		</div>
-
-		<!--div v-if="$debugging" class="card">
-			<div class="card-header">
-				Raw properties
-				<i class="float-right fas fa-debug fa-lg" v-tooltip="'Only visible to users with the Debug permission'"/>
-			</div>
-			<div class="card-body">
 				<pre>{{$props}}</pre>
 			</div>
-		</div-->
+		</div>
 	</div>
 </template>
 
