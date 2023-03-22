@@ -60,6 +60,7 @@ export default app.mgComponent('mgContainer', {
 			],
 		},
 
+		// TODO: Simply make the component responsible an mgFormEditor? Doesn't exist...
 		items: {type: 'mgAlert', vueType: 'array', text: 'Use the editor to define child widgets'}, // Child items
 	},
 	childProps: {
