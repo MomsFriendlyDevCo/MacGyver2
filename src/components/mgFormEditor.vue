@@ -54,7 +54,7 @@ export default app.component('mgFormEditor', {
 				return [
 					{
 						type: 'mgButton',
-						action: "setMode('collapsed')", // FIXME: For some reason when not sending 'collapsed' the default did not apply
+						action: "setMode()",
 						class: 'btn btn-primary text-white px-2',
 						icon: 'fa fa-mouse-pointer fa-fw',
 						showTitle: false,
@@ -147,17 +147,24 @@ export default app.component('mgFormEditor', {
 		this.$refs.form.$on('mgContainer.click', (container, specPath, componentIndex, e) => {
 			e.stopPropagation();
 			e.preventDefault();
+			var component = this.$refs.form.getComponentBySpecPath(specPath);
+			if (!component.editable) return;
+
 			this.editWidget(specPath);
 		});
 
 		this.$refs.form.$on('mgContainer.mouseEnter', (container, specPath, componentIndex, e) => {
 			var component = this.$refs.form.getComponentBySpecPath(specPath);
+			if (!component.editable) return;
+
 			var componentIndex = container.findChildIndex(component);
 			container.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).concat(['editHover']));
 		});
 
 		this.$refs.form.$on('mgContainer.mouseLeave', (container, specPath, componentIndex, e) => {
 			var component = this.$refs.form.getComponentBySpecPath(specPath);
+			if (!component.editable) return;
+
 			var componentIndex = container.findChildIndex(component);
 			container.$set(container.highlights, componentIndex, (container.highlights[componentIndex] || []).filter(c => c != 'editHover'));
 		});
@@ -256,7 +263,7 @@ export default app.component('mgFormEditor', {
 								rowClass: 'aside-actions',
 								items: [
 									{type: 'mgButton', action: 'deleteWidget', class: 'btn btn-link btn-link-danger btn-xs', icon: 'fas fa-trash', tooltip: 'Delete this widget'},
-									{type: 'mgButton', action: 'setMode', text: '', class: 'btn btn-link btn-xs', icon: 'far fa-times'},
+									{type: 'mgButton', action: 'setMode', text: '', class: 'btn btn-link btn-xs', icon: 'far fa-times'}, // FIXME: UX: Unintuitive when placed right next to delete button
 								],
 							},
 						],
@@ -267,7 +274,7 @@ export default app.component('mgFormEditor', {
 						formClass: 'titles-above',
 						rowClass: 'aside-body',
 						showTitle: false,
-						items: _.map(widget.props, (v, k) => _.set(v, 'id', k)),
+						items: _.map(widget.props, (v, k) => _.set(v, 'id', k)), // FIXME: Not interested in all property types?
 					},
 				]);
 				$debug('Set editConfig', this.editConfig);

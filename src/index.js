@@ -169,6 +169,7 @@ export default {
 					// FIXME: Having a `change` property conflicts with event handlers called `change`.
 					change: {type: Function},
 					value: {},
+					editable: {type: Boolean, default: true}, // Allows disabling mgFormEditor features and having a custom component take-over with bespoke handling
 					..._.mapValues(component.props || {}, rewriteProp), // Rewrite MacGyver props into Vue compatible props
 				},
 				methods: {
