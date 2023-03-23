@@ -1,6 +1,6 @@
 <script lang="js">
 import Debug from '@doop/debug';
-const $debug = Debug('mgWysiwyg').enable(false);
+const $debug = Debug('mgWysiwyg').enable(true);
 
 import tinymce from 'tinymce';
 
@@ -11,13 +11,13 @@ import 'tinymce/models/dom';
 
 import 'tinymce/skins/ui/oxide/skin.css';
 
-//import 'tinymce/plugins/advlist';
-//import 'tinymce/plugins/code'; // FIXME: Not picking up changes made in editor view?
-//import 'tinymce/plugins/emoticons';
-//import 'tinymce/plugins/emoticons/js/emojis';
-//import 'tinymce/plugins/link';
-//import 'tinymce/plugins/lists';
-//import 'tinymce/plugins/table';
+import 'tinymce/plugins/advlist';
+import 'tinymce/plugins/code'; // FIXME: Not picking up changes made in editor view?
+import 'tinymce/plugins/emoticons';
+import 'tinymce/plugins/emoticons/js/emojis';
+import 'tinymce/plugins/link';
+import 'tinymce/plugins/lists';
+import 'tinymce/plugins/table';
 
 // import './plugins/checklist/plugin';
 // import './plugins/powerpaste/plugin';
@@ -63,21 +63,22 @@ export default app.mgComponent('mgWysiwyg', {
 			resize: 'both',
 
 			menubar: false,
-			//plugins: 'advlist code emoticons link lists table', // TinyMCE believes it is being told to load "rtc" plugin @see https://github.com/tinymce/tinymce/issues/8582
-			//plugins: ['advlist', 'code', 'emoticons', 'link', 'lists', 'table'],
-			//toolbar: 'undo redo | bold italic forecolor backcolor | bullist numlist checklist table | link emoticons | code',
-			plugins: [],
-			toolbar: '',
+			plugins: ['advlist', 'code', 'emoticons', 'link', 'lists', 'table'],
+			toolbar: 'undo redo | bold italic forecolor backcolor | bullist numlist checklist table | link emoticons | code',
+			model: 'dom', // FIXME: Forcing "dom" because non-existant RTC "Premium plugin" getting in the way
 
 			// Configuration required for local self-install
 			skin: false,
 			content_css: false,
 			content_style: contentUiSkinCss.toString() + '\n' + contentCss.toString(),
 
-			promotion: false, // Oh yeah we really want adverts!
+			//promotion: false, // Oh yeah we really want adverts!
 
 			// Bound to "change keyup" events as per https://github.com/tinymce/tinymce-vue/blob/b41c2a47eb8d9629eb01a41d6c6c633651f2d078/src/main/ts/Utils.ts#L115-L119
-			init_instance_callback: editor => editor.on('change keyup', e => this.data = editor.getContent({ format: this.syntax })),
+			init_instance_callback: editor => {
+				$debug('hasRTC', editor.hasPlugin('rtc'));
+				editor.on('change keyup', e => this.data = editor.getContent({ format: this.syntax }))
+			},
 		});
 
 		// Prevent Bootstrap dialog from blocking focusin
