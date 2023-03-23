@@ -64,8 +64,10 @@ export default app.mgComponent('mgWysiwyg', {
 
 			menubar: false,
 			//plugins: 'advlist code emoticons link lists table', // TinyMCE believes it is being told to load "rtc" plugin @see https://github.com/tinymce/tinymce/issues/8582
-			plugins: ['advlist', 'code', 'emoticons', 'link', 'lists', 'table'],
-			toolbar: 'undo redo | bold italic forecolor backcolor | bullist numlist checklist table | link emoticons | code',
+			//plugins: ['advlist', 'code', 'emoticons', 'link', 'lists', 'table'],
+			//toolbar: 'undo redo | bold italic forecolor backcolor | bullist numlist checklist table | link emoticons | code',
+			plugins: [],
+			toolbar: '',
 
 			// Configuration required for local self-install
 			skin: false,
