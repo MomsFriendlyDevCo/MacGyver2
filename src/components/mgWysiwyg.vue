@@ -2,12 +2,15 @@
 import Debug from '@doop/debug';
 const $debug = Debug('mgWysiwyg').enable(false);
 
+// Vendor-locked component requiring CDN quota developed by parasites.
+//import Editor from '@tinymce/tinymce-vue';
+
 import tinymce from 'tinymce';
 
 import 'tinymce/icons/default';
 
 import 'tinymce/themes/silver';
-import 'tinymce/models/dom';
+//import 'tinymce/models/dom'; // Needed for v6
 
 import 'tinymce/skins/ui/oxide/skin.css';
 
@@ -19,12 +22,7 @@ import 'tinymce/plugins/link';
 import 'tinymce/plugins/lists';
 import 'tinymce/plugins/table';
 
-// import './plugins/checklist/plugin';
-// import './plugins/powerpaste/plugin';
-// import './plugins/powerpaste/js/wordimport';
-
 import contentUiSkinCss from 'tinymce/skins/ui/oxide/content.css';
-
 import contentCss from 'tinymce/skins/content/default/content.css';
 
 export default app.mgComponent('mgWysiwyg', {
@@ -65,23 +63,16 @@ export default app.mgComponent('mgWysiwyg', {
 			menubar: false,
 			plugins: ['advlist', 'code', 'emoticons', 'link', 'lists', 'table'],
 			toolbar: 'undo redo | bold italic forecolor backcolor | bullist numlist checklist table | link emoticons | code',
-			model: 'dom', // FIXME: Forcing "dom" because non-existant RTC "Premium plugin" getting in the way
 
 			// Configuration required for local self-install
 			skin: false,
 			content_css: false,
 			content_style: contentUiSkinCss.toString() + '\n' + contentCss.toString(),
 
-			//promotion: false, // Oh yeah we really want adverts!
+			promotion: false, // Oh yeah we really want adverts!
 
 			// Bound to "change keyup" events as per https://github.com/tinymce/tinymce-vue/blob/b41c2a47eb8d9629eb01a41d6c6c633651f2d078/src/main/ts/Utils.ts#L115-L119
-			init_instance_callback: editor => {
-				console.log('hasRTC', editor.hasPlugin('rtc'));
-				editor.on('change keyup', e => {
-					console.log('hasRTC', editor.hasPlugin('rtc'));
-					this.data = editor.getContent({ format: this.syntax })
-				})
-			},
+			init_instance_callback: editor => editor.on('change keyup', e => this.data = editor.getContent({ format: this.syntax })),
 		});
 
 		// Prevent Bootstrap dialog from blocking focusin
@@ -101,6 +92,18 @@ export default app.mgComponent('mgWysiwyg', {
 
 <template>
 	<div class="mg-wysiwyg">
+		<!--
+		<editor
+			:init="config"
+			:disabled="disabled"
+			:placeholder="placeholder"
+			:plugins="config.plugins"
+			:toolbar="config.toolbar"
+			:output-format="syntax"
+			v-model="data"
+		/>
+		-->
+
 		<textarea
 			:id="`mg-wysiwyg-${_uid}`"
 			:value="data"
