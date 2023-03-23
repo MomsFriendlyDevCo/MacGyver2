@@ -1,6 +1,6 @@
 <script lang="js">
 import Debug from '@doop/debug';
-const $debug = Debug('mgWysiwyg').enable(true);
+const $debug = Debug('mgWysiwyg').enable(false);
 
 import tinymce from 'tinymce';
 
@@ -76,8 +76,11 @@ export default app.mgComponent('mgWysiwyg', {
 
 			// Bound to "change keyup" events as per https://github.com/tinymce/tinymce-vue/blob/b41c2a47eb8d9629eb01a41d6c6c633651f2d078/src/main/ts/Utils.ts#L115-L119
 			init_instance_callback: editor => {
-				$debug('hasRTC', editor.hasPlugin('rtc'));
-				editor.on('change keyup', e => this.data = editor.getContent({ format: this.syntax }))
+				console.log('hasRTC', editor.hasPlugin('rtc'));
+				editor.on('change keyup', e => {
+					console.log('hasRTC', editor.hasPlugin('rtc'));
+					this.data = editor.getContent({ format: this.syntax })
+				})
 			},
 		});
 
