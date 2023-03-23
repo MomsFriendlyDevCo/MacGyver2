@@ -9,10 +9,8 @@ export default app.mgComponent('mgHtml', {
 		category: 'General Decoration',
 	},
 	props: {
-		// TODO: Refactor "text" to "html" or "contents"
-		// FIXME: Replace with "mgWysiwyg" once it is working again
-		//text: {type: 'mgWysiwyg', syntax: 'html'},
-		text: {type: 'mgCode', convert: false, syntax: 'html'},
+		// TODO: Refactor "text" to "html" or "contents"? Some other components use "text"...
+		text: {type: 'mgWysiwyg', syntax: 'html'},
 	},
 	created() {
 		this.$debug = $debug;
