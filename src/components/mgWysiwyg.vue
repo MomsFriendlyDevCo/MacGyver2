@@ -63,7 +63,8 @@ export default app.mgComponent('mgWysiwyg', {
 			resize: 'both',
 
 			menubar: false,
-			plugins: 'advlist code emoticons link lists table',
+			//plugins: 'advlist code emoticons link lists table',
+			plugins: ['advlist', 'code', 'emoticons', 'link', 'lists', 'table'],
 			toolbar: 'undo redo | bold italic forecolor backcolor | bullist numlist checklist table | link emoticons | code',
 
 			// Configuration required for local self-install
