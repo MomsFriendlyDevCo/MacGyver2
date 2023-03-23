@@ -11,13 +11,13 @@ import 'tinymce/models/dom';
 
 import 'tinymce/skins/ui/oxide/skin.css';
 
-import 'tinymce/plugins/advlist';
-import 'tinymce/plugins/code'; // FIXME: Not picking up changes made in editor view?
-import 'tinymce/plugins/emoticons';
-import 'tinymce/plugins/emoticons/js/emojis';
-import 'tinymce/plugins/link';
-import 'tinymce/plugins/lists';
-import 'tinymce/plugins/table';
+//import 'tinymce/plugins/advlist';
+//import 'tinymce/plugins/code'; // FIXME: Not picking up changes made in editor view?
+//import 'tinymce/plugins/emoticons';
+//import 'tinymce/plugins/emoticons/js/emojis';
+//import 'tinymce/plugins/link';
+//import 'tinymce/plugins/lists';
+//import 'tinymce/plugins/table';
 
 // import './plugins/checklist/plugin';
 // import './plugins/powerpaste/plugin';
