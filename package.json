@@ -1,6 +1,6 @@
 {
   "name": "@momsfriendlydevco/macgyver",
-  "version": "2.0.13",
+  "version": "2.0.14",
   "description": "Dynamic form widgets for Vue",
   "main": "dist/main.js",
   "repository": {
