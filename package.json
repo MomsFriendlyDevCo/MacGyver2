@@ -32,9 +32,9 @@
     "jquery": "^3.6.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.3",
+    "tinymce": "^6.4.0",
     "vue-input-facade": "^1.1.5",
-    "vue-select": "^3.11.2",
-    "vue2-editor": "^2.10.3"
+    "vue-select": "^3.11.2"
   },
   "devDependencies": {
     "@babel/core": "^7.18.5",
