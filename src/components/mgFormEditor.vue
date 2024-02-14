@@ -308,14 +308,18 @@ export default app.component('mgFormEditor', {
 		* @emits changeItem Emitted as `{path, value}` for a single item mutation
 		*/
 		mutatePath(path, value) {
+			$debug('mutatePath', path, value);
+
+			/*
+			// FIXME: This was taking out meaningful specPath information...
 			// Strip out "mgContainer" from "wrappedConfig"
 			if (_.isArray(this.$props.config)) {
 				path = path.replace('items.', '');
 			} else {
 				path = path.replace('items.0.', '');
 			}
+			*/
 
-			$debug('mutatePath', path, value);
 			// Only bother cloning the entire object if something is listening to 'change'
 			if (this.$emit.hasListeners('change')) {
 				var configCopy = _.cloneDeep(this.config);
