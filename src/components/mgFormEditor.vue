@@ -3,7 +3,7 @@ import Debug from '@doop/debug';
 const $debug = Debug('mgFormEditor').enable(true);
 
 import _ from 'lodash';
-import './mgFormEditorControls';
+import mgFormEditorControls from './mgFormEditorControls';
 
 /**
 * mg-form-editor - Drag-and-drop form designer for MacGyver
@@ -25,6 +25,9 @@ export default app.component('mgFormEditor', {
 	provide() { return {
 		$mgFormEditor: this,
 	}},
+	components: {
+		mgFormEditorControls,
+	},
 	data() { return {
 		mode: 'collapsed', // ENUM: collapsed, toc, editing, adding
 		id: this.$macgyver.nextId(), // ID of the editing form item
@@ -40,7 +43,7 @@ export default app.component('mgFormEditor', {
 	}},
 	props: {
 		// FIXME: Does not like array type specs.
-		config: [Object, Array], // Can be a single object, array of objects or shorthand style
+		config: { type: [Object, Array], required: true }, // Can be a single object, array of objects or shorthand style
 		data: Object,
 		asideClassActive: {type: String, default: 'mgfe-aside aside-right open'},
 		asideClassInactive: {type: String, default: 'mgfe-aside aside-right'},
@@ -259,7 +262,7 @@ export default app.component('mgFormEditor', {
 						rowClass: 'aside-header',
 						showTitle: false,
 						items: [
-							{id: 'metaIcon', type: 'mgIcon'},
+							{id: 'metaIcon', type: 'mgIcon'}, // FIXME: Clickable but does nothing?
 							{id: 'id', type: 'mgText', placeholder: 'No ID'},
 							{
 								type: 'mgContainer',

@@ -1,8 +1,10 @@
 <script lang="js">
 export default app.component('mgFormEditorControls', {
-	inject: ['$mgFormEditor'],
+	inject: {
+		$mgFormEditor: {from: '$mgFormEditor', default: false},
+	},
 	props: {
-		config: {type: Object, required: true},
+		config: { type: [Object, Array], required: true }, // Can be a single object, array of objects or shorthand style
 	},
 });
 </script>
