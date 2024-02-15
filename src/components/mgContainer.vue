@@ -79,6 +79,11 @@ export default app.mgComponent('mgContainer', {
 		highlights: {}, // Lookup of extra classes to add to widgets, each key is the array offset of the widget within this container, the value is an array of classes to add
 		localData: {}, // Lookup of immediate child data values, used when `$props.layout == 'formFloating'`
 	}},
+	computed: {
+		shownWidgets() {
+			return this.$props.items.filter(d => (d?.show === true));
+		},
+	},
 	mounted() {
 		if (this.$props.collapsable) {
 			var $card = $(this.$el).find('.card').first();
@@ -152,9 +157,8 @@ export default app.mgComponent('mgContainer', {
 		:class="$props.formClass"
 	>
 		<div
-			v-for="(widget, widgetIndex) in $props.items"
+			v-for="(widget, widgetIndex) in shownWidgets"
 			:key="widget.id"
-			v-if="widget.show"
 			class="form-group row mg-component"
 			:class="[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])"
 		>
@@ -192,9 +196,8 @@ export default app.mgComponent('mgContainer', {
 			</div>
 			<div class="card-body">
 				<div
-					v-for="(widget, widgetIndex) in $props.items"
+					v-for="(widget, widgetIndex) in shownWidgets"
 					:key="widget.id"
-					v-if="widget.show"
 					class="form-group row mg-component"
 					:class="[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])"
 					@click="componentEvent('mgContainer.click', widget.$specPath, widgetIndex, $event)"
@@ -224,9 +227,8 @@ export default app.mgComponent('mgContainer', {
 	<!-- Layout: formFloating {{{ -->
 	<div v-else-if="$props.layout == 'formFloating'">
 		<div
-			v-for="(widget, widgetIndex) in $props.items"
+			v-for="(widget, widgetIndex) in shownWidgets"
 			:key="widget.id"
-			v-if="widget.show"
 			class="form-group mgContainer-formFloating row mg-component"
 			:class="[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])"
 		>
@@ -250,18 +252,16 @@ export default app.mgComponent('mgContainer', {
 			<thead v-if="$props.columnHeaders">
 				<tr>
 					<th
-						v-for="widget in config.items"
+						v-for="widget in shownWidgets"
 						:key="widget.id"
-						v-if="widget.show"
 					>{{widget.title}}</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
 					<td
-						v-for="(widget, widgetIndex) in $props.items"
+						v-for="(widget, widgetIndex) in shownWidgets"
 						:key="widget.id"
-						v-if="widget.show"
 						class="mg-component-wrapper"
 						:class="[widget.mgValidation == 'error' ? 'has-error' : '', widget.rowClass].concat(highlights[widgetIndex] || [])"
 					>
